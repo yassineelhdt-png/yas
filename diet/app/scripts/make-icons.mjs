@@ -1,9 +1,10 @@
 // Génère les icônes (app web embarquée, Windows, Android) à partir de assets/icon.svg.
 // Usage : npm run icons   (les fichiers générés sont versionnés : inutile de relancer à chaque build)
 import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-const p = (rel) => new URL("../" + rel, import.meta.url).pathname;
+const p = (rel) => fileURLToPath(new URL("../" + rel, import.meta.url));
 const svg = readFileSync(p("assets/icon.svg"), "utf8");
 const INK = "#18222F", BG = "#EDF1F5";
 

@@ -1,8 +1,10 @@
 // Prépare l'app Android / PC : diet/mon-suivi.html (source de l'artefact Claude, sans <head>)
 // devient www/index.html, un document complet qui marche hors ligne (polices et icônes locales).
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, rmSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
-const here = (rel) => new URL(rel, import.meta.url).pathname;
+// fileURLToPath (et pas URL.pathname) : chemins valides aussi sous Windows
+const here = (rel) => fileURLToPath(new URL(rel, import.meta.url));
 const src = readFileSync(here("../../mon-suivi.html"), "utf8");
 const www = here("../www/");
 rmSync(www, { recursive: true, force: true });
