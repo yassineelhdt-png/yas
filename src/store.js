@@ -132,7 +132,7 @@ export function saveDay(ds, patch) {
 }
 
 // Réglages qui ne peuvent pas être vides (sinon le planning ne peut pas être calculé)
-const OPTIONAL = new Set(["concoursStart"]);
+const OPTIONAL = new Set(["concoursStart", "endAt"]);
 
 export function saveSettings(patch) {
   const s = { ...state.settings };

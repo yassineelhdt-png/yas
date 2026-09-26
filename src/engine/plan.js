@@ -1,13 +1,19 @@
 // Plan d'un jour et d'une semaine.
 import H from "../data/index.js";
-import { m, hm, dur, addDays, dow, monday, daysBetween } from "./time.js";
+import { m, hm, dur, hdur, addDays, dow, monday, daysBetween } from "./time.js";
 import { withDefaults } from "./settings.js";
 import { SUBJ, evLabel } from "./labels.js";
 import { weekNo, isBlocus, dayEvents, buildHard } from "./events.js";
-import { simulateDay } from "./simulate.js";
+import { fitDay, goHome } from "./fit.js";
 import { rotKey, prepFor, assign, assignGrouped } from "./tasks.js";
 
 const noDay = () => null;
+
+/** Journée simulée et calée sur l'heure de fin ; en semaine, retour de la bibliothèque avant le sport. */
+function runDay(res, S, start, hard, init) {
+  const r = fitDay(start, hard, S, init, res.endAt);
+  return res.dow >= 1 && res.dow <= 5 ? goHome(r, +S.libTravel) : r;
+}
 const freshWeekMin = () => ({ CHIM: 0, PHYS: 0, MATH: 0, BIO: 0 });
 
 /** Partie éthique ce dimanche ? (réglage manuel du jour, sinon 1 dimanche sur N) */
@@ -45,9 +51,11 @@ function planSunday(res, S, day, pre, weekMin) {
     { subj: "CONC", kind: "corr", title: "Correction · partie sciences", detail: "Chaque erreur : pourquoi, notion en cause, règle à retenir → fiche d'erreurs", min: 150 },
     { subj: "CONC", kind: "remed", title: "Remédiation ciblée", detail: "Revoir la théorie des notions les plus ratées, refaire les questions fausses", min: 999 }
   ];
-  const r = simulateDay(t, [], S, { studied: did, lunch: true, streak: +S.session, sinceBig: did - 180 });
+  const r = runDay(res, S, t, [], { studied: did, lunch: true, streak: +S.session, sinceBig: did - 180 });
   res.items = [...pre, ...preItems, ...r.items];
   res.end = r.end;
+  res.workEnd = r.workEnd;
+  res.fit = r.fit;
   finish(res, S, queue, weekMin);
   res.backlogOut = [];
   return res;
@@ -116,8 +124,11 @@ function planOne(ds, S, getDay, backlog, weekMin) {
   const w = dow(ds);
   const wake = m(day.wake || S.wake);
   const start = day.start ? m(day.start) : wake + +S.prep;
+  // heure de fin : celle du jour, sinon celle des réglages (vide = dès que l'objectif est atteint)
+  const endStr = day.end || S.endAt;
   const res = {
     date: ds, dow: w, week: weekNo(ds), wake, start, startSet: !!day.start,
+    endAt: endStr ? m(endStr) : null, endSet: !!day.end,
     closed: H.closed[ds] || null, blocus: isBlocus(ds), events: [], warnings: []
   };
   const pre = start > wake ? [{ kind: "prep", s: wake, e: start, long: start - wake > +S.prep + 10 }] : [];
@@ -134,7 +145,7 @@ function planOne(ds, S, getDay, backlog, weekMin) {
   const rp = day.replan;
   if (rp && typeof rp.at === "number") {
     // replanification : ce qui précède `at` est figé (passé), la suite est recalculée
-    const full = simulateDay(start, hard, S, {});
+    const full = runDay(res, S, start, hard, {});
     const before = [];
     for (const it of full.items) {
       if (it.s >= rp.at) continue;
@@ -142,19 +153,23 @@ function planOne(ds, S, getDay, backlog, weekMin) {
       if (c.e > rp.at) c.e = rp.at;
       before.push(c);
     }
-    const r = simulateDay(rp.at, hard.filter((h) => h.e > rp.at), S, {
+    const r = runDay(res, S, rp.at, hard.filter((h) => h.e > rp.at), {
       replan: true, studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0
     });
     res.missed = r.missed;
     res.items = [...pre, ...before, { kind: "replan", s: rp.at, e: rp.at, studied: rp.studied || 0 }, ...r.items];
     res.end = r.end;
+    res.workEnd = r.workEnd;
+    res.fit = r.fit;
     res.replanAt = rp.at;
     res.replanStudied = rp.studied || 0;
   } else {
-    const r = simulateDay(start, hard, S, {});
+    const r = runDay(res, S, start, hard, {});
     res.missed = r.missed;
     res.items = [...pre, ...r.items];
     res.end = r.end;
+    res.workEnd = r.workEnd;
+    res.fit = r.fit;
   }
   res.backlogOut = finish(res, S, queue, weekMin);
   return res;
@@ -205,6 +220,19 @@ function finish(res, S, queue, weekMin) {
   res.studyEnd = counted.reduce((a, it) => Math.max(a, it.e), 0);
   res.studyStart = counted.reduce((a, it) => Math.min(a, it.s), 1e9);
 
+  const fit = res.fit;
+  if (fit?.mode === "squeeze") {
+    // seulement ce qui existe dans la journée
+    const b = fit.breaks, parts = [], has = (k) => res.items.some((it) => it.kind === k && !it.past);
+    if ((has("lunch") && b.lunch < +S.lunch) || (has("dinner") && b.dinner < +S.dinner)) parts.push("repas de " + Math.min(b.lunch, b.dinner) + " min");
+    if (has("bigpause") && b.bigPause < +S.bigPause) parts.push("grande pause de " + b.bigPause + " min");
+    if (has("pause") && b.pause < +S.pause) parts.push("pauses de " + b.pause + " min");
+    if (!parts.length) parts.push("pauses raccourcies");
+    res.warnings.push("Pour faire tes " + S.targetH + "h avant " + hm(fit.endAt) + " : " + parts.join(", ") + ".");
+  }
+  if (fit?.mode === "cut") res.warnings.push("Pour finir à " + hm(fit.endAt) + ", tu fais " + hdur(net) + " nettes au lieu de " + S.targetH + "h. Commence plus tôt ou recule l'heure de fin.");
+  if (fit?.mode === "late") res.warnings.push("Tes séances à l'unif finissent après " + hm(fit.endAt) + " : impossible de finir à cette heure-là.");
+  if (fit?.mode === "invalid") res.warnings.push("L'heure de fin (" + hm(fit.endAt) + ") est avant le début : elle est ignorée.");
   if (res.end > 23 * 60) res.warnings.push("La journée finit après 23h. Lève-toi plus tôt demain pour garder tes " + S.sleepH + "h de sommeil.");
   for (const it of res.missed || []) res.warnings.push(evLabel(it) + " (" + hm(it.s0 || it.s) + ") est déjà passé : pas compté.");
   for (const it of res.items) if (it.conflict) res.warnings.push(evLabel(it) + " chevauche une autre séance : vérifie tes présences.");

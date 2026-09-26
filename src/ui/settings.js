@@ -12,6 +12,8 @@ const FORM = [
     ["wake", "Réveil habituel (si tu ne saisis rien)", "time"],
     ["prep", "Préparation après le lever", "min"],
     ["targetH", "Objectif net par jour", "h", { min: 1, max: 14 }],
+    ["endAt", "Heure de fin du programme (vide = dès que l'objectif est atteint)", "time"],
+    ["libTravel", "Retour de la bibliothèque, lun–ven, avant le sport (0 si tu étudies chez toi)", "min"],
     ["sleepH", "Sommeil visé", "h", { min: 4, max: 12 }]
   ]],
   ["Rythme", [

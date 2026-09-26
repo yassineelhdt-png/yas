@@ -3,7 +3,7 @@ import { html, nothing } from "lit-html";
 import { live } from "lit-html/directives/live.js";
 import * as E from "../engine/index.js";
 import { state, S, getDay, saveDay, toast } from "../store.js";
-import { longDate, cv, mainTask } from "./format.js";
+import { longDate, cv, mainTask, shownTasks } from "./format.js";
 import { icons } from "./icons.js";
 
 const PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie" };
@@ -19,9 +19,12 @@ function minorLabel(it, st) {
     case "dinner": return ["Dîner", ""];
     case "sport": return ["Sport " + st.sport + " min + douche", "Dernier truc de la journée"];
     case "travel":
+      if (it.dir === "home") return ["Retour à la maison", "La bibliothèque ferme : sport en rentrant"];
       if (it.dir !== "to") return ["Retour", "Anki sur le téléphone possible (non compté)"];
       return ["Trajet vers Erasme", (it.dest ? it.destLabel + " · " + it.dest : "") + (it.snack ? ". Prends une collation : tu mangeras après les séances" : "") + (it.late ? ". Pars tout de suite" : "")];
-    case "free": return [it.done ? "Libre" : "Transition", it.note || (it.done ? "Ton quota du jour est atteint" : "Range, prépare tes affaires")];
+    case "free":
+      if (it.slack) return ["Temps libre", "De la marge pour finir à l'heure : repos, marche, appel…"];
+      return [it.done ? "Libre" : "Transition", it.note || (it.done ? "Ton quota du jour est atteint" : "Range, prépare tes affaires")];
   }
   return [it.kind, ""];
 }
@@ -71,6 +74,16 @@ const act = {
     const n = Math.ceil(E.nowMin() / 5) * 5;
     saveDay(state.date, { start: E.hm(n), replan: undefined });
     toast("Programme calé sur " + E.hm(n));
+  },
+  end(value) {
+    if (!value) return;
+    saveDay(state.date, { end: value });
+    toast("Fin calée sur " + value);
+  },
+  endAuto() {
+    saveDay(state.date, { end: undefined });
+    const st = S();
+    toast(st.endAt ? "Fin automatique : " + st.endAt : "Fin automatique : dès que l'objectif est atteint");
   },
   startAuto() {
     saveDay(state.date, { start: undefined });
@@ -177,12 +190,16 @@ function header(res, st, ctx) {
         <div class="times">
           <label><span class="lbl">Levé à</span><input type="time" step="300" .value=${live(E.hm(res.wake))} @change=${(e) => act.wake(e.target.value)}></label>
           <label><span class="lbl">Je commence à</span><input type="time" step="300" .value=${live(E.hm(res.start))} @change=${(e) => act.start(e.target.value)}></label>
-          <span class="auto">${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>Remettre en auto</button>` : "auto : lever + " + st.prep + " min"}</span>
+          <label><span class="lbl">Je finis à</span><input type="time" step="300" .value=${live(E.hm(res.endAt ?? res.workEnd))} @change=${(e) => act.end(e.target.value)}></label>
+          <span class="auto">
+            <span>Début ${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min"}</span>
+            <span>Fin ${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
+          </span>
         </div>
         ${isToday ? html`<div class="wbtns"><button class="btn primary" @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}>Je commence maintenant</button></div>` : nothing}
         <div class="facts">
           <div class="fact"><span class="lbl">Début</span><b>${res.studyStart < 1e9 ? E.hm(res.studyStart) : "—"}</b></div>
-          <div class="fact"><span class="lbl">Fin</span><b>${E.hm(res.end)}</b></div>
+          <div class="fact"><span class="lbl">Fin</span><b>${E.hm(res.workEnd)}</b></div>
           <div class="fact"><span class="lbl">Net</span><b>${E.hdur(res.net)}</b></div>
           <div class="fact"><span class="lbl">Coucher</span><b>${E.hm(bed)}</b></div>
         </div>
@@ -234,7 +251,7 @@ function row(it, res, st, ctx, flags) {
         ? html`<div class="where">${pill}<span class="lbl">Local</span><b>${it.room || "non indiqué"}</b></div>${meta.length ? html`<div class="meta">${metaHtml}</div>` : nothing}`
         : pill !== nothing || meta.length ? html`<div class="meta">${pill}${metaHtml}</div>` : nothing}
       ${it.kind === "study" && it.tasks
-        ? html`<ul class="tasks">${it.tasks.map((t) => html`<li style="--c:${cv(t.subj)}"><i></i><span>${t.title}</span><em>${t.min} min</em>${t.detail ? html`<small>${t.detail}</small>` : nothing}</li>`)}</ul>
+        ? html`<ul class="tasks">${shownTasks(it).map((t) => html`<li style="--c:${cv(t.subj)}"><i></i><span>${t.title}</span><em>${t.min} min</em>${t.detail ? html`<small>${t.detail}</small>` : nothing}</li>`)}</ul>
           ${it.note ? html`<div class="note">${it.note}</div>` : nothing}
           ${it.loc === "campus" ? html`<div class="note">Sur le campus : bibliothèque ou salle d'étude</div>` : nothing}`
         : nothing}
@@ -272,8 +289,8 @@ function timeline(res, st, ctx) {
     <div class="tl">
       ${out}
       <div class="endrow">
-        <b>${E.hm(res.end)} · journée terminée</b>
-        <span>${E.hdur(res.net)} nettes. Coucher conseillé vers ${E.hm(ctx.bed)} pour ${st.sleepH}h de sommeil (lever ${E.hm(ctx.nextWake)} demain).</span>
+        <b>${E.hm(res.workEnd)} · programme terminé</b>
+        <span>${E.hdur(res.net)} nettes, puis ${res.items.some((it) => it.dir === "home") ? "retour à la maison et " : ""}sport jusqu'à ${E.hm(res.end)}. Coucher conseillé vers ${E.hm(ctx.bed)} pour ${st.sleepH}h de sommeil (lever ${E.hm(ctx.nextWake)} demain).</span>
       </div>
     </div>`;
 }

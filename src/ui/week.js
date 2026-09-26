@@ -69,7 +69,7 @@ export function weekView(week, nav) {
         <div class="corner"></div>
         ${week.map((r) => html`
           <div class="whead ${r.date === today ? "today" : ""}">
-            <button @click=${() => nav.openDay(r.date)}>${shortDay(r.date)}<small>${E.hm(r.wake)} → ${E.hm(r.end)}</small></button>
+            <button @click=${() => nav.openDay(r.date)}>${shortDay(r.date)}<small>${E.hm(r.studyStart < 1e9 ? r.studyStart : r.start)} → ${E.hm(r.workEnd)}</small></button>
           </div>`)}
         <div class="hours" style="height:${H}px">${hours}</div>
         ${week.map((r) => html`

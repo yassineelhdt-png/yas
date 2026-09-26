@@ -16,6 +16,15 @@ export function methodView() {
       <h1>Comment le plan est construit</h1>
       <p>Tu entres l'heure à laquelle tu t'es levé. Après ${st.prep} min de préparation, l'app remplit la journée jusqu'à ${st.targetH}h d'étude nettes, en calant les séances fixes à leur heure.</p>
 
+      <h2>Heure de fin</h2>
+      <ul>
+        <li>Le programme se termine à ${st.endAt || "l'heure où l'objectif est atteint"}${st.endAt ? " (Réglages → Journée), ou à l'heure que tu écris dans « Je finis à » pour un jour donné" : ""}.</li>
+        <li>S'il y a de la marge, les pauses et les repas s'allongent (pause jusqu'à 30 min, grande pause jusqu'à 1h, repas jusqu'à 1h15) ; au-delà, un créneau « Temps libre » s'ajoute après le dîner.</li>
+        <li>S'il manque du temps (tu commences tard), l'objectif net baisse pour finir à l'heure, et l'app te dit combien d'heures tu fais.</li>
+        <li>Quand le programme finit après 20h, le dîner a lieu pendant le programme.</li>
+        <li>Du lundi au vendredi : retour de la bibliothèque (${st.libTravel} min), puis sport à la maison.</li>
+      </ul>
+
       <h2>Ce qui compte dans les ${st.targetH}h</h2>
       <ul>
         <li>Étude perso, séminaires, exercices, TP, guidance, permanence, appuis : oui.</li>
@@ -26,7 +35,7 @@ export function methodView() {
       <ul>
         <li>Bloc 1 jusqu'au déjeuner (entre 12h et 13h15), bloc 2 jusqu'à une grande pause de ${st.bigPause} min, bloc 3 le soir.</li>
         <li>Sessions de ${st.session} min maximum, ${st.pause} min de pause entre deux.</li>
-        <li>Le sport (${st.sport} min + douche) est toujours la dernière chose de la journée.</li>
+        <li>Le sport (${st.sport} min + douche) est toujours la dernière chose de la journée, après le programme.</li>
         <li>Tu peux choisir l'heure à laquelle tu commences : tout le programme se décale.</li>
       </ul>
 

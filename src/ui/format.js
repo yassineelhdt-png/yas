@@ -30,5 +30,28 @@ const COLORS = {
 /** Couleur CSS d'une matière */
 export const cv = (s) => "var(" + (COLORS[s] || "--c-rev") + ")";
 
+/**
+ * Tâches d'une session telles qu'affichées : les miettes (< 10 min) sont ajoutées à la tâche
+ * voisine (la précédente, sinon la suivante) plutôt que montrées seules.
+ */
+export function shownTasks(it) {
+  const tasks = (it.tasks || []).map((t) => ({ ...t }));
+  if (tasks.length < 2) return tasks;
+  const out = [];
+  let carry = 0; // miettes en tête de session, reportées sur la tâche suivante
+  for (const t of tasks) {
+    if (t.min < 10 && out.length) out[out.length - 1].min += t.min;
+    else if (t.min < 10) carry += t.min;
+    else {
+      t.min += carry;
+      carry = 0;
+      out.push(t);
+    }
+  }
+  if (!out.length) return tasks; // que des miettes : on les garde telles quelles
+  if (carry) out[out.length - 1].min += carry;
+  return out;
+}
+
 /** Tâche principale (la plus longue) d'une session d'étude */
-export const mainTask = (it) => (it.tasks || []).reduce((a, t) => (!a || t.min > a.min ? t : a), null);
+export const mainTask = (it) => shownTasks(it).reduce((a, t) => (!a || t.min > a.min ? t : a), null);

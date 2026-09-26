@@ -9,9 +9,12 @@ const LUNCH_LATE = 795;  // 13:15
 const DIN_PREF = 1140;   // 19:00
 const DIN_LATE = 1230;   // 20:30
 
-export function simulateDay(start, hard, S, init = {}) {
-  const target = +S.targetH * 60;
-  const L = +S.lunch, D = +S.dinner, SP = +S.sport + +S.shower, P = +S.pause, BP = +S.bigPause, SES = +S.session, T = +S.travel;
+// `tune` (facultatif) remplace l'objectif net et la durée des pauses / repas : sert à caler la fin
+// de journée sur une heure précise (voir fitDay dans plan.js).
+export function simulateDay(start, hard, S, init = {}, tune = {}) {
+  const target = tune.target ?? +S.targetH * 60;
+  const L = tune.lunch ?? +S.lunch, D = tune.dinner ?? +S.dinner, P = tune.pause ?? +S.pause, BP = tune.bigPause ?? +S.bigPause;
+  const SP = +S.sport + +S.shower, SES = +S.session, T = +S.travel;
 
   let t = start;
   let studied = init.studied || 0, streak = init.streak || 0, sinceBig = init.sinceBig || 0;
@@ -50,7 +53,8 @@ export function simulateDay(start, hard, S, init = {}) {
   }
   function dinnerAt(selfLeft, nh) {
     if (dinner) return Infinity;
-    if (!nh && selfLeft <= 60) return Infinity; // on termine avant de manger
+    // on termine avant de manger… sauf si la journée doit finir tard (tune.dine) : dîner pendant le programme
+    if (!nh && selfLeft <= 60 && !tune.dine) return Infinity;
     return Math.min(Math.max(DIN_PREF, t + Math.max(0, 90 - sinceBig)), DIN_LATE);
   }
   function meal(kind, len) {
@@ -109,6 +113,8 @@ export function simulateDay(start, hard, S, init = {}) {
     // le sport est toujours le dernier élément de la journée : en cours de journée, une grande pause sépare les blocs
     const nextMeal = Math.min(la, da);
     if (sinceBig >= (lunch ? 180 : 240) && nextMeal - t > 45 && gap >= BP && selfLeft > 30) {
+      // fin de journée tardive : la grande pause du soir est le dîner
+      if (tune.dine && !dinner && t >= 1080 && gap >= 30) { meal("dinner", Math.min(D, gap)); continue; }
       push({ kind: "bigpause", s: t, e: t + BP, loc: loc() });
       t += BP; streak = 0; sinceBig = 0;
       continue;
@@ -146,6 +152,7 @@ export function simulateDay(start, hard, S, init = {}) {
     t += len; studied += len; streak += len; sinceBig += len;
   }
 
+  const workEnd = t; // fin du programme (avant le sport)
   if (!sport) {
     push({ kind: "sport", s: t, e: t + SP });
     t += SP;
@@ -158,5 +165,5 @@ export function simulateDay(start, hard, S, init = {}) {
     if (last && last.kind === "study" && it.kind === "study" && last.e === it.s && last.loc === it.loc && it.e - last.s <= SES) last.e = it.e;
     else merged.push(it);
   }
-  return { items: merged, missed, end: t, studied, lunch, dinner };
+  return { items: merged, missed, end: t, workEnd, studied, lunch, dinner };
 }
