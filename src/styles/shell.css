@@ -1,0 +1,74 @@
+/* ---------- barre du haut ---------- */
+.top {
+  position: sticky; top: 0; z-index: 20;
+  padding: calc(10px + var(--safe-t)) calc(16px + var(--safe-r)) 10px calc(16px + var(--safe-l));
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  backdrop-filter: saturate(1.6) blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.top-in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.brand { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; margin-right: auto; white-space: nowrap; }
+.brand b { font-family: var(--mono); font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: .02em; }
+
+.tabs { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+.tab { display: flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
+.tab .ico { width: 16px; height: 16px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+
+.sync { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.sync i { width: 7px; height: 7px; border-radius: 50%; background: var(--c-break); display: inline-block; }
+.sync[data-s="cloud"] i { background: var(--ok); }
+.sync[data-s="error"] i { background: var(--warn); }
+.sync[data-s="connecting"] i { animation: pulse 1s infinite alternate; }
+@keyframes pulse { to { opacity: .3; } }
+
+/* ---------- contenu ---------- */
+.wrap {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 calc(16px + var(--safe-r)) calc(56px + var(--bottomnav-h) + var(--safe-b)) calc(16px + var(--safe-l));
+  view-transition-name: main;
+}
+
+/* ---------- barre du bas (téléphone) ---------- */
+.bottomnav { display: none; }
+
+@media (max-width: 719px) {
+  :root { --bottomnav-h: 62px; }
+  .tabs { display: none; }
+  .brand b { display: none; }
+  .bottomnav {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    height: calc(var(--bottomnav-h) + var(--safe-b));
+    padding: 0 var(--safe-r) var(--safe-b) var(--safe-l);
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+    -webkit-backdrop-filter: saturate(1.6) blur(14px);
+    backdrop-filter: saturate(1.6) blur(14px);
+    border-top: 1px solid var(--line);
+    view-transition-name: bottomnav;
+  }
+  .btab {
+    display: grid; justify-items: center; align-content: center; gap: 3px;
+    border: 0; background: none; padding: 6px 0 4px;
+    font-size: 11px; font-weight: 600; letter-spacing: .01em;
+    color: var(--muted);
+    transition: color .15s;
+  }
+  .btab .ico { width: 24px; height: 24px; padding: 2px 14px; box-sizing: content-box; border-radius: 999px; transition: background-color .2s var(--ease); }
+  .btab[aria-selected="true"] { color: var(--ink); }
+  .btab[aria-selected="true"] .ico { background: var(--accent-soft); color: var(--accent); }
+}
+
+/* ---------- transitions entre vues ---------- */
+.top { view-transition-name: top; }
+::view-transition-old(main), ::view-transition-new(main) { animation-duration: .2s; animation-timing-function: var(--ease); }
+:root[data-vt="next"]::view-transition-old(main) { animation-name: vt-out-left; }
+:root[data-vt="next"]::view-transition-new(main) { animation-name: vt-in-right; }
+:root[data-vt="prev"]::view-transition-old(main) { animation-name: vt-out-right; }
+:root[data-vt="prev"]::view-transition-new(main) { animation-name: vt-in-left; }
+@keyframes vt-out-left { to { opacity: 0; transform: translateX(-28px); } }
+@keyframes vt-in-right { from { opacity: 0; transform: translateX(28px); } }
+@keyframes vt-out-right { to { opacity: 0; transform: translateX(28px); } }
+@keyframes vt-in-left { from { opacity: 0; transform: translateX(-28px); } }

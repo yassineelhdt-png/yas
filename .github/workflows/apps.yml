@@ -1,0 +1,115 @@
+# Teste le code, fabrique l'APK Android et l'app Windows, puis les publie dans la release « latest ».
+name: Apps
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apps-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_VERSION: 2.0.${{ github.run_number }}
+
+jobs:
+  test:
+    name: Tests + build web
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  android:
+    name: APK Android
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run android:sync
+      - name: Compiler l'APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon -PappVersionCode=${{ github.run_number }} -PappVersionName=${{ env.APP_VERSION }}
+      - run: cp android/app/build/outputs/apk/release/app-release.apk Horaire-9h.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-android
+          path: Horaire-9h.apk
+          if-no-files-found: error
+
+  windows:
+    name: App Windows
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Créer l'installeur et la version portable
+        run: npx electron-builder --win --publish never -c.extraMetadata.version=${{ env.APP_VERSION }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-windows
+          path: release/*.exe
+          if-no-files-found: error
+
+  release:
+    name: Publier la release
+    needs: [android, windows]
+    # seulement pour la branche principale du dépôt (pas pour les PR ni les autres branches)
+    if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: app-*
+          path: out
+          merge-multiple: true
+      - name: Remplacer la release « latest »
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SITE: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          ls -la out
+          cat > notes.md <<EOF
+          ## Installer Horaire 9h
+
+          - **Tablette / téléphone Android** : télécharge \`Horaire-9h.apk\` depuis la tablette, ouvre-le et autorise l'installation (« sources inconnues »). Les mises à jour s'installent par-dessus, sans perdre tes données.
+          - **PC Windows** : \`Horaire-9h-Installation.exe\` (installe l'app avec un raccourci) ou \`Horaire-9h-Portable.exe\` (sans installation). Si Windows affiche « Windows a protégé votre ordinateur » : *Informations complémentaires* → *Exécuter quand même*.
+          - **iPhone** : ouvre ${SITE} dans Safari → Partager → « Sur l'écran d'accueil ».
+
+          Version ${APP_VERSION} · commit ${GITHUB_SHA::7}
+          EOF
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest out/Horaire-9h.apk out/Horaire-9h-Installation.exe out/Horaire-9h-Portable.exe \
+            --target "$GITHUB_SHA" --title "Horaire 9h — version ${APP_VERSION}" --notes-file notes.md --latest

@@ -1,0 +1,70 @@
+{
+  "name": "horaire-9h",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Planning quotidien « 9h nettes » — B1 BIME (ULB Erasme). Web, iPhone (PWA), Android (APK) et Windows.",
+  "author": "Horaire 9h",
+  "homepage": "https://github.com/yassineelhdt-png/yas",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "icons": "node scripts/make-icons.mjs",
+    "android:sync": "vite build && cap sync android",
+    "android:apk": "npm run android:sync && cd android && ./gradlew assembleRelease",
+    "desktop": "vite build && electron .",
+    "desktop:win": "vite build && electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "lit-html": "^3.3.3",
+    "sharp": "^0.35.4",
+    "vite": "^8.3.1",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^5.0.2",
+    "workbox-window": "^7.4.1"
+  },
+  "build": {
+    "appId": "com.yas.horaire9h",
+    "productName": "Horaire 9h",
+    "copyright": "Horaire 9h",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "shortcutName": "Horaire 9h",
+      "artifactName": "Horaire-9h-Installation.${ext}"
+    },
+    "portable": {
+      "artifactName": "Horaire-9h-Portable.${ext}"
+    }
+  }
+}

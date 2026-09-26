@@ -1,0 +1,1291 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Horaire 9h nettes</title>
+<meta name="description" content="Planning quotidien B1 BIME : 9h d'étude nettes, calé sur l'heure de lever.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --surface-2:#F5F7F9; --ink:#111922; --ink-2:#3A4652; --muted:#66727F; --line:#D8DEE4; --line-2:#E6EAEE;
+  --accent:#1A47D6; --accent-ink:#FFFFFF; --accent-soft:#E3E9FB;
+  --ok:#17804A; --warn:#A8660B; --warn-soft:#FBF0DE;
+  --c-chim:#0A8581; --c-phys:#5543D1; --c-math:#B86200; --c-bio:#2C8538; --c-medig:#7A6955;
+  --c-chq2:#03668A; --c-conc:#BF2F4E; --c-rais:#B0407A; --c-eth:#84559B; --c-rev:#3B6897;
+  --c-sport:#D35E28; --c-break:#A3ADB8;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --sans:"IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0D1218; --surface:#151C24; --surface-2:#1A232D; --ink:#E7ECF1; --ink-2:#B9C3CD; --muted:#8793A0; --line:#2A3440; --line-2:#222C37;
+    --accent:#7B9BFF; --accent-ink:#0D1218; --accent-soft:#1E2A4A;
+    --ok:#4CC27F; --warn:#E3A64B; --warn-soft:#33281A;
+    --c-chim:#2FBFB9; --c-phys:#9486FF; --c-math:#EEA23F; --c-bio:#5DC36B; --c-medig:#B9A68F;
+    --c-chq2:#3AB3E0; --c-conc:#F2657F; --c-rais:#E27BB0; --c-eth:#C28FE0; --c-rev:#80A7D8;
+    --c-sport:#FF9460; --c-break:#5C6875;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0D1218; --surface:#151C24; --surface-2:#1A232D; --ink:#E7ECF1; --ink-2:#B9C3CD; --muted:#8793A0; --line:#2A3440; --line-2:#222C37;
+  --accent:#7B9BFF; --accent-ink:#0D1218; --accent-soft:#1E2A4A;
+  --ok:#4CC27F; --warn:#E3A64B; --warn-soft:#33281A;
+  --c-chim:#2FBFB9; --c-phys:#9486FF; --c-math:#EEA23F; --c-bio:#5DC36B; --c-medig:#B9A68F;
+  --c-chq2:#3AB3E0; --c-conc:#F2657F; --c-rais:#E27BB0; --c-eth:#C28FE0; --c-rev:#80A7D8;
+  --c-sport:#FF9460; --c-break:#5C6875;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans);margin:0;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:0 56px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* barre du haut */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:10px 16px}
+.top-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:6px;margin-right:auto}
+.brand b{font-family:var(--mono);font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.02em}
+.tabs{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.tabs button{border:0;background:none;padding:6px 12px;border-radius:999px;font-size:13.5px;font-weight:500;color:var(--ink-2)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--c-break);display:inline-block}
+.sync[data-s="cloud"] i{background:var(--ok)}
+.sync[data-s="error"] i{background:var(--warn)}
+
+/* en-tête du jour */
+.dayhead{display:grid;gap:14px;padding-block:18px 8px}
+.datenav{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap}
+.navbtns{display:flex;gap:8px;align-items:center}
+.datenav h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,5.4vw,38px);line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.nb{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:18px;line-height:1}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink-2)}
+.chip.mode-concours{background:color-mix(in srgb,var(--c-conc) 14%,var(--surface));border-color:color-mix(in srgb,var(--c-conc) 35%,var(--line));color:var(--c-conc)}
+.chip.mode-samedi{background:color-mix(in srgb,var(--c-chq2) 14%,var(--surface));border-color:color-mix(in srgb,var(--c-chq2) 35%,var(--line));color:var(--c-chq2)}
+.chip.mode-conge{background:var(--warn-soft);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,var(--line))}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:none}
+.btn:disabled{opacity:.5;cursor:default}
+
+.wake{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.wake label{display:grid;gap:2px}
+.lbl{font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.wake input[type=time]{font-family:var(--mono);font-size:30px;font-weight:500;border:0;background:none;padding:0;min-width:0;width:auto;max-width:100%}
+.wake .facts{display:flex;flex-wrap:wrap;gap:6px 18px;margin-left:auto}
+.times{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:flex-end}
+.times .auto{font-size:12px;color:var(--muted);padding-bottom:8px}
+.wbtns{display:flex;flex-wrap:wrap;gap:8px}
+.linkbtn{border:0;background:none;color:var(--accent);padding:0;font-size:12.5px;text-decoration:underline;text-underline-offset:2px}
+.where{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-top:6px}
+.where .lbl{font-size:10.5px}
+.where b{font-size:14px;font-weight:600;line-height:1.3}
+.blk small{display:block;opacity:.85;font-family:var(--mono);font-size:9.5px}
+.fact{display:grid;gap:1px}
+.fact b{font-family:var(--mono);font-weight:500;font-size:17px;font-variant-numeric:tabular-nums}
+.meter{grid-column:1/-1;width:100%;display:grid;gap:6px}
+.meter .bar{height:8px;border-radius:99px;background:var(--line-2);overflow:hidden;display:flex}
+.meter .bar span{display:block;height:100%}
+.meter .row1{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2)}
+.blocsum{display:flex;flex-wrap:wrap;gap:6px}
+.blocsum span{font-size:12.5px;padding:3px 9px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2)}
+.blocsum b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+
+.warnbox{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:4px}
+
+/* mise en page jour */
+.daygrid{display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:920px){.daygrid{grid-template-columns:minmax(0,1fr) 330px;align-items:start}.aside{position:sticky;top:78px}}
+
+/* timeline */
+.tl{display:grid}
+.bloc-h{display:flex;align-items:baseline;gap:10px;padding:18px 0 8px 64px;font-family:var(--display);font-weight:600;font-size:17px}
+.bloc-h small{font-family:var(--mono);font-size:12.5px;font-weight:400;color:var(--muted)}
+.row{display:grid;grid-template-columns:52px 6px minmax(0,1fr);gap:0 12px;position:relative}
+.row .tm{font-family:var(--mono);font-size:13px;color:var(--ink-2);padding-top:10px;text-align:right;font-variant-numeric:tabular-nums;display:grid;align-content:start;gap:2px}
+.row .tm .te{color:var(--muted);font-size:11.5px}
+.row .rail{background:var(--c,var(--c-break));border-radius:3px;margin-block:3px;min-height:var(--h,20px)}
+.row .body{padding:8px 0 10px;min-width:0}
+.row.major .body{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-block:3px}
+.row.minor .tm{padding-top:4px;font-size:12px}
+.row.minor .rail{background:repeating-linear-gradient(to bottom,var(--c-break) 0 3px,transparent 3px 6px);width:2px;margin-inline:2px}
+.row.minor.k-sport .rail,.row.minor.k-lunch .rail,.row.minor.k-dinner .rail{background:var(--c);width:6px;margin-inline:0}
+.row.minor .body{padding:3px 0 5px;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:14px;color:var(--ink-2)}
+.row.minor .body b{font-weight:600;color:var(--ink)}
+.row.minor .body small{color:var(--muted);font-size:12.5px}
+.row.k-sport .body b{color:var(--c-sport)}
+.l1{display:flex;align-items:flex-start;gap:10px}
+.ttl{font-weight:600;font-size:15.5px;line-height:1.3;flex:1;min-width:0}
+.meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px}
+.pill{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--c);white-space:nowrap}
+.len{font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap;padding-top:2px}
+.chk{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0}
+.chk svg{width:14px;height:14px;opacity:0}
+.chk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok)}
+.chk[aria-pressed="true"] svg{opacity:1}
+.tasks{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tasks li{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:0 9px;align-items:baseline}
+.tasks li i{width:10px;height:10px;border-radius:3px;background:var(--c);transform:translateY(1px)}
+.tasks li span{font-size:14.5px}
+.tasks li em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tasks li small{grid-column:2/-1;color:var(--muted);font-size:12.5px;line-height:1.35}
+.note{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-radius:6px;padding:4px 8px;margin-top:8px;display:inline-block}
+.row.done .body{opacity:.62}
+.row.done .ttl{text-decoration:line-through;text-decoration-thickness:1px}
+.row.past{opacity:.45}
+.row.now .tm span:first-child{color:var(--accent);font-weight:500}
+.row.now.major .body{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.nowtag{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);border-radius:5px;padding:2px 6px}
+.replan-line{display:flex;align-items:center;gap:10px;padding:14px 0 6px 64px;font-size:13px;color:var(--accent);font-weight:500}
+.replan-line::after{content:"";flex:1;height:1px;background:var(--accent);opacity:.4}
+.endrow{padding:16px 0 0 64px;display:grid;gap:4px}
+.endrow b{font-family:var(--display);font-size:20px;font-weight:700}
+.endrow span{color:var(--muted);font-size:13.5px}
+
+/* panneau latéral */
+.aside{display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.card h2{font-family:var(--display);font-size:17px;font-weight:600;margin:0 0 4px}
+.card p.sub{margin:0 0 10px;color:var(--muted);font-size:13px}
+.ev{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line-2);align-items:center}
+.ev:first-of-type{border-top:0}
+.ev .t{font-size:14px;font-weight:500;display:flex;gap:7px;align-items:baseline;flex-wrap:wrap}
+.ev .t i{width:8px;height:8px;border-radius:2px;background:var(--c);display:inline-block;transform:translateY(-1px)}
+.ev .d{grid-column:1;font-size:12.5px;color:var(--muted)}
+.ev.off .t{color:var(--muted)}
+.sw{position:relative;width:42px;height:24px;border-radius:99px;border:0;background:var(--line);padding:0;grid-row:1/span 2;grid-column:2}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--accent)}
+.sw[aria-checked="true"]::after{transform:translateX(18px)}
+@media (prefers-reduced-motion:reduce){.sw::after{transition:none}}
+.rp{display:grid;gap:10px}
+.rp .f{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.rp input[type=time],.rp input[type=number]{border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:6px 8px;font-family:var(--mono)}
+.rp input[type=number]{width:4.2em}
+.rp label.ck{display:flex;gap:6px;align-items:center;font-size:14px}
+
+/* semaine */
+.weekhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-block:18px 12px}
+.weekhead h1{font-family:var(--display);font-size:clamp(24px,4.6vw,32px);font-weight:700;margin:0;letter-spacing:-.02em;margin-right:auto}
+.wscroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 10px 12px}
+.wgrid{display:grid;grid-template-columns:40px repeat(7,minmax(92px,1fr));gap:0 6px;min-width:720px}
+.whead{font-size:12.5px;font-weight:600;padding:2px 2px 8px;display:grid;gap:1px}
+.whead button{all:unset;cursor:pointer;display:grid;gap:1px;padding:4px 6px;border-radius:8px}
+.whead button:hover,.whead button:focus-visible{background:var(--surface-2)}
+.whead small{font-weight:400;color:var(--muted);font-family:var(--mono);font-size:11px}
+.whead.today button{background:var(--accent-soft)}
+.hours{position:relative}
+.hours span{position:absolute;right:4px;font-family:var(--mono);font-size:10.5px;color:var(--muted);transform:translateY(-50%)}
+.track{position:relative;border-left:1px solid var(--line-2);background-image:linear-gradient(to bottom,var(--line-2) 1px,transparent 1px);background-size:100% var(--hr)}
+.blk{position:absolute;left:3px;right:2px;border-radius:4px;background:color-mix(in srgb,var(--c) 22%,var(--surface));border-left:3px solid var(--c);font-size:10.5px;line-height:1.2;padding:2px 4px;overflow:hidden;color:var(--ink)}
+.blk.fx{background:var(--c);color:var(--surface);border-left-color:var(--c)}
+.blk.brk{background:var(--surface-2);border-left:2px solid var(--line);color:var(--muted)}
+.blk.sp{background:color-mix(in srgb,var(--c-sport) 25%,var(--surface));border-left-color:var(--c-sport)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink-2);padding:10px 2px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:5px;transform:translateY(1px)}
+.totals{display:grid;gap:8px}
+.tot{display:grid;grid-template-columns:120px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:13.5px}
+.tot .b{height:10px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.tot .b span{display:block;height:100%;background:var(--c);border-radius:99px}
+.tot em{font-style:normal;font-family:var(--mono);font-size:12.5px;text-align:right;color:var(--ink-2)}
+.wcards{display:grid;gap:16px;grid-template-columns:minmax(0,1fr);margin-top:16px}
+@media (min-width:820px){.wcards{grid-template-columns:1fr 1fr}}
+
+/* réglages */
+.settings{display:grid;gap:16px;padding-top:18px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:820px){.settings{grid-template-columns:1fr 1fr}}
+.settings h1{grid-column:1/-1;font-family:var(--display);font-size:30px;margin:0;letter-spacing:-.02em}
+fieldset{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:6px 14px 10px;margin:0;min-width:0}
+legend{font-family:var(--display);font-weight:600;font-size:16px;padding:0 6px}
+.fr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line-2)}
+.fr:first-of-type{border-top:0}
+.fr label{font-size:14px}
+.fr .in{display:flex;align-items:center;gap:6px}
+.fr input[type=number],.fr input[type=time],.fr input[type=date],.fr select{border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:6px 8px;font-family:var(--mono);font-size:14px;max-width:160px}
+.fr input[type=number]{width:5.5em}
+.fr .u{font-size:12.5px;color:var(--muted);min-width:22px}
+.setfoot{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13.5px;z-index:20}
+
+/* méthode */
+.method{max-width:720px;padding-top:18px}
+.method h1{font-family:var(--display);font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+.method h2{font-family:var(--display);font-size:19px;margin:26px 0 6px}
+.method p,.method li{color:var(--ink-2);max-width:65ch}
+.method ul{padding-left:18px;display:grid;gap:4px}
+.method code{font-family:var(--mono);font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+.cyc{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cyc span{font-family:var(--mono);font-size:12.5px;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--c-eth) 14%,var(--surface));color:var(--c-eth)}
+
+@media (max-width:520px){
+  .brand b{display:none}
+  .datenav h1{width:100%}
+  .tabs button{padding:6px 9px;font-size:13px}
+  .wake input[type=time]{font-size:26px}
+  .wake .facts{margin-left:0;width:100%;justify-content:space-between}
+  .row{grid-template-columns:44px 6px minmax(0,1fr);gap:0 9px}
+  .bloc-h,.replan-line,.endrow{padding-left:53px}
+  .tot{grid-template-columns:92px minmax(0,1fr) 56px}
+}
+</style>
+
+<div class="wrap">
+  <div class="top"><div class="top-in">
+    <div class="brand">Horaire 9h <b>B1-BIME · Q1</b></div>
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-v="jour" aria-selected="true">Jour</button>
+      <button role="tab" data-v="semaine" aria-selected="false">Semaine</button>
+      <button role="tab" data-v="reglages" aria-selected="false">Réglages</button>
+      <button role="tab" data-v="methode" aria-selected="false">Méthode</button>
+    </div>
+    <div class="sync" id="sync" data-s="local"><i></i><span>Sur cet appareil</span></div>
+  </div></div>
+  <main id="app"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// ===== Données horaire Q1 2026-2027 — B1-BIME-B1 (ULB, campus Erasme) =====
+// Source : export TimeEdit B1-BIME-B1 du 26/09/2026 + affiche SAA « Guidance en chimie – Erasme » (sept/oct 2026)
+// + page « Horaires Q1 » des permanences de physique.
+// Types : TH théorie · SEM séminaire · EX exercices · TP travaux pratiques · APPUI appui pédagogique
+//         TEST interrogation · INFO infos examen · VISITE visite de copies
+// vete:true = appui partagé avec B1-VETE (créneau secondaire, désactivé par défaut)
+var HORAIRE = {
+  subjects: {
+    CHIM:  { name: "Chimie",   code: "CHIMG1109", full: "Bases chimiques pour les sciences biomédicales – Module I" },
+    PHYS:  { name: "Physique", code: "PHYSG1105", full: "Physique appliquée aux sciences de la vie – Module 1" },
+    MATH:  { name: "Maths",    code: "MATHG1101", full: "Mathématiques appliquées aux sciences de la vie" },
+    BIO:   { name: "Bio",      code: "BIOLG1106", full: "Biologie générale – Module I" },
+    BIO2:  { name: "Bio · diversité", code: "BIOLG1108", full: "Structures, fonctions, adaptations et diversité du monde vivant" },
+    MEDIG: { name: "MEDIG",    code: "MEDIG1108/1109", full: "Réflexion scientifique, développement professionnel et anglais" }
+  },
+  rooms: {
+    LT: "E.W.3.302 · Auditoire Lise Thiry", MDG: "E.W.1.302 · Auditoire Madeleine De Genst", MUK: "Auditoire Denis Mukwege (J2.00 · Auditoire J)",
+    S3: "E.F2.405 · Séminaire 3", S1: "E.F2.402 · Séminaire 1", AE: "E.F2.103A/B · Auditoire E", AA: "E.F2.303A/B · Auditoire A",
+    WP: "E.F2.104A/B · Auditoire Willy Peers", LP: "E.W.1.306 · Auditoire Louise Popelin", AB: "E.B1.003/003A · Auditoire B",
+    BRE: "Auditoire Bremer", BOR: "Auditoire Bordet (F2.304A/B)", TPB: "E.G2.3.306 · labo TP", INF: "E.E1.2.314 · Salle InforMel (pédagogie active)",
+    F3307: "E.F3.307", GE: "GE.3.310 · bâtiment GE (monter d'un niveau après l'entrée principale, à gauche en sortant des escaliers)",
+    F3: "Erasme F3.307", A3: "Erasme A3.155"
+  },
+  // [date, début, fin, matière, type, local, note, vete]
+  events: [
+    // s3
+    ["2026-09-28","08:00","10:00","CHIM","TH","LT"],["2026-09-28","10:00","12:00","PHYS","TH","LT"],
+    ["2026-09-29","08:00","10:00","BIO","TH","LT"],["2026-09-29","10:00","12:00","CHIM","TH","LT"],["2026-09-29","12:00","14:00","MATH","APPUI","AE"],
+    ["2026-09-30","08:00","10:00","CHIM","TH","LT"],["2026-09-30","10:00","12:00","MEDIG","TH","LT","IA"],["2026-09-30","14:00","16:00","CHIM","SEM","S3"],["2026-09-30","14:00","16:00","BIO","APPUI","",null,1],["2026-09-30","16:00","18:00","PHYS","EX","S3"],
+    ["2026-10-01","08:00","10:00","BIO","TH","MDG"],["2026-10-01","10:00","12:00","MATH","TH","LT"],
+    ["2026-10-02","09:00","12:00","BIO","APPUI","",null,1],["2026-10-02","12:00","14:00","BIO","APPUI","AA"],
+    // s4
+    ["2026-10-05","08:00","10:00","CHIM","TH","LT"],["2026-10-05","10:00","12:00","PHYS","TH","LT"],["2026-10-05","14:00","18:00","BIO","TP","TPB"],
+    ["2026-10-06","08:00","10:00","BIO","TH","LT"],["2026-10-06","10:00","12:00","MATH","TH","LT"],["2026-10-06","12:00","14:00","MATH","APPUI","AE"],
+    ["2026-10-07","08:00","10:00","CHIM","TH","LT"],["2026-10-07","10:00","12:00","PHYS","TH","LT"],["2026-10-07","14:00","16:00","CHIM","SEM","S3"],["2026-10-07","14:00","16:00","BIO","APPUI","",null,1],["2026-10-07","16:00","18:00","PHYS","EX","S3"],
+    ["2026-10-08","08:00","10:00","BIO","TH","MDG"],["2026-10-08","10:00","12:00","PHYS","TH","LT"],["2026-10-08","14:00","18:00","MATH","SEM","WP"],
+    ["2026-10-09","09:00","12:00","BIO","APPUI","",null,1],["2026-10-09","12:00","14:00","BIO","APPUI","AA"],
+    // s5
+    ["2026-10-12","08:00","10:00","CHIM","TH","LT"],["2026-10-12","10:00","12:00","PHYS","TH","LT"],
+    ["2026-10-13","08:00","10:00","BIO","TH","LT"],["2026-10-13","10:00","12:00","MATH","TH","LT"],["2026-10-13","12:00","14:00","MATH","APPUI","AE"],
+    ["2026-10-14","08:00","10:00","CHIM","TH","LT"],["2026-10-14","10:00","12:00","MATH","TH","LT"],["2026-10-14","14:00","16:00","CHIM","SEM","S3"],["2026-10-14","14:00","16:00","BIO","APPUI","",null,1],["2026-10-14","16:00","18:00","PHYS","EX","S3"],
+    ["2026-10-15","08:00","10:00","BIO","TH","LT"],["2026-10-15","10:00","12:00","PHYS","TH","LT"],["2026-10-15","14:00","18:00","MATH","SEM","WP"],
+    ["2026-10-16","09:00","12:00","BIO","APPUI","",null,1],["2026-10-16","12:00","14:00","BIO","APPUI","AA"],
+    // s6
+    ["2026-10-19","08:00","10:00","CHIM","TH","LT"],["2026-10-19","10:00","12:00","PHYS","TH","LT"],
+    ["2026-10-20","08:00","10:00","BIO","TH","LT"],["2026-10-20","10:00","12:00","MATH","TH","LT"],["2026-10-20","12:00","14:00","MATH","APPUI","AE"],["2026-10-20","14:00","18:00","BIO","TP","TPB"],
+    ["2026-10-21","08:00","10:00","CHIM","TH","LT"],["2026-10-21","10:00","12:00","PHYS","TH","LT"],["2026-10-21","14:00","16:00","CHIM","SEM","S3"],["2026-10-21","14:00","16:00","BIO","APPUI","",null,1],["2026-10-21","16:00","18:00","PHYS","EX","S3"],
+    ["2026-10-22","08:00","10:00","BIO","TH","LT"],["2026-10-22","10:00","12:00","MATH","TH","LT"],["2026-10-22","14:00","18:00","MATH","SEM",""],
+    ["2026-10-23","09:00","12:00","BIO","APPUI","",null,1],["2026-10-23","12:00","14:00","BIO","APPUI","AA"],
+    // s7 (semaine allégée)
+    ["2026-10-28","14:00","16:00","BIO","APPUI","",null,1],
+    ["2026-10-29","14:00","18:00","MATH","SEM","S1"],
+    ["2026-10-30","09:00","12:00","BIO","APPUI","",null,1],
+    // s8
+    ["2026-11-03","08:00","10:00","BIO","TH","MUK"],["2026-11-03","10:00","12:00","MATH","TH","MUK"],
+    ["2026-11-04","08:00","10:00","CHIM","TH","LT"],["2026-11-04","10:00","12:00","PHYS","TH","LT"],["2026-11-04","14:00","16:00","CHIM","SEM","S3"],["2026-11-04","14:00","16:00","BIO","APPUI","",null,1],["2026-11-04","16:00","18:00","PHYS","EX","S3"],
+    ["2026-11-05","08:00","10:00","BIO","TH","MDG"],["2026-11-05","10:00","12:00","MATH","TH","LT"],["2026-11-05","14:00","18:00","MATH","SEM","AB"],
+    ["2026-11-06","09:00","12:00","BIO","APPUI","",null,1],["2026-11-06","12:00","14:00","BIO","APPUI","AA"],
+    // s9
+    ["2026-11-09","08:00","10:00","CHIM","TH","LT"],["2026-11-09","10:00","12:00","PHYS","TH","LT"],
+    ["2026-11-10","08:00","10:00","BIO","TH","LT"],["2026-11-10","10:00","12:00","MATH","TH","LT"],["2026-11-10","12:00","14:00","MATH","APPUI","WP"],["2026-11-10","16:00","18:00","PHYS","EX","AB"],
+    ["2026-11-12","08:00","10:00","BIO","TH","MDG"],["2026-11-12","10:00","12:00","PHYS","TH","LT"],["2026-11-12","14:00","16:00","BIO","APPUI","",null,1],["2026-11-12","14:00","18:00","MATH","SEM","WP"],
+    ["2026-11-13","09:00","12:00","BIO","APPUI","",null,1],["2026-11-13","12:00","14:00","BIO","APPUI","AE"],["2026-11-13","14:00","16:00","CHIM","SEM","AE"],
+    // s10
+    ["2026-11-16","08:00","10:00","CHIM","TH","LT"],["2026-11-16","10:00","12:00","PHYS","TH","LT"],
+    ["2026-11-17","08:00","10:00","BIO","TH","LT"],["2026-11-17","10:00","12:00","BIO2","TH","LT"],["2026-11-17","12:00","14:00","MATH","APPUI","AE"],
+    ["2026-11-18","08:00","10:00","CHIM","TH","LT"],["2026-11-18","10:00","12:00","PHYS","TH","LT"],["2026-11-18","14:00","16:00","CHIM","SEM","S3"],["2026-11-18","14:00","16:00","BIO","APPUI","",null,1],["2026-11-18","16:00","18:00","PHYS","EX","S3"],
+    ["2026-11-19","08:00","10:00","BIO","TH","BRE"],["2026-11-19","09:00","12:00","BIO","APPUI","",null,1],["2026-11-19","10:00","12:00","MATH","TH","LT"],["2026-11-19","12:00","14:00","BIO","APPUI","BOR"],["2026-11-19","14:00","18:00","MATH","SEM","LP"],
+    // s11
+    ["2026-11-23","08:00","10:00","CHIM","TH","LT"],["2026-11-23","10:00","12:00","PHYS","TH","LT"],["2026-11-23","14:00","18:00","BIO","EX","INF","Pédagogie active"],
+    ["2026-11-24","08:00","10:00","BIO","INFO","LT","Infos examen"],["2026-11-24","10:00","12:00","BIO2","TH","LT"],["2026-11-24","12:00","14:00","MATH","APPUI","AE"],["2026-11-24","14:00","16:00","BIO","EX","F3307"],
+    ["2026-11-25","08:00","10:00","CHIM","TH","LT","ERSB"],["2026-11-25","10:00","12:00","PHYS","TH","LT"],["2026-11-25","14:00","16:00","CHIM","SEM","S3"],["2026-11-25","14:00","16:00","BIO","APPUI","",null,1],["2026-11-25","16:00","18:00","PHYS","EX","S3"],
+    ["2026-11-26","08:00","10:00","MEDIG","TH","LT","Durabilité"],["2026-11-26","10:00","12:00","BIO2","TH","LT"],["2026-11-26","14:00","18:00","MATH","SEM","LP"],
+    ["2026-11-27","09:00","12:00","BIO","APPUI","",null,1],["2026-11-27","12:00","14:00","BIO","APPUI","AE"],
+    // s12
+    ["2026-11-30","08:00","10:00","BIO2","TH","LT"],["2026-11-30","10:00","12:00","PHYS","TH","LT"],
+    ["2026-12-01","08:00","10:00","MEDIG","TH","LT","ERSB"],["2026-12-01","10:00","12:00","BIO2","TH","LT"],["2026-12-01","12:00","14:00","MATH","APPUI","AE"],
+    ["2026-12-02","08:00","10:00","BIO2","TH","LT"],["2026-12-02","10:00","12:00","BIO2","TH","LT"],["2026-12-02","14:00","16:00","CHIM","SEM","S3"],["2026-12-02","14:00","16:00","BIO","APPUI","",null,1],["2026-12-02","16:00","18:00","PHYS","EX","S3"],
+    ["2026-12-03","08:00","10:00","MEDIG","TH","LT","Durabilité"],["2026-12-03","10:00","12:00","BIO2","TH","LT"],["2026-12-03","14:00","18:00","MATH","SEM","LP"],
+    ["2026-12-04","09:00","12:00","BIO","APPUI","",null,1],["2026-12-04","12:00","14:00","BIO","APPUI","AE"],["2026-12-04","14:00","16:00","MATH","TH","BRE"],
+    // s13
+    ["2026-12-07","08:00","10:00","BIO2","TH","LT"],["2026-12-07","10:00","12:00","MEDIG","TH","LT","ERSB"],
+    ["2026-12-08","08:00","10:00","MEDIG","TH","LT"],["2026-12-08","10:00","12:00","BIO2","TH","LT"],["2026-12-08","12:00","14:00","MATH","APPUI","AE"],
+    ["2026-12-09","08:00","10:00","BIO2","TH","LT"],["2026-12-09","10:00","12:00","BIO2","TH","LT"],["2026-12-09","14:00","16:00","CHIM","SEM","S3"],["2026-12-09","14:00","16:00","BIO","APPUI","",null,1],["2026-12-09","16:00","18:00","PHYS","EX","S3"],
+    ["2026-12-10","08:00","10:00","MEDIG","TH","MDG"],["2026-12-10","14:00","18:00","MATH","SEM","WP"],
+    ["2026-12-11","09:00","12:00","BIO","APPUI","",null,1],["2026-12-11","12:00","14:00","BIO","APPUI","AE"],
+    // s14
+    ["2026-12-15","10:00","12:00","MATH","TEST","MUK","Interrogation"],
+    ["2026-12-16","08:00","10:00","BIO2","TH","LT"],["2026-12-16","10:00","12:00","BIO2","TH","LT"],["2026-12-16","14:00","16:00","BIO","APPUI","",null,1],["2026-12-16","14:00","16:00","CHIM","SEM","AE"],
+    ["2026-12-17","08:00","10:00","BIO2","TH","LT"],["2026-12-17","10:00","12:00","MATH","VISITE","","Visite de copies"],["2026-12-17","14:00","18:00","MATH","SEM","S1"],
+    ["2026-12-18","09:00","12:00","BIO","APPUI","",null,1],["2026-12-18","12:00","14:00","BIO","APPUI","AE"]
+  ],
+  // Jours sans cours
+  closed: {
+    "2026-11-02": "Congé (pas de cours)", "2026-11-11": "Armistice", "2026-11-20": "Saint-Verhaegen",
+    "2026-12-21": "Vacances d'hiver", "2026-12-22": "Vacances d'hiver", "2026-12-23": "Vacances d'hiver",
+    "2026-12-24": "Vacances d'hiver", "2026-12-25": "Noël", "2026-12-28": "Vacances d'hiver",
+    "2026-12-29": "Vacances d'hiver", "2026-12-30": "Vacances d'hiver", "2026-12-31": "Vacances d'hiver", "2027-01-01": "Nouvel An"
+  },
+  // Guidance chimie SAA – Erasme (affiche sept/oct 2026). F3 = F3.307, A3 = A3.155
+  guidChim: [
+    ["2026-09-29","10:30","14:00","A3"],["2026-09-30","10:00","14:00","F3"],["2026-10-01","11:00","15:00","A3"],
+    ["2026-10-06","10:30","14:30","F3"],["2026-10-07","10:00","14:00","F3"],["2026-10-08","11:00","15:00","A3"],
+    ["2026-10-13","10:30","14:30","F3"],["2026-10-14","10:00","14:00","F3"],["2026-10-15","11:00","14:00","F3"],
+    ["2026-10-20","10:30","14:30","F3"],["2026-10-21","10:00","14:00","F3"],["2026-10-22","11:00","15:00","A3"],
+    ["2026-10-27","10:30","14:30","F3"],["2026-10-28","10:00","14:00","F3"],["2026-10-29","11:00","15:00","F3"]
+  ],
+  // Après octobre : créneaux supposés identiques (à confirmer avec l'affiche de novembre)
+  guidChimAssumed: { 2: ["10:30","14:30"], 3: ["10:00","14:00"], 4: ["11:00","15:00"] },
+  guidChimKnownUntil: "2026-10-31",
+  // Permanences de physique – Erasme GE.3.310, lun→ven 10h-14h, dès la semaine 3
+  permPhys: { from: "2026-09-28", until: "2026-12-18", start: "10:00", end: "14:00", room: "GE" },
+  semesterStart: "2026-09-21" // lundi de la semaine 2
+};
+if (typeof module !== "undefined") module.exports = HORAIRE;
+
+</script>
+<script>
+// ===== Moteur de planification « 9h nettes » =====
+// Pur JS, sans DOM. Entrée : une date + réglages + données du jour (heure de lever, présences…).
+// Sortie : la liste ordonnée des créneaux de la journée.
+var Engine = (function () {
+  var H = (typeof HORAIRE !== "undefined") ? HORAIRE : require("./data.js");
+
+  // ---------- temps & dates ----------
+  function m(s) { var p = s.split(":"); return (+p[0]) * 60 + (+p[1]); }
+  function hm(x) {
+    x = Math.round(x); var neg = x < 0; if (neg) x += 1440;
+    var h = Math.floor(x / 60) % 24, mi = x % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (mi < 10 ? "0" : "") + mi;
+  }
+  function dur(x) { x = Math.round(x); var h = Math.floor(x / 60), mi = x % 60; return h ? (h + "h" + (mi ? (mi < 10 ? "0" : "") + mi : "")) : mi + " min"; }
+  function pd(ds) { var p = ds.split("-"); return new Date(+p[0], +p[1] - 1, +p[2], 12); }
+  function fd(d) { var mo = d.getMonth() + 1, da = d.getDate(); return d.getFullYear() + "-" + (mo < 10 ? "0" : "") + mo + "-" + (da < 10 ? "0" : "") + da; }
+  function addDays(ds, n) { var d = pd(ds); d.setDate(d.getDate() + n); return fd(d); }
+  function dow(ds) { return pd(ds).getDay(); } // 0 = dimanche
+  function monday(ds) { var w = dow(ds); return addDays(ds, w === 0 ? -6 : 1 - w); }
+  function weekNo(ds) { return Math.round((pd(monday(ds)) - pd(H.semesterStart)) / 864e5 / 7) + 2; }
+  function daysBetween(a, b) { return Math.round((pd(b) - pd(a)) / 864e5); }
+
+  var DEFAULTS = {
+    wake: "07:30", prep: 20, targetH: 9, session: 90, pause: 10, bigPause: 20,
+    lunch: 45, dinner: 45, sport: 30, shower: 15, travel: 30, sleepH: 8,
+    guidChimDay: 4, guidChimDur: 120, permPhysDay: 3, permPhysStart: "10:00", permPhysDur: 120,
+    appuiMath: true, appuiBio: true, attendTheory: false,
+    concoursStart: "", ethiqueAnchor: "2026-10-04", ethiqueEvery: 4,
+    raisonnement: 60, ethique: 60, concoursPause: 90,
+    chimOrga: 150, chimMin: 90, concoursSat: 180, revSat: 120
+  };
+  function settings(s) { var o = {}, k; for (k in DEFAULTS) o[k] = DEFAULTS[k]; if (s) for (k in s) if (s[k] !== undefined && s[k] !== null) o[k] = s[k]; return o; }
+
+  var SUBJ = {
+    CHIM: "Chimie", PHYS: "Physique", MATH: "Maths", BIO: "Bio", BIO2: "Bio", MEDIG: "MEDIG",
+    CHQ2: "Chimie Q2", CONC: "Concours", REV: "Révision", RAIS: "Raisonnement", ETH: "Éthique & empathie"
+  };
+  var TYPE = {
+    TH: "Cours théorique", SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui pédagogique",
+    TEST: "Interrogation", INFO: "Infos examen", VISITE: "Visite de copies", GUID: "Guidance", PERM: "Permanence"
+  };
+  function isBlocus(ds) { return ds >= "2026-12-19"; }
+
+  // ---------- séances de la journée ----------
+  function defaultAttend(t, c, vete, S) {
+    if (t === "TH") return !!S.attendTheory;
+    if (t === "VISITE") return false;
+    if (t === "APPUI") { if (vete) return false; if (c === "MATH") return !!S.appuiMath; if (c === "BIO") return !!S.appuiBio; return true; }
+    return true; // SEM, EX, TP, TEST, INFO
+  }
+  function guidSlot(ds) {
+    if (H.closed[ds]) return null;
+    for (var i = 0; i < H.guidChim.length; i++) {
+      var g = H.guidChim[i];
+      if (g[0] === ds) return { s: m(g[1]), e: m(g[2]), room: H.rooms[g[3]] || g[3], assumed: false };
+    }
+    if (ds > H.guidChimKnownUntil && ds <= H.permPhys.until) {
+      var a = H.guidChimAssumed[dow(ds)];
+      if (a) return { s: m(a[0]), e: m(a[1]), room: "local à confirmer", assumed: true };
+    }
+    return null;
+  }
+  function permSlot(ds) {
+    var w = dow(ds), P = H.permPhys;
+    if (H.closed[ds] || w === 0 || w === 6 || ds < P.from || ds > P.until) return null;
+    return { s: m(P.start), e: m(P.end), room: H.rooms[P.room] };
+  }
+  // jour de la semaine choisi pour la guidance chimie / la permanence physique (avec repli si fermé)
+  function weekPicks(ds, S) {
+    var mon = monday(ds), res = { chim: null, phys: null };
+    function order(pref, cands) { return cands.slice().sort(function (a, b) { return Math.abs(a - pref) - Math.abs(b - pref) || a - b; }); }
+    var oc = order(+S.guidChimDay, [2, 3, 4]);
+    for (var i = 0; i < oc.length; i++) { var d = addDays(mon, oc[i] - 1); if (guidSlot(d)) { res.chim = d; break; } }
+    var op = order(+S.permPhysDay, [1, 2, 3, 4, 5]);
+    for (i = 0; i < op.length; i++) { d = addDays(mon, op[i] - 1); if (permSlot(d)) { res.phys = d; break; } }
+    return res;
+  }
+  function dayEvents(ds, S, ov) {
+    var out = [];
+    H.events.forEach(function (r) {
+      if (r[0] !== ds) return;
+      var id = r[0] + "_" + r[1].replace(":", "") + "_" + r[3] + "_" + r[4] + (r[7] ? "_V" : "");
+      out.push({
+        id: id, s: m(r[1]), e: m(r[2]), subj: r[3], type: r[4], room: H.rooms[r[5]] || r[5] || "Local non indiqué sur TimeEdit",
+        note: r[6] || "", vete: !!r[7], def: defaultAttend(r[4], r[3], r[7], S)
+      });
+    });
+    var picks = weekPicks(ds, S);
+    var g = guidSlot(ds);
+    if (g) {
+      out.push({ id: ds + "_GUIDCHIM", s: g.s, e: Math.min(g.s + (+S.guidChimDur), g.e), subj: "CHIM", type: "GUID",
+        room: g.room, note: "Guidance SAA · créneau " + hm(g.s) + "–" + hm(g.e) + (g.assumed ? " (supposé)" : ""),
+        assumed: g.assumed, def: picks.chim === ds, moved: picks.chim === ds && dow(ds) !== +S.guidChimDay });
+    }
+    var p = permSlot(ds);
+    if (p) {
+      var st = Math.max(p.s, Math.min(m(S.permPhysStart), p.e - 30));
+      out.push({ id: ds + "_PERMPHYS", s: st, e: Math.min(st + (+S.permPhysDur), p.e), subj: "PHYS", type: "PERM",
+        room: p.room, note: "Permanence ouverte " + hm(p.s) + "–" + hm(p.e), def: picks.phys === ds,
+        moved: picks.phys === ds && dow(ds) !== +S.permPhysDay });
+    }
+    out.forEach(function (ev) { ev.attend = (ov && Object.prototype.hasOwnProperty.call(ov, ev.id)) ? !!ov[ev.id] : ev.def; });
+    out.sort(function (a, b) { return a.s - b.s || a.e - b.e; });
+    return out;
+  }
+  function evLabel(ev) {
+    var n = SUBJ[ev.subj] || ev.subj;
+    if (ev.type === "GUID") return "Guidance chimie";
+    if (ev.type === "PERM") return "Permanence physique";
+    if (ev.type === "SEM") return "Séminaire de " + n.toLowerCase();
+    if (ev.type === "EX") return "Séminaire de " + n.toLowerCase() + " (exercices)";
+    if (ev.type === "TP") return "TP de " + n.toLowerCase();
+    if (ev.type === "APPUI") return "Appui " + n.toLowerCase();
+    if (ev.type === "TEST") return "Interro de " + n.toLowerCase();
+    if (ev.type === "INFO") return "Infos examen " + n.toLowerCase();
+    if (ev.type === "VISITE") return "Visite de copies " + n.toLowerCase();
+    return "Cours de " + n.toLowerCase() + (ev.note ? " · " + ev.note : "");
+  }
+
+  // ---------- séances fixes -> éléments « durs » (avec trajets) ----------
+  function buildHard(evs, S) {
+    var att = evs.filter(function (e) { return e.attend; }).sort(function (a, b) { return a.s - b.s || a.e - b.e; });
+    var list = [], lastE = -1;
+    att.forEach(function (ev) {
+      var s = ev.s, conflict = false;
+      if (s < lastE) { conflict = true; s = lastE; }
+      if (s >= ev.e) { ev.conflict = true; return; }
+      var o = {}; for (var k in ev) o[k] = ev[k];
+      o.s = s; o.s0 = ev.s; o.conflict = conflict; list.push(o); lastE = Math.max(lastE, ev.e);
+    });
+    var T = +S.travel, hard = [], i = 0;
+    while (i < list.length) {
+      var j = i;
+      while (j + 1 < list.length && list[j + 1].s - list[j].e < 2 * T + 90) j++;
+      var ws = list[i].s, we = list[j].e;
+      if (T > 0) hard.push({ kind: "travel", dir: "to", s: ws - T, e: ws, winEnd: we, dest: list[i].room, destLabel: evLabel(list[i]) });
+      for (var k = i; k <= j; k++) { list[k].kind = "fixed"; list[k].counts = true; list[k].winEnd = we; hard.push(list[k]); }
+      if (T > 0) hard.push({ kind: "travel", dir: "back", s: we, e: we + T, shiftable: true, winEnd: we });
+      i = j + 1;
+    }
+    return hard;
+  }
+
+  // ---------- simulation de la journée ----------
+  function run(start, hard, S, init) {
+    init = init || {};
+    var target = (+S.targetH) * 60;
+    var t = start, studied = init.studied || 0, streak = init.streak || 0, sinceBig = init.sinceBig || 0;
+    var lunch = !!init.lunch, dinner = !!init.dinner, sport = !!init.sport, onCampus = false;
+    var L = +S.lunch, D = +S.dinner, SP = (+S.sport) + (+S.shower), P = +S.pause, BP = +S.bigPause, SES = +S.session, T = +S.travel;
+    var LUNCH_MIN = 675, LUNCH_PREF = 720, LUNCH_LATE = 795, DIN_PREF = 1140, DIN_LATE = 1230;
+    var items = [], missed = [], hi = 0, guard = 0;
+    function push(it) { if (it.e > it.s) items.push(it); }
+    function loc() { return onCampus ? "campus" : "maison"; }
+    function remFixed() { var s = 0; for (var k = hi; k < hard.length; k++) { var h = hard[k]; if (h.counts) s += Math.max(0, h.e - Math.max(h.s, t)); } return s; }
+    function lunchAt(nh) {
+      if (lunch) return Infinity;
+      var at = Math.min(Math.max(LUNCH_PREF, t + Math.max(0, 180 - sinceBig)), LUNCH_LATE);
+      if (nh && !nh.shiftable && nh.s < at + L) {
+        var b;
+        if (nh.winEnd >= 870) { b = Math.max(nh.s - L, 660); if (nh.s - b >= 30) at = Math.min(at, b); }
+        else if (nh.winEnd >= 810) { b = nh.s - L; if (b >= LUNCH_MIN) at = Math.min(at, b); }
+      }
+      return at;
+    }
+    function dinnerAt(selfLeft, nh) {
+      if (dinner) return Infinity;
+      if (!nh && selfLeft <= 60) return Infinity; // on termine avant de manger
+      return Math.min(Math.max(DIN_PREF, t + Math.max(0, 90 - sinceBig)), DIN_LATE);
+    }
+    function meal(kind, len) { push({ kind: kind, s: t, e: t + len, loc: loc() }); t += len; streak = 0; sinceBig = 0; if (kind === "lunch") lunch = true; else dinner = true; }
+    while (guard++ < 500) {
+      var nh = hard[hi];
+      // séance déjà terminée (lever tardif) -> manquée
+      if (nh && nh.kind === "fixed" && nh.e <= t) { var mi = {}; for (var k0 in nh) mi[k0] = nh[k0]; mi.missed = true; missed.push(mi); hi++; continue; }
+      if (nh && nh.kind === "travel" && nh.dir === "to" && t > nh.s) {
+        // en retard : on part maintenant si la fenêtre a encore des séances
+        var still = false; for (var q = hi + 1; q < hard.length && hard[q].kind === "fixed"; q++) if (hard[q].e > t + T) still = true;
+        if (!still) { hi++; while (hi < hard.length && hard[hi].kind === "fixed") { var mm = {}; for (var k1 in hard[hi]) mm[k1] = hard[hi][k1]; mm.missed = true; missed.push(mm); hi++; } if (hard[hi] && hard[hi].dir === "back") hi++; continue; }
+        push({ kind: "travel", dir: "to", s: t, e: t + T, late: true, dest: nh.dest, destLabel: nh.destLabel }); t += T; onCampus = true; streak = 0; hi++; continue;
+      }
+      if (nh && t >= nh.s) {
+        if (nh.kind === "travel" && nh.dir === "back") {
+          if (!lunch && t >= lunchAt(null) - 10) { meal("lunch", L); continue; }
+          push({ kind: "travel", dir: "back", s: t, e: t + T }); t += T; onCampus = false; streak = 0; hi++; continue;
+        }
+        if (nh.kind === "travel") { push({ kind: "travel", dir: "to", s: nh.s, e: nh.e, snack: !lunch && nh.winEnd >= 810 && t < 720, dest: nh.dest, destLabel: nh.destLabel }); t = nh.e; onCampus = true; streak = 0; hi++; continue; }
+        var s = Math.max(nh.s, t), fx = {}; for (var k2 in nh) fx[k2] = nh[k2];
+        fx.s = s; fx.late = !init.replan && s > nh.s0 + 5; push(fx);
+        studied += nh.e - s; sinceBig += nh.e - s; streak = SES; t = nh.e; hi++; continue;
+      }
+      var gap = nh ? nh.s - t : Infinity;
+      var selfLeft = target - studied - remFixed();
+      if (selfLeft <= 0 && !nh) break;
+      var la = lunchAt(nh), da = dinnerAt(selfLeft, nh);
+      if (!lunch && t >= la - 10 && gap >= 30) { meal("lunch", Math.min(L, gap)); continue; }
+      if (!dinner && t >= da - 10 && gap >= 30) { meal("dinner", Math.min(D, gap)); continue; }
+      // le sport est toujours le dernier élément de la journée : en cours de journée, une grande pause sépare les blocs
+      var nextMeal = Math.min(la, da);
+      if (sinceBig >= (lunch ? 180 : 240) && nextMeal - t > 45 && gap >= BP && selfLeft > 30) {
+        push({ kind: "bigpause", s: t, e: t + BP, loc: loc() }); t += BP; streak = 0; sinceBig = 0; continue;
+      }
+      if (streak >= SES && selfLeft > 0) {
+        if (!lunch && t >= 690 && la - t <= 30 && gap >= 30) { meal("lunch", Math.min(L, gap)); continue; }
+        if (!dinner && t >= 1110 && da - t <= 30 && gap >= 30) { meal("dinner", Math.min(D, gap)); continue; }
+        if (gap >= P) { push({ kind: "pause", s: t, e: t + P, loc: loc() }); t += P; streak = 0; continue; }
+        push({ kind: "free", s: t, e: nh.s, loc: loc() }); t = nh.s; streak = 0; continue;
+      }
+      if (selfLeft <= 0) { push({ kind: "free", s: t, e: nh.s, loc: loc(), done: true }); t = nh.s; continue; }
+      var len = Math.min(SES - streak, selfLeft, gap);
+      if (!lunch && la > t) len = Math.min(len, la - t);
+      if (!dinner && isFinite(da) && da > t) len = Math.min(len, da - t);
+      if (len < 15 && gap <= len + 5 && selfLeft > len) { push({ kind: "free", s: t, e: nh.s, loc: loc() }); t = nh.s; streak = 0; continue; }
+      if (len <= 0) len = Math.max(1, Math.min(SES, selfLeft, gap));
+      push({ kind: "study", s: t, e: t + len, loc: loc() }); t += len; studied += len; streak += len; sinceBig += len;
+    }
+    if (!sport) { push({ kind: "sport", s: t, e: t + SP }); t += SP; sport = true; }
+    // fusion des blocs d'étude contigus
+    var merged = [];
+    items.forEach(function (it) {
+      var last = merged[merged.length - 1];
+      if (last && last.kind === "study" && it.kind === "study" && last.e === it.s && last.loc === it.loc && (it.e - last.s) <= SES) last.e = it.e;
+      else merged.push(it);
+    });
+    return { items: merged, missed: missed, end: t, studied: studied, lunch: lunch, dinner: dinner };
+  }
+
+  // ---------- contenu des blocs ----------
+  var ROT = ["CHIM", "PHYS", "MATH", "BIO"];
+  var ROT_TXT = {
+    CHIM: ["Exercices de chimie", "Séries du séminaire + anciens examens, chrono en main"],
+    PHYS: ["Exercices de physique", "Refaire les exercices sans la solution, puis corriger"],
+    MATH: ["Exercices de maths", "Séries + méthodes à connaître par cœur"],
+    BIO: ["Bio · fiches + Anki", "Mémorisation active : schémas à redessiner, cartes Anki"]
+  };
+  function rotKey(sj) { return sj === "BIO2" ? "BIO" : sj; }
+  function rotItem(weekMin, blocus) {
+    var best = ROT[0];
+    ROT.forEach(function (s) { if ((weekMin[s] || 0) < (weekMin[best] || 0)) best = s; });
+    var tx = ROT_TXT[best];
+    return { subj: best, kind: "rot", title: blocus ? "Révision examen · " + SUBJ[best].toLowerCase() : tx[0], detail: blocus ? "Synthèses, anciens examens, points faibles" : tx[1], min: 90 };
+  }
+  function prepFor(ev) {
+    var n = (SUBJ[ev.subj] || "").toLowerCase();
+    if (ev.type === "SEM" || ev.type === "EX") return { subj: ev.subj, kind: "prep", title: "Préparer le séminaire de " + n, detail: "Faire la série avant la séance, noter ce qui bloque", min: 60 };
+    if (ev.type === "TP") return { subj: ev.subj, kind: "prep", title: "Préparer le TP de " + n, detail: "Lire le protocole, répondre aux questions préalables", min: 30 };
+    if (ev.type === "TEST") return { subj: ev.subj, kind: "prep", title: "Réviser l'interro de " + n, detail: "Exercices types, formules, anciens tests", min: 120 };
+    if (ev.type === "APPUI" || ev.type === "GUID" || ev.type === "PERM") return { subj: ev.subj, kind: "prep", title: "Questions pour " + evLabel(ev).toLowerCase(), detail: "Lister précisément ce que tu veux demander", min: 15 };
+    return null;
+  }
+  function assign(chunks, queue, weekMin, blocus) {
+    chunks.forEach(function (ch) {
+      var rem = ch.e - ch.s; ch.tasks = [];
+      while (rem > 0) {
+        var now = ch.e - rem, qi = -1;
+        for (var z = 0; z < queue.length; z++) if (!queue[z].after || queue[z].after <= now + 15) { qi = z; break; }
+        if (qi < 0) { queue.push(rotItem(weekMin, blocus)); qi = queue.length - 1; }
+        var q = queue[qi], take = Math.min(q.min, rem);
+        var last = ch.tasks[ch.tasks.length - 1];
+        if (last && last.title === q.title) { last.min += take; }
+        else if (take < 15 && last && q.min > take) { last.min += take; rem -= take; q.min -= take; if (q.min < 10) queue.splice(qi, 1); continue; }
+        else ch.tasks.push({ subj: q.subj, kind: q.kind, title: q.title, detail: q.detail, min: take });
+        var rk = rotKey(q.subj); if (weekMin[rk] !== undefined) weekMin[rk] += take;
+        q.min -= take; rem -= take;
+        if (q.min < 10) queue.splice(qi, 1);
+      }
+      ch.subj = ch.tasks.length ? ch.tasks.reduce(function (a, x) { return x.min > a.min ? x : a; }).subj : "REV";
+    });
+    return queue.filter(function (q) { return q.carry && q.min >= 20; });
+  }
+
+  // Semaine : chaque matière forme UN bloc continu dans la journée (on n'y revient jamais).
+  // Les « segments » sont les suites de sessions d'étude non coupées par une séance à l'unif.
+  function assignGrouped(chunks, queue, weekMin, blocus) {
+    var groups = {}, order = [];
+    queue.forEach(function (q0) {
+      var q = {}; for (var k in q0) q[k] = q0[k];
+      var key = rotKey(q.subj), g = groups[key];
+      if (!g) { g = groups[key] = { key: key, tasks: [], req: 0, after: 0, prio: 0, readyPart: false, done: false }; order.push(key); }
+      g.tasks.push(q); g.req += q.min;
+      if (q.kind === "th" && q.after) g.after = Math.max(g.after, q.after);
+      if (q.kind === "backlog" || (q.kind === "prep" && q.min >= 30)) g.readyPart = true;
+      g.prio = Math.max(g.prio, q.kind === "prep" && q.min >= 30 ? 3 : (q.subj === "MEDIG" ? 0 : (q.kind === "th" || q.kind === "backlog" ? 2 : 1)));
+    });
+    var segs = [];
+    chunks.forEach(function (ch) { var i = ch.seg || 0; if (!segs[i]) segs[i] = { chunks: [], cap: 0 }; segs[i].chunks.push(ch); segs[i].cap += ch.e - ch.s; ch.tasks = []; });
+    segs = segs.filter(Boolean);
+    var C = 0; segs.forEach(function (x) { C += x.cap; });
+    var nT = Math.max(order.length, Math.min(4, Math.round(C / 135)));
+    var level = Math.round(C / Math.max(1, nT) / 5) * 5;
+    var carry = [];
+    function isRot(k) { return ROT.indexOf(k) >= 0; }
+    function ready(g, now) { return !g.after || g.after <= now + 15 || g.readyPart; }
+    function rotPick() { var best = null; ROT.forEach(function (k) { if (groups[k]) return; if (!best || (weekMin[k] || 0) < (weekMin[best] || 0)) best = k; }); return best; }
+    function rotTask(k, min) { var tx = ROT_TXT[k]; return { subj: k, kind: "rot", title: blocus ? "Révision examen · " + SUBJ[k].toLowerCase() : tx[0], detail: blocus ? "Synthèses, anciens examens, points faibles" : tx[1], min: min }; }
+    segs.forEach(function (sg, si) {
+      var ci = 0, off = 0, rem = sg.cap, lastKey = null, futureMax = 0;
+      for (var j = si + 1; j < segs.length; j++) futureMax = Math.max(futureMax, segs[j].cap);
+      function nowT() { var ch = sg.chunks[ci]; return ch ? ch.s + off : 1e9; }
+      function filler() { return si === segs.length - 1 && si > 0 ? { subj: "REV", kind: "rev", title: "Bilan du jour · Anki + fiches", detail: "Relire les fiches faites aujourd'hui, cartes Anki du jour" } : { subj: "REV", kind: "rev", title: "Rappel actif · Anki", detail: "Cartes en retard, toutes matières" }; }
+      function lay(t0, min) {
+        while (min > 0 && ci < sg.chunks.length) {
+          var ch = sg.chunks[ci], room = ch.e - ch.s - off, take = Math.min(room, min), last = ch.tasks[ch.tasks.length - 1];
+          if (last && last.title === t0.title) last.min += take; else ch.tasks.push({ subj: t0.subj, kind: t0.kind, title: t0.title, detail: t0.detail, min: take });
+          var rk = rotKey(t0.subj); if (weekMin[rk] !== undefined) weekMin[rk] += take;
+          min -= take; off += take; rem -= take;
+          if (off >= ch.e - ch.s) { ci++; off = 0; }
+        }
+      }
+      var guard = 0;
+      while (rem > 0 && guard++ < 40) {
+        var now = nowT();
+        var cands = order.filter(function (k) { return !groups[k].done; });
+        var stuck = cands.filter(function (k) { return groups[k].req > futureMax && groups[k].req > rem && rem >= 30 && groups[k].prio >= 2; });
+        var fit = cands.filter(function (k) { return groups[k].req <= rem && ready(groups[k], now); });
+        var full = function (k) { var g0 = groups[k]; return !g0.after || g0.after <= now + 15 ? 1 : 0; };
+        fit.sort(function (a, b) { return (full(b) - full(a)) || (groups[b].prio - groups[a].prio); });
+        var pick = null;
+        if (fit.length && (groups[fit[0]].prio > 0 || !stuck.length)) pick = fit[0];
+        if (!pick && stuck.length) pick = stuck[0];
+        if (!pick && rem >= 45) { var rk2 = rotPick(); if (rk2) { pick = rk2; groups[rk2] = { key: rk2, tasks: [], req: 0, after: 0, prio: 1, done: false }; } }
+        if (!pick) { var any = cands.filter(function (k) { return groups[k].req <= rem; }); if (any.length) pick = any[0]; }
+        if (!pick) {
+          if (lastKey && isRot(lastKey)) lay(rotTask(lastKey, rem), rem);
+          else lay(filler(), rem);
+          break;
+        }
+        var g = groups[pick];
+        var A = Math.min(isRot(pick) ? Math.max(g.req, level) : g.req, rem);
+        var tail = rem - A;
+        if (tail > 0 && tail < 45 && isRot(pick) && !cands.some(function (k) { return k !== pick && groups[k].req <= tail; })) A = rem;
+        // caler la fin du bloc sur une fin de session (pas de miettes de 5 min)
+        if (A < rem) {
+          var need = A, c2 = ci, o2 = off;
+          while (c2 < sg.chunks.length) { var len2 = sg.chunks[c2].e - sg.chunks[c2].s - o2; if (need <= len2) break; need -= len2; c2++; o2 = 0; }
+          if (c2 < sg.chunks.length) {
+            var endOff = o2 + need, chLen = sg.chunks[c2].e - sg.chunks[c2].s, r2 = chLen - endOff;
+            if (r2 > 0 && r2 < 20 && A + r2 <= rem) A += r2;
+            else if (endOff > 0 && endOff < 20 && o2 === 0 && A - endOff >= Math.max(30, isRot(pick) ? Math.min(g.req, A) : g.req)) A -= endOff;
+          }
+        }
+        var byK = function (f) { return g.tasks.filter(f); };
+        var bl = byK(function (t) { return t.kind === "backlog"; }), th = byK(function (t) { return t.kind === "th"; });
+        var pr = byK(function (t) { return t.kind === "prep" && t.min >= 30; }), sq = byK(function (t) { return t.kind === "prep" && t.min < 30; });
+        var ex = A > g.req && isRot(pick) ? [rotTask(pick, A - g.req)] : [];
+        var thReady = !g.after || g.after <= now + 15;
+        var seq = thReady ? bl.concat(th, pr, ex, sq) : bl.concat(pr, ex, th, sq);
+        var left = A;
+        seq.forEach(function (t0) {
+          var take = Math.min(t0.min, left);
+          if (take > 0) { lay(t0, take); left -= take; }
+          if (t0.min - take >= 20 && (t0.kind === "th" || t0.kind === "backlog")) { var c = {}; for (var k5 in t0) c[k5] = t0[k5]; c.min = t0.min - take; carry.push(c); }
+        });
+        if (left > 0) lay(isRot(pick) ? rotTask(pick, left) : filler(), left);
+        g.done = true; lastKey = pick;
+      }
+    });
+    order.forEach(function (k) { if (!groups[k].done) groups[k].tasks.forEach(function (t0) { if ((t0.kind === "th" || t0.kind === "backlog") && t0.min >= 20) carry.push(t0); }); });
+    chunks.forEach(function (ch) { ch.subj = ch.tasks.length ? ch.tasks.reduce(function (a, x) { return x.min > a.min ? x : a; }).subj : "REV"; });
+    return carry.map(function (c) { c.carry = true; return c; });
+  }
+
+  // ---------- éthique (1 dimanche sur N) ----------
+  function isEthique(ds, S, day) {
+    if (day && typeof day.ethique === "boolean") return day.ethique;
+    var n = daysBetween(S.ethiqueAnchor, ds);
+    return n >= 0 && (n / 7) % (+S.ethiqueEvery) === 0;
+  }
+
+  // ---------- plan d'un jour (interne) ----------
+  function planOne(ds, S, getDay, backlog, weekMin) {
+    var day = getDay(ds) || {};
+    var w = dow(ds);
+    var wake = m(day.wake || S.wake);
+    var start = day.start ? m(day.start) : wake + (+S.prep);
+    var res = { date: ds, dow: w, week: weekNo(ds), wake: wake, start: start, startSet: !!day.start, closed: H.closed[ds] || null, blocus: isBlocus(ds), events: [], warnings: [] };
+    var pre = start > wake ? [{ kind: "prep", s: wake, e: start, long: start - wake > (+S.prep) + 10 }] : [];
+    var hard = [], init = {}, queue = [], preItems = [], shortQ = [];
+    if (w === 0) {
+      res.mode = "concours";
+      var eth = isEthique(ds, S, day); res.ethique = eth;
+      var t = start;
+      if (S.concoursStart && m(S.concoursStart) > t) { pre.push({ kind: "free", s: t, e: m(S.concoursStart), note: "Petit-déj · mise en condition" }); t = m(S.concoursStart); }
+      preItems.push({ kind: "exam", subj: "CONC", s: t, e: t + 180, title: "Concours blanc · partie 1 — sciences", detail: "Bio · chimie · physique · maths. Conditions réelles : chrono, pas de téléphone, pas de pause." }); t += 180;
+      preItems.push({ kind: "lunch", s: t, e: t + (+S.concoursPause), note: "Pause " + dur(+S.concoursPause) + " avec repas, comme le jour J" }); t += +S.concoursPause;
+      preItems.push({ kind: "exam", subj: "RAIS", s: t, e: t + (+S.raisonnement), title: "Partie 2 — raisonnement", detail: "Chrono, conditions d'examen" }); t += +S.raisonnement;
+      var did = 180 + (+S.raisonnement);
+      if (eth) { preItems.push({ kind: "exam", subj: "ETH", s: t, e: t + (+S.ethique), title: "Partie 2 — éthique & empathie", detail: "Épreuve mensuelle" }); t += +S.ethique; did += +S.ethique; }
+      init = { studied: did, lunch: true, streak: +S.session, sinceBig: did - 180 };
+      queue = [
+        { subj: "RAIS", kind: "corr", title: "Correction · raisonnement" + (eth ? " + éthique" : ""), detail: "À chaud : comprendre le piège de chaque question ratée", min: eth ? 50 : 30 },
+        { subj: "CONC", kind: "corr", title: "Correction · partie sciences", detail: "Chaque erreur : pourquoi, notion en cause, règle à retenir → fiche d'erreurs", min: 150 },
+        { subj: "CONC", kind: "remed", title: "Remédiation ciblée", detail: "Revoir la théorie des notions les plus ratées, refaire les questions fausses", min: 999 }
+      ];
+      var r0 = run(t, [], S, init);
+      res.items = pre.concat(preItems, r0.items); res.end = r0.end;
+      finish(res, S, queue, weekMin, day);
+      res.backlogOut = [];
+      return res;
+    }
+    var evs = dayEvents(ds, S, day.ov);
+    res.events = evs;
+    if (w === 6) {
+      res.mode = "samedi";
+      var cs = +S.concoursSat, cp = Math.round(cs / 2 / 5) * 5;
+      var extra = [];
+      backlog.forEach(function (x) { extra.push(x.title.replace(" · reporté", "").replace(" du jour", "").replace(/^Cours/, "cours") + " (" + x.min + " min)"); });
+      var mon = addDays(ds, 2);
+      dayEvents(mon, S, (getDay(mon) || {}).ov).filter(function (e) { return e.attend; }).forEach(function (e) { var p = prepFor(e); if (p && p.min >= 30) extra.push(p.title.toLowerCase() + " de lundi"); });
+      res.satExtra = extra;
+      queue = [
+        { subj: "CHQ2", kind: "q2", title: "Chimie Q2 · organique", detail: "Nouvelle matière puis exercices, sans regarder la solution (avec ton artefact)", min: +S.chimOrga },
+        { subj: "CHQ2", kind: "q2", title: "Chimie Q2 · minérale", detail: "Oxydoréduction et acide-base : équilibrer des redox, pH, tampons", min: +S.chimMin },
+        { subj: "PHYS", kind: "conc", title: "Prépa concours · physique", detail: "Questions type concours, chrono en main", min: cp },
+        { subj: "MATH", kind: "conc", title: "Prépa concours · maths", detail: "Questions type concours, chrono en main", min: cs - cp },
+        { subj: "REV", kind: "rev", title: "Révision de la semaine", detail: "Anki + fiches de la semaine (bio, chimie, physique, maths)" + (extra.length ? ". D'abord : " + extra.join(", ") : ""), min: +S.revSat }
+      ];
+    } else {
+      res.mode = res.closed ? "conge" : "semaine";
+      hard = buildHard(evs, S);
+      var tm = addDays(ds, 1);
+      if (dow(tm) >= 1 && dow(tm) <= 5) {
+        dayEvents(tm, S, (getDay(tm) || {}).ov).filter(function (e) { return e.attend; }).forEach(function (e) { var p = prepFor(e); if (p) { p.title += " de demain"; if (p.min < 30) p.after = 840; (p.min >= 30 ? queue : shortQ).push(p); } });
+      }
+      backlog.forEach(function (x) { var c3 = {}; for (var k4 in x) c3[k4] = x[k4]; delete c3.after; c3.kind = "backlog"; c3.title = x.title.replace(" du jour", "") + " · reporté"; queue.push(c3); });
+      evs.forEach(function (e) {
+        if (e.type === "TH" && !e.attend) {
+          var nm = SUBJ[e.subj] || e.subj;
+          queue.push({ subj: e.subj, kind: "th", carry: true, after: e.e, title: "Cours de " + (e.subj === "MEDIG" ? nm : nm.toLowerCase()) + " du jour" + (e.note ? " (" + e.note + ")" : ""), detail: "Slides ou podcast ×1,5 → fiche résumé → 5 cartes Anki", min: e.subj === "MEDIG" ? 45 : 90 });
+        }
+      });
+      shortQ.forEach(function (x) { queue.push(x); });
+    }
+    var rp = day.replan;
+    if (rp && typeof rp.at === "number") {
+      var full = run(start, hard, S, {});
+      var before = [];
+      full.items.forEach(function (it) { if (it.s < rp.at) { var c2 = {}; for (var k in it) c2[k] = it[k]; if (c2.e > rp.at) c2.e = rp.at; c2.past = true; before.push(c2); } });
+      var hard2 = hard.filter(function (h) { return h.e > rp.at; });
+      var r1 = run(rp.at, hard2, S, { replan: true, studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0 });
+      res.missed = r1.missed; res.items = pre.concat(before, [{ kind: "replan", s: rp.at, e: rp.at, studied: rp.studied || 0 }], r1.items); res.end = r1.end; res.replanAt = rp.at; res.replanStudied = rp.studied || 0;
+    } else {
+      var r = run(start, hard, S, init);
+      res.missed = r.missed; res.items = pre.concat(r.items); res.end = r.end;
+    }
+    res.backlogOut = finish(res, S, queue, weekMin, day);
+    return res;
+  }
+
+  function finish(res, S, queue, weekMin, day) {
+    var seg = 0, had = false;
+    res.items.forEach(function (it) {
+      if (it.kind === "study") { it.seg = seg; had = true; }
+      else if ((it.kind === "fixed" || it.kind === "exam" || it.kind === "replan") && had) { seg++; had = false; }
+    });
+    var chunks = res.items.filter(function (it) { return it.kind === "study"; });
+    var carry = (res.mode === "semaine" || res.mode === "conge") ? assignGrouped(chunks, queue, weekMin, res.blocus) : assign(chunks, queue, weekMin, res.blocus);
+    if (chunks.length && res.mode !== "concours") chunks[0].note = "Commence par 10 min d'Anki : rappel actif d'hier";
+    // stats
+    var net = 0, byS = {};
+    res.items.forEach(function (it, i) {
+      it.key = it.kind + "@" + hm(it.s) + (it.id ? "#" + it.id : "");
+      var counts = !it.past && (it.kind === "study" || it.kind === "exam" || (it.kind === "fixed" && !it.missed));
+      it.counts = counts;
+      if (counts) {
+        net += it.e - it.s;
+        if (it.tasks) it.tasks.forEach(function (tk) { var k = rotKey(tk.subj); byS[k] = (byS[k] || 0) + tk.min; });
+        else { var k2 = rotKey(it.subj || "REV"); byS[k2] = (byS[k2] || 0) + (it.e - it.s); }
+      }
+    });
+    // blocs (séparés par repas, sport, grande pause)
+    var bloc = 1, inBloc = 0;
+    res.items.forEach(function (it) {
+      if (it.kind === "lunch" || it.kind === "dinner" || it.kind === "sport" || it.kind === "bigpause") { if (inBloc) { bloc++; inBloc = 0; } it.bloc = 0; }
+      else if (it.counts) { it.bloc = bloc; inBloc += it.e - it.s; }
+      else it.bloc = inBloc ? bloc : 0;
+    });
+    var blocs = {};
+    res.items.forEach(function (it) { if (it.counts && it.bloc) blocs[it.bloc] = (blocs[it.bloc] || 0) + (it.e - it.s); });
+    res.blocs = blocs;
+    if (res.replanStudied) net += res.replanStudied;
+    res.net = net; res.bySubject = byS;
+    var lastStudy = 0; res.items.forEach(function (it) { if (it.counts) lastStudy = Math.max(lastStudy, it.e); });
+    res.studyEnd = lastStudy;
+    res.studyStart = res.items.filter(function (it) { return it.counts; }).reduce(function (a, it) { return Math.min(a, it.s); }, 1e9);
+    if (res.end > 23 * 60) res.warnings.push("La journée finit après 23h. Lève-toi plus tôt demain pour garder tes 8h de sommeil.");
+    (res.missed || []).forEach(function (it) { res.warnings.push(evLabel(it) + " (" + hm(it.s0 || it.s) + ") est déjà passé : pas compté."); });
+    res.items.forEach(function (it) {
+      if (it.conflict) res.warnings.push(evLabel(it) + " chevauche une autre séance : vérifie tes présences.");
+    });
+    return carry;
+  }
+
+  // ---------- API publique ----------
+  function planDay(ds, rawSettings, getDay) {
+    var S = settings(rawSettings);
+    getDay = getDay || function () { return null; };
+    var w = dow(ds);
+    if (w === 0) return planOne(ds, S, getDay, [], {});
+    var mon = monday(ds), backlog = [], weekMin = { CHIM: 0, PHYS: 0, MATH: 0, BIO: 0 }, r = null;
+    for (var d = mon; d <= ds; d = addDays(d, 1)) {
+      r = planOne(d, S, getDay, backlog, weekMin);
+      backlog = r.backlogOut || [];
+    }
+    r.backlogCarried = backlog;
+    return r;
+  }
+  function planWeek(ds, rawSettings, getDay) {
+    var mon = monday(ds), out = [];
+    for (var i = 0; i < 7; i++) out.push(planDay(addDays(mon, i), rawSettings, getDay));
+    return out;
+  }
+
+  return {
+    DEFAULTS: DEFAULTS, SUBJ: SUBJ, TYPE: TYPE, H: H,
+    m: m, hm: hm, dur: dur, addDays: addDays, dow: dow, monday: monday, weekNo: weekNo, fd: fd, pd: pd,
+    settings: settings, dayEvents: dayEvents, evLabel: evLabel, planDay: planDay, planWeek: planWeek, isEthique: isEthique
+  };
+})();
+if (typeof module !== "undefined") module.exports = Engine;
+
+</script>
+<script>
+(function () {
+  "use strict";
+  var E = Engine;
+  var LS_KEY = "horaire9h.v1";
+  var COLORS = { CHIM: "--c-chim", PHYS: "--c-phys", MATH: "--c-math", BIO: "--c-bio", BIO2: "--c-bio", MEDIG: "--c-medig", CHQ2: "--c-chq2", CONC: "--c-conc", RAIS: "--c-rais", ETH: "--c-eth", REV: "--c-rev" };
+  function cv(s) { return "var(" + (COLORS[s] || "--c-rev") + ")"; }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  var JOURS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+  var MOISC = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+  var MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+  function longDate(ds) { var d = E.pd(ds); return JOURS[d.getDay()] + " " + d.getDate() + " " + MOIS[d.getMonth()]; }
+  function shortDay(ds) { var d = E.pd(ds); return JOURS[d.getDay()].slice(0, 3) + " " + d.getDate(); }
+  function todayStr() { return E.fd(new Date()); }
+  function nowMin() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+  function hdur(x) { x = Math.max(0, Math.round(x)); return Math.floor(x / 60) + "h" + String(x % 60).padStart(2, "0"); }
+  var CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>';
+
+  // ---------- état ----------
+  var state = { settings: {}, days: {}, view: "jour", date: null, sync: "local", replanOpen: false };
+  (function load() {
+    try { var raw = localStorage.getItem(LS_KEY); if (raw) { var o = JSON.parse(raw); state.settings = o.settings || {}; state.days = o.days || {}; if (o.view) state.view = o.view; } } catch (e) {}
+    var t = todayStr(); state.date = t < "2026-09-28" ? "2026-09-28" : t;
+    var h = (location.hash || "").replace("#", ""); if (["jour", "semaine", "reglages", "methode"].indexOf(h) >= 0) state.view = h;
+  })();
+  function cache() { try { localStorage.setItem(LS_KEY, JSON.stringify({ settings: state.settings, days: state.days, view: state.view })); } catch (e) {} }
+  function S() { return E.settings(state.settings); }
+  function getDay(ds) { return state.days[ds] || null; }
+
+  // ---------- synchro (db) ----------
+  var db = null, writeQ = {};
+  function setSync(s) {
+    state.sync = s; var el = document.getElementById("sync"); el.dataset.s = s;
+    el.querySelector("span").textContent = s === "cloud" ? "Synchronisé" : s === "error" ? "Synchro en pause" : s === "connecting" ? "Connexion…" : "Sur cet appareil";
+  }
+  function writeDoc(path, data) {
+    if (!db) return;
+    var prev = writeQ[path] || Promise.resolve();
+    writeQ[path] = prev.then(function () { return db.doc(path).set(data); }).then(function () { if (state.sync !== "cloud") setSync("cloud"); }).catch(function (e) {
+      if (e && e.code === "unavailable") return new Promise(function (r) { setTimeout(r, 800 + Math.random() * 800); }).then(function () { return db.doc(path).set(data); }).catch(function () { setSync("error"); });
+      setSync("error");
+    });
+  }
+  function saveDay(ds, patch) {
+    var d = Object.assign({}, state.days[ds] || {}, patch); d.updated = new Date().toISOString();
+    Object.keys(d).forEach(function (k) { if (d[k] === undefined) delete d[k]; });
+    state.days[ds] = d; cache(); render(); writeDoc("days/" + ds, d);
+  }
+  function saveSettings(patch) {
+    var s = Object.assign({}, state.settings, patch); state.settings = s; cache(); render(); writeDoc("app/settings", s);
+  }
+  (function connect() {
+    var c = window.claude;
+    if (!c || typeof c.use !== "function") return;
+    setSync("connecting");
+    c.use("db").then(function (d) {
+      if (!d) { setSync("local"); return; }
+      db = d;
+      db.doc("app/settings").onSnapshot(function (snap) {
+        if (snap.exists) { state.settings = Object.assign({}, snap.data()); cache(); render(); }
+        setSync("cloud");
+      }, function () { setSync("error"); });
+      db.collection("days").onSnapshot(function (qs) {
+        var days = {}; qs.docs.forEach(function (doc) { days[doc.id] = Object.assign({}, doc.data()); });
+        Object.keys(state.days).forEach(function (k) { if (!days[k] && state.days[k] && !qs.metadata.fromCache) days[k] = state.days[k]; });
+        state.days = days; cache(); render(); setSync("cloud");
+      }, function () { setSync("error"); });
+    }).catch(function () { setSync("local"); });
+  })();
+
+  // ---------- toast ----------
+  var toastT = null;
+  function toast(msg) { var t = document.getElementById("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 2200); }
+
+  // ---------- libellés ----------
+  var PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie" };
+  function minorLabel(it, res) {
+    switch (it.kind) {
+      case "prep": return it.long ? ["Avant de commencer", "Tu as choisi de commencer à " + E.hm(it.e)] : ["Réveil & préparation", "Eau, petit-déj, bureau prêt, téléphone en mode concentration"];
+      case "pause": return ["Pause", "Debout, eau, loin des écrans"];
+      case "bigpause": return ["Grande pause", "Marche dehors ou collation"];
+      case "lunch": return ["Déjeuner" + (it.loc === "campus" ? " · campus" : ""), it.note || ""];
+      case "dinner": return ["Dîner", ""];
+      case "sport": return ["Sport " + S().sport + " min + douche", "Dernier truc de la journée"];
+      case "travel":
+        if (it.dir !== "to") return ["Retour", "Anki sur le téléphone possible (non compté)"];
+        return ["Trajet vers Erasme", (it.dest ? it.destLabel + " · " + it.dest : "") + (it.snack ? ". Prends une collation : tu mangeras après les séances" : "") + (it.late ? ". Pars tout de suite" : "")];
+      case "free": return [it.done ? "Libre" : "Transition", it.note || (it.done ? "Ton quota du jour est atteint" : "Range, prépare tes affaires")];
+    }
+    return [it.kind, ""];
+  }
+
+  // ---------- vue Jour ----------
+  function planFor(ds) { return E.planDay(ds, state.settings, getDay); }
+  function renderDay() {
+    var ds = state.date, st = S(), res = planFor(ds), day = getDay(ds) || {}, done = day.done || {};
+    var isToday = ds === todayStr(), nm = nowMin();
+    var modeTxt = res.mode === "concours" ? "Concours blanc" + (res.ethique ? " + éthique" : "") : res.mode === "samedi" ? "Chimie Q2 + rattrapage" : res.mode === "conge" ? (res.closed || "Congé") : res.blocus ? "Blocus" : "Semaine de cours";
+    var weekTxt = res.week >= 3 && res.week <= 16 ? "S" + res.week : "";
+    // chiffres
+    var doneMin = res.replanStudied || 0;
+    res.items.forEach(function (it) { if (it.counts && done[it.key]) doneMin += it.e - it.s; });
+    var target = st.targetH * 60;
+    var nextDs = E.addDays(ds, 1), nextWake = E.m(((getDay(nextDs) || {}).wake) || st.wake);
+    var bed = nextWake - st.sleepH * 60;
+    var h = [];
+    h.push('<section class="dayhead">');
+    h.push('<div class="datenav"><h1>' + esc(longDate(ds)) + '</h1><div class="navbtns"><button class="nb" data-act="prev" aria-label="Jour précédent">‹</button><button class="nb" data-act="next" aria-label="Jour suivant">›</button>');
+    if (!isToday) h.push('<button class="btn ghost" data-act="today">Aujourd\'hui</button>');
+    h.push('</div></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + (weekTxt ? '<span class="chip mono">' + weekTxt + '</span>' : '') + '<span class="chip mode-' + res.mode + '">' + esc(modeTxt) + '</span></div>');
+    h.push('<div class="wake"><div class="times"><label for="wake"><span class="lbl">Levé à</span><input type="time" id="wake" value="' + E.hm(res.wake) + '" step="300"></label>');
+    h.push('<label for="start"><span class="lbl">Je commence à</span><input type="time" id="start" value="' + E.hm(res.start) + '" step="300"></label>');
+    h.push('<span class="auto">' + (res.startSet ? '<button class="linkbtn" data-act="startauto">Remettre en auto</button>' : 'auto : lever + ' + st.prep + ' min') + '</span></div>');
+    if (isToday) h.push('<div class="wbtns"><button class="btn primary" data-act="wakenow">Je viens de me lever</button><button class="btn" data-act="startnow">Je commence maintenant</button></div>');
+    h.push('<div class="facts"><div class="fact"><span class="lbl">Début</span><b>' + E.hm(res.studyStart) + '</b></div><div class="fact"><span class="lbl">Fin</span><b>' + E.hm(res.end) + '</b></div><div class="fact"><span class="lbl">Net</span><b>' + hdur(res.net) + '</b></div><div class="fact"><span class="lbl">Coucher</span><b>' + E.hm(bed) + '</b></div></div>');
+    var pct = Math.min(100, doneMin / target * 100);
+    h.push('<div class="meter"><div class="row1"><span><b class="mono">' + hdur(doneMin) + '</b> cochées sur ' + hdur(target) + '</span><span>' + (doneMin >= target ? "Objectif atteint" : "reste " + hdur(target - doneMin)) + '</span></div><div class="bar"><span style="width:' + pct.toFixed(1) + '%;background:var(--ok)"></span></div></div>');
+    h.push('</div>');
+    var bl = Object.keys(res.blocs);
+    if (bl.length) h.push('<div class="blocsum">' + bl.map(function (k) { return '<span>Bloc ' + k + ' <b>' + hdur(res.blocs[k]) + '</b></span>'; }).join("") + '</div>');
+    if (res.warnings.length) h.push('<div class="warnbox">' + res.warnings.map(esc).map(function (w) { return "<span>" + w + "</span>"; }).join("") + '</div>');
+    h.push('</section>');
+
+    h.push('<div class="daygrid"><div class="tl" id="tl">');
+    var curBloc = -1;
+    res.items.forEach(function (it) {
+      if (it.kind === "replan") { h.push('<div class="replan-line">Replanifié à ' + E.hm(it.s) + ' · ' + hdur(it.studied) + ' déjà faites</div>'); curBloc = -1; return; }
+      if (it.counts && it.bloc && it.bloc !== curBloc) { curBloc = it.bloc; h.push('<div class="bloc-h">Bloc ' + it.bloc + ' <small>' + hdur(res.blocs[it.bloc]) + ' nettes</small></div>'); }
+      var d = it.e - it.s, isNow = isToday && nm >= it.s && nm < it.e && !it.past;
+      var cls = ["row", "k-" + it.kind], color;
+      if (it.past) cls.push("past");
+      if (isNow) cls.push("now");
+      var major = it.kind === "study" || it.kind === "fixed" || it.kind === "exam";
+      cls.push(major ? "major" : "minor");
+      if (major && done[it.key]) cls.push("done");
+      if (it.kind === "study") color = cv(it.subj);
+      else if (it.kind === "fixed" || it.kind === "exam") color = cv(it.subj);
+      else if (it.kind === "sport") color = "var(--c-sport)";
+      else if (it.kind === "lunch" || it.kind === "dinner") color = "var(--c-break)";
+      else color = "var(--c-break)";
+      var railH = major ? Math.max(40, Math.round(d * 0.95)) : Math.max(14, Math.round(d * 0.5));
+      h.push('<div class="' + cls.join(" ") + '" data-s="' + it.s + '" data-e="' + it.e + '" style="--c:' + color + '">');
+      h.push('<div class="tm"><span>' + E.hm(it.s) + '</span>' + (major ? '<span class="te">' + E.hm(it.e) + '</span>' : '') + '</div><div class="rail" style="--h:' + railH + 'px"></div><div class="body">');
+      if (major) {
+        var title, meta = [], pill = "";
+        if (it.kind === "study") {
+          var big = (it.tasks || []).reduce(function (a, t) { return !a || t.min > a.min ? t : a; }, null);
+          title = big ? big.title : "Étude";
+        } else if (it.kind === "exam") {
+          title = it.title; pill = '<span class="pill">' + (it.subj === "CONC" ? "Concours" : "Partie 2") + '</span>';
+        } else {
+          title = E.evLabel(it);
+          pill = '<span class="pill">' + (PILL[it.type] || it.type) + '</span>';
+          var sub = E.H.subjects[it.subj];
+          if (sub) meta.push('<span class="mono">' + esc(sub.code) + '</span>');
+          if (it.note && it.type !== "TH") meta.push(esc(it.note));
+          if (it.moved) meta.push("déplacé : jour habituel fermé");
+          if (it.late) meta.push("tu arrives en cours de séance");
+          if (it.missed) meta.push("manqué");
+        }
+        h.push('<div class="l1"><div class="ttl">' + esc(title) + '</div>' + (isNow ? '<span class="nowtag">En cours</span>' : '') + '<span class="len">' + E.dur(d) + '</span>');
+        if (!it.past && !it.missed) h.push('<button class="chk" data-key="' + esc(it.key) + '" aria-pressed="' + (!!done[it.key]) + '" aria-label="Marquer comme fait">' + CHECK + '</button>');
+        h.push('</div>');
+        if (it.kind === "fixed") {
+          h.push('<div class="where">' + pill + '<span class="lbl">Local</span><b>' + esc(it.room || "non indiqué") + '</b></div>');
+          if (meta.length) h.push('<div class="meta">' + meta.map(function (x) { return '<span>' + x + '</span>'; }).join("") + '</div>');
+        } else if (pill || meta.length) h.push('<div class="meta">' + pill + meta.map(function (x) { return '<span>' + x + '</span>'; }).join("") + '</div>');
+        if (it.kind === "study" && it.tasks) {
+          h.push('<ul class="tasks">' + it.tasks.map(function (t) { return '<li style="--c:' + cv(t.subj) + '"><i></i><span>' + esc(t.title) + '</span><em>' + t.min + ' min</em>' + (t.detail ? '<small>' + esc(t.detail) + '</small>' : '') + '</li>'; }).join("") + '</ul>');
+          if (it.note) h.push('<div class="note">' + esc(it.note) + '</div>');
+          if (it.loc === "campus") h.push('<div class="note">Sur le campus : bibliothèque ou salle d\'étude</div>');
+        }
+        if (it.kind === "exam" && it.detail) h.push('<div class="meta" style="margin-top:6px"><span>' + esc(it.detail) + '</span></div>');
+      } else {
+        var lb = minorLabel(it, res);
+        h.push('<b>' + esc(lb[0]) + '</b><span class="mono" style="font-size:12.5px">' + E.dur(d) + '</span>' + (isNow ? '<span class="nowtag">Maintenant</span>' : '') + (lb[1] ? '<small>' + esc(lb[1]) + '</small>' : ''));
+      }
+      h.push('</div></div>');
+    });
+    h.push('<div class="endrow"><b>' + E.hm(res.end) + ' · journée terminée</b><span>' + hdur(res.net) + ' nettes. Coucher conseillé vers ' + E.hm(bed) + ' pour ' + st.sleepH + 'h de sommeil (lever ' + E.hm(nextWake) + ' demain).</span></div>');
+    h.push('</div>');
+
+    // panneau latéral
+    h.push('<aside class="aside">');
+    if (isToday || day.replan) {
+      h.push('<div class="card"><h2>Pris du retard ?</h2><p class="sub">Recalcule la suite de la journée à partir de maintenant, sans perdre ce qui est déjà fait.</p>');
+      if (state.replanOpen) {
+        var at = isToday ? Math.floor(nm / 5) * 5 : (day.replan ? day.replan.at : res.studyStart);
+        var dflt = replanDefaults(res, at, done);
+        h.push('<div class="rp"><div class="f"><label>Reprise à <input type="time" id="rp-at" value="' + E.hm(at) + '" step="300"></label></div>');
+        h.push('<div class="f"><span>Déjà étudié</span><input type="number" id="rp-h" min="0" max="14" value="' + Math.floor(dflt.studied / 60) + '"> h <input type="number" id="rp-m" min="0" max="55" step="5" value="' + (Math.round(dflt.studied % 60 / 5) * 5) + '"> min</div>');
+        h.push('<div class="f"><label class="ck"><input type="checkbox" id="rp-lunch"' + (dflt.lunch ? " checked" : "") + '> Déjeuner pris</label><label class="ck"><input type="checkbox" id="rp-sport"' + (dflt.sport ? " checked" : "") + '> Sport fait</label><label class="ck"><input type="checkbox" id="rp-dinner"' + (dflt.dinner ? " checked" : "") + '> Dîner pris</label></div>');
+        h.push('<div class="f"><button class="btn primary" data-act="rp-go">Replanifier</button><button class="btn ghost" data-act="rp-close">Fermer</button></div></div>');
+      } else {
+        h.push('<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="rp-open">Replanifier depuis maintenant</button>' + (day.replan ? '<button class="btn ghost" data-act="rp-clear">Revenir au plan initial</button>' : '') + '</div>');
+      }
+      h.push('</div>');
+    }
+    if (res.mode === "concours") {
+      h.push('<div class="card"><h2>Dimanche concours</h2><p class="sub">Éthique & empathie : un dimanche sur ' + st.ethiqueEvery + '. Le raisonnement, tous les dimanches.</p>');
+      h.push('<div class="ev" style="--c:var(--c-eth)"><div class="t"><i></i>Partie éthique & empathie</div><div class="d">' + st.ethique + ' min après le raisonnement' + (typeof day.ethique === "boolean" ? " · réglé à la main" : " · selon le cycle") + '</div><button class="sw" role="switch" data-act="eth" aria-checked="' + !!res.ethique + '" aria-label="Partie éthique ce dimanche"></button></div></div>');
+    }
+    if (res.events.length) {
+      h.push('<div class="card"><h2>Séances à l\'unif</h2><p class="sub">Active ce à quoi tu vas : le plan se recalcule et le compte des 9h aussi.</p>');
+      res.events.forEach(function (ev) {
+        var desc = E.hm(ev.s) + "–" + E.hm(ev.e) + (ev.room ? " · " + ev.room : "");
+        if (ev.type === "TH") desc += " · facultatif";
+        if (ev.vete) desc += " · créneau partagé VETE";
+        if (ev.assumed) desc += " · horaire supposé";
+        if ((ev.type === "GUID" || ev.type === "PERM") && !ev.def) desc += " · autre créneau possible";
+        h.push('<div class="ev' + (ev.attend ? "" : " off") + '" style="--c:' + cv(ev.subj) + '"><div class="t"><i></i>' + esc(E.evLabel(ev)) + '</div><div class="d">' + esc(desc) + '</div><button class="sw" role="switch" data-act="ev" data-id="' + esc(ev.id) + '" aria-checked="' + ev.attend + '" aria-label="J\'y vais"></button></div>');
+      });
+      h.push('</div>');
+    } else if (res.mode === "semaine" || res.mode === "conge") {
+      h.push('<div class="card"><h2>Pas de séance aujourd\'hui</h2><p class="sub">Journée complète à la maison : ' + hdur(res.net) + ' d\'étude perso.</p></div>');
+    }
+    if (res.backlogCarried && res.backlogCarried.length && res.mode !== "samedi") {
+      h.push('<div class="card"><h2>Reporté à demain</h2><p class="sub">Ce qui n\'a pas tenu aujourd\'hui passe en tête de demain (puis au samedi).</p>' + res.backlogCarried.map(function (b) { return '<div class="ev" style="--c:' + cv(b.subj) + '"><div class="t"><i></i>' + esc(b.title) + '</div><div class="d">' + b.min + ' min restantes</div></div>'; }).join("") + '</div>');
+    }
+    h.push('</aside></div>');
+    return h.join("");
+  }
+  function replanDefaults(res, at, done) {
+    var any = false, studied = res.replanStudied || 0;
+    res.items.forEach(function (it) { if (it.counts && done[it.key]) any = true; });
+    res.items.forEach(function (it) {
+      if (!it.counts || it.s >= at) return;
+      var part = Math.min(it.e, at) - it.s;
+      if (!any || done[it.key]) studied += part;
+    });
+    function did(k) { return res.items.some(function (it) { return it.kind === k && it.e <= at; }); }
+    return { studied: studied, lunch: did("lunch"), sport: did("sport"), dinner: did("dinner") };
+  }
+
+  // ---------- vue Semaine ----------
+  function renderWeek() {
+    var mon = E.monday(state.date), week = E.planWeek(state.date, state.settings, getDay), today = todayStr();
+    var minS = 1440, maxE = 0;
+    week.forEach(function (r) { r.items.forEach(function (it) { minS = Math.min(minS, it.s); maxE = Math.max(maxE, it.e); }); });
+    var h0 = Math.floor(minS / 60), h1 = Math.ceil(maxE / 60), HR = 38, H = (h1 - h0) * HR;
+    function y(x) { return (x - h0 * 60) / 60 * HR; }
+    var sun = E.addDays(mon, 6), dm = E.pd(mon), dsun = E.pd(sun);
+    var h = [];
+    h.push('<div class="weekhead"><h1>' + dm.getDate() + " " + MOISC[dm.getMonth()] + " → " + dsun.getDate() + " " + MOISC[dsun.getMonth()] + '</h1><button class="nb" data-act="wprev" aria-label="Semaine précédente">‹</button><button class="nb" data-act="wnext" aria-label="Semaine suivante">›</button>' + (E.weekNo(mon) >= 3 && E.weekNo(mon) <= 16 ? '<span class="chip mono">S' + E.weekNo(mon) + '</span>' : '') + '</div>');
+    h.push('<div class="wscroll"><div class="wgrid" style="--hr:' + HR + 'px"><div></div>');
+    week.forEach(function (r) { h.push('<div class="whead' + (r.date === today ? " today" : "") + '"><button data-act="goday" data-date="' + r.date + '">' + esc(shortDay(r.date)) + '<small>' + E.hm(r.wake) + ' → ' + E.hm(r.end) + '</small></button></div>'); });
+    var hrs = []; for (var k = h0; k <= h1; k++) hrs.push('<span style="top:' + ((k - h0) * HR) + 'px">' + String(k % 24).padStart(2, "0") + 'h</span>');
+    h.push('<div class="hours" style="height:' + H + 'px">' + hrs.join("") + '</div>');
+    week.forEach(function (r) {
+      h.push('<div class="track" style="height:' + H + 'px">');
+      r.items.forEach(function (it) {
+        if (it.kind === "replan" || it.e <= it.s) return;
+        var top = y(it.s), ht = Math.max(2, y(it.e) - top - 1), cls = "blk", lab = "", c = "var(--c-break)";
+        if (it.kind === "study") { var bg = (it.tasks || []).reduce(function (a, t) { return !a || t.min > a.min ? t : a; }, null); c = cv(bg ? bg.subj : it.subj); lab = bg ? bg.title : ""; }
+        else if (it.kind === "fixed") { cls += " fx"; c = cv(it.subj); lab = E.evLabel(it); var rm = (it.room || "").split(" · ")[0]; if (rm) lab += "\u0001" + rm; }
+        else if (it.kind === "exam") { cls += " fx"; c = cv(it.subj); lab = it.title; }
+        else if (it.kind === "sport") { cls += " sp"; lab = "Sport"; }
+        else { cls += " brk"; lab = it.kind === "lunch" ? "Déjeuner" : it.kind === "dinner" ? "Dîner" : it.kind === "travel" ? "Trajet" : ""; }
+        h.push('<div class="' + cls + '" style="top:' + top.toFixed(1) + 'px;height:' + ht.toFixed(1) + 'px;--c:' + c + '" title="' + esc(E.hm(it.s) + "–" + E.hm(it.e) + " " + lab.replace("\u0001", " · ")) + '">' + (ht >= 20 ? esc(lab).split("\u0001").join(ht >= 34 ? "<small>" : " · ") + (lab.indexOf("\u0001") >= 0 && ht >= 34 ? "</small>" : "") : "") + '</div>');
+      });
+      h.push('</div>');
+    });
+    h.push('</div><div class="legend">' + [["CHIM", "Chimie"], ["PHYS", "Physique"], ["MATH", "Maths"], ["BIO", "Bio"], ["CHQ2", "Chimie Q2"], ["CONC", "Concours"], ["REV", "Révision"]].map(function (x) { return '<span style="--c:' + cv(x[0]) + '"><i></i>' + x[1] + '</span>'; }).join("") + '<span style="--c:var(--c-sport)"><i></i>Sport</span><span>Bloc plein = séance à l\'unif</span></div></div>');
+    // totaux
+    var tot = {}, net = 0, fixed = 0;
+    week.forEach(function (r) { net += r.net; Object.keys(r.bySubject).forEach(function (k) { tot[k] = (tot[k] || 0) + r.bySubject[k]; }); r.items.forEach(function (it) { if (it.kind === "fixed" && it.counts) fixed += it.e - it.s; }); });
+    var order = ["CHIM", "PHYS", "MATH", "BIO", "CHQ2", "CONC", "RAIS", "ETH", "REV", "MEDIG"], names = { CHIM: "Chimie", PHYS: "Physique", MATH: "Maths", BIO: "Bio", CHQ2: "Chimie Q2", CONC: "Concours", RAIS: "Raisonnement", ETH: "Éthique", REV: "Révision", MEDIG: "MEDIG" };
+    var mx = 0; order.forEach(function (k) { mx = Math.max(mx, tot[k] || 0); });
+    h.push('<div class="wcards"><div class="card"><h2>Répartition de la semaine</h2><p class="sub">' + hdur(net) + ' nettes au total, dont ' + hdur(fixed) + ' en séances à l\'unif.</p><div class="totals">');
+    order.forEach(function (k) { if (!tot[k]) return; h.push('<div class="tot" style="--c:' + cv(k) + '"><span>' + names[k] + '</span><div class="b"><span style="width:' + (tot[k] / mx * 100).toFixed(1) + '%"></span></div><em>' + hdur(tot[k]) + '</em></div>'); });
+    h.push('</div></div>');
+    h.push('<div class="card"><h2>Séances de la semaine</h2><p class="sub">Celles que tu as activées.</p>');
+    week.forEach(function (r) { r.items.forEach(function (it) { if (it.kind !== "fixed") return; h.push('<div class="ev" style="--c:' + cv(it.subj) + '"><div class="t"><i></i>' + esc(E.evLabel(it)) + '</div><div class="d">' + esc(shortDay(r.date) + " · " + E.hm(it.s) + "–" + E.hm(it.e) + (it.room ? " · " + it.room : "")) + '</div></div>'); }); });
+    h.push('</div></div>');
+    return h.join("");
+  }
+
+  // ---------- vue Réglages ----------
+  var FORM = [
+    ["Journée", [["wake", "Réveil habituel (si tu ne saisis rien)", "time"], ["prep", "Préparation après le lever", "min"], ["targetH", "Objectif net par jour", "h"], ["sleepH", "Sommeil visé", "h"]]],
+    ["Rythme", [["session", "Session de concentration max", "min"], ["pause", "Micro-pause", "min"], ["bigPause", "Grande pause", "min"], ["lunch", "Déjeuner", "min"], ["dinner", "Dîner", "min"], ["sport", "Sport", "min"], ["shower", "Douche après le sport", "min"]]],
+    ["Unif · Erasme", [["travel", "Trajet aller simple", "min"], ["guidChimDay", "Guidance chimie : jour", "sel", [[2, "Mardi"], [3, "Mercredi"], [4, "Jeudi"]]], ["guidChimDur", "Guidance chimie : durée", "min"], ["permPhysDay", "Permanence physique : jour", "sel", [[1, "Lundi"], [2, "Mardi"], [3, "Mercredi"], [4, "Jeudi"], [5, "Vendredi"]]], ["permPhysStart", "Permanence physique : arrivée", "time"], ["permPhysDur", "Permanence physique : durée", "min"], ["appuiMath", "Appui maths du mardi", "bool"], ["appuiBio", "Appui bio du vendredi", "bool"], ["attendTheory", "Aller aux cours théoriques", "bool"]]],
+    ["Week-end", [["chimOrga", "Samedi : chimie organique (Q2)", "min"], ["chimMin", "Samedi : chimie minérale (Q2)", "min"], ["concoursSat", "Samedi : prépa concours physique + maths", "min"], ["revSat", "Samedi : révision de la semaine", "min"], ["concoursStart", "Début du concours blanc (vide = dès que prêt)", "time"], ["concoursPause", "Pause entre les deux parties", "min"], ["raisonnement", "Raisonnement", "min"], ["ethique", "Éthique & empathie", "min"], ["ethiqueEvery", "Éthique : toutes les", "sem"], ["ethiqueAnchor", "Éthique : premier dimanche", "date"]]]
+  ];
+  function renderSettings() {
+    var st = S(), h = ['<section class="settings"><h1>Réglages</h1>'];
+    FORM.forEach(function (g) {
+      h.push('<fieldset><legend>' + g[0] + '</legend>');
+      g[1].forEach(function (f) {
+        var k = f[0], v = st[k], id = "set-" + k, inp;
+        if (f[2] === "time") inp = '<input type="time" id="' + id + '" data-set="' + k + '" data-t="str" value="' + esc(v || "") + '">';
+        else if (f[2] === "date") inp = '<input type="date" id="' + id + '" data-set="' + k + '" data-t="str" value="' + esc(v) + '">';
+        else if (f[2] === "bool") inp = '<button class="sw" role="switch" id="' + id + '" data-set="' + k + '" data-t="bool" aria-checked="' + !!v + '" aria-label="' + esc(f[1]) + '" style="grid-row:auto"></button>';
+        else if (f[2] === "sel") inp = '<select id="' + id + '" data-set="' + k + '" data-t="num">' + f[3].map(function (o) { return '<option value="' + o[0] + '"' + (+v === o[0] ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select>';
+        else inp = '<input type="number" id="' + id + '" data-set="' + k + '" data-t="num" value="' + esc(v) + '" min="0" step="' + (f[2] === "h" ? "0.5" : "5") + '"><span class="u">' + (f[2] === "sem" ? "sem." : f[2]) + '</span>';
+        h.push('<div class="fr"><label for="' + id + '">' + esc(f[1]) + '</label><div class="in">' + inp + '</div></div>');
+      });
+      h.push('</fieldset>');
+    });
+    h.push('<div class="setfoot"><button class="btn" data-act="reset">Revenir aux réglages de base</button><span class="sub" style="color:var(--muted);font-size:13px">' + (state.sync === "cloud" ? "Enregistré et synchronisé sur tes appareils." : "Enregistré sur cet appareil.") + '</span></div></section>');
+    return h.join("");
+  }
+
+  // ---------- vue Méthode ----------
+  function renderMethod() {
+    var st = S(), cyc = [], d = st.ethiqueAnchor;
+    for (var i = 0; i < 8; i++) { var x = E.pd(d); cyc.push(x.getDate() + " " + MOISC[x.getMonth()]); d = E.addDays(d, 7 * st.ethiqueEvery); }
+    return '<article class="method"><h1>Comment le plan est construit</h1>' +
+      '<p>Tu entres l\'heure à laquelle tu t\'es levé. Après ' + st.prep + ' min de préparation, l\'app remplit la journée jusqu\'à ' + st.targetH + 'h d\'étude nettes, en calant les séances fixes à leur heure.</p>' +
+      '<h2>Ce qui compte dans les ' + st.targetH + 'h</h2><ul><li>Étude perso, séminaires, exercices, TP, guidance, permanence, appuis : oui.</li><li>Trajets, repas, pauses, sport : non.</li></ul>' +
+      '<h2>Trois blocs</h2><ul><li>Bloc 1 jusqu\'au déjeuner (entre 12h et 13h15), bloc 2 jusqu\'à une grande pause de ' + st.bigPause + ' min, bloc 3 le soir.</li><li>Sessions de ' + st.session + ' min maximum, ' + st.pause + ' min de pause entre deux.</li><li>Le sport (' + st.sport + ' min + douche) est toujours la dernière chose de la journée.</li><li>Tu peux choisir l\'heure à laquelle tu commences : tout le programme se décale.</li></ul>' +
+      '<h2>Une matière = un bloc</h2><ul><li>En semaine, chaque matière est travaillée d\'un seul tenant : cours du jour, préparation de séminaire et exercices de la même matière se suivent. Une fois que tu es passé à autre chose, la matière ne revient plus dans la journée.</li></ul>' +
+      '<h2>Semaine de cours</h2><ul><li>Tu ne vas pas aux cours magistraux : le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l\'heure du cours.</li><li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li><li>La veille d\'un séminaire : préparation de la série.</li><li>Guidance chimie 1×/semaine : jeudi par défaut, avant le séminaire de maths (un seul trajet). Permanence physique 1×/semaine : mercredi 10h–12h, avant les séminaires de chimie et physique.</li><li>Appuis : maths le mardi 12h–14h, bio le vendredi 12h–14h. Les créneaux partagés avec VETE sont désactivés par défaut.</li><li>Le reste du temps tourne entre chimie, physique, maths et bio pour équilibrer la semaine.</li></ul>' +
+      '<h2>Samedi</h2><ul><li>Matin : chimie Q2, ' + hdur(st.chimOrga) + ' d\'organique puis ' + hdur(st.chimMin) + ' de minérale (redox, acide-base).</li><li>Après-midi : prépa concours ' + hdur(st.concoursSat) + ' (physique puis maths), puis révision de la semaine ' + hdur(st.revSat) + ', qui commence par ce qui a été reporté.</li></ul>' +
+      '<h2>Dimanche concours</h2><ul><li>Concours blanc 3h en sciences dès que tu es prêt' + (st.concoursStart ? " (ou à " + esc(st.concoursStart) + ")" : "") + ', pause ' + st.concoursPause + ' min, raisonnement ' + st.raisonnement + ' min.</li><li>Éthique & empathie un dimanche sur ' + st.ethiqueEvery + ' :</li></ul><div class="cyc">' + cyc.map(function (c) { return "<span>" + c + "</span>"; }).join("") + '</div>' +
+      '<ul><li>Ensuite : correction complète (fiche d\'erreurs), puis remédiation sur les notions ratées.</li></ul>' +
+      '<h2>À vérifier de ton côté</h2><ul><li>Guidance chimie à partir de novembre : créneaux supposés identiques à octobre (mar 10h30, mer 10h, jeu 11h).</li><li>Séminaire de maths du 22/10 : local non indiqué dans TimeEdit.</li><li>Cours MEDIG (IA, ERSB, durabilité) : vérifie si la présence est obligatoire, puis active-les dans « Séances à l\'unif ».</li></ul>' +
+      '<h2>Sur tes appareils</h2><ul><li>iPhone (Safari) : Partager → Sur l\'écran d\'accueil.</li><li>Tablette Android (Chrome) : menu ⋮ → Ajouter à l\'écran d\'accueil.</li><li>PC : ajoute la page à tes favoris ou épingle l\'onglet.</li><li>Connecté à ton compte Claude, ton heure de lever, tes cases cochées et tes réglages se synchronisent entre les appareils.</li></ul></article>';
+  }
+
+  // ---------- rendu & navigation ----------
+  function render() {
+    var app = document.getElementById("app"), html;
+    if (state.view === "semaine") html = renderWeek();
+    else if (state.view === "reglages") html = renderSettings();
+    else if (state.view === "methode") html = renderMethod();
+    else html = renderDay();
+    var active = document.activeElement && document.activeElement.id;
+    app.innerHTML = html;
+    if (active) { var el = document.getElementById(active); if (el && el.tagName === "INPUT" && el.type !== "time") try { el.focus(); } catch (e) {} }
+    Array.prototype.forEach.call(document.querySelectorAll("#tabs button"), function (b) { b.setAttribute("aria-selected", String(b.dataset.v === state.view)); });
+  }
+  function go(view) { state.view = view; state.replanOpen = false; cache(); render(); window.scrollTo(0, 0); }
+  document.getElementById("tabs").addEventListener("click", function (e) { var b = e.target.closest("button[data-v]"); if (b) go(b.dataset.v); });
+
+  var app = document.getElementById("app");
+  app.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-act],[data-key],[data-set]");
+    if (!b) return;
+    if (b.dataset.key && b.classList.contains("chk")) {
+      var day = getDay(state.date) || {}, done = Object.assign({}, day.done || {});
+      if (done[b.dataset.key]) delete done[b.dataset.key]; else done[b.dataset.key] = true;
+      saveDay(state.date, { done: done }); return;
+    }
+    if (b.dataset.set && b.dataset.t === "bool") { var o = {}; o[b.dataset.set] = b.getAttribute("aria-checked") !== "true"; saveSettings(o); return; }
+    var act = b.dataset.act;
+    if (act === "prev") { state.date = E.addDays(state.date, -1); state.replanOpen = false; render(); }
+    else if (act === "next") { state.date = E.addDays(state.date, 1); state.replanOpen = false; render(); }
+    else if (act === "today") { state.date = todayStr(); render(); }
+    else if (act === "wprev") { state.date = E.addDays(state.date, -7); render(); }
+    else if (act === "wnext") { state.date = E.addDays(state.date, 7); render(); }
+    else if (act === "goday") { state.date = b.dataset.date; go("jour"); }
+    else if (act === "wakenow") { var n = Math.floor(nowMin() / 5) * 5, dw2 = getDay(state.date) || {}, pw2 = { wake: E.hm(n), replan: undefined }; if (dw2.start && E.m(dw2.start) < n) pw2.start = undefined; saveDay(state.date, pw2); toast("Levé à " + E.hm(n) + " : journée calculée"); }
+    else if (act === "startnow") { var n2 = Math.ceil(nowMin() / 5) * 5; saveDay(state.date, { start: E.hm(n2), replan: undefined }); toast("Programme calé sur " + E.hm(n2)); }
+    else if (act === "startauto") { saveDay(state.date, { start: undefined }); toast("Début automatique : lever + " + S().prep + " min"); }
+    else if (act === "ev") {
+      var d0 = getDay(state.date) || {}, ov = Object.assign({}, d0.ov || {});
+      ov[b.dataset.id] = b.getAttribute("aria-checked") !== "true"; saveDay(state.date, { ov: ov });
+    }
+    else if (act === "eth") { saveDay(state.date, { ethique: b.getAttribute("aria-checked") !== "true" }); }
+    else if (act === "rp-open") { state.replanOpen = true; render(); }
+    else if (act === "rp-close") { state.replanOpen = false; render(); }
+    else if (act === "rp-clear") { state.replanOpen = false; saveDay(state.date, { replan: undefined }); toast("Plan initial rétabli"); }
+    else if (act === "rp-go") {
+      var at = E.m(document.getElementById("rp-at").value || "12:00");
+      var studied = (+document.getElementById("rp-h").value || 0) * 60 + (+document.getElementById("rp-m").value || 0);
+      state.replanOpen = false;
+      saveDay(state.date, { replan: { at: at, studied: studied, lunch: document.getElementById("rp-lunch").checked, sport: document.getElementById("rp-sport").checked, dinner: document.getElementById("rp-dinner").checked } });
+      toast("Suite de la journée recalculée");
+    }
+    else if (act === "reset") { state.settings = {}; cache(); render(); writeDoc("app/settings", {}); toast("Réglages de base rétablis"); }
+  });
+  app.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.id === "wake" && t.value) { var dw = getDay(state.date) || {}, pw = { wake: t.value }; if (dw.start && E.m(dw.start) < E.m(t.value)) pw.start = undefined; saveDay(state.date, pw); return; }
+    if (t.id === "start" && t.value) { saveDay(state.date, { start: t.value, replan: undefined }); toast("Programme calé sur " + t.value); return; }
+    if (t.dataset && t.dataset.set) {
+      var o = {}, v = t.value;
+      if (t.dataset.t === "num") { if (v === "" || isNaN(+v)) return; v = +v; }
+      o[t.dataset.set] = v; saveSettings(o); toast("Réglage enregistré");
+    }
+  });
+
+  // surlignage « maintenant » sans tout redessiner
+  setInterval(function () {
+    if (state.view !== "jour" || state.date !== todayStr()) return;
+    var nm = nowMin(), changed = false;
+    Array.prototype.forEach.call(document.querySelectorAll("#tl .row"), function (r) {
+      var on = nm >= +r.dataset.s && nm < +r.dataset.e && !r.classList.contains("past");
+      if (on !== r.classList.contains("now")) changed = true;
+    });
+    if (changed && !(document.activeElement && /INPUT|SELECT/.test(document.activeElement.tagName))) render();
+  }, 30000);
+
+  render();
+})();
+</script>
+
+</body></html>

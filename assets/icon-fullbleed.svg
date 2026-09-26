@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Variante plein cadre (icônes « maskable », iPhone, Android) : motif réduit dans la zone sûre -->
+  <rect width="512" height="512" fill="#1A47D6"/>
+  <g transform="translate(256 256) scale(.72) translate(-256 -256)">
+    <circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="42"/>
+    <path d="M256 106 A150 150 0 1 1 106 256" fill="none" stroke="#fff" stroke-width="42" stroke-linecap="round"/>
+    <path d="M256 256 V168 M256 256 H186" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="256" cy="256" r="20" fill="#fff"/>
+  </g>
+</svg>

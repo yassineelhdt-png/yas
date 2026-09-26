@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Horaire 9h</string>
+    <string name="title_activity_main">Horaire 9h</string>
+    <string name="package_name">com.yas.horaire9h</string>
+    <string name="custom_url_scheme">com.yas.horaire9h</string>
+</resources>

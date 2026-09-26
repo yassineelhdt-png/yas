@@ -1,0 +1,14 @@
+{
+  "appId": "com.yas.horaire9h",
+  "appName": "Horaire 9h",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#EDF0F3"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}

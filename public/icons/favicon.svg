@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Horaire 9h : horloge à 9:00, arc des 9 heures sur 12 -->
+  <rect width="512" height="512" rx="116" fill="#1A47D6"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="42"/>
+  <path d="M256 106 A150 150 0 1 1 106 256" fill="none" stroke="#fff" stroke-width="42" stroke-linecap="round"/>
+  <path d="M256 256 V168 M256 256 H186" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="256" cy="256" r="20" fill="#fff"/>
+</svg>
