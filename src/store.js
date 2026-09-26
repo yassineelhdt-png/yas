@@ -172,8 +172,8 @@ export function exportData() {
   return { app: EXPORT_APP, version: 1, exportedAt: new Date().toISOString(), settings: state.settings, days: state.days };
 }
 
-/** Remplace réglages et journées par ceux d'une sauvegarde. Lève une erreur si le contenu est invalide. */
-export function importData(text) {
+/** Lit une sauvegarde (texte JSON) sans rien modifier. Lève une erreur lisible si le contenu est invalide. */
+export function parseBackup(text) {
   let o;
   try {
     o = JSON.parse(text);
@@ -186,11 +186,15 @@ export function importData(text) {
   }
   const days = {};
   for (const [k, v] of Object.entries(o.days || {})) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && isObj(v)) days[k] = v;
-  state.settings = o.settings || {};
+  return { settings: o.settings || {}, days };
+}
+
+/** Remplace réglages et journées par ceux d'une sauvegarde lue avec parseBackup. */
+export function importData({ settings, days }) {
+  state.settings = settings;
   state.days = days;
   cache();
   notify();
-  writeDoc("app/settings", state.settings);
+  writeDoc("app/settings", settings);
   for (const [k, v] of Object.entries(days)) writeDoc("days/" + k, v);
-  return Object.keys(days).length;
 }

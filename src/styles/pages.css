@@ -21,6 +21,7 @@ legend { font-family: var(--display); font-weight: 650; font-size: 16px; padding
   border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2);
   padding: 8px 10px; font-family: var(--mono); font-size: 12px;
 }
+.confirmbox { display: grid; gap: 10px; background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
 .setfoot { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .setfoot .sub { margin: 0; }
 

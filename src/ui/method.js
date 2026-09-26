@@ -1,7 +1,7 @@
 // Vue « Méthode » : comment le plan est construit.
 import { html } from "lit-html";
 import * as E from "../engine/index.js";
-import { S } from "../store.js";
+import { S, state } from "../store.js";
 import { MOISC } from "./format.js";
 
 export function methodView() {
@@ -68,10 +68,12 @@ export function methodView() {
 
       <h2>Sur tes appareils</h2>
       <ul>
-        <li>iPhone : ouvre l'app web dans Safari → Partager → « Sur l'écran d'accueil ». Elle s'ouvre en plein écran et marche sans réseau.</li>
+        <li>iPhone : ouvre l'app (artefact Claude ou site web) dans Safari → Partager → « Sur l'écran d'accueil ».</li>
         <li>Tablette Android : installe l'APK (téléchargé depuis la page GitHub « Releases »).</li>
         <li>PC : installe « Horaire 9h » pour Windows, ou, dans Chrome/Edge, clique sur l'icône « Installer » de la barre d'adresse.</li>
-        <li>Chaque appareil garde ses propres données. Pour copier tes réglages et tes cases cochées d'un appareil à l'autre : Réglages → Sauvegarde.</li>
+        <li>${state.sync === "cloud"
+          ? "Ouverte depuis ton compte Claude, l'app synchronise tes réglages et tes cases cochées entre tes appareils."
+          : "Chaque appareil garde ses propres données. Pour copier tes réglages et tes cases cochées d'un appareil à l'autre : Réglages → Sauvegarde."}</li>
         <li>Raccourcis clavier sur PC : ← → changer de jour, T aujourd'hui, 1 à 4 pour les onglets.</li>
       </ul>
     </article>`;

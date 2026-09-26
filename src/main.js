@@ -8,10 +8,11 @@ import { mountApp } from "./ui/app.js";
 import { connectSync } from "./store.js";
 import { platform } from "./platform.js";
 
+if (platform.artifact) document.documentElement.classList.add("in-artifact");
 mountApp(document.getElementById("app"));
 connectSync();
 
 // Hors ligne sur iPhone / navigateur : service worker (inutile dans les apps Android et PC, déjà hors ligne)
-if (import.meta.env.PROD && "serviceWorker" in navigator && location.protocol === "https:" && !platform.native && !platform.electron) {
+if (import.meta.env.PROD && !platform.artifact && "serviceWorker" in navigator && location.protocol === "https:" && !platform.native && !platform.electron) {
   import("virtual:pwa-register").then(({ registerSW }) => registerSW({ immediate: true })).catch(() => {});
 }

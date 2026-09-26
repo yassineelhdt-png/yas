@@ -17,7 +17,8 @@
     "android:sync": "vite build && cap sync android",
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleRelease",
     "desktop": "vite build && electron .",
-    "desktop:win": "vite build && electron-builder --win --publish never"
+    "desktop:win": "vite build && electron-builder --win --publish never",
+    "build:artifact": "node scripts/build-artifact.mjs"
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.2",
@@ -33,6 +34,7 @@
     "sharp": "^0.35.4",
     "vite": "^8.3.1",
     "vite-plugin-pwa": "^1.3.0",
+    "vite-plugin-singlefile": "^2.3.3",
     "vitest": "^5.0.2",
     "workbox-window": "^7.4.1"
   },

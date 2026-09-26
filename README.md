@@ -5,14 +5,16 @@ Une seule base de code pour toutes les plateformes :
 
 | Appareil | Format | Où le trouver |
 |---|---|---|
-| iPhone | App web installable (plein écran, hors ligne) | https://yassineelhdt-png.github.io/yas/ |
+| iPhone | Artefact Claude (synchronisé avec ton compte) ou app web installable | ton lien d'artefact Claude, ou https://yassineelhdt-png.github.io/yas/ |
 | Tablette Android (Honor MagicPad 4) | APK | [Releases → `Horaire-9h.apk`](https://github.com/yassineelhdt-png/yas/releases/latest/download/Horaire-9h.apk) |
 | PC Windows | Installeur ou version portable | [Releases](https://github.com/yassineelhdt-png/yas/releases/latest) |
 
 ## Installer
 
-**iPhone** — ouvre le lien dans **Safari** → bouton Partager → « Sur l'écran d'accueil ».
-L'app s'ouvre en plein écran et fonctionne sans réseau.
+**iPhone** — deux possibilités, à ouvrir dans **Safari** puis Partager → « Sur l'écran d'accueil » :
+- ton **artefact Claude** « Horaire 9h nettes » (la même app, publiée avec `npm run build:artifact`) :
+  aucun réglage GitHub, et tes données se synchronisent avec ton compte Claude ;
+- le **site** GitHub Pages (après l'activation ci-dessous) : plein écran et utilisable sans réseau.
 
 **Tablette Android** — sur la tablette, télécharge `Horaire-9h.apk` depuis la page *Releases*, ouvre-le et
 autorise l'installation depuis le navigateur (« sources inconnues »). Les versions suivantes s'installent
@@ -60,6 +62,7 @@ npm run build        # build web → dist/
 npm run desktop      # lancer l'app PC (Electron)
 npm run android:apk  # APK (nécessite le SDK Android + Java 21)
 npm run icons        # régénérer les icônes depuis assets/*.svg
+npm run build:artifact  # version artefact Claude → dist-artifact/horaire-9h.html
 ```
 
 À chaque push, GitHub Actions teste le code, fabrique l'APK et l'app Windows, les publie dans la

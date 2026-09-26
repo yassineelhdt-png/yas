@@ -7,6 +7,8 @@
   backdrop-filter: saturate(1.6) blur(14px);
   border-bottom: 1px solid var(--line);
 }
+/* artefact Claude : :root est déjà décalé par la zone sûre ; l'en-tête collant se cale dessous */
+.in-artifact .top { top: env(safe-area-inset-top, 0px); padding-top: 10px; }
 .top-in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
 .brand { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; margin-right: auto; white-space: nowrap; }
 .brand b { font-family: var(--mono); font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: .02em; }

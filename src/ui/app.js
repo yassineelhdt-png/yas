@@ -54,14 +54,23 @@ function applyView(view) {
   window.scrollTo(0, 0);
 }
 
+// certains cadres (artefact Claude) refusent de modifier l'historique : l'onglet change quand même
+function safeHistory(method, data, url) {
+  try {
+    history[method](data, "", url);
+  } catch {
+    /* pas d'historique : le bouton retour ne changera pas d'onglet */
+  }
+}
+
 /** Onglets : un seul niveau d'historique (Jour ← autre onglet), pour que « retour » ramène au Jour. */
 function goView(view) {
   if (view === state.view) return window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
   if (view === "jour") {
     if (history.state?.tab) return history.back(); // popstate s'occupe du reste
-    history.replaceState(null, "", location.pathname + location.search);
-  } else if (state.view === "jour") history.pushState({ tab: true }, "", "#" + view);
-  else history.replaceState({ tab: true }, "", "#" + view);
+    safeHistory("replaceState", null, location.pathname + location.search);
+  } else if (state.view === "jour") safeHistory("pushState", { tab: true }, "#" + view);
+  else safeHistory("replaceState", { tab: true }, "#" + view);
   applyView(view);
 }
 
@@ -118,11 +127,18 @@ function shell() {
     <div class="toast ${state.toast ? "show" : ""}" role="status" aria-live="polite">${state.toast || ""}</div>`;
 }
 
+// En « auto », on ne touche pas à data-theme : dans un artefact Claude, c'est le thème choisi dans Claude.
+let ownTheme = false;
 function applyTheme() {
   const root = document.documentElement;
-  if (state.theme === "auto") delete root.dataset.theme;
-  else root.dataset.theme = state.theme;
-  const dark = state.theme === "dark" || (state.theme === "auto" && darkScheme.matches);
+  if (state.theme !== "auto") {
+    root.dataset.theme = state.theme;
+    ownTheme = true;
+  } else if (ownTheme) {
+    delete root.dataset.theme;
+    ownTheme = false;
+  }
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : darkScheme.matches;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? THEME_COLOR.dark : THEME_COLOR.light);
   native?.then((n) => n.setBarsDark(dark));
 }

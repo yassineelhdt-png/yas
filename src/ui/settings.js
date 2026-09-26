@@ -1,7 +1,7 @@
 // Vue « Réglages » : paramètres du planning, apparence, sauvegarde.
 import { html, nothing } from "lit-html";
 import { live } from "lit-html/directives/live.js";
-import { state, S, saveSettings, resetSettings, setTheme, toast, exportData, importData } from "../store.js";
+import { state, S, notify, saveSettings, resetSettings, setTheme, toast, exportData, parseBackup, importData } from "../store.js";
 import { platform } from "../platform.js";
 import { icons } from "./icons.js";
 
@@ -102,22 +102,48 @@ function downloadBackup() {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-function doImport(text) {
+// Sauvegarde lue et en attente de confirmation (confirm() n'existe pas partout, ex. dans un artefact Claude)
+let pending = null;
+
+function prepareImport(text) {
   if (!text.trim()) return toast("Colle d'abord une sauvegarde");
-  if (!confirm("Remplacer tes réglages et tes journées par cette sauvegarde ?")) return;
   try {
-    const n = importData(text);
-    toast("Sauvegarde restaurée (" + n + " jour" + (n > 1 ? "s" : "") + ")");
-    document.getElementById("backup-in").value = "";
+    pending = parseBackup(text);
+    notify();
   } catch (err) {
     toast(err.message);
   }
 }
 
+function confirmImport() {
+  importData(pending);
+  const n = Object.keys(pending.days).length;
+  pending = null;
+  document.getElementById("backup-in").value = "";
+  toast("Sauvegarde restaurée (" + n + " jour" + (n > 1 ? "s" : "") + ")");
+}
+
+function cancelImport() {
+  pending = null;
+  notify();
+}
+
 async function importFile(e) {
   const file = e.target.files?.[0];
   e.target.value = "";
-  if (file) doImport(await file.text());
+  if (file) prepareImport(await file.text());
+}
+
+function importControls() {
+  if (!pending) {
+    return html`<div class="btnrow"><button class="btn primary" @click=${() => prepareImport(document.getElementById("backup-in").value)}>Restaurer cette sauvegarde</button></div>`;
+  }
+  const n = Object.keys(pending.days).length;
+  return html`
+    <div class="confirmbox" role="alert">
+      <span>Tes réglages et tes journées actuels seront remplacés par ceux de la sauvegarde (${n} jour${n > 1 ? "s" : ""}).</span>
+      <div class="btnrow"><button class="btn primary" @click=${confirmImport}>Remplacer mes données</button><button class="btn ghost" @click=${cancelImport}>Annuler</button></div>
+    </div>`;
 }
 
 export function settingsView() {
@@ -148,7 +174,7 @@ export function settingsView() {
           <label class="btn">${icons.upload()} Ouvrir un fichier<input type="file" accept="application/json,.json" hidden @change=${importFile}></label>
         </div>
         <textarea id="backup-in" rows="3" placeholder="Colle ici une sauvegarde copiée depuis un autre appareil…" spellcheck="false"></textarea>
-        <div class="btnrow"><button class="btn primary" @click=${() => doImport(document.getElementById("backup-in").value)}>Restaurer cette sauvegarde</button></div>
+        ${importControls()}
       </fieldset>
 
       <div class="setfoot">
