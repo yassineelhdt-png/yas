@@ -1,8 +1,3 @@
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mon suivi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,7 +49,7 @@ body{ margin:0; min-height:100vh; background:var(--bg); color:var(--ink); font-f
 button,input,select,textarea{ font:inherit; color:inherit; }
 button{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
 :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
-h1,h2,h3{ margin:0; }
+h1,h2,h3{ margin:0; text-wrap:balance; }
 .sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
 /* Barre du haut */
@@ -84,6 +79,10 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .link{ border:0; background:transparent; color:var(--muted); font-weight:700; font-size:14px; padding:6px 8px; border-radius:8px; }
 .link:hover{ color:var(--ink); }
 .link.danger{ color:var(--danger); background:transparent; min-height:0; padding:6px 8px; }
+@media (hover:hover){
+  .icon:hover,.ghost:hover,.lid:hover{ border-color:var(--muted); }
+  .tabs button:not([aria-current]):hover{ color:var(--ink); }
+}
 .hint{ margin:0 0 12px; color:var(--muted); font-size:14px; font-weight:500; }
 .empty{ margin:4px 0 0; color:var(--muted); }
 .muted{ color:var(--muted); }
@@ -204,7 +203,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .month h3{ font-size:15px; font-weight:800; margin-bottom:8px; }
 .blister{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:5px; }
 .wdh{ text-align:center; font-size:11px; font-weight:700; color:var(--muted); }
-.bub{ display:block; width:100%; min-height:20px; aspect-ratio:1/1; padding:0; border-radius:50%; border:1px solid var(--line); background:var(--bub); position:relative; box-shadow:inset 0 -2px 0 rgba(0,0,0,.07); }
+.bub{ display:block; width:100%; max-width:100%; min-height:20px; aspect-ratio:1/1; padding:0; border-radius:50%; border:1px solid var(--line); background:var(--bub); position:relative; box-shadow:inset 0 -2px 0 rgba(0,0,0,.07); }
 .bub.none{ background:transparent; border-style:dashed; box-shadow:none; }
 .bub.part{ background:conic-gradient(var(--fill) calc(var(--p) * 1turn), var(--bub) 0); }
 .bub.full{ background:var(--fill); border-color:var(--fill); }
@@ -246,8 +245,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 #toast.show{ opacity:1; transform:none; }
 @media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation:none !important; transition:none !important; } }
 </style>
-</head>
-<body>
+
 <div id="app">
   <header class="top">
     <div class="top-in">
@@ -258,84 +256,126 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         <button type="button" data-act="tab" data-view="annee">Année</button>
         <button type="button" data-act="tab" data-view="reglages">Réglages</button>
       </nav>
-      <span class="sync" id="sync" aria-live="polite">Chargement…</span>
+      <span class="sync" id="sync">Chargement…</span>
     </div>
   </header>
   <main id="view"><p class="loading">Chargement de tes données…</p></main>
   <div class="toast-wrap"><div id="toast" role="status" aria-live="polite"></div></div>
 </div>
+
 <script>
-(function () {
+(() => {
   'use strict';
+  document.documentElement.lang = 'fr';
+
+  /* ---------- Réglages techniques ---------- */
+  const LS_KEY = 'mon-suivi-v1';          // données en mode local (sans compte Claude)
+  const CACHE_KEY = 'mon-suivi-cloud-v1'; // copie du compte sur cet appareil + modifications pas encore envoyées
+  const SAVE_DELAY = 700;                 // regroupe les frappes avant d'écrire en ligne
+  const LOCAL_DELAY = 250;
+  const CAPS_TIMEOUT = 9000;
+  const GET_TIMEOUT = 12000;
+  const MAX_DOC_BYTES = 250000;           // marge sous la limite de 256 Kio par document
+  const RETRY_DELAYS = [5000, 15000, 30000, 60000];
+  const MONTH_DOC = /^m\d{4}-\d{2}$/;
 
   /* ---------- Outils ---------- */
-  var pad = function (n) { return String(n).padStart(2, '0'); };
-  var toKey = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
-  var fromKey = function (k) { var p = k.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); };
-  var todayKey = function () { return toKey(new Date()); };
-  var addDays = function (k, n) { var d = fromKey(k); d.setDate(d.getDate() + n); return toKey(d); };
-  var dayNum = function (k) { var p = k.split('-').map(Number); return Math.round(Date.UTC(p[0], p[1] - 1, p[2]) / 86400000); };
-  var weekdayOf = function (k) { return (fromKey(k).getDay() + 6) % 7; };
-  var monthKey = function (k) { return k.slice(0, 7); };
-  var startOfWeek = function (k) { return addDays(k, -weekdayOf(k)); };
-  var isKey = function (s) { return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s); };
-  var nowTime = function () { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
-  var toMin = function (t) { if (typeof t !== 'string' || !/^\d{1,2}:\d{2}$/.test(t)) return null; var p = t.split(':').map(Number); return p[0] * 60 + p[1]; };
-  var fromMin = function (m) { m = ((m % 1440) + 1440) % 1440; return pad(Math.floor(m / 60)) + ':' + pad(m % 60); };
-  var newId = function () { return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-5); };
-  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-  var cap1 = function (s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; };
-  var clean = function (o) { return JSON.parse(JSON.stringify(o)); };
-  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
-  var byTime = function (a, b) { var x = toMin(a.time), y = toMin(b.time); return (x == null ? 9999 : x) - (y == null ? 9999 : y); };
+  const pad = (n) => String(n).padStart(2, '0');
+  const toKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const fromKey = (k) => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const todayKey = () => toKey(new Date());
+  const addDays = (k, n) => { const d = fromKey(k); d.setDate(d.getDate() + n); return toKey(d); };
+  const dayNum = (k) => { const [y, m, d] = k.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 86400000); };
+  const weekdayOf = (k) => (fromKey(k).getDay() + 6) % 7;
+  const monthKey = (k) => k.slice(0, 7);
+  const monthDocId = (k) => 'm' + monthKey(k);
+  const startOfWeek = (k) => addDays(k, -weekdayOf(k));
+  const isKey = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  const nowTime = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  const toMin = (t) => {
+    const m = typeof t === 'string' ? /^(\d{1,2}):(\d{2})$/.exec(t) : null;
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+  };
+  const fromMin = (m) => { m = ((m % 1440) + 1440) % 1440; return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; };
+  const newId = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-5);
+  const cap1 = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+  const clone = (o) => (o === undefined ? undefined : JSON.parse(JSON.stringify(o)));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const withTimeout = (p, ms, fallback) => Promise.race([p, sleep(ms).then(() => fallback)]);
+  const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+  const str = (v) => (typeof v === 'string' ? v : '');
+  const listOf = (v) => (Array.isArray(v) ? v.filter(isObj) : []);
+  const byTime = (a, b) => (toMin(a.time) ?? 9999) - (toMin(b.time) ?? 9999);
+  const bytes = (s) => new TextEncoder().encode(s).length;
+  const plural = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
+  const bool = (b) => (b ? 'true' : 'false');
+  const attr = (name, value) => `[${name}="${CSS.escape(String(value))}"]`;
+  /* Souris ou pavé tactile : on peut déplacer le focus sans ouvrir de clavier à l'écran. */
+  const finePointer = () => { try { return matchMedia('(pointer: fine)').matches; } catch (e) { return false; } };
   function stable(v) {
     if (Array.isArray(v)) return '[' + v.map(stable).join(',') + ']';
-    if (v && typeof v === 'object') return '{' + Object.keys(v).sort().filter(function (k) { return v[k] !== undefined; }).map(function (k) { return JSON.stringify(k) + ':' + stable(v[k]); }).join(',') + '}';
+    if (v && typeof v === 'object') {
+      return '{' + Object.keys(v).sort().filter((k) => v[k] !== undefined).map((k) => JSON.stringify(k) + ':' + stable(v[k])).join(',') + '}';
+    }
     return JSON.stringify(v === undefined ? null : v);
   }
-  function withTimeout(p, ms, fallback) { return Promise.race([p, new Promise(function (r) { setTimeout(function () { r(fallback); }, ms); })]); }
 
-  var fmtDay, fmtMonth;
-  try {
-    fmtDay = new Intl.DateTimeFormat('fr-BE', { weekday: 'long', day: 'numeric', month: 'long' });
-    fmtMonth = new Intl.DateTimeFormat('fr-BE', { month: 'long' });
-  } catch (e) {
-    fmtDay = new Intl.DateTimeFormat('fr', { weekday: 'long', day: 'numeric', month: 'long' });
-    fmtMonth = new Intl.DateTimeFormat('fr', { month: 'long' });
+  /* Gabarits HTML : tout ce qui est inséré avec ${…} est échappé, sauf un autre gabarit html`…`.
+     Un tableau est concaténé ; null, undefined et false n'affichent rien. */
+  const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
+  class Html { constructor(s) { this.s = s; } toString() { return this.s; } }
+  const trusted = (s) => new Html(s);
+  const part = (v) => (v instanceof Html ? v.s : Array.isArray(v) ? v.map(part).join('') : v == null || v === false ? '' : esc(v));
+  const html = (strings, ...vals) => new Html(strings.reduce((out, s, i) => out + part(vals[i - 1]) + s));
+
+  /* ---------- Dates en français ---------- */
+  const WD_SHORT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const WD_LETTER = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  const WD_LONG = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+  const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const dayNumber = (n) => (n === 1 ? '1er' : String(n));
+  const yearSuffix = (d) => (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '');
+  const longDate = (k) => {
+    const d = fromKey(k);
+    return cap1(`${WD_LONG[weekdayOf(k)]} ${dayNumber(d.getDate())} ${MONTHS[d.getMonth()]}${yearSuffix(d)}`);
+  };
+  function weekTitle(start) {
+    const a = fromKey(start), b = fromKey(addDays(start, 6));
+    const split = a.getFullYear() !== b.getFullYear();
+    const from = a.getMonth() === b.getMonth() ? dayNumber(a.getDate()) : `${dayNumber(a.getDate())} ${MONTHS[a.getMonth()]}${split ? ' ' + a.getFullYear() : ''}`;
+    return `Semaine du ${from} au ${dayNumber(b.getDate())} ${MONTHS[b.getMonth()]}${split ? ' ' + b.getFullYear() : yearSuffix(b)}`;
   }
-  var longDate = function (k) { return cap1(fmtDay.format(fromKey(k))); };
-  var monthName = function (y, m) { return cap1(fmtMonth.format(new Date(y, m, 1))); };
-  var WD_SHORT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-  var WD_LETTER = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-  var WD_LONG = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
-  var MOMENTS = [
+  /* ---------- Contenu ---------- */
+  const MOMENTS = [
     { key: 'matin', label: 'Matin', hint: 'avec le café' },
     { key: 'midi', label: 'Midi', hint: 'avec le repas' },
     { key: 'aprem', label: '16h', hint: 'repas ou collation' },
     { key: 'soir', label: 'Soir', hint: '' }
   ];
-  var MOMENT_KEYS = MOMENTS.map(function (m) { return m.key; });
-  var FREQS = { daily: 'Tous les jours', alt: 'Un jour sur deux', weekly: 'Une fois par semaine' };
-  var FREQ_BADGE = { alt: '1 jour sur 2', weekly: '1 fois par semaine' };
-  var SCALES = [
+  const MOMENT_KEYS = MOMENTS.map((m) => m.key);
+  const FREQS = { daily: 'Tous les jours', alt: 'Un jour sur deux', weekly: 'Une fois par semaine' };
+  const FREQ_BADGE = { alt: '1 jour sur 2', weekly: '1 fois par semaine' };
+  const SCALES = [
     { key: 'mood', label: 'Humeur', lo: 'au plus bas', hi: 'au top', faces: ['😞', '😕', '😐', '🙂', '😄'] },
     { key: 'energy', label: 'Énergie', lo: 'à plat', hi: 'à fond' },
     { key: 'focus', label: 'Concentration', lo: 'dispersé', hi: 'focus total' },
     { key: 'hunger', label: 'Faim', lo: 'aucune', hi: 'très forte' }
   ];
-  var FACES = SCALES[0].faces;
-  var ICON = {
-    left: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    right: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    check: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  const FACES = SCALES[0].faces;
+  const MEAL_KINDS = ['Repas', 'Collation'];
+  const ICON = {
+    left: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    right: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')
   };
+  /* Une note de 1 à 5, sinon null (protège l'affichage contre une donnée abîmée). */
+  const scaleValue = (v) => (Number.isInteger(v) && v >= 1 && v <= 5 ? v : null);
 
   /* ---------- Liste de départ ---------- */
   function defaultSupplements(since) {
-    var mk = function (name, dose, moment, freq, note) {
-      return { id: newId(), name: name, dose: dose, moment: moment, freq: freq, note: note, since: since, active: true, weekday: null };
-    };
+    const mk = (name, dose, moment, freq, note) => ({ id: newId(), name, dose, moment, freq, note, since, active: true, weekday: null });
     return [
       mk('L-théanine', '200 mg', 'matin', 'daily', 'Avec le café'),
       mk('Citicoline', '250 mg', 'matin', 'daily', ''),
@@ -351,864 +391,1091 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       mk('Mounjaro', '2,5 mg', 'matin', 'weekly', 'Dose prescrite par ton médecin')
     ];
   }
-  function freshSettings() { var t = todayKey(); return { version: 1, created: t, supplements: defaultSupplements(t) }; }
+  const freshSettings = () => { const t = todayKey(); return { version: 1, created: t, supplements: defaultSupplements(t) }; };
   function normalizeSettings(raw) {
-    var created = raw && isKey(raw.created) ? raw.created : todayKey();
-    var sups = raw && Array.isArray(raw.supplements) ? raw.supplements : [];
+    const created = raw && isKey(raw.created) ? raw.created : todayKey();
+    const sups = raw && Array.isArray(raw.supplements) ? raw.supplements : [];
     return {
-      version: 1, created: created,
-      supplements: sups.filter(function (s) { return s && typeof s === 'object'; }).map(function (s) {
-        var wd = (s.weekday === null || s.weekday === undefined || s.weekday === '') ? null : Math.min(6, Math.max(0, Number(s.weekday) || 0));
-        return {
-          id: String(s.id || newId()), name: String(s.name || 'Sans nom'), dose: String(s.dose || ''), note: String(s.note || ''),
-          moment: MOMENT_KEYS.indexOf(s.moment) >= 0 ? s.moment : 'matin',
-          freq: FREQS[s.freq] ? s.freq : 'daily',
-          since: isKey(s.since) ? s.since : created,
-          active: s.active !== false, weekday: wd
-        };
-      })
+      version: 1,
+      created,
+      supplements: sups.filter(isObj).map((s) => ({
+        id: String(s.id || newId()),
+        name: String(s.name || 'Sans nom'),
+        dose: String(s.dose || ''),
+        note: String(s.note || ''),
+        moment: MOMENT_KEYS.includes(s.moment) ? s.moment : 'matin',
+        freq: FREQS[s.freq] ? s.freq : 'daily',
+        since: isKey(s.since) ? s.since : created,
+        active: s.active !== false,
+        weekday: s.weekday == null || s.weekday === '' ? null : Math.min(6, Math.max(0, Math.round(Number(s.weekday)) || 0))
+      }))
     };
   }
+  /* Garde les mois « AAAA-MM » et, dedans, les jours « AAAA-MM-JJ » de ce mois. */
   function sanitizeMonths(m) {
-    var out = {};
-    if (m && typeof m === 'object') Object.keys(m).forEach(function (key) {
-      if (/^\d{4}-\d{2}$/.test(key) && m[key] && m[key].days && typeof m[key].days === 'object') out[key] = { days: m[key].days };
+    const out = {};
+    if (!isObj(m)) return out;
+    Object.keys(m).forEach((mk) => {
+      if (!/^\d{4}-\d{2}$/.test(mk) || !isObj(m[mk]) || !isObj(m[mk].days)) return;
+      const days = {};
+      Object.keys(m[mk].days).forEach((dk) => { if (isKey(dk) && monthKey(dk) === mk && isObj(m[mk].days[dk])) days[dk] = m[mk].days[dk]; });
+      out[mk] = { days };
     });
     return out;
   }
 
   /* ---------- État ---------- */
-  var S = {
+  const S = {
     settings: null, months: {}, ready: false,
     ui: { view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(), form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null }
   };
-  function peekDay(k) { var m = S.months[monthKey(k)]; return m && m.days ? m.days[k] : undefined; }
+  let localData = null;
+
+  function peekDay(k) { const m = S.months[monthKey(k)]; return m && isObj(m.days) && isObj(m.days[k]) ? m.days[k] : undefined; }
   function ensureDay(k) {
-    var mk = monthKey(k);
-    if (!S.months[mk]) S.months[mk] = { days: {} };
-    if (!S.months[mk].days) S.months[mk].days = {};
-    var d = S.months[mk].days[k];
-    if (!d) { d = { taken: {}, wake: '', bed: '', checkins: [], meals: [], notes: '' }; S.months[mk].days[k] = d; }
-    if (!d.taken || typeof d.taken !== 'object') d.taken = {};
+    const mk = monthKey(k);
+    const month = S.months[mk] || (S.months[mk] = { days: {} });
+    if (!isObj(month.days)) month.days = {};
+    let d = month.days[k];
+    if (!isObj(d)) d = month.days[k] = { taken: {}, wake: '', bed: '', checkins: [], meals: [], notes: '' };
+    if (!isObj(d.taken)) d.taken = {};
     if (!Array.isArray(d.checkins)) d.checkins = [];
     if (!Array.isArray(d.meals)) d.meals = [];
     return d;
   }
-  function mutateDay(k, field, fn, rerender) { var d = ensureDay(k); fn(d); touchDay(k, field); markDirty('m' + monthKey(k)); if (rerender !== false) render(); }
-  function mutateSettings(fn, rerender) { fn(S.settings); markDirty('settings'); if (rerender !== false) render(); }
+  function mutateDay(k, field, fn, rerender = true) {
+    fn(ensureDay(k));
+    touchDay(k, field);
+    markDirty(monthDocId(k));
+    if (rerender) render();
+  }
+  function mutateSettings(fn, rerender = true) {
+    fn(S.settings);
+    markDirty('settings');
+    if (rerender) render();
+  }
 
   function isScheduled(s, k) {
     if (!s || s.active === false) return false;
     if (s.since && k < s.since) return false;
     if (s.freq === 'alt') return Math.abs(dayNum(k) - dayNum(s.since || k)) % 2 === 0;
-    if (s.freq === 'weekly') return s.weekday !== null && s.weekday !== undefined && weekdayOf(k) === Number(s.weekday);
+    if (s.freq === 'weekly') return s.weekday != null && weekdayOf(k) === Number(s.weekday);
     return true;
   }
-  function isTaken(sid, k) { var d = peekDay(k); return !!(d && d.taken && d.taken[sid]); }
-  function scheduledFor(k) { return S.settings.supplements.filter(function (s) { return isScheduled(s, k); }); }
-  function itemsForDay(k) { return S.settings.supplements.filter(function (s) { return isScheduled(s, k) || isTaken(s.id, k); }); }
+  function isTaken(sid, k) { const d = peekDay(k); return !!(d && isObj(d.taken) && d.taken[sid]); }
+  const scheduledFor = (k) => S.settings.supplements.filter((s) => isScheduled(s, k));
+  const itemsForDay = (k) => S.settings.supplements.filter((s) => isScheduled(s, k) || isTaken(s.id, k));
   function stats(k) {
-    var sch = scheduledFor(k), n = 0;
-    sch.forEach(function (s) { if (isTaken(s.id, k)) n++; });
-    return { total: sch.length, taken: n };
+    const sch = scheduledFor(k);
+    return { total: sch.length, taken: sch.filter((s) => isTaken(s.id, k)).length };
   }
   function avgScale(k, key) {
-    var d = peekDay(k); if (!d || !Array.isArray(d.checkins)) return null;
-    var vals = d.checkins.map(function (c) { return c[key]; }).filter(function (v) { return typeof v === 'number' && v >= 1 && v <= 5; });
-    if (!vals.length) return null;
-    return vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
+    const d = peekDay(k);
+    const vals = d ? listOf(d.checkins).map((c) => scaleValue(c[key])).filter((v) => v != null) : [];
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
   }
-  var fmtAvg = function (v) { return String(Math.round(v * 10) / 10).replace('.', ','); };
+  const fmtAvg = (v) => String(Math.round(v * 10) / 10).replace('.', ',');
+  /* Durée de la nuit : coucher noté la veille (avant midi = après minuit), réveil noté ce jour-là. */
   function nightLength(bed, wake) {
-    var b = toMin(bed), w = toMin(wake);
+    const b = toMin(bed), w = toMin(wake);
     if (b === null || w === null) return '';
-    var bAdj = b < 720 ? b + 1440 : b;
-    var dur = (w + 1440) - bAdj;
+    const dur = w + 1440 - (b < 720 ? b + 1440 : b);
     if (dur <= 0 || dur > 20 * 60) return '';
-    return Math.floor(dur / 60) + ' h ' + pad(dur % 60);
+    return `${Math.floor(dur / 60)} h ${pad(dur % 60)}`;
+  }
+  function hasJournal(d) {
+    return !!(d && (listOf(d.checkins).length || listOf(d.meals).length || str(d.wake) || str(d.notes)));
   }
 
-  /* ---------- Enregistrement ---------- */
-  var LS_KEY = 'mon-suivi-v1';
-  var store = { mode: 'local', col: null, dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, dirtyDays: {}, writingDays: {}, downloads: null, unsub: null };
-  /* Champs modifiés ici et pas encore écrits : { 'm2026-09': { '2026-09-26': { 'taken:abc': true, notes: true } } } */
-  function touchDay(k, field) {
-    var id = 'm' + monthKey(k);
-    var map = store.dirtyDays[id] || (store.dirtyDays[id] = {});
-    (map[k] || (map[k] = {}))[field || '*'] = true;
-  }
-  function restoreDays(docId, pending) {
-    delete store.writingDays[docId];
-    var cur = store.dirtyDays[docId] || (store.dirtyDays[docId] = {});
-    Object.keys(pending || {}).forEach(function (dk) {
-      var c = cur[dk] || (cur[dk] = {});
-      Object.keys(pending[dk]).forEach(function (f) { c[f] = true; });
+  /* ---------- Enregistrement ----------
+     Mode « local » : pas de compte Claude, tout reste dans ce navigateur (LS_KEY).
+     Mode « cloud » : un document « settings » et un document par mois (« m2026-09 ») dans data/users/<id>.
+     Chaque modification note le jour et le champ touchés (« taken:<id> », « notes »… ou « * » pour le jour entier) :
+     seuls ces champs partent en ligne, pour ne pas écraser ce qu'un autre appareil écrit en même temps.
+     Tant qu'ils ne sont pas confirmés, ils restent aussi dans la copie de l'appareil (CACHE_KEY) :
+     hors ligne ou page fermée trop tôt, ils repartent au prochain chargement. Cette copie sert aussi
+     à afficher tes données tout de suite, avant la réponse du compte. */
+  const store = {
+    mode: 'local', online: false, connecting: false, stopped: false, failed: false,
+    col: null, uid: null, downloads: null, unsub: null,
+    trusted: true,        // false : la liste affichée n'est pas (encore) celle du compte
+    dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {},
+    dirtyDays: {},        // { 'm2026-09': { '2026-09-26': { 'taken:abc': true, notes: true } } }
+    writingDays: {},      // la même chose, pour les écritures en cours
+    connectTry: 0, connectTimer: null, retryTry: 0, retryTimer: null, lsTimer: null, status: null
+  };
+
+  function lsGet(key) { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+  function lsSet(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
+
+  function addFields(target, src) {
+    if (!isObj(src)) return target;
+    Object.keys(src).forEach((dk) => {
+      if (!isKey(dk) || !isObj(src[dk])) return;
+      const t = target[dk] || (target[dk] = {});
+      Object.keys(src[dk]).forEach((f) => { t[f] = true; });
     });
+    return target;
+  }
+  function touchDay(k, field = '*') {
+    if (store.mode !== 'cloud') return;
+    addFields(store.dirtyDays[monthDocId(k)] || (store.dirtyDays[monthDocId(k)] = {}), { [k]: { [field]: true } });
   }
   function pendingFields(docId, dk) {
-    var a = store.dirtyDays[docId] && store.dirtyDays[docId][dk], b = store.writingDays[docId] && store.writingDays[docId][dk];
-    if (!a && !b) return null;
-    var out = {};
-    [a, b].forEach(function (o) { if (o) Object.keys(o).forEach(function (f) { out[f] = true; }); });
-    return out;
+    const a = store.dirtyDays[docId] && store.dirtyDays[docId][dk];
+    const b = store.writingDays[docId] && store.writingDays[docId][dk];
+    return a || b ? Object.assign({}, a, b) : null;
   }
-  function lsRead() { try { var raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
-  function lsWrite() { try { localStorage.setItem(LS_KEY, JSON.stringify({ settings: S.settings, months: S.months })); return true; } catch (e) { return false; } }
+  function pendingSnapshot() {
+    const days = {};
+    new Set([...Object.keys(store.dirtyDays), ...Object.keys(store.writingDays)]).forEach((id) => {
+      const m = addFields(addFields({}, store.dirtyDays[id]), store.writingDays[id]);
+      if (Object.keys(m).length) days[id] = m;
+    });
+    return { settings: store.dirty.has('settings') || store.inflight.has('settings'), days };
+  }
 
-  function setSync(st) {
-    var el = document.getElementById('sync'); if (!el) return;
-    var map = {
-      loading: ['Chargement…', 'var(--muted)'],
-      saved: ['Enregistré', 'var(--fill)'],
-      saving: ['Enregistrement…', 'var(--matin)'],
-      local: ['Sur cet appareil', 'var(--muted)'],
-      error: ['Pas enregistré en ligne', 'var(--danger)']
-    };
-    var v = map[st] || map.saved;
-    el.textContent = v[0];
-    el.style.setProperty('--dot', v[1]);
-    el.title = st === 'error' ? "L'enregistrement en ligne a échoué. Tes données sont gardées sur cet appareil en attendant." : '';
-  }
-  function markDirty(docId) {
+  function persistNow() {
+    clearTimeout(store.lsTimer); store.lsTimer = null;
+    if (!S.settings) return true;
     if (store.mode === 'local') {
-      store.dirtyDays = {};
-      clearTimeout(store.timers.ls);
-      store.timers.ls = setTimeout(function () { store.timers.ls = null; setSync(lsWrite() ? 'local' : 'error'); }, 250);
-      return;
+      store.failed = !lsSet(LS_KEY, { settings: S.settings, months: S.months });
+      refreshSync();
+      return !store.failed;
     }
+    if (!store.uid) return false;
+    return lsSet(CACHE_KEY, { v: 1, uid: store.uid, trusted: store.trusted, settings: S.settings, months: S.months, pending: pendingSnapshot() });
+  }
+  function persistSoon() { clearTimeout(store.lsTimer); store.lsTimer = setTimeout(persistNow, LOCAL_DELAY); }
+
+  const SYNC = {
+    loading: ['Chargement…', 'var(--muted)', ''],
+    saved: ['Enregistré', 'var(--fill)', 'Enregistré sur ton compte Claude.'],
+    saving: ['Enregistrement…', 'var(--matin)', ''],
+    local: ['Sur cet appareil', 'var(--muted)', 'Enregistré dans ce navigateur uniquement.'],
+    offline: ['Hors ligne', 'var(--matin)', 'Pas de connexion à ton compte Claude pour l’instant. Tes modifications sont gardées sur cet appareil et partiront dès que possible.'],
+    error: ['Pas enregistré en ligne', 'var(--danger)', 'L’enregistrement en ligne a échoué. Tes modifications sont gardées sur cet appareil et repartiront au prochain essai.'],
+    localError: ['Pas enregistré', 'var(--danger)', 'Ce navigateur refuse d’enregistrer (stockage plein ou bloqué). Fais une sauvegarde depuis Réglages.']
+  };
+  function syncState() {
+    if (store.mode === 'local') return !S.ready ? 'loading' : store.failed ? 'localError' : 'local';
+    if (store.stopped) return 'error';
+    if (!store.online) return store.connectTry ? 'offline' : 'loading';
+    if (store.failed) return 'error';
+    return store.dirty.size || store.inflight.size ? 'saving' : 'saved';
+  }
+  function refreshSync() {
+    const st = syncState();
+    if (st === store.status) return;
+    store.status = st;
+    const el = document.getElementById('sync');
+    const [label, dot, title] = SYNC[st];
+    el.textContent = label;
+    el.style.setProperty('--dot', dot);
+    el.title = title;
+  }
+
+  function markDirty(docId) {
+    if (store.mode === 'local') { persistSoon(); return; }
     store.dirty.add(docId);
-    setSync('saving');
-    clearTimeout(store.timers[docId]);
-    store.timers[docId] = setTimeout(function () { flush(docId); }, 700);
+    persistSoon();
+    if (store.online && !store.stopped) {
+      clearTimeout(store.timers[docId]);
+      store.timers[docId] = setTimeout(() => flush(docId), SAVE_DELAY);
+    }
+    refreshSync();
   }
   function docData(docId) {
-    if (docId === 'settings') return clean(S.settings);
-    var mk = docId.slice(1);
-    return clean({ days: (S.months[mk] && S.months[mk].days) || {} });
+    if (docId === 'settings') return clone(S.settings);
+    const month = S.months[docId.slice(1)];
+    return clone({ days: (month && isObj(month.days) && month.days) || {} });
   }
-  function handleWriteError(code) {
-    lsWrite();
-    setSync('error');
-    if (code === 'quota_exceeded') toast("Plus de place pour enregistrer en ligne. Tes données restent sur cet appareil.");
+  /* Seuls les champs modifiés partent ; si le mois n'existe pas encore en ligne, on l'écrit en entier. */
+  async function writeMonth(ref, full, writing) {
+    const days = {};
+    Object.keys(writing).forEach((dk) => {
+      const day = full.days[dk], fields = writing[dk];
+      if (!isObj(day)) return;
+      if (fields['*']) { days[dk] = day; return; }
+      const out = {};
+      Object.keys(fields).forEach((f) => {
+        if (f.startsWith('taken:')) {
+          const sid = f.slice(6);
+          (out.taken || (out.taken = {}))[sid] = !!(isObj(day.taken) && day.taken[sid]);
+        } else if (f in day) out[f] = day[f];
+      });
+      days[dk] = out;
+    });
+    if (!Object.keys(days).length) return;
+    try {
+      await ref.update({ days });
+    } catch (e) {
+      if (!e || e.code !== 'invalid_argument') throw e;
+      const snap = await ref.get();
+      if (snap.exists) throw e;
+      await ref.set(full);
+    }
   }
+  async function withOneRetry(fn) {
+    try { return await fn(); } catch (e) {
+      if (!e || e.code !== 'unavailable') throw e;
+      await sleep(600 + Math.random() * 900);
+      return fn();
+    }
+  }
+  function onWriteError(e) {
+    const code = e && e.code;
+    store.failed = true;
+    if (code === 'revoked') { stopSync(); return; }
+    if (code === 'quota_exceeded') { toast('Plus de place pour enregistrer en ligne. Tes données restent sur cet appareil.'); return; }
+    if (code === 'invalid_argument' || code === 'transform_error') return;
+    scheduleRetry();
+  }
+  function scheduleRetry() {
+    if (store.retryTimer || store.stopped) return;
+    const delay = RETRY_DELAYS[Math.min(store.retryTry++, RETRY_DELAYS.length - 1)];
+    store.retryTimer = setTimeout(() => { store.retryTimer = null; flushAll(); }, delay);
+  }
+
   async function flush(docId) {
     clearTimeout(store.timers[docId]); delete store.timers[docId];
-    if (store.mode !== 'cloud' || !store.col) return;
+    if (store.mode !== 'cloud' || !store.online || store.stopped) return;
     if (store.inflight.has(docId)) { store.again.add(docId); return; }
     if (!store.dirty.has(docId)) return;
     store.dirty.delete(docId);
-    var isMonth = docId !== 'settings';
-    var writing = store.dirtyDays[docId] || {};
-    store.dirtyDays[docId] = {};
+    const isMonth = docId !== 'settings';
+    const writing = store.dirtyDays[docId] || {};
+    delete store.dirtyDays[docId];
+    if (isMonth && !Object.keys(writing).length) { refreshSync(); return; }
     store.writingDays[docId] = writing;
-    var full = docData(docId), sig = stable(full);
-    var known = store.last[docId] !== undefined;
-    if (isMonth && known && !Object.keys(writing).length) {
+    const full = docData(docId), sig = stable(full);
+    const restore = () => { addFields(store.dirtyDays[docId] || (store.dirtyDays[docId] = {}), writing); store.dirty.add(docId); };
+    if (bytes(sig) > MAX_DOC_BYTES) {
       delete store.writingDays[docId];
-      if (!store.dirty.size && !store.inflight.size) setSync('saved');
-      return;
-    }
-    if (sig.length > 250000) {
-      restoreDays(docId, writing);
-      handleWriteError('too_large');
-      toast('Ce mois est trop long pour être enregistré en ligne. Raccourcis quelques notes.');
+      restore();
+      store.failed = true;
+      toast(isMonth ? 'Ce mois est trop long pour être enregistré en ligne. Raccourcis quelques notes.' : 'Ta liste est trop longue pour être enregistrée en ligne.');
+      persistSoon(); refreshSync();
       return;
     }
     store.inflight.add(docId);
-    var ref = store.col.doc(docId), ok = false;
-    for (var attempt = 0; attempt < 2 && !ok; attempt++) {
-      try {
-        if (isMonth && known) {
-          /* Seuls les champs modifiés partent : un autre appareil peut écrire le reste en même temps. */
-          var part = {};
-          Object.keys(writing).forEach(function (dk) {
-            var day = full.days[dk], f = writing[dk];
-            if (!day) return;
-            if (f['*']) { part[dk] = day; return; }
-            var out = {};
-            Object.keys(f).forEach(function (field) {
-              if (field.indexOf('taken:') === 0) { var sidf = field.slice(6); (out.taken || (out.taken = {}))[sidf] = !!(day.taken && day.taken[sidf]); }
-              else if (field in day) out[field] = day[field];
-            });
-            part[dk] = out;
-          });
-          try { await ref.update({ days: part }); }
-          catch (e1) { if (e1 && e1.code === 'invalid_argument') await ref.set(full); else throw e1; }
-        } else await ref.set(full);
-        ok = true; store.last[docId] = sig;
-      } catch (e) {
-        var code = e && e.code;
-        if (code === 'unavailable' && attempt === 0) { await sleep(600 + Math.random() * 900); continue; }
-        handleWriteError(code);
-        break;
-      }
-    }
+    refreshSync();
+    const ref = store.col.doc(docId);
+    let error = null;
+    try {
+      await withOneRetry(() => (isMonth ? writeMonth(ref, full, writing) : ref.set(full)));
+    } catch (e) { error = e || { code: 'unavailable' }; }
     store.inflight.delete(docId);
-    if (ok) delete store.writingDays[docId];
-    else { restoreDays(docId, writing); store.dirty.add(docId); }
-    if (store.again.has(docId)) { store.again.delete(docId); store.dirty.add(docId); flush(docId); return; }
-    if (ok && !store.dirty.size && !store.inflight.size) setSync('saved');
+    delete store.writingDays[docId];
+    if (error) { restore(); onWriteError(error); }
+    else { store.last[docId] = sig; store.failed = false; store.retryTry = 0; }
+    persistSoon();
+    if (store.again.delete(docId)) flush(docId);
+    refreshSync();
   }
   function flushAll() {
-    if (store.mode === 'local') { if (store.timers.ls) { clearTimeout(store.timers.ls); store.timers.ls = null; lsWrite(); } return; }
-    Array.from(store.dirty).forEach(function (id) { flush(id); });
-  }
-  function applyRemoteDoc(id, data) {
-    if (id === 'settings') S.settings = normalizeSettings(data);
-    else if (/^m\d{4}-\d{2}$/.test(id)) S.months[id.slice(1)] = { days: (data && data.days && typeof data.days === 'object') ? data.days : {} };
-  }
-  function subscribe() {
-    try {
-      store.unsub = store.col.onSnapshot(function (snap) {
-        var changed = false;
-        snap.docs.forEach(function (ds) {
-          if (!ds.exists) return;
-          var id = ds.id, data = clean(ds.data()), sig = stable(data);
-          var busy = store.dirty.has(id) || store.inflight.has(id) || !!store.timers[id];
-          if (!busy) {
-            if (sig === store.last[id]) return;
-            store.last[id] = sig; applyRemoteDoc(id, data); changed = true;
-            return;
-          }
-          /* Écriture en cours sur ce mois : on prend les autres jours venus d'ailleurs, pas ceux qu'on modifie. */
-          if (!/^m\d{4}-\d{2}$/.test(id) || !data || !data.days) return;
-          var mk = id.slice(1);
-          if (!S.months[mk]) S.months[mk] = { days: {} };
-          var local = S.months[mk].days || (S.months[mk].days = {});
-          Object.keys(data.days).forEach(function (dk) {
-            var rd = data.days[dk], pend = pendingFields(id, dk);
-            if (!pend) { if (stable(rd) !== stable(local[dk])) { local[dk] = rd; changed = true; } return; }
-            if (pend['*'] || !rd || typeof rd !== 'object') return;
-            var ld = local[dk] || (local[dk] = {});
-            Object.keys(rd).forEach(function (field) {
-              if (field === 'taken') {
-                var rt = rd.taken || {};
-                if (!ld.taken || typeof ld.taken !== 'object') ld.taken = {};
-                Object.keys(rt).forEach(function (sidr) {
-                  if (pend['taken:' + sidr] || ld.taken[sidr] === rt[sidr]) return;
-                  ld.taken[sidr] = rt[sidr]; changed = true;
-                });
-                return;
-              }
-              if (pend[field] || stable(rd[field]) === stable(ld[field])) return;
-              ld[field] = rd[field]; changed = true;
-            });
-          });
-        });
-        if (changed) safeRender();
-      }, function () { setSync('error'); });
-    } catch (e) { /* la page reste utilisable sans synchro en direct */ }
-  }
-  function loadLocal(local) {
-    if (local && local.settings) { S.settings = normalizeSettings(local.settings); S.months = sanitizeMonths(local.months); }
-    else { S.settings = freshSettings(); S.months = {}; lsWrite(); }
+    if (store.mode === 'local') { if (store.lsTimer) persistNow(); return; }
+    [...store.dirty].forEach(flush);
+    persistNow();
   }
 
-  async function init() {
-    setSync('loading');
-    var local = lsRead();
-    var db = null, user = null, dl = null, uidv = null;
-    var hasUse = !!(window.claude && typeof window.claude.use === 'function');
-    if (hasUse) {
-      try {
-        var res = await withTimeout(Promise.all([
-          window.claude.use('db').catch(function () { return null; }),
-          window.claude.use('user').catch(function () { return null; }),
-          window.claude.use('downloads').catch(function () { return null; })
-        ]), 9000, [null, null, null]);
-        db = res[0]; user = res[1]; dl = res[2];
-        if (user && typeof user.id === 'function') uidv = await withTimeout(user.id().catch(function () { return null; }), 5000, null);
-      } catch (e) { db = null; }
-    }
-    store.downloads = dl || null;
-    if (db && uidv) {
-      try {
-        var col = db.collection('data/users/' + uidv);
-        var snap = await withTimeout(col.get(), 12000, null);
-        if (!snap) throw new Error('timeout');
-        store.col = col; store.mode = 'cloud';
-        var hasSettings = false;
-        snap.docs.forEach(function (ds) {
-          if (!ds.exists) return;
-          var data = clean(ds.data());
-          applyRemoteDoc(ds.id, data);
-          store.last[ds.id] = stable(data);
-          if (ds.id === 'settings') hasSettings = true;
-        });
-        if (!hasSettings) {
-          if (local && local.settings) {
-            S.settings = normalizeSettings(local.settings);
-            var lm = sanitizeMonths(local.months);
-            Object.keys(lm).forEach(function (m) { if (!S.months[m]) { S.months[m] = lm[m]; markDirty('m' + m); } });
-          } else S.settings = freshSettings();
-          markDirty('settings');
-        }
-        subscribe();
-        if (!store.dirty.size) setSync('saved');
-      } catch (e) {
-        store.mode = 'local'; store.col = null; loadLocal(local); setSync('local');
+  function applyRemoteDoc(id, data) {
+    if (id === 'settings') S.settings = normalizeSettings(data);
+    else if (MONTH_DOC.test(id)) S.months[id.slice(1)] = { days: isObj(data && data.days) ? data.days : {} };
+  }
+  /* Un mois modifié ici pendant qu'un autre appareil écrit : on prend ses jours et ses champs, sauf ceux qu'on est en train d'envoyer. */
+  function mergeBusyMonth(id, remoteDays) {
+    const mk = id.slice(1);
+    const month = S.months[mk] || (S.months[mk] = { days: {} });
+    if (!isObj(month.days)) month.days = {};
+    const local = month.days;
+    let changed = false;
+    Object.keys(remoteDays).forEach((dk) => {
+      const rd = remoteDays[dk], pend = pendingFields(id, dk);
+      if (!pend) {
+        if (stable(rd) !== stable(local[dk])) { local[dk] = rd; changed = true; }
+        return;
       }
-    } else { loadLocal(local); setSync('local'); }
+      if (pend['*'] || !isObj(rd)) return;
+      const ld = isObj(local[dk]) ? local[dk] : (local[dk] = {});
+      Object.keys(rd).forEach((field) => {
+        if (field === 'taken') {
+          const rt = isObj(rd.taken) ? rd.taken : {};
+          if (!isObj(ld.taken)) ld.taken = {};
+          Object.keys(rt).forEach((sid) => {
+            if (pend['taken:' + sid] || ld.taken[sid] === rt[sid]) return;
+            ld.taken[sid] = rt[sid]; changed = true;
+          });
+          return;
+        }
+        if (pend[field] || stable(rd[field]) === stable(ld[field])) return;
+        ld[field] = rd[field]; changed = true;
+      });
+    });
+    return changed;
+  }
+  function onRemote(snap) {
+    let changed = false;
+    snap.docs.forEach((ds) => {
+      if (!ds.exists) return;
+      const raw = ds.data();
+      if (store.refs[ds.id] === raw) return; // document inchangé depuis la dernière livraison
+      store.refs[ds.id] = raw;
+      const id = ds.id, data = clone(raw) || {}, sig = stable(data);
+      const busy = store.dirty.has(id) || store.inflight.has(id) || !!store.timers[id];
+      if (!busy) {
+        if (sig === store.last[id]) return;
+        store.last[id] = sig;
+        applyRemoteDoc(id, data);
+        changed = true;
+      } else if (MONTH_DOC.test(id) && isObj(data.days)) {
+        changed = mergeBusyMonth(id, data.days) || changed;
+      }
+    });
+    if (changed) { persistSoon(); safeRender(); }
+  }
+  function subscribe() {
+    if (store.unsub || store.stopped) return;
+    try {
+      store.unsub = store.col.onSnapshot(onRemote, (e) => {
+        store.unsub = null;
+        const code = e && e.code;
+        if (code === 'revoked') { stopSync(); return; }
+        if (code === 'invalid_argument' || code === 'transform_error') return;
+        setTimeout(subscribe, 15000); // flux coupé : on se réabonne un peu plus tard
+      });
+    } catch (e) { /* la page reste utilisable sans synchro en direct */ }
+  }
+  function stopSync() {
+    store.stopped = true;
+    if (store.unsub) { try { store.unsub(); } catch (e) { /* déjà fermé */ } store.unsub = null; }
+    clearTimeout(store.retryTimer); clearTimeout(store.connectTimer);
+    Object.values(store.timers).forEach(clearTimeout); store.timers = {};
+    if (!S.ready) startOffline();
+    persistNow(); refreshSync();
+  }
+
+  /* Remet par-dessus les données du compte ce qui a été modifié sur l'appareil et pas encore envoyé. */
+  function copyFields(dk, src, fields) {
+    const day = ensureDay(dk);
+    if (fields['*']) { S.months[monthKey(dk)].days[dk] = clone(src); return; }
+    Object.keys(fields).forEach((f) => {
+      if (f.startsWith('taken:')) { const sid = f.slice(6); day.taken[sid] = !!(isObj(src.taken) && src.taken[sid]); }
+      else if (f in src) day[f] = clone(src[f]);
+    });
+  }
+  function applyInitialSnapshot(snap) {
+    const before = { settings: S.settings, months: S.months, trusted: store.trusted };
+    S.months = {};
+    let hasSettings = false;
+    snap.docs.forEach((ds) => {
+      if (!ds.exists) return;
+      const raw = ds.data(), data = clone(raw) || {};
+      store.refs[ds.id] = raw;
+      store.last[ds.id] = stable(data);
+      if (ds.id === 'settings') hasSettings = true;
+      applyRemoteDoc(ds.id, data);
+    });
+    if (!hasSettings) {
+      // Rien encore sur ce compte : on y met ce qu'il y a sur l'appareil (sinon la liste de départ).
+      const src = before.settings ? before
+        : localData && localData.settings ? { settings: normalizeSettings(localData.settings), months: sanitizeMonths(localData.months) }
+        : { settings: freshSettings(), months: {} };
+      S.settings = src.settings;
+      store.dirty.add('settings');
+      Object.keys(src.months).forEach((mk) => {
+        if (S.months[mk]) return;
+        S.months[mk] = src.months[mk];
+        Object.keys(src.months[mk].days || {}).forEach((dk) => touchDay(dk));
+      });
+    } else if (before.settings && before.trusted && store.dirty.has('settings')) {
+      S.settings = before.settings;
+    } else {
+      store.dirty.delete('settings');
+    }
+    Object.keys(store.dirtyDays).forEach((docId) => {
+      const month = before.months[docId.slice(1)];
+      Object.keys(store.dirtyDays[docId]).forEach((dk) => {
+        const src = month && isObj(month.days) ? month.days[dk] : null;
+        if (isObj(src)) copyFields(dk, src, store.dirtyDays[docId][dk]);
+      });
+      store.dirty.add(docId);
+    });
+    store.trusted = true;
+  }
+
+  function scheduleConnect() {
+    if (store.connectTimer || store.stopped) return;
+    const delay = RETRY_DELAYS[Math.min(store.connectTry - 1, RETRY_DELAYS.length - 1)];
+    store.connectTimer = setTimeout(() => { store.connectTimer = null; connect(); }, delay);
+  }
+  async function connect() {
+    if (store.online || store.stopped || store.connecting || !store.col) return;
+    clearTimeout(store.connectTimer); store.connectTimer = null;
+    store.connecting = true;
+    let snap = null, error = null;
+    try { snap = await withTimeout(store.col.get(), GET_TIMEOUT, null); } catch (e) { error = e; }
+    store.connecting = false;
+    if (!snap) {
+      store.connectTry++;
+      const code = error && error.code;
+      if (['revoked', 'not_granted', 'capability_disabled', 'capability_removed'].includes(code)) { stopSync(); return; }
+      if (!S.ready) startOffline();
+      scheduleConnect();
+      refreshSync();
+      return;
+    }
+    applyInitialSnapshot(snap);
+    store.online = true;
+    store.connectTry = 0;
+    subscribe();
+    flushAll();
+    if (S.ready) safeRender(); else { S.ready = true; render(); }
+    refreshSync();
+  }
+
+  function startLocal() {
+    store.mode = 'local';
+    if (localData && localData.settings) { S.settings = normalizeSettings(localData.settings); S.months = sanitizeMonths(localData.months); }
+    else { S.settings = freshSettings(); S.months = {}; persistNow(); }
+    S.ready = true;
+    render(); refreshSync();
+  }
+  function startFromCache(cache) {
+    S.settings = normalizeSettings(cache.settings);
+    S.months = sanitizeMonths(cache.months);
+    store.trusted = cache.trusted !== false;
+    const p = isObj(cache.pending) ? cache.pending : {};
+    if (p.settings) store.dirty.add('settings');
+    if (isObj(p.days)) Object.keys(p.days).forEach((docId) => {
+      if (!MONTH_DOC.test(docId)) return;
+      const days = addFields({}, p.days[docId]);
+      if (!Object.keys(days).length) return;
+      store.dirtyDays[docId] = days;
+      store.dirty.add(docId);
+    });
+    S.ready = true;
+    render();
+  }
+  /* Le compte ne répond pas et l'appareil n'en a pas de copie : on montre les données locales ou la liste de départ. */
+  function startOffline() {
+    if (S.ready) return;
+    const base = localData && localData.settings ? localData : null;
+    S.settings = base ? normalizeSettings(base.settings) : freshSettings();
+    S.months = base ? sanitizeMonths(base.months) : {};
+    store.trusted = false;
     S.ready = true;
     render();
   }
 
+  async function getCapabilities() {
+    const none = { db: null, downloads: null, uid: null };
+    const claude = window.claude;
+    if (!claude || typeof claude.use !== 'function') return none;
+    const use = (name) => Promise.resolve().then(() => claude.use(name)).catch(() => null);
+    try {
+      const [db, user, downloads] = await withTimeout(Promise.all([use('db'), use('user'), use('downloads')]), CAPS_TIMEOUT, [null, null, null]);
+      const uid = user && typeof user.id === 'function' ? await withTimeout(user.id().catch(() => null), 5000, null) : null;
+      return { db, downloads, uid };
+    } catch (e) { return none; }
+  }
+  async function init() {
+    refreshSync();
+    localData = lsGet(LS_KEY);
+    const caps = await getCapabilities();
+    store.downloads = caps.downloads || null;
+    if (!caps.db || !caps.uid) { startLocal(); return; }
+    try { store.col = caps.db.collection('data/users/' + caps.uid); } catch (e) { startLocal(); return; }
+    store.mode = 'cloud';
+    store.uid = caps.uid;
+    const cache = lsGet(CACHE_KEY);
+    if (isObj(cache) && cache.uid === caps.uid && isObj(cache.settings)) startFromCache(cache);
+    refreshSync();
+    connect();
+  }
+
   /* ---------- Rendu : Jour ---------- */
   function renderDay() {
-    var k = S.ui.date, t = todayKey(), isToday = k === t;
-    var d = peekDay(k) || {};
-    var y = fromKey(k).getFullYear();
-    var yearTxt = y !== new Date().getFullYear() ? ' ' + y : '';
-    var h = '<section class="dayhead"><div class="datebar">';
-    h += '<h1 class="date">' + esc(longDate(k) + yearTxt) + '</h1><div class="daynav">';
-    if (!isToday) h += '<button type="button" class="ghost" data-act="day-today">Aujourd\u2019hui</button>';
-    h += '<button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">' + ICON.left + '</button>';
-    h += '<button type="button" class="icon" data-act="day-next" aria-label="Jour suivant">' + ICON.right + '</button>';
-    h += '</div></div>' + weekStrip(k) + '</section>';
-    h += weeklyBanner();
-    h += '<div class="daygrid"><div class="col">' + sleepBlock(k, d, isToday) + supplementBlock(k) + '</div>';
-    h += '<div class="col">' + checkinBlock(k, d, isToday) + mealBlock(k, d) + notesBlock(k, d) + '</div></div>';
-    return h;
+    const k = S.ui.date, isToday = k === todayKey();
+    const d = peekDay(k) || {};
+    return html`<section class="dayhead"><div class="datebar">
+        <h1 class="date">${longDate(k)}</h1>
+        <div class="daynav">
+          ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
+          <button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">${ICON.left}</button>
+          <button type="button" class="icon" data-act="day-next" aria-label="Jour suivant">${ICON.right}</button>
+        </div>
+      </div>${weekStrip(k)}</section>
+      ${weeklyBanner()}
+      <div class="daygrid">
+        <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}</div>
+        <div class="col">${checkinBlock(k, d, isToday)}${mealBlock(k, d)}${notesBlock(k, d)}</div>
+      </div>`;
   }
   function weekStrip(k) {
-    var start = startOfWeek(k), t = todayKey();
-    var h = '<div class="strip" role="group" aria-label="Jours de la semaine">';
-    for (var i = 0; i < 7; i++) {
-      var dk = addDays(start, i), st = stats(dk), p = st.total ? st.taken / st.total : 0;
-      h += '<button type="button" class="lid' + (dk === t ? ' today' : '') + '" data-act="goto" data-date="' + dk + '"' + (dk === k ? ' aria-current="date"' : '') + ' aria-label="' + esc(longDate(dk)) + '">';
-      h += '<span class="wd">' + WD_SHORT[i] + '</span><span class="dn">' + fromKey(dk).getDate() + '</span>';
-      h += '<span class="bar" aria-hidden="true"><i style="width:' + Math.round(p * 100) + '%"></i></span></button>';
-    }
-    return h + '</div>';
+    const start = startOfWeek(k), t = todayKey();
+    const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+    return html`<div class="strip" role="group" aria-label="Jours de la semaine">${days.map((dk, i) => {
+      const st = stats(dk), pct = st.total ? Math.round((st.taken / st.total) * 100) : 0;
+      const label = longDate(dk) + (st.total ? `, ${st.taken} sur ${st.total} compléments` : '');
+      return html`<button type="button" class="lid${dk === t ? ' today' : ''}" data-act="goto" data-date="${dk}"${dk === k ? html` aria-current="date"` : ''} aria-label="${label}"><span class="wd">${WD_SHORT[i]}</span><span class="dn">${fromKey(dk).getDate()}</span><span class="bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
+    })}</div>`;
   }
   function weeklyBanner() {
-    return S.settings.supplements.filter(function (s) { return s.active !== false && s.freq === 'weekly' && s.weekday == null; }).map(function (s) {
-      var opts = WD_LONG.map(function (w, i) { return '<option value="' + i + '">' + cap1(w) + '</option>'; }).join('');
-      return '<div class="banner"><p><label for="wk-' + s.id + '">' + esc(s.name) + ' : quel jour de la semaine ?</label></p>' +
-        '<select id="wk-' + s.id + '" data-weekly="' + s.id + '"><option value="">Choisir le jour</option>' + opts + '</select></div>';
-    }).join('');
+    return S.settings.supplements.filter((s) => s.active && s.freq === 'weekly' && s.weekday == null).map((s) => html`<div class="banner">
+      <p><label for="wk-${s.id}">${s.name} : quel jour de la semaine ?</label></p>
+      <select id="wk-${s.id}" data-weekly="${s.id}"><option value="">Choisir le jour</option>${WD_LONG.map((w, i) => html`<option value="${i}">${cap1(w)}</option>`)}</select>
+    </div>`);
   }
   function sleepBlock(k, d, isToday) {
-    var prev = peekDay(addDays(k, -1));
-    var night = nightLength(prev && prev.bed, d.wake);
-    var h = '<section class="sleep" aria-label="Sommeil">';
-    h += '<label class="field"><span>Réveil</span><input type="time" data-bind="wake" data-date="' + k + '" value="' + esc(d.wake || '') + '"></label>';
-    h += '<label class="field"><span>Coucher</span><input type="time" data-bind="bed" data-date="' + k + '" value="' + esc(d.bed || '') + '"></label>';
-    if (!d.wake && isToday) h += '<button type="button" class="chip" data-act="wake-now" data-date="' + k + '">Je viens de me lever</button>';
-    else if (night) h += '<p class="night">Nuit de ' + night + '</p>';
-    return h + '</section>';
+    const prev = peekDay(addDays(k, -1));
+    const wake = str(d.wake), night = nightLength(prev && prev.bed, wake);
+    return html`<section class="sleep" aria-label="Sommeil">
+      <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
+      <label class="field"><span>Coucher</span><input type="time" id="bed-${k}" data-bind="bed" data-date="${k}" value="${str(d.bed)}"></label>
+      ${!wake && isToday ? html`<button type="button" class="chip" data-act="wake-now" data-date="${k}">Je viens de me lever</button>`
+        : night ? html`<p class="night">Nuit de ${night}</p>` : ''}
+    </section>`;
+  }
+  function supplementItem(s, k) {
+    const on = isTaken(s.id, k), just = S.ui.just === `${s.id}|${k}`;
+    return html`<button type="button" class="item" data-act="toggle" data-sid="${s.id}" data-date="${k}" aria-pressed="${bool(on)}"><span class="cap${on ? ' on' : ''}${just ? ' just' : ''}" aria-hidden="true">${on ? ICON.check : ''}</span><span class="it-main"><span class="it-name">${s.name}</span>${s.dose ? html`<span class="it-dose">${s.dose}</span>` : ''}${s.note ? html`<span class="it-note">${s.note}</span>` : ''}</span>${FREQ_BADGE[s.freq] ? html`<span class="freq">${FREQ_BADGE[s.freq]}</span>` : ''}</button>`;
   }
   function supplementBlock(k) {
-    var items = itemsForDay(k), st = stats(k);
-    var h = '<section class="supps"><div class="sec-head"><h2>Compléments</h2>' + (st.total ? '<span class="count">' + st.taken + ' sur ' + st.total + '</span>' : '') + '</div>';
-    if (!items.length) {
-      h += '<p class="empty">Rien de prévu ce jour-là.' + (S.settings.supplements.length ? '' : ' Ajoute tes compléments dans Réglages.') + '</p>';
-      return h + '</section>';
-    }
-    h += '<div class="boxes">';
-    MOMENTS.forEach(function (m) {
-      var list = items.filter(function (s) { return s.moment === m.key; });
-      if (!list.length) return;
-      h += '<div class="box m-' + m.key + '"><div class="box-lid"><h3>' + m.label + '</h3>' + (m.hint ? '<span>' + m.hint + '</span>' : '') + '</div>';
-      list.forEach(function (s) {
-        var on = isTaken(s.id, k), just = S.ui.just === s.id + '|' + k;
-        h += '<button type="button" class="item" data-act="toggle" data-sid="' + s.id + '" data-date="' + k + '" aria-pressed="' + on + '">';
-        h += '<span class="cap' + (on ? ' on' : '') + (just ? ' just' : '') + '" aria-hidden="true">' + (on ? ICON.check : '') + '</span>';
-        h += '<span class="it-main"><span class="it-name">' + esc(s.name) + '</span>' + (s.dose ? '<span class="it-dose">' + esc(s.dose) + '</span>' : '') + (s.note ? '<span class="it-note">' + esc(s.note) + '</span>' : '') + '</span>';
-        if (FREQ_BADGE[s.freq]) h += '<span class="freq">' + FREQ_BADGE[s.freq] + '</span>';
-        h += '</button>';
-      });
-      h += '</div>';
-    });
-    return h + '</div></section>';
+    const items = itemsForDay(k), st = stats(k);
+    const body = items.length
+      ? html`<div class="boxes">${MOMENTS.map((m) => {
+          const list = items.filter((s) => s.moment === m.key);
+          return list.length ? html`<div class="box m-${m.key}"><div class="box-lid"><h3>${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${list.map((s) => supplementItem(s, k))}</div>` : '';
+        })}</div>`
+      : html`<p class="empty">Rien de prévu ce jour-là.${S.settings.supplements.length ? '' : ' Ajoute tes compléments dans Réglages.'}</p>`;
+    return html`<section class="supps"><div class="sec-head"><h2>Compléments</h2>${st.total ? html`<span class="count">${st.taken} sur ${st.total}</span>` : ''}</div>${body}</section>`;
   }
-  function rowActions(kind, k, id) {
-    if (S.ui.confirm === kind + ':' + id) {
-      return '<span class="row-actions"><button type="button" class="link danger" data-act="' + kind + '-del" data-date="' + k + '" data-id="' + id + '">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>';
+  function rowActions(kind, k, id, what) {
+    if (S.ui.confirm === `${kind}:${id}`) {
+      return html`<span class="row-actions"><button type="button" class="link danger" data-act="${kind}-del" data-date="${k}" data-id="${id}" aria-label="Oui, supprimer ${what}">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>`;
     }
-    return '<span class="row-actions"><button type="button" class="link" data-act="' + kind + '-edit" data-date="' + k + '" data-id="' + id + '">Modifier</button><button type="button" class="link" data-act="' + kind + '-ask" data-date="' + k + '" data-id="' + id + '">Supprimer</button></span>';
+    return html`<span class="row-actions"><button type="button" class="link" data-act="${kind}-edit" data-date="${k}" data-id="${id}" aria-label="Modifier ${what}">Modifier</button><button type="button" class="link" data-act="${kind}-ask" data-date="${k}" data-id="${id}" aria-label="Supprimer ${what}">Supprimer</button></span>`;
   }
+  const openForm = (type, k) => (S.ui.form && S.ui.form.type === type && S.ui.form.date === k ? S.ui.form : null);
   function checkinBlock(k, d, isToday) {
-    var list = (Array.isArray(d.checkins) ? d.checkins : []).slice().sort(byTime);
-    var f = S.ui.form && S.ui.form.type === 'checkin' && S.ui.form.date === k ? S.ui.form : null;
-    var h = '<section class="jsec"><div class="sec-head"><h2>Comment je me sens</h2>' + (f ? '' : '<button type="button" class="primary" data-act="ci-new" data-date="' + k + '">Nouveau check-in</button>') + '</div>';
+    const list = listOf(d.checkins).sort(byTime);
+    const f = openForm('checkin', k);
+    let hint = '';
     if (isToday && !f) {
-      var hint = '';
-      if (list.length) {
-        var last = toMin(list[list.length - 1].time);
-        if (last != null && last + 180 < 23 * 60) hint = 'Prochain check-in entre ' + fromMin(last + 180) + ' et ' + fromMin(Math.min(last + 240, 23 * 60 + 59));
-      } else hint = 'Premier check-in : comment tu te sens au réveil ?';
-      if (hint) h += '<p class="hint">' + hint + '</p>';
+      const last = list.length ? toMin(list[list.length - 1].time) : null;
+      if (!list.length) hint = 'Premier check-in : comment tu te sens au réveil ?';
+      else if (last != null && last + 180 < 23 * 60) hint = `Prochain check-in entre ${fromMin(last + 180)} et ${fromMin(Math.min(last + 240, 23 * 60 + 59))}`;
     }
-    if (f && !f.id) h += checkinForm(f);
-    if (list.length) {
-      h += '<ul class="list">';
-      list.forEach(function (c) {
-        if (f && f.id === c.id) { h += '<li class="editing">' + checkinForm(f) + '</li>'; return; }
-        h += '<li class="entry"><span class="t">' + esc(c.time || '') + '</span><div class="e-body"><div class="ci-line">';
-        if (c.mood >= 1 && c.mood <= 5) h += '<span class="face" role="img" aria-label="Humeur ' + c.mood + ' sur 5">' + FACES[c.mood - 1] + '</span>';
-        h += '<span class="meters">';
-        SCALES.slice(1).forEach(function (sc) {
-          var v = c[sc.key]; if (!(v >= 1 && v <= 5)) return;
-          var segs = ''; for (var i = 1; i <= 5; i++) segs += '<i' + (i <= v ? ' class="on"' : '') + '></i>';
-          h += '<span class="meter"><span aria-hidden="true">' + sc.label + '</span><span class="segs" aria-hidden="true">' + segs + '</span><span class="sr-only">' + sc.label + ' ' + v + ' sur 5</span></span>';
-        });
-        h += '</span></div>' + (c.note ? '<p class="note">' + esc(c.note) + '</p>' : '') + '</div>' + rowActions('ci', k, c.id) + '</li>';
-      });
-      h += '</ul>';
-    } else if (!f) h += '<p class="empty">Aucun check-in pour l\u2019instant.</p>';
-    return h + '</section>';
+    return html`<section class="jsec"><div class="sec-head"><h2>Comment je me sens</h2>${f ? '' : html`<button type="button" class="primary" data-act="ci-new" data-date="${k}">Nouveau check-in</button>`}</div>
+      ${hint ? html`<p class="hint">${hint}</p>` : ''}
+      ${f && !f.id ? checkinForm(f) : ''}
+      ${list.length ? html`<ul class="list">${list.map((c) => (f && f.id === c.id ? html`<li class="editing">${checkinForm(f)}</li>` : checkinEntry(c, k)))}</ul>`
+        : f ? '' : html`<p class="empty">Aucun check-in pour l’instant.</p>`}
+    </section>`;
+  }
+  function checkinEntry(c, k) {
+    const mood = scaleValue(c.mood);
+    const meters = SCALES.slice(1).map((sc) => {
+      const v = scaleValue(c[sc.key]);
+      if (!v) return '';
+      const segs = [1, 2, 3, 4, 5].map((i) => (i <= v ? html`<i class="on"></i>` : html`<i></i>`));
+      return html`<span class="meter"><span aria-hidden="true">${sc.label}</span><span class="segs" aria-hidden="true">${segs}</span><span class="sr-only">${sc.label} ${v} sur 5</span></span>`;
+    });
+    return html`<li class="entry"><span class="t">${str(c.time)}</span><div class="e-body"><div class="ci-line">${mood ? html`<span class="face" role="img" aria-label="Humeur ${mood} sur 5">${FACES[mood - 1]}</span>` : ''}<span class="meters">${meters}</span></div>${c.note ? html`<p class="note">${c.note}</p>` : ''}</div>${rowActions('ci', k, c.id, `le check-in de ${str(c.time)}`)}</li>`;
   }
   function checkinForm(f) {
-    var dr = f.draft;
-    var h = '<div class="form" role="group" aria-label="Check-in">';
-    h += '<label class="field field-time"><span>Heure</span><input type="time" data-draft="time" value="' + esc(dr.time || '') + '"></label>';
-    SCALES.forEach(function (sc) {
-      h += '<fieldset class="scale"><legend>' + sc.label + '</legend><div class="dots">';
-      for (var i = 1; i <= 5; i++) {
-        h += '<button type="button" class="dot' + (sc.faces ? ' emoji' : '') + '" data-act="rate" data-scale="' + sc.key + '" data-v="' + i + '" aria-pressed="' + (dr[sc.key] === i) + '" aria-label="' + sc.label + ' ' + i + ' sur 5">' + (sc.faces ? sc.faces[i - 1] : i) + '</button>';
-      }
-      h += '</div><div class="ends" aria-hidden="true"><span>' + sc.lo + '</span><span>' + sc.hi + '</span></div></fieldset>';
-    });
-    h += '<label class="field"><span>Note</span><textarea data-draft="note" rows="2" placeholder="Ce qui se passe, ce qui joue sur ton état">' + esc(dr.note || '') + '</textarea></label>';
-    h += '<div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button><button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>';
-    return h + '</div>';
+    const dr = f.draft;
+    return html`<div class="form" role="group" aria-label="Check-in">
+      <label class="field field-time"><span>Heure</span><input type="time" id="draft-time" data-draft="time" value="${str(dr.time)}"></label>
+      ${SCALES.map((sc) => html`<fieldset class="scale"><legend>${sc.label}</legend><div class="dots">${[1, 2, 3, 4, 5].map((i) => html`<button type="button" class="dot${sc.faces ? ' emoji' : ''}" data-act="rate" data-scale="${sc.key}" data-v="${i}" aria-pressed="${bool(dr[sc.key] === i)}" aria-label="${sc.label} ${i} sur 5">${sc.faces ? sc.faces[i - 1] : i}</button>`)}</div><div class="ends" aria-hidden="true"><span>${sc.lo}</span><span>${sc.hi}</span></div></fieldset>`)}
+      <label class="field"><span>Note</span><textarea id="draft-note" data-draft="note" rows="2" placeholder="Ce qui se passe, ce qui joue sur ton état">${str(dr.note)}</textarea></label>
+      <div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button><button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>
+    </div>`;
   }
   function mealBlock(k, d) {
-    var list = (Array.isArray(d.meals) ? d.meals : []).slice().sort(byTime);
-    var f = S.ui.form && S.ui.form.type === 'meal' && S.ui.form.date === k ? S.ui.form : null;
-    var h = '<section class="jsec"><div class="sec-head"><h2>Ce que j\u2019ai mangé</h2>' + (f ? '' : '<button type="button" class="primary" data-act="meal-new" data-date="' + k + '">Ajouter</button>') + '</div>';
-    if (f && !f.id) h += mealForm(f);
-    if (list.length) {
-      h += '<ul class="list">';
-      list.forEach(function (m) {
-        if (f && f.id === m.id) { h += '<li class="editing">' + mealForm(f) + '</li>'; return; }
-        h += '<li class="entry"><span class="t">' + esc(m.time || '') + '</span><div class="e-body"><span class="kind">' + esc(m.kind || 'Repas') + '</span><p class="note">' + esc(m.text || '') + '</p></div>' + rowActions('meal', k, m.id) + '</li>';
-      });
-      h += '</ul>';
-    } else if (!f) h += '<p class="empty">Rien de noté pour l\u2019instant.</p>';
-    return h + '</section>';
+    const list = listOf(d.meals).sort(byTime);
+    const f = openForm('meal', k);
+    const entry = (m) => html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${m.kind || 'Repas'}</span><p class="note">${m.text}</p></div>${rowActions('meal', k, m.id, `${m.kind === 'Collation' ? 'la collation' : 'le repas'} de ${str(m.time)}`)}</li>`;
+    return html`<section class="jsec"><div class="sec-head"><h2>Ce que j’ai mangé</h2>${f ? '' : html`<button type="button" class="primary" data-act="meal-new" data-date="${k}">Ajouter</button>`}</div>
+      ${f && !f.id ? mealForm(f) : ''}
+      ${list.length ? html`<ul class="list">${list.map((m) => (f && f.id === m.id ? html`<li class="editing">${mealForm(f)}</li>` : entry(m)))}</ul>`
+        : f ? '' : html`<p class="empty">Rien de noté pour l’instant.</p>`}
+    </section>`;
   }
   function mealForm(f) {
-    var dr = f.draft;
-    var h = '<div class="form" role="group" aria-label="Repas"><div class="form-row">';
-    h += '<label class="field field-time"><span>Heure</span><input type="time" data-draft="time" value="' + esc(dr.time || '') + '"></label>';
-    h += '<div class="field"><span id="kind-lbl">Type</span><div class="seg" role="group" aria-labelledby="kind-lbl">' + ['Repas', 'Collation'].map(function (v) {
-      return '<button type="button" data-act="meal-kind" data-v="' + v + '" aria-pressed="' + (dr.kind === v) + '">' + v + '</button>';
-    }).join('') + '</div></div></div>';
-    h += '<label class="field"><span>Qu\u2019est-ce que tu as mangé ?</span><textarea id="meal-text" data-draft="text" rows="3" placeholder="Riz complet, poulet, brocolis…">' + esc(dr.text || '') + '</textarea></label>';
-    h += '<div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button><button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>';
-    return h + '</div>';
+    const dr = f.draft;
+    return html`<div class="form" role="group" aria-label="Repas">
+      <div class="form-row">
+        <label class="field field-time"><span>Heure</span><input type="time" id="draft-time" data-draft="time" value="${str(dr.time)}"></label>
+        <div class="field"><span id="kind-lbl">Type</span><div class="seg" role="group" aria-labelledby="kind-lbl">${MEAL_KINDS.map((v) => html`<button type="button" data-act="meal-kind" data-v="${v}" aria-pressed="${bool(dr.kind === v)}">${v}</button>`)}</div></div>
+      </div>
+      <label class="field"><span>Qu’est-ce que tu as mangé ?</span><textarea id="meal-text" data-draft="text" rows="3" placeholder="Riz complet, poulet, brocolis…">${str(dr.text)}</textarea></label>
+      <div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button><button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>
+    </div>`;
   }
   function notesBlock(k, d) {
-    return '<section class="jsec"><div class="sec-head"><h2><label for="notes-' + k + '">Notes du jour</label></h2></div>' +
-      '<textarea id="notes-' + k + '" class="notes" data-bind="notes" data-date="' + k + '" rows="4" placeholder="Cours, révisions, ce qui s\u2019est passé…">' + esc(d.notes || '') + '</textarea></section>';
+    return html`<section class="jsec"><div class="sec-head"><h2><label for="notes-${k}">Notes du jour</label></h2></div><textarea id="notes-${k}" class="notes" data-bind="notes" data-date="${k}" rows="4" placeholder="Cours, révisions, ce qui s’est passé…">${str(d.notes)}</textarea></section>`;
   }
 
   /* ---------- Rendu : Semaine ---------- */
   function renderWeek() {
-    var start = S.ui.weekOf, t = todayKey(), days = [];
-    for (var i = 0; i < 7; i++) days.push(addDays(start, i));
-    var a = fromKey(days[0]), b = fromKey(days[6]);
-    var title = a.getMonth() === b.getMonth()
-      ? 'Semaine du ' + a.getDate() + ' au ' + b.getDate() + ' ' + fmtMonth.format(b)
-      : 'Semaine du ' + a.getDate() + ' ' + fmtMonth.format(a) + ' au ' + b.getDate() + ' ' + fmtMonth.format(b);
-    var h = '<div class="wk-head"><h1 class="wk-title">' + esc(title) + '</h1><div class="daynav">';
-    if (start !== startOfWeek(t)) h += '<button type="button" class="ghost" data-act="week-now">Cette semaine</button>';
-    h += '<button type="button" class="icon" data-act="week-prev" aria-label="Semaine précédente">' + ICON.left + '</button>';
-    h += '<button type="button" class="icon" data-act="week-next" aria-label="Semaine suivante">' + ICON.right + '</button></div></div>';
-    h += '<p class="hint">Touche une gélule pour la cocher, ou un jour pour ouvrir son journal.</p>';
-    h += '<div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>';
-    days.forEach(function (dk, i) {
-      h += '<th scope="col"' + (dk === t ? ' class="today"' : '') + '><button type="button" data-act="goto" data-date="' + dk + '" aria-label="' + esc(longDate(dk)) + '"><span>' + WD_SHORT[i] + '</span><b>' + fromKey(dk).getDate() + '</b></button></th>';
+    const start = S.ui.weekOf, t = todayKey();
+    const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+    const rows = MOMENTS.map((m) => {
+      const sups = S.settings.supplements.filter((s) => s.moment === m.key && days.some((dk) => isScheduled(s, dk) || isTaken(s.id, dk)));
+      if (!sups.length) return '';
+      return html`<tr class="grp m-${m.key}"><th colspan="8" scope="colgroup">${m.label}${m.hint ? html` <span>${m.hint}</span>` : ''}</th></tr>${sups.map((s) => html`<tr class="m-${m.key}"><th scope="row">${s.name}${s.dose ? html` <small>${s.dose}</small>` : ''}</th>${days.map((dk) => {
+        const on = isTaken(s.id, dk);
+        if (!on && !isScheduled(s, dk)) return html`<td></td>`;
+        return html`<td><button type="button" class="mini${on ? ' on' : ''}" data-act="toggle" data-sid="${s.id}" data-date="${dk}" aria-pressed="${bool(on)}" aria-label="${s.name}, ${longDate(dk)}">${on ? ICON.check : ''}</button></td>`;
+      })}</tr>`)}`;
     });
-    h += '</tr></thead><tbody>';
-    MOMENTS.forEach(function (m) {
-      var sups = S.settings.supplements.filter(function (s) { return s.moment === m.key && days.some(function (dk) { return isScheduled(s, dk) || isTaken(s.id, dk); }); });
-      if (!sups.length) return;
-      h += '<tr class="grp m-' + m.key + '"><th colspan="8" scope="colgroup">' + m.label + (m.hint ? ' <span>' + m.hint + '</span>' : '') + '</th></tr>';
-      sups.forEach(function (s) {
-        h += '<tr class="m-' + m.key + '"><th scope="row">' + esc(s.name) + (s.dose ? ' <small>' + esc(s.dose) + '</small>' : '') + '</th>';
-        days.forEach(function (dk) {
-          var sch = isScheduled(s, dk), on = isTaken(s.id, dk);
-          if (!sch && !on) { h += '<td></td>'; return; }
-          h += '<td><button type="button" class="mini' + (on ? ' on' : '') + '" data-act="toggle" data-sid="' + s.id + '" data-date="' + dk + '" aria-pressed="' + on + '" aria-label="' + esc(s.name + ', ' + longDate(dk)) + '">' + (on ? ICON.check : '') + '</button></td>';
-        });
-        h += '</tr>';
-      });
-    });
-    h += '</tbody><tbody class="sum">';
-    h += '<tr><th scope="row">Pris</th>' + days.map(function (dk) { var st = stats(dk); return '<td>' + (st.total ? st.taken + '/' + st.total : '') + '</td>'; }).join('') + '</tr>';
-    h += '<tr><th scope="row">Réveil</th>' + days.map(function (dk) { var d = peekDay(dk); return '<td>' + esc((d && d.wake) || '') + '</td>'; }).join('') + '</tr>';
-    SCALES.forEach(function (sc) {
-      h += '<tr><th scope="row">' + sc.label + (sc.faces ? '' : ' <small>sur 5</small>') + '</th>' + days.map(function (dk) {
-        var v = avgScale(dk, sc.key);
-        if (v == null) return '<td></td>';
-        if (sc.faces) return '<td><span role="img" aria-label="' + sc.label + ' ' + fmtAvg(v) + ' sur 5">' + sc.faces[Math.min(4, Math.max(0, Math.round(v) - 1))] + '</span></td>';
-        return '<td>' + fmtAvg(v) + '</td>';
-      }).join('') + '</tr>';
-    });
-    h += '</tbody></table></div>';
-    if (!S.settings.supplements.length) h += '<p class="empty">Ta liste est vide. Ajoute tes compléments dans Réglages.</p>';
-    return h;
+    const summary = [
+      html`<tr><th scope="row">Pris</th>${days.map((dk) => { const st = stats(dk); return html`<td>${st.total ? `${st.taken}/${st.total}` : ''}</td>`; })}</tr>`,
+      html`<tr><th scope="row">Réveil</th>${days.map((dk) => html`<td>${str((peekDay(dk) || {}).wake)}</td>`)}</tr>`,
+      SCALES.map((sc) => html`<tr><th scope="row">${sc.label}${sc.faces ? '' : html` <small>sur 5</small>`}</th>${days.map((dk) => {
+        const v = avgScale(dk, sc.key);
+        if (v == null) return html`<td></td>`;
+        if (sc.faces) return html`<td><span role="img" aria-label="${sc.label} ${fmtAvg(v)} sur 5">${sc.faces[Math.min(4, Math.max(0, Math.round(v) - 1))]}</span></td>`;
+        return html`<td>${fmtAvg(v)}</td>`;
+      })}</tr>`)
+    ];
+    return html`<div class="wk-head"><h1 class="wk-title">${weekTitle(start)}</h1><div class="daynav">
+        ${start !== startOfWeek(t) ? html`<button type="button" class="ghost" data-act="week-now">Cette semaine</button>` : ''}
+        <button type="button" class="icon" data-act="week-prev" aria-label="Semaine précédente">${ICON.left}</button>
+        <button type="button" class="icon" data-act="week-next" aria-label="Semaine suivante">${ICON.right}</button>
+      </div></div>
+      <p class="hint">Touche une gélule pour la cocher, ou un jour pour ouvrir son journal.</p>
+      <div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>${days.map((dk, i) => html`<th scope="col"${dk === t ? html` class="today"` : ''}><button type="button" data-act="goto" data-date="${dk}" aria-label="${longDate(dk)}"><span>${WD_SHORT[i]}</span><b>${fromKey(dk).getDate()}</b></button></th>`)}</tr></thead>
+      <tbody>${rows}</tbody><tbody class="sum">${summary}</tbody></table></div>
+      ${S.settings.supplements.length ? '' : html`<p class="empty">Ta liste est vide. Ajoute tes compléments dans Réglages.</p>`}`;
   }
 
   /* ---------- Rendu : Année ---------- */
   function renderYear() {
-    var y = S.ui.year, t = todayKey(), full = 0, tracked = 0, months = '';
-    for (var m = 0; m < 12; m++) {
-      var cells = WD_LETTER.map(function (l) { return '<span class="wdh" aria-hidden="true">' + l + '</span>'; }).join('');
-      var offset = (new Date(y, m, 1).getDay() + 6) % 7, nDays = new Date(y, m + 1, 0).getDate();
-      for (var i = 0; i < offset; i++) cells += '<span aria-hidden="true"></span>';
-      for (var dn = 1; dn <= nDays; dn++) {
-        var k = y + '-' + pad(m + 1) + '-' + pad(dn), st = stats(k), d = peekDay(k);
-        var future = k > t, p = st.total ? st.taken / st.total : 0;
-        var j = !!(d && ((Array.isArray(d.checkins) && d.checkins.length) || (Array.isArray(d.meals) && d.meals.length) || d.wake || d.notes));
-        var cls = 'bub' + (future ? ' future' : '') + (!st.total ? ' none' : p >= 1 ? ' full' : p > 0 ? ' part' : '') + (j ? ' j' : '') + (k === t ? ' today' : '');
+    const y = S.ui.year, t = todayKey();
+    let full = 0, tracked = 0;
+    const months = MONTHS.map((name, m) => {
+      const offset = (new Date(y, m, 1).getDay() + 6) % 7, nDays = new Date(y, m + 1, 0).getDate();
+      const cells = [];
+      for (let dn = 1; dn <= nDays; dn++) {
+        const k = `${y}-${pad(m + 1)}-${pad(dn)}`, st = stats(k), j = hasJournal(peekDay(k));
+        const future = k > t, p = st.total ? st.taken / st.total : 0;
         if (!future && st.total) { tracked++; if (p >= 1) full++; }
-        var label = longDate(k) + ' : ' + (st.total ? st.taken + ' sur ' + st.total + ' compléments' : 'rien de prévu') + (j ? ', journal rempli' : '');
-        cells += '<button type="button" class="' + cls + '" style="--p:' + p.toFixed(3) + '" data-act="goto" data-date="' + k + '" aria-label="' + esc(label) + '"></button>';
+        const cls = 'bub' + (future ? ' future' : '') + (!st.total ? ' none' : p >= 1 ? ' full' : p > 0 ? ' part' : '') + (j ? ' j' : '') + (k === t ? ' today' : '');
+        const label = `${longDate(k)} : ${st.total ? `${st.taken} sur ${st.total} compléments` : 'rien de prévu'}${j ? ', journal rempli' : ''}`;
+        cells.push(html`<button type="button" class="${cls}" style="--p:${p.toFixed(3)}" data-act="goto" data-date="${k}" aria-label="${label}"></button>`);
       }
-      months += '<section class="month"><h3>' + monthName(y, m) + '</h3><div class="blister">' + cells + '</div></section>';
-    }
-    var h = '<div class="yr-head"><h1 class="yr-title">' + y + '</h1><div class="daynav">';
-    if (y !== new Date().getFullYear()) h += '<button type="button" class="ghost" data-act="year-now">Cette année</button>';
-    h += '<button type="button" class="icon" data-act="year-prev" aria-label="Année précédente">' + ICON.left + '</button>';
-    h += '<button type="button" class="icon" data-act="year-next" aria-label="Année suivante">' + ICON.right + '</button></div></div>';
-    h += '<p class="yr-sum">' + (tracked ? 'Tout pris ' + full + ' jour' + (full > 1 ? 's' : '') + ' sur ' + tracked + ' suivi' + (tracked > 1 ? 's' : '') + '.' : 'Rien de suivi cette année pour l\u2019instant.') + '</p>';
-    h += '<div class="legend" aria-hidden="true"><span><i class="bub"></i>Rien pris</span><span><i class="bub part" style="--p:.5"></i>En partie</span><span><i class="bub full"></i>Tout pris</span><span><i class="bub j"></i>Journal rempli</span></div>';
-    return h + '<div class="months">' + months + '</div>';
+      return html`<section class="month"><h3>${cap1(name)}</h3><div class="blister">${WD_LETTER.map((l) => html`<span class="wdh" aria-hidden="true">${l}</span>`)}${Array.from({ length: offset }, () => html`<span aria-hidden="true"></span>`)}${cells}</div></section>`;
+    });
+    return html`<div class="yr-head"><h1 class="yr-title">${y}</h1><div class="daynav">
+        ${y !== new Date().getFullYear() ? html`<button type="button" class="ghost" data-act="year-now">Cette année</button>` : ''}
+        <button type="button" class="icon" data-act="year-prev" aria-label="Année précédente">${ICON.left}</button>
+        <button type="button" class="icon" data-act="year-next" aria-label="Année suivante">${ICON.right}</button>
+      </div></div>
+      <p class="yr-sum">${tracked ? `Tout pris ${plural(full, 'jour')} sur ${plural(tracked, 'suivi')}.` : 'Rien de suivi cette année pour l’instant.'}</p>
+      <div class="legend" aria-hidden="true"><span><i class="bub"></i>Rien pris</span><span><i class="bub part" style="--p:.5"></i>En partie</span><span><i class="bub full"></i>Tout pris</span><span><i class="bub j"></i>Journal rempli</span></div>
+      <div class="months">${months}</div>`;
   }
 
   /* ---------- Rendu : Réglages ---------- */
   function supSummary(s) {
-    if (s.active === false) return 'En pause';
+    if (!s.active) return 'En pause';
     if (s.freq === 'alt') return 'Un jour sur deux';
     if (s.freq === 'weekly') return s.weekday == null ? 'Jour à choisir' : 'Chaque ' + WD_LONG[s.weekday];
     return 'Tous les jours';
   }
   function supRow(s) {
+    const cls = `srow m-${s.moment}${s.active ? '' : ' paused'}`;
     if (S.ui.openSup !== s.id) {
-      return '<div class="srow srow-c m-' + s.moment + (s.active === false ? ' paused' : '') + '" data-sid="' + s.id + '">' +
-        '<button type="button" class="srow-open" data-act="sup-open" data-sid="' + s.id + '" aria-expanded="false">' +
-        '<span class="it-name">' + esc(s.name) + '</span>' + (s.dose ? '<span class="it-dose">' + esc(s.dose) + '</span>' : '') +
-        '<span class="srow-meta">' + supSummary(s) + '</span></button></div>';
+      return html`<div class="${cls} srow-c" data-sid="${s.id}"><button type="button" class="srow-open" data-act="sup-open" data-sid="${s.id}" aria-expanded="false"><span class="it-name">${s.name}</span>${s.dose ? html`<span class="it-dose">${s.dose}</span>` : ''}<span class="srow-meta">${supSummary(s)}</span></button></div>`;
     }
-    var h = '<div class="srow m-' + s.moment + (s.active === false ? ' paused' : '') + '" data-sid="' + s.id + '"><div class="srow-line">';
-    h += '<label class="field grow"><span>Nom</span><input type="text" data-sset="name" value="' + esc(s.name) + '" autocomplete="off"></label>';
-    h += '<label class="field"><span>Dose</span><input type="text" data-sset="dose" value="' + esc(s.dose) + '" autocomplete="off" size="10"></label></div><div class="srow-line">';
-    h += '<label class="field"><span>Moment</span><select data-sset="moment">' + MOMENTS.map(function (m) { return '<option value="' + m.key + '"' + (m.key === s.moment ? ' selected' : '') + '>' + m.label + '</option>'; }).join('') + '</select></label>';
-    h += '<label class="field"><span>Fréquence</span><select data-sset="freq">' + Object.keys(FREQS).map(function (f) { return '<option value="' + f + '"' + (f === s.freq ? ' selected' : '') + '>' + FREQS[f] + '</option>'; }).join('') + '</select></label>';
-    if (s.freq === 'weekly') {
-      h += '<label class="field"><span>Jour</span><select data-sset="weekday"><option value=""' + (s.weekday == null ? ' selected' : '') + '>Choisir</option>' +
-        WD_LONG.map(function (w, i) { return '<option value="' + i + '"' + (s.weekday === i ? ' selected' : '') + '>' + cap1(w) + '</option>'; }).join('') + '</select></label>';
-    }
-    h += '<label class="field"><span>' + (s.freq === 'alt' ? 'Premier jour' : 'Depuis le') + '</span><input type="date" data-sset="since" value="' + esc(s.since) + '"></label></div>';
-    h += '<label class="field"><span>Note</span><input type="text" data-sset="note" value="' + esc(s.note) + '" placeholder="Optionnel" autocomplete="off"></label>';
-    h += '<div class="srow-foot"><label class="switch"><input type="checkbox" data-sset="active"' + (s.active !== false ? ' checked' : '') + '> Actif</label>';
-    h += S.ui.confirm === 'sup:' + s.id
-      ? '<span class="row-actions"><button type="button" class="link danger" data-act="sup-del" data-sid="' + s.id + '">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>'
-      : '<span class="row-actions"><button type="button" class="link" data-act="sup-ask" data-sid="' + s.id + '">Supprimer</button><button type="button" class="ghost" data-act="sup-close">Terminé</button></span>';
-    return h + '</div></div>';
+    const id = (f) => `sup-${s.id}-${f}`;
+    const options = (entries, current) => entries.map(([v, label]) => html`<option value="${v}"${String(v) === String(current) ? html` selected` : ''}>${label}</option>`);
+    return html`<div class="${cls}" data-sid="${s.id}">
+      <div class="srow-line">
+        <label class="field grow"><span>Nom</span><input type="text" id="${id('name')}" data-sset="name" value="${s.name}" autocomplete="off"></label>
+        <label class="field"><span>Dose</span><input type="text" id="${id('dose')}" data-sset="dose" value="${s.dose}" autocomplete="off" size="10"></label>
+      </div>
+      <div class="srow-line">
+        <label class="field"><span>Moment</span><select id="${id('moment')}" data-sset="moment">${options(MOMENTS.map((m) => [m.key, m.label]), s.moment)}</select></label>
+        <label class="field"><span>Fréquence</span><select id="${id('freq')}" data-sset="freq">${options(Object.entries(FREQS), s.freq)}</select></label>
+        ${s.freq === 'weekly' ? html`<label class="field"><span>Jour</span><select id="${id('weekday')}" data-sset="weekday">${options([['', 'Choisir'], ...WD_LONG.map((w, i) => [i, cap1(w)])], s.weekday == null ? '' : s.weekday)}</select></label>` : ''}
+        <label class="field"><span>${s.freq === 'alt' ? 'Premier jour' : 'Depuis le'}</span><input type="date" id="${id('since')}" data-sset="since" value="${s.since}"></label>
+      </div>
+      <label class="field"><span>Note</span><input type="text" id="${id('note')}" data-sset="note" value="${s.note}" placeholder="Optionnel" autocomplete="off"></label>
+      <div class="srow-foot"><label class="switch"><input type="checkbox" id="${id('active')}" data-sset="active"${s.active ? html` checked` : ''}> Actif</label>
+        ${S.ui.confirm === `sup:${s.id}`
+          ? html`<span class="row-actions"><button type="button" class="link danger" data-act="sup-del" data-sid="${s.id}">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>`
+          : html`<span class="row-actions"><button type="button" class="link" data-act="sup-ask" data-sid="${s.id}">Supprimer</button><button type="button" class="ghost" data-act="sup-close" data-sid="${s.id}">Terminé</button></span>`}
+      </div>
+    </div>`;
   }
   function renderSettings() {
-    var h = '<h1 class="set-title">Réglages</h1><section class="set-sec"><div class="sec-head"><h2>Ta liste</h2><button type="button" class="primary" data-act="sup-add">Ajouter un complément</button></div>';
-    h += '<p class="hint">Touche un complément pour le modifier. Tout est enregistré au fur et à mesure. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p>';
-    MOMENTS.forEach(function (m) {
-      var list = S.settings.supplements.filter(function (s) { return s.moment === m.key; });
-      if (!list.length) return;
-      h += '<h3 class="m-title m-' + m.key + '">' + m.label + (m.hint ? ' <span>' + m.hint + '</span>' : '') + '</h3>';
-      list.forEach(function (s) { h += supRow(s); });
+    const sups = S.settings.supplements;
+    const groups = MOMENTS.map((m) => {
+      const list = sups.filter((s) => s.moment === m.key);
+      return list.length ? html`<h3 class="m-title m-${m.key}">${m.label}${m.hint ? html` <span>${m.hint}</span>` : ''}</h3>${list.map(supRow)}` : '';
     });
-    if (!S.settings.supplements.length) h += '<p class="empty">Ta liste est vide.</p>';
-    h += '</section><section class="set-sec"><div class="sec-head"><h2>Tes données</h2></div>';
-    h += '<p class="muted">' + (store.mode === 'cloud'
-      ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre ta tablette et tes autres appareils.'
-      : 'Enregistrées dans ce navigateur, sur cet appareil uniquement. Fais une sauvegarde de temps en temps.') + '</p>';
-    h += '<div class="actions"><button type="button" class="ghost" data-act="export-json">Faire une sauvegarde</button><button type="button" class="ghost" data-act="export-csv">Exporter le journal en tableau</button>';
-    h += '<label class="ghost filebtn">Restaurer une sauvegarde<input type="file" accept=".json,application/json" data-file="import" class="sr-only"></label></div>';
-    if (S.ui.exportText != null) {
-      h += '<div class="exportbox"><p class="hint">Le téléchargement n\u2019est pas disponible ici. Copie ce texte et garde-le quelque part.</p><textarea readonly class="export" id="export-text" rows="8">' + esc(S.ui.exportText) + '</textarea>';
-      h += '<div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button><button type="button" class="link" data-act="close-export">Fermer</button></div></div>';
-    }
-    h += '<div class="reset">' + (S.ui.confirm === 'reset'
-      ? '<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>'
-      : '<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>') + '</div></section>';
-    return h;
+    const where = store.mode === 'cloud'
+      ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre ta tablette et tes autres appareils. Sans connexion, tes modifications restent sur l’appareil et partent dès que possible.'
+      : 'Enregistrées dans ce navigateur, sur cet appareil uniquement. Fais une sauvegarde de temps en temps.';
+    return html`<h1 class="set-title">Réglages</h1>
+      <section class="set-sec"><div class="sec-head"><h2>Ta liste</h2><button type="button" class="primary" data-act="sup-add">Ajouter un complément</button></div>
+        <p class="hint">Touche un complément pour le modifier. Tout est enregistré au fur et à mesure. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p>
+        ${groups}${sups.length ? '' : html`<p class="empty">Ta liste est vide.</p>`}
+      </section>
+      <section class="set-sec"><div class="sec-head"><h2>Tes données</h2></div>
+        <p class="muted">${where}</p>
+        <div class="actions"><button type="button" class="ghost" data-act="export-json">Faire une sauvegarde</button><button type="button" class="ghost" data-act="export-csv">Exporter le journal en tableau</button><label class="ghost filebtn">Restaurer une sauvegarde<input type="file" id="import-file" accept=".json,application/json" data-file="import" class="sr-only"></label></div>
+        ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">Le téléchargement n’est pas disponible ici. Copie ce texte et garde-le quelque part.</p><textarea readonly class="export" id="export-text" rows="8">${S.ui.exportText}</textarea><div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button><button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
+        <div class="reset">${S.ui.confirm === 'reset'
+          ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
+          : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
+      </section>`;
   }
 
   /* ---------- Rendu général ---------- */
-  var pendingRender = false;
+  const view = document.getElementById('view');
+  const VIEWS = { jour: renderDay, semaine: renderWeek, annee: renderYear, reglages: renderSettings };
+  let pendingRender = false;
+  /* Le bouton qui a le focus est recréé à chaque rendu : on retrouve le même (mêmes data-*) pour garder la place au clavier. */
+  const FOCUS_ATTRS = ['data-act', 'data-sid', 'data-date', 'data-id', 'data-scale', 'data-v'];
+  function focusedButton() {
+    const a = document.activeElement;
+    if (!a || a.tagName !== 'BUTTON' || !view.contains(a)) return null;
+    const sel = FOCUS_ATTRS.filter((n) => a.hasAttribute(n)).map((n) => attr(n, a.getAttribute(n))).join('');
+    return sel ? 'button' + sel : null;
+  }
   function render() {
-    document.querySelectorAll('.tabs [data-view]').forEach(function (b) {
+    document.querySelectorAll('.tabs [data-view]').forEach((b) => {
       if (b.dataset.view === S.ui.view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
-    var view = document.getElementById('view');
     if (!S.ready) { view.innerHTML = '<p class="loading">Chargement de tes données…</p>'; return; }
     pendingRender = false;
-    var v = S.ui.view;
-    view.innerHTML = v === 'semaine' ? renderWeek() : v === 'annee' ? renderYear() : v === 'reglages' ? renderSettings() : renderDay();
+    const explicit = S.ui.focus, keep = explicit || focusedButton();
+    view.innerHTML = String((VIEWS[S.ui.view] || renderDay)());
     S.ui.just = null;
-    if (S.ui.focus) {
-      var el = view.querySelector(S.ui.focus);
-      if (el) { try { el.focus(); if (S.ui.select && el.select) el.select(); } catch (e) { /* rien */ } }
-      S.ui.focus = null; S.ui.select = false;
+    if (keep) {
+      const el = view.querySelector(keep);
+      if (el) { try { el.focus(explicit ? undefined : { preventScroll: true }); if (S.ui.select && el.select) el.select(); } catch (e) { /* rien */ } }
     }
+    S.ui.focus = null; S.ui.select = false;
   }
   function isEditing() {
-    var a = document.activeElement;
-    return !!(a && a.closest && a.closest('#view') && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName));
+    const a = document.activeElement;
+    return !!(a && view.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox');
   }
   function safeRender() { if (isEditing()) { pendingRender = true; return; } render(); }
-  document.addEventListener('focusout', function () {
+  document.addEventListener('focusout', () => {
     if (!pendingRender) return;
-    setTimeout(function () { if (pendingRender && !isEditing()) render(); }, 60);
+    setTimeout(() => { if (pendingRender && !isEditing()) render(); }, 60);
   });
 
-  var toastTimer = null;
+  let toastTimer = null;
   function toast(msg) {
-    var el = document.getElementById('toast');
-    el.textContent = msg; el.classList.add('show');
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2400);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
   }
   function toTop() { try { window.scrollTo(0, 0); } catch (e) { /* rien */ } }
   function go(k) { S.ui.date = k; S.ui.form = null; S.ui.confirm = null; render(); }
 
   /* ---------- Formulaires ---------- */
-  function saveForm() {
-    var f = S.ui.form; if (!f) return;
-    var dr = f.draft;
-    if (toMin(dr.time) === null) { toast('Indique l\u2019heure.'); return; }
-    if (f.type === 'meal' && !String(dr.text || '').trim()) { toast('Écris ce que tu as mangé.'); return; }
-    if (f.type === 'checkin' && dr.mood == null && dr.energy == null && dr.focus == null && dr.hunger == null && !String(dr.note || '').trim()) {
-      toast('Choisis au moins ton humeur.'); return;
+  function startForm(type, k, id) {
+    let draft;
+    if (id) {
+      const d = peekDay(k);
+      const it = d ? listOf(type === 'checkin' ? d.checkins : d.meals).find((x) => x.id === id) : null;
+      if (!it) return;
+      draft = clone(it);
+    } else {
+      draft = type === 'checkin'
+        ? { time: nowTime(), mood: null, energy: null, focus: null, hunger: null, note: '' }
+        : { time: nowTime(), kind: 'Repas', text: '' };
     }
-    var entry = f.type === 'checkin'
-      ? { id: f.id || newId(), time: dr.time, mood: dr.mood == null ? null : dr.mood, energy: dr.energy == null ? null : dr.energy, focus: dr.focus == null ? null : dr.focus, hunger: dr.hunger == null ? null : dr.hunger, note: String(dr.note || '').trim() }
-      : { id: f.id || newId(), time: dr.time, kind: dr.kind === 'Collation' ? 'Collation' : 'Repas', text: String(dr.text).trim() };
-    mutateDay(f.date, f.type === 'checkin' ? 'checkins' : 'meals', function (d) {
-      var list = f.type === 'checkin' ? d.checkins : d.meals;
-      var i = list.findIndex(function (x) { return x.id === entry.id; });
-      if (i >= 0) list[i] = entry; else list.push(entry);
+    S.ui.confirm = null;
+    S.ui.form = { type, date: k, id: id || null, draft };
+    if (type === 'meal') S.ui.focus = '#meal-text';
+    render();
+  }
+  function saveForm() {
+    const f = S.ui.form;
+    if (!f) return;
+    const dr = f.draft, isCheckin = f.type === 'checkin';
+    const note = String(dr.note || '').trim(), text = String(dr.text || '').trim();
+    if (toMin(dr.time) === null) { toast('Indique l’heure.'); return; }
+    if (!isCheckin && !text) { toast('Écris ce que tu as mangé.'); return; }
+    const scores = {};
+    SCALES.forEach((sc) => { scores[sc.key] = scaleValue(dr[sc.key]); });
+    if (isCheckin && Object.values(scores).every((v) => v == null) && !note) { toast('Choisis au moins ton humeur.'); return; }
+    const entry = isCheckin
+      ? { id: f.id || newId(), time: dr.time, ...scores, note }
+      : { id: f.id || newId(), time: dr.time, kind: dr.kind === 'Collation' ? 'Collation' : 'Repas', text };
+    const field = isCheckin ? 'checkins' : 'meals';
+    mutateDay(f.date, field, (d) => {
+      const i = d[field].findIndex((x) => x && x.id === entry.id);
+      if (i >= 0) d[field][i] = entry; else d[field].push(entry);
     }, false);
     S.ui.form = null;
+    S.ui.focus = `[data-act="${isCheckin ? 'ci' : 'meal'}-new"]`;
     render();
-    toast(f.type === 'checkin' ? 'Check-in enregistré' : 'Repas noté');
+    toast(isCheckin ? 'Check-in enregistré' : 'Repas noté');
   }
 
   /* ---------- Sauvegardes ---------- */
-  var csvCell = function (v) {
-    var s = String(v == null ? '' : v);
+  const csvCell = (v) => {
+    let s = String(v ?? '');
     if (/^[=+\-@]/.test(s)) s = "'" + s;
     return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   };
   function buildCSV() {
-    var rows = [['Date', 'Réveil', 'Coucher', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Repas', 'Notes']];
-    Object.keys(S.months).sort().forEach(function (m) {
-      Object.keys(S.months[m].days || {}).sort().forEach(function (k) {
-        var d = peekDay(k); if (!d) return;
-        var st = stats(k);
-        var ci = (Array.isArray(d.checkins) ? d.checkins : []).slice().sort(byTime).map(function (c) {
-          var dash = function (v) { return v == null ? '-' : v; };
-          return c.time + ' humeur ' + dash(c.mood) + ' énergie ' + dash(c.energy) + ' concentration ' + dash(c.focus) + ' faim ' + dash(c.hunger) + (c.note ? ' (' + c.note + ')' : '');
-        }).join(' | ');
-        var ml = (Array.isArray(d.meals) ? d.meals : []).slice().sort(byTime).map(function (x) { return x.time + ' ' + x.kind + ' : ' + x.text; }).join(' | ');
-        var hasTaken = d.taken && Object.keys(d.taken).some(function (x) { return d.taken[x]; });
-        if (!d.wake && !d.bed && !ci && !ml && !d.notes && !hasTaken) return;
-        rows.push([k, d.wake || '', d.bed || '', st.taken, st.total, ci, ml, d.notes || '']);
+    const rows = [['Date', 'Réveil', 'Coucher', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Repas', 'Notes']];
+    const dash = (v) => v ?? '-';
+    Object.keys(S.months).sort().forEach((mk) => {
+      Object.keys(S.months[mk].days || {}).sort().forEach((k) => {
+        const d = peekDay(k);
+        if (!d) return;
+        const ci = listOf(d.checkins).sort(byTime).map((c) => `${str(c.time)} humeur ${dash(scaleValue(c.mood))} énergie ${dash(scaleValue(c.energy))} concentration ${dash(scaleValue(c.focus))} faim ${dash(scaleValue(c.hunger))}${c.note ? ` (${c.note})` : ''}`).join(' | ');
+        const ml = listOf(d.meals).sort(byTime).map((x) => `${str(x.time)} ${str(x.kind) || 'Repas'} : ${str(x.text)}`).join(' | ');
+        const hasTaken = isObj(d.taken) && Object.values(d.taken).some(Boolean);
+        if (!str(d.wake) && !str(d.bed) && !ci && !ml && !str(d.notes) && !hasTaken) return;
+        const st = stats(k);
+        rows.push([k, str(d.wake), str(d.bed), st.taken, st.total, ci, ml, str(d.notes)]);
       });
     });
-    return '\uFEFF' + rows.map(function (r) { return r.map(csvCell).join(';'); }).join('\r\n');
+    return '﻿' + rows.map((r) => r.map(csvCell).join(';')).join('\r\n');
   }
   async function offerFile(name, data) {
     if (store.downloads) {
-      try { await store.downloads.save({ filename: name, data: data }); toast('Fichier enregistré'); return; }
-      catch (e) {
-        var c = e && e.code;
-        if (c === 'declined') return;
-        if (c === 'rate_limited') { toast('Réessaie dans un instant.'); return; }
+      try {
+        const res = await store.downloads.save({ filename: name, data });
+        if (!res || res.status !== 'delivered') toast('Fichier enregistré');
+        return;
+      } catch (e) {
+        const code = e && e.code;
+        if (code === 'declined') return;
+        if (code === 'rate_limited') { toast('Réessaie dans un instant.'); return; }
       }
     }
     S.ui.exportText = data;
+    S.ui.focus = '#export-text';
+    S.ui.select = true;
     render();
   }
   function exportJSON() {
-    offerFile('mon-suivi-sauvegarde-' + todayKey() + '.json', JSON.stringify({ app: 'mon-suivi', version: 1, exported: new Date().toISOString(), settings: S.settings, months: S.months }, null, 2));
+    const backup = { app: 'mon-suivi', version: 1, exported: new Date().toISOString(), settings: S.settings, months: S.months };
+    offerFile(`mon-suivi-sauvegarde-${todayKey()}.json`, JSON.stringify(backup, null, 2));
   }
-  function exportCSV() { offerFile('mon-suivi-journal-' + todayKey() + '.csv', buildCSV()); }
+  function exportCSV() { offerFile(`mon-suivi-journal-${todayKey()}.csv`, buildCSV()); }
   async function copyExport() {
-    var ta = document.getElementById('export-text');
     try { await navigator.clipboard.writeText(S.ui.exportText || ''); toast('Copié'); }
-    catch (e) { if (ta) { ta.focus(); ta.select(); } toast('Sélectionne le texte et copie-le.'); }
+    catch (e) {
+      const ta = document.getElementById('export-text');
+      if (ta) { ta.focus(); ta.select(); }
+      toast('Sélectionne le texte et copie-le.');
+    }
   }
   function importFile(file) {
     if (!file) return;
-    var r = new FileReader();
-    r.onload = function () {
-      try {
-        var obj = JSON.parse(String(r.result));
-        if (!obj || !obj.settings || !Array.isArray(obj.settings.supplements) || !obj.months || typeof obj.months !== 'object') throw new Error('format');
-        S.settings = normalizeSettings(obj.settings);
-        markDirty('settings');
-        var mo = sanitizeMonths(obj.months);
-        Object.keys(mo).forEach(function (m) { S.months[m] = mo[m]; Object.keys(mo[m].days).forEach(function (dk) { touchDay(dk, '*'); }); markDirty('m' + m); });
-        render();
-        toast('Sauvegarde restaurée');
-      } catch (e) { toast('Ce fichier n\u2019est pas une sauvegarde de Mon suivi.'); }
+    const r = new FileReader();
+    r.onload = () => {
+      let obj = null;
+      try { obj = JSON.parse(String(r.result)); } catch (e) { obj = null; }
+      if (!isObj(obj) || !isObj(obj.settings) || !Array.isArray(obj.settings.supplements) || !isObj(obj.months)) {
+        toast('Ce fichier n’est pas une sauvegarde de Mon suivi.');
+        return;
+      }
+      S.settings = normalizeSettings(obj.settings);
+      store.trusted = true;
+      markDirty('settings');
+      const months = sanitizeMonths(obj.months);
+      let n = 0;
+      Object.keys(months).forEach((mk) => {
+        S.months[mk] = months[mk];
+        Object.keys(months[mk].days).forEach((dk) => { touchDay(dk); n++; });
+        markDirty('m' + mk);
+      });
+      S.ui.form = null; S.ui.confirm = null; S.ui.openSup = null;
+      render();
+      toast(`Sauvegarde restaurée (${plural(n, 'jour')})`);
     };
-    r.onerror = function () { toast('Impossible de lire ce fichier.'); };
+    r.onerror = () => toast('Impossible de lire ce fichier.');
     r.readAsText(file);
   }
 
+  /* ---------- Actions (boutons data-act) ---------- */
+  const askDelete = (kind, id, focus) => { S.ui.confirm = `${kind}:${id}`; S.ui.focus = focus; render(); };
+  function deleteEntry(field, k, id) {
+    S.ui.confirm = null;
+    mutateDay(k, field, (d) => { d[field] = d[field].filter((x) => !x || x.id !== id); });
+    toast('Supprimé');
+  }
+  const actions = {
+    tab: (d) => { S.ui.view = d.view; S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); toTop(); },
+    'day-prev': () => go(addDays(S.ui.date, -1)),
+    'day-next': () => go(addDays(S.ui.date, 1)),
+    'day-today': () => go(todayKey()),
+    goto: (d) => { const fromOther = S.ui.view !== 'jour'; S.ui.view = 'jour'; go(d.date); if (fromOther) toTop(); },
+    toggle: (d) => {
+      S.ui.just = `${d.sid}|${d.date}`;
+      mutateDay(d.date, 'taken:' + d.sid, (day) => { day.taken[d.sid] = !day.taken[d.sid]; });
+    },
+    'wake-now': (d) => {
+      const t = nowTime();
+      mutateDay(d.date, 'wake', (day) => { day.wake = t; });
+      toast(`Réveil noté à ${t}`);
+    },
+    'ci-new': (d) => startForm('checkin', d.date),
+    'meal-new': (d) => startForm('meal', d.date),
+    'ci-edit': (d) => startForm('checkin', d.date, d.id),
+    'meal-edit': (d) => startForm('meal', d.date, d.id),
+    'ci-ask': (d) => askDelete('ci', d.id, `[data-act="ci-del"]${attr('data-id', d.id)}`),
+    'meal-ask': (d) => askDelete('meal', d.id, `[data-act="meal-del"]${attr('data-id', d.id)}`),
+    'ci-del': (d) => deleteEntry('checkins', d.date, d.id),
+    'meal-del': (d) => deleteEntry('meals', d.date, d.id),
+    'confirm-cancel': () => {
+      const [kind, id] = String(S.ui.confirm || '').split(/:(.*)/);
+      if (kind === 'reset') S.ui.focus = '[data-act="reset-ask"]';
+      else if (kind === 'sup') S.ui.focus = `[data-act="sup-ask"]${attr('data-sid', id)}`;
+      else if (kind) S.ui.focus = `[data-act="${kind}-ask"]${attr('data-id', id)}`;
+      S.ui.confirm = null;
+      render();
+    },
+    rate: (d) => {
+      const f = S.ui.form;
+      if (!f) return;
+      const v = Number(d.v);
+      f.draft[d.scale] = f.draft[d.scale] === v ? null : v;
+      render();
+    },
+    'meal-kind': (d) => { if (S.ui.form) { S.ui.form.draft.kind = d.v; render(); } },
+    'form-save': () => saveForm(),
+    'form-cancel': () => {
+      const f = S.ui.form;
+      S.ui.form = null;
+      if (f) S.ui.focus = f.id ? `[data-act="${f.type === 'checkin' ? 'ci' : 'meal'}-edit"]${attr('data-id', f.id)}` : `[data-act="${f.type === 'checkin' ? 'ci' : 'meal'}-new"]`;
+      render();
+    },
+    'week-prev': () => { S.ui.weekOf = addDays(S.ui.weekOf, -7); render(); },
+    'week-next': () => { S.ui.weekOf = addDays(S.ui.weekOf, 7); render(); },
+    'week-now': () => { S.ui.weekOf = startOfWeek(todayKey()); render(); },
+    'year-prev': () => { S.ui.year--; render(); },
+    'year-next': () => { S.ui.year++; render(); },
+    'year-now': () => { S.ui.year = new Date().getFullYear(); render(); },
+    'sup-add': () => {
+      const s = { id: newId(), name: 'Nouveau complément', dose: '', note: '', moment: 'matin', freq: 'daily', since: todayKey(), active: true, weekday: null };
+      S.ui.openSup = s.id;
+      S.ui.focus = `#sup-${CSS.escape(s.id)}-name`;
+      S.ui.select = true;
+      mutateSettings((st) => { st.supplements.push(s); });
+    },
+    'sup-open': (d) => { S.ui.openSup = d.sid; S.ui.confirm = null; if (finePointer()) S.ui.focus = `#sup-${CSS.escape(d.sid)}-name`; render(); },
+    'sup-close': (d) => { S.ui.openSup = null; S.ui.confirm = null; S.ui.focus = `[data-act="sup-open"]${attr('data-sid', d.sid)}`; render(); },
+    'sup-ask': (d) => askDelete('sup', d.sid, `[data-act="sup-del"]${attr('data-sid', d.sid)}`),
+    'sup-del': (d) => {
+      S.ui.confirm = null;
+      mutateSettings((st) => { st.supplements = st.supplements.filter((x) => x.id !== d.sid); });
+      toast('Complément supprimé');
+    },
+    'reset-ask': () => { S.ui.confirm = 'reset'; S.ui.focus = '[data-act="reset-yes"]'; render(); },
+    'reset-yes': () => {
+      S.ui.confirm = null;
+      mutateSettings((st) => { st.supplements = defaultSupplements(todayKey()); });
+      toast('Liste de départ remise');
+    },
+    'export-json': () => exportJSON(),
+    'export-csv': () => exportCSV(),
+    'copy-export': () => copyExport(),
+    'close-export': () => { S.ui.exportText = null; render(); }
+  };
+
   /* ---------- Événements ---------- */
-  var app = document.getElementById('app');
-  app.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-act]');
-    if (!b || !app.contains(b)) return;
-    var act = b.dataset.act, k = b.dataset.date, sid = b.dataset.sid, id = b.dataset.id;
-    if (!S.ready) return;
-    switch (act) {
-      case 'tab': S.ui.view = b.dataset.view; S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); toTop(); break;
-      case 'day-prev': go(addDays(S.ui.date, -1)); break;
-      case 'day-next': go(addDays(S.ui.date, 1)); break;
-      case 'day-today': go(todayKey()); break;
-      case 'goto': if (S.ui.view !== 'jour') { S.ui.view = 'jour'; go(k); toTop(); } else go(k); break;
-      case 'toggle':
-        S.ui.just = sid + '|' + k;
-        mutateDay(k, 'taken:' + sid, function (d) { d.taken[sid] = !d.taken[sid]; });
-        break;
-      case 'wake-now': mutateDay(k, 'wake', function (d) { d.wake = nowTime(); }); toast('Réveil noté à ' + nowTime()); break;
-      case 'ci-new':
-        S.ui.confirm = null;
-        S.ui.form = { type: 'checkin', date: k, id: null, draft: { time: nowTime(), mood: null, energy: null, focus: null, hunger: null, note: '' } };
-        render(); break;
-      case 'meal-new':
-        S.ui.confirm = null;
-        S.ui.form = { type: 'meal', date: k, id: null, draft: { time: nowTime(), kind: 'Repas', text: '' } };
-        S.ui.focus = '#meal-text'; render(); break;
-      case 'ci-edit': case 'meal-edit': {
-        var dd = peekDay(k);
-        var arr = dd ? (act === 'ci-edit' ? dd.checkins : dd.meals) : null;
-        var it = Array.isArray(arr) ? arr.find(function (x) { return x.id === id; }) : null;
-        if (!it) break;
-        S.ui.confirm = null;
-        S.ui.form = { type: act === 'ci-edit' ? 'checkin' : 'meal', date: k, id: id, draft: Object.assign({}, it) };
-        if (act === 'meal-edit') S.ui.focus = '#meal-text';
-        render(); break;
-      }
-      case 'ci-ask': case 'meal-ask': S.ui.confirm = (act === 'ci-ask' ? 'ci:' : 'meal:') + id; render(); break;
-      case 'ci-del': case 'meal-del':
-        S.ui.confirm = null;
-        mutateDay(k, act === 'ci-del' ? 'checkins' : 'meals', function (d) {
-          if (act === 'ci-del') d.checkins = d.checkins.filter(function (x) { return x.id !== id; });
-          else d.meals = d.meals.filter(function (x) { return x.id !== id; });
-        });
-        toast('Supprimé'); break;
-      case 'confirm-cancel': S.ui.confirm = null; render(); break;
-      case 'rate':
-        if (S.ui.form) { var key = b.dataset.scale, v = Number(b.dataset.v); S.ui.form.draft[key] = S.ui.form.draft[key] === v ? null : v; render(); }
-        break;
-      case 'meal-kind': if (S.ui.form) { S.ui.form.draft.kind = b.dataset.v; render(); } break;
-      case 'form-save': saveForm(); break;
-      case 'form-cancel': S.ui.form = null; render(); break;
-      case 'week-prev': S.ui.weekOf = addDays(S.ui.weekOf, -7); render(); break;
-      case 'week-next': S.ui.weekOf = addDays(S.ui.weekOf, 7); render(); break;
-      case 'week-now': S.ui.weekOf = startOfWeek(todayKey()); render(); break;
-      case 'year-prev': S.ui.year--; render(); break;
-      case 'year-next': S.ui.year++; render(); break;
-      case 'year-now': S.ui.year = new Date().getFullYear(); render(); break;
-      case 'sup-add': {
-        var s = { id: newId(), name: 'Nouveau complément', dose: '', note: '', moment: 'matin', freq: 'daily', since: todayKey(), active: true, weekday: null };
-        S.ui.openSup = s.id; S.ui.focus = '[data-sid="' + s.id + '"] input[data-sset="name"]'; S.ui.select = true;
-        mutateSettings(function (st) { st.supplements.push(s); });
-        break;
-      }
-      case 'sup-open': S.ui.openSup = sid; S.ui.confirm = null; render(); break;
-      case 'sup-close': S.ui.openSup = null; S.ui.confirm = null; render(); break;
-      case 'sup-ask': S.ui.confirm = 'sup:' + sid; render(); break;
-      case 'sup-del':
-        S.ui.confirm = null;
-        mutateSettings(function (st) { st.supplements = st.supplements.filter(function (x) { return x.id !== sid; }); });
-        toast('Complément supprimé'); break;
-      case 'reset-ask': S.ui.confirm = 'reset'; render(); break;
-      case 'reset-yes':
-        S.ui.confirm = null;
-        mutateSettings(function (st) { st.supplements = defaultSupplements(todayKey()); });
-        toast('Liste de départ remise'); break;
-      case 'export-json': exportJSON(); break;
-      case 'export-csv': exportCSV(); break;
-      case 'copy-export': copyExport(); break;
-      case 'close-export': S.ui.exportText = null; render(); break;
+  const app = document.getElementById('app');
+  app.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act]');
+    if (!b || !app.contains(b) || !S.ready) return;
+    const fn = actions[b.dataset.act];
+    if (fn) fn(b.dataset);
+  });
+  function setSupplementField(sid, f, v) {
+    const s = S.settings.supplements.find((x) => x.id === sid);
+    if (!s) return;
+    if (f === 'active') s.active = !!v;
+    else if (f === 'weekday') s.weekday = v === '' ? null : Number(v);
+    else if (f === 'since') { if (isKey(v)) s.since = v; }
+    else if (f === 'moment') { if (MOMENT_KEYS.includes(v)) s.moment = v; }
+    else if (f === 'freq') { if (FREQS[v]) s.freq = v; }
+    else if (f === 'name') s.name = String(v).trim() || 'Sans nom';
+    else if (f === 'dose' || f === 'note') s[f] = String(v);
+  }
+  app.addEventListener('change', (e) => {
+    const t = e.target, ds = t.dataset;
+    if (!S.ready || !ds) return;
+    if (ds.bind === 'wake' || ds.bind === 'bed') {
+      // Enregistré tout de suite ; l'affichage (durée de la nuit) suit quand on quitte le champ.
+      const field = ds.bind, val = t.value;
+      mutateDay(ds.date, field, (d) => { d[field] = val; }, false);
+      safeRender();
+    } else if (ds.draft && S.ui.form) {
+      S.ui.form.draft[ds.draft] = t.value;
+    } else if (ds.weekly) {
+      const v = t.value;
+      mutateSettings((st) => { const s = st.supplements.find((x) => x.id === ds.weekly); if (s) s.weekday = v === '' ? null : Number(v); });
+      if (v !== '') toast('Jour enregistré');
+    } else if (ds.sset) {
+      const row = t.closest('[data-sid]');
+      if (!row) return;
+      const structural = ['moment', 'freq', 'active'].includes(ds.sset); // ceux qui changent la fiche affichée
+      if (structural && (t.type === 'checkbox' || finePointer())) S.ui.focus = `#${CSS.escape(t.id)}`;
+      mutateSettings(() => setSupplementField(row.dataset.sid, ds.sset, t.type === 'checkbox' ? t.checked : t.value), structural);
+    } else if (ds.file === 'import') {
+      importFile(t.files && t.files[0]);
+      t.value = '';
     }
   });
-  app.addEventListener('change', function (e) {
-    var t = e.target;
-    if (!S.ready || !t.dataset) return;
-    if (t.dataset.bind === 'wake' || t.dataset.bind === 'bed') {
-      var field = t.dataset.bind, val = t.value;
-      mutateDay(t.dataset.date, field, function (d) { d[field] = val; });
-      return;
-    }
-    if (t.dataset.draft && S.ui.form) { S.ui.form.draft[t.dataset.draft] = t.value; return; }
-    if (t.dataset.weekly) {
-      var wv = t.value, wid = t.dataset.weekly;
-      mutateSettings(function (st) { var s = st.supplements.find(function (x) { return x.id === wid; }); if (s) s.weekday = wv === '' ? null : Number(wv); });
-      if (wv !== '') toast('Jour enregistré');
-      return;
-    }
-    if (t.dataset.sset) {
-      var row = t.closest('[data-sid]'); if (!row) return;
-      var rid = row.dataset.sid, f = t.dataset.sset, v = t.type === 'checkbox' ? t.checked : t.value;
-      var structural = ['moment', 'freq', 'active', 'weekday', 'since'].indexOf(f) >= 0;
-      mutateSettings(function (st) {
-        var s = st.supplements.find(function (x) { return x.id === rid; }); if (!s) return;
-        if (f === 'active') s.active = !!v;
-        else if (f === 'weekday') s.weekday = v === '' ? null : Number(v);
-        else if (f === 'since') { if (isKey(v)) s.since = v; }
-        else if (f === 'moment') { if (MOMENT_KEYS.indexOf(v) >= 0) s.moment = v; }
-        else if (f === 'freq') { if (FREQS[v]) s.freq = v; }
-        else if (f === 'name') s.name = String(v).trim() || 'Sans nom';
-        else s[f] = String(v);
-      }, structural);
-      return;
-    }
-    if (t.dataset.file === 'import') { var file = t.files && t.files[0]; importFile(file); t.value = ''; }
-  });
-  app.addEventListener('input', function (e) {
-    var t = e.target;
-    if (!S.ready || !t.dataset) return;
-    if (t.dataset.bind === 'notes') {
-      var k = t.dataset.date, d = ensureDay(k);
-      d.notes = t.value; touchDay(k, 'notes'); markDirty('m' + monthKey(k)); return;
-    }
-    if (t.dataset.draft && S.ui.form) { S.ui.form.draft[t.dataset.draft] = t.value; return; }
-    if (t.dataset.sset && ['name', 'dose', 'note'].indexOf(t.dataset.sset) >= 0) {
-      var row = t.closest('[data-sid]'); if (!row) return;
-      var s = S.settings.supplements.find(function (x) { return x.id === row.dataset.sid; });
+  app.addEventListener('input', (e) => {
+    const t = e.target, ds = t.dataset;
+    if (!S.ready || !ds) return;
+    if (ds.bind === 'notes') {
+      mutateDay(ds.date, 'notes', (d) => { d.notes = t.value; }, false);
+    } else if (ds.draft && S.ui.form) {
+      S.ui.form.draft[ds.draft] = t.value;
+    } else if (['name', 'dose', 'note'].includes(ds.sset)) {
+      const row = t.closest('[data-sid]');
+      const s = row && S.settings.supplements.find((x) => x.id === row.dataset.sid);
       if (!s) return;
-      s[t.dataset.sset] = t.value; markDirty('settings');
+      s[ds.sset] = t.value;
+      markDirty('settings');
     }
   });
 
-  /* Nouveau jour, onglet caché, fermeture */
-  var lastToday = todayKey();
+  /* Nouveau jour, retour sur la page, connexion retrouvée, fermeture */
+  let lastToday = todayKey();
   function checkRollover() {
-    var t = todayKey();
+    const t = todayKey();
     if (t === lastToday) return;
     if (S.ui.date === lastToday) S.ui.date = t;
     if (S.ui.weekOf === startOfWeek(lastToday)) S.ui.weekOf = startOfWeek(t);
     lastToday = t;
     if (S.ready) safeRender();
   }
-  document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') checkRollover(); else flushAll();
+  function resume() {
+    if (store.mode !== 'cloud' || store.stopped) return;
+    if (!store.online) { clearTimeout(store.connectTimer); store.connectTimer = null; connect(); }
+    else if (store.dirty.size) { clearTimeout(store.retryTimer); store.retryTimer = null; flushAll(); }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') { checkRollover(); resume(); }
+    else flushAll();
   });
+  window.addEventListener('online', resume);
   window.addEventListener('pagehide', flushAll);
   setInterval(checkRollover, 60000);
 
   init();
 })();
 </script>
-</body>
-</html>
