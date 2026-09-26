@@ -93,7 +93,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .datebar{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 .date{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px, 4.4vw, 40px); line-height:1.08; letter-spacing:-.025em; }
 .strip{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:6px; margin:18px 0 26px; }
-.lid{ border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:7px 2px 9px; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:0; }
+.lid{ position:relative; border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:7px 2px 9px; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:0; }
+.lid.visit::before{ content:""; position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--soir); }
+.lid[aria-current="date"].visit::before{ background:var(--soir-2); }
 .lid .wd{ font-size:12px; font-weight:700; color:var(--muted); }
 .lid .dn{ font-size:18px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.3; }
 .lid .bar{ width:64%; height:4px; border-radius:2px; background:var(--bub); overflow:hidden; margin-top:3px; }
@@ -103,6 +105,10 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .lid[aria-current="date"] .bar{ background:rgba(127,127,127,.4); }
 .lid.today .dn{ text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; }
 .banner{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin:-8px 0 24px; padding:12px 14px; border:1.5px dashed var(--matin); background:var(--surface); border-radius:14px; }
+.banner.remind{ border:1.5px solid var(--soir-line); background:var(--soir-tint); }
+.banner .btxt{ flex:1 1 220px; min-width:0; }
+.banner .btxt b{ display:block; font-weight:800; }
+.banner .btxt span{ display:block; font-size:14px; font-weight:600; color:var(--muted); }
 .banner p{ margin:0; font-weight:700; }
 .banner select{ background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:8px 10px; min-height:42px; }
 .daygrid{ display:grid; gap:36px; }
@@ -111,21 +117,43 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .sec-head h2{ font-size:20px; font-weight:800; letter-spacing:-.01em; min-width:0; }
 .sec-head .primary,.sec-head .ghost{ white-space:nowrap; flex:none; }
 .count{ font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
-.sleep{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px 14px; padding-bottom:24px; margin-bottom:24px; border-bottom:1px solid var(--line); }
+/* Cartes */
+.col{ display:grid; gap:18px; align-content:start; min-width:0; }
+.card,.jsec{ background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:16px; min-width:0; }
+@media (min-width:720px){ .card,.jsec{ padding:18px 20px; } }
+.card-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.card-head h2{ flex:1; font-size:20px; font-weight:800; letter-spacing:-.01em; }
+.pill{ flex:none; font-size:13px; font-weight:800; padding:4px 10px; border-radius:999px; background:var(--surface-2); border:1px solid var(--line); font-variant-numeric:tabular-nums; }
+.mico{ flex:none; width:34px; height:34px; border-radius:11px; background:var(--m, var(--ink)); color:var(--mo, var(--bg)); display:grid; place-items:center; }
+.mico svg{ width:20px; height:20px; }
+.sleep{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px 14px; }
 .sleep .field{ width:132px; }
-.night{ margin:0 0 10px; font-weight:700; }
 .chip{ border:1.5px dashed var(--matin); background:var(--matin-tint); color:var(--ink); border-radius:999px; padding:9px 16px; font-weight:700; min-height:44px; }
 .field{ display:flex; flex-direction:column; gap:5px; font-size:14px; font-weight:700; color:var(--muted); min-width:0; }
 .field input,.field select,.field textarea,.notes{ width:100%; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:9px 11px; min-height:44px; font-weight:500; font-size:16px; }
 .field textarea,.notes{ resize:vertical; line-height:1.45; }
-.boxes{ display:flex; flex-direction:column; gap:14px; }
-.box{ background:var(--mt); border:1.5px solid var(--ml); border-radius:18px; padding:4px 14px 6px; }
-.box-lid{ display:flex; align-items:baseline; gap:10px; padding:10px 0 4px; }
-.box-lid h3{ font-family:var(--font-display); font-weight:600; font-size:17px; letter-spacing:-.01em; }
-.box-lid span{ font-size:14px; color:var(--muted); font-weight:600; }
-.item{ width:100%; display:flex; align-items:center; gap:14px; padding:12px 0; background:transparent; border:0; border-top:1px solid var(--ml); text-align:left; }
-.box-lid + .item{ border-top:0; }
-.cap{ flex:none; position:relative; width:48px; height:26px; border-radius:999px; border:2px solid var(--m); background:var(--surface); }
+/* Compléments */
+.supps-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.supps-head h2{ font-size:20px; font-weight:800; letter-spacing:-.01em; }
+.supps-head .sub{ margin:2px 0 0; font-size:14px; font-weight:700; color:var(--muted); }
+.supps-head .sub.done{ color:var(--fill); }
+.ring{ flex:none; width:54px; height:54px; border-radius:50%; background:conic-gradient(var(--fill) calc(var(--p) * 1turn), var(--bub) 0); display:grid; place-items:center; }
+.ring span{ width:42px; height:42px; border-radius:50%; background:var(--surface); display:grid; place-items:center; font-size:13px; font-weight:800; font-variant-numeric:tabular-nums; }
+.moments{ display:grid; gap:12px; }
+.moment{ background:var(--mt); border:1px solid var(--ml); border-radius:16px; padding:10px; }
+.moment-head{ display:flex; align-items:center; gap:10px; padding:2px 2px 10px 4px; }
+.mtitle{ flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+.mtitle h3{ font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-.01em; }
+.mtitle span{ font-size:13px; color:var(--muted); font-weight:600; }
+.mcount{ font-size:13px; font-weight:800; color:var(--muted); font-variant-numeric:tabular-nums; }
+.mall{ flex:none; border:1px solid var(--ml); background:var(--surface); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:13px; font-weight:800; min-height:36px; }
+.mdone{ flex:none; display:inline-flex; align-items:center; gap:5px; padding:6px 11px; border-radius:999px; background:var(--m); color:var(--mo); font-size:13px; font-weight:800; }
+.mdone svg{ width:14px; height:14px; }
+.mitems{ display:grid; gap:6px; }
+.item{ width:100%; display:flex; align-items:center; gap:12px; padding:11px 12px; background:var(--surface); border:1px solid transparent; border-radius:12px; text-align:left; transition:background-color .15s ease, border-color .15s ease; }
+@media (hover:hover){ .item:hover{ border-color:var(--ml); } }
+.item.on{ border-color:var(--ml); background:var(--surface); background:color-mix(in srgb, var(--m) 9%, var(--surface)); }
+.cap{ flex:none; position:relative; width:50px; height:27px; border-radius:999px; border:2px solid var(--m); background:var(--surface); }
 .cap::after{ content:""; position:absolute; top:4px; bottom:4px; left:50%; width:2px; margin-left:-1px; background:var(--ml); border-radius:1px; }
 .cap.on{ background:linear-gradient(90deg, var(--m) 0 50%, var(--m2) 50% 100%); }
 .cap.on::after{ background:rgba(0,0,0,.14); }
@@ -137,7 +165,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .it-dose{ font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
 .it-note{ flex-basis:100%; font-size:14px; color:var(--muted); line-height:1.35; }
 .freq{ flex:none; font-size:12px; font-weight:800; padding:3px 9px; border-radius:999px; background:var(--surface); border:1px solid var(--ml); white-space:nowrap; }
-.jsec + .jsec,.supps + .jsec{ margin-top:34px; }
+
 .list{ list-style:none; margin:0; padding:0; }
 .entry{ display:grid; grid-template-columns:52px minmax(0,1fr) auto; gap:4px 12px; padding:12px 0; border-top:1px solid var(--line); align-items:start; }
 .list > li:first-child{ border-top:0; }
@@ -154,7 +182,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .kind{ display:block; font-size:13px; font-weight:800; color:var(--muted); }
 .kind + .note{ margin-top:0; }
 .row-actions{ display:flex; flex-wrap:wrap; justify-content:flex-end; }
-.form{ display:flex; flex-direction:column; gap:16px; padding:16px; margin-bottom:14px; background:var(--surface); border:1px solid var(--line); border-radius:16px; }
+.form{ display:flex; flex-direction:column; gap:16px; padding:16px; margin-bottom:14px; background:var(--surface-2); border:1px solid var(--line); border-radius:16px; }
 .form-row{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; }
 .field-time{ width:132px; }
 .scale{ border:0; margin:0; padding:0; min-width:0; }
@@ -181,6 +209,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .week thead button b{ font-size:17px; color:var(--ink); font-variant-numeric:tabular-nums; }
 .week thead th.today button{ background:var(--ink); color:var(--bg); }
 .week thead th.today button b{ color:var(--bg); }
+.vtag{ display:block; margin-top:2px; font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--soir); }
+.week thead th.today .vtag{ color:var(--soir-2); }
+.week-claude{ margin-top:22px; }
 .week th[scope="row"]{ text-align:left; padding-left:14px; font-weight:700; white-space:nowrap; }
 .week th[scope="row"] small{ margin-left:6px; font-size:13px; font-weight:600; color:var(--muted); }
 .week tr.grp th{ text-align:left; padding:12px 14px 6px; background:var(--mt); border-bottom:1px solid var(--ml); font-family:var(--font-display); font-weight:600; font-size:15px; }
@@ -209,17 +240,29 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .bub.full{ background:var(--fill); border-color:var(--fill); }
 .bub.future{ opacity:.4; }
 .bub.today{ outline:2px solid var(--ink); outline-offset:1px; }
+.bub.v{ box-shadow:0 0 0 2px var(--soir); }
 .bub.j::after{ content:""; position:absolute; right:-2px; bottom:-2px; width:8px; height:8px; border-radius:50%; background:var(--aprem); border:1.5px solid var(--surface-2); }
 .legend .bub{ display:inline-block; width:16px; height:16px; min-height:0; }
 
 /* Réglages */
 .set-title{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px, 4.4vw, 40px); letter-spacing:-.025em; margin-bottom:22px; }
-.set-sec{ max-width:780px; }
-.set-sec + .set-sec{ margin-top:44px; padding-top:28px; border-top:1px solid var(--line); }
+.set-sec{ max-width:820px; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:18px; }
+@media (min-width:720px){ .set-sec{ padding:22px 24px; } }
+.set-sec + .set-sec{ margin-top:18px; }
+.next-visit{ display:flex; align-items:center; gap:12px; margin:0 0 14px; padding:12px 14px; background:var(--soir-tint); border:1px solid var(--soir-line); border-radius:14px; }
+.next-visit b{ display:block; font-weight:800; }
+.next-visit span span{ display:block; font-size:14px; font-weight:600; color:var(--muted); }
+.dgroups{ display:grid; gap:12px; margin-top:14px; }
+.dgroup{ padding:14px; background:var(--surface-2); border:1px solid var(--line); border-radius:14px; }
+.dgroup h3{ font-size:16px; font-weight:800; }
+.dgroup > p{ margin:2px 0 12px; font-size:14px; color:var(--muted); font-weight:500; }
+.dgroup .day-pick{ max-width:220px; margin-bottom:10px; }
+.confirm-box{ margin-top:12px; padding:12px 14px; border:1.5px solid var(--danger); border-radius:12px; background:var(--surface); }
+.confirm-box p{ margin:0 0 10px; }
 .m-title{ display:flex; align-items:center; gap:10px; margin:24px 0 10px; font-family:var(--font-display); font-weight:600; font-size:16px; }
 .m-title::before{ content:""; flex:none; width:24px; height:13px; border-radius:999px; background:linear-gradient(90deg, var(--m) 0 50%, var(--m2) 50% 100%); }
 .m-title span{ font-family:var(--font-ui); font-size:14px; font-weight:600; color:var(--muted); }
-.srow{ display:flex; flex-direction:column; gap:10px; padding:14px; margin-bottom:10px; background:var(--surface); border:1px solid var(--line); border-left:5px solid var(--m); border-radius:12px; }
+.srow{ display:flex; flex-direction:column; gap:10px; padding:14px; margin-bottom:10px; background:var(--surface-2); border:1px solid var(--line); border-left:5px solid var(--m); border-radius:12px; }
 .srow.paused{ opacity:.62; }
 .srow-c{ padding:0; }
 .srow-open{ width:100%; display:flex; flex-wrap:wrap; align-items:baseline; column-gap:8px; row-gap:2px; padding:13px 14px; min-height:48px; background:transparent; border:0; border-radius:10px; text-align:left; }
@@ -247,7 +290,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .to-claude{ margin-top:10px; }
 
 /* Nutrition */
-.nutri{ display:grid; gap:10px; padding:14px; margin-bottom:14px; background:var(--surface); border:1px solid var(--line); border-radius:16px; }
+.nutri{ display:grid; gap:10px; padding:14px; margin-bottom:14px; background:var(--surface-2); border:1px solid var(--line); border-radius:16px; }
 .nutri-top{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; }
 .nutri-top b{ font-family:var(--font-display); font-weight:600; font-size:26px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
 .nutri-top span{ color:var(--muted); font-weight:700; font-size:14px; }
@@ -263,11 +306,11 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .items li{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:0 10px; }
 .items li span{ color:var(--muted); font-variant-numeric:tabular-nums; }
 .macros{ margin:4px 0 0; font-size:13px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
-.foods{ display:grid; gap:12px; padding:12px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; }
+.foods{ display:grid; gap:12px; padding:12px; background:var(--surface); border:1px solid var(--line); border-radius:12px; }
 .foods-head{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 12px; font-weight:800; }
 .foods-head span{ color:var(--muted); font-size:14px; font-variant-numeric:tabular-nums; }
 .food-list{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
-.food-list li{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; padding:8px 10px; background:var(--surface); border:1px solid var(--line); border-radius:10px; }
+.food-list li{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; padding:8px 10px; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; }
 .food-list .fl-name{ font-weight:800; flex:1 1 140px; min-width:0; }
 .food-list .fl-vals{ color:var(--muted); font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
 .food-add{ display:grid; gap:10px; }
@@ -277,8 +320,30 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .food-add .field span{ font-size:13px; }
 .per100{ margin:0; font-size:13px; font-weight:600; color:var(--muted); }
 
+/* Visite médicale */
+.visit{ border:1.5px solid var(--soir-line); margin-bottom:18px; }
+.visit-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.visit-head h2{ font-family:var(--font-display); font-weight:600; font-size:20px; letter-spacing:-.02em; }
+.visit-head p{ margin:2px 0 0; color:var(--muted); font-size:14px; font-weight:600; }
+.vchecks{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.vcheck{ display:inline-flex; align-items:center; gap:9px; border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink); border-radius:999px; padding:8px 16px 8px 10px; font-weight:800; min-height:44px; }
+.vbox{ width:22px; height:22px; border-radius:7px; border:2px solid var(--soir); display:grid; place-items:center; }
+.vbox svg{ width:14px; height:14px; }
+.vcheck[aria-pressed="true"]{ background:var(--soir-tint); border-color:var(--soir-line); }
+.vcheck[aria-pressed="true"] .vbox{ background:var(--soir); color:var(--soir-on); }
+.vweight{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px 16px; margin-bottom:6px; }
+.vweight .field{ width:140px; }
+.delta{ margin:0 0 12px; font-weight:800; font-size:14px; }
+.vhist{ margin:0 0 14px; font-size:13px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
+.labs{ margin:0 0 14px; padding:12px 14px; background:var(--surface-2); border:1px solid var(--line); border-radius:14px; }
+.labs summary{ cursor:pointer; font-weight:800; display:flex; align-items:center; gap:10px; }
+.labs[open] summary{ margin-bottom:8px; }
+.labs .count{ font-size:13px; }
+.vgrid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:10px; margin-bottom:10px; }
+.vgrid .field span{ font-size:13px; }
+
 /* Claude */
-.claude{ padding:16px; background:var(--surface); border:1.5px solid var(--aprem-line); border-radius:18px; }
+.claude{ border:1.5px solid var(--aprem-line); }
 .claude .sec-head h2{ font-family:var(--font-display); font-weight:600; font-size:18px; }
 .claude > .field{ margin-bottom:10px; }
 .ask-opts{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:14px; }
@@ -475,8 +540,17 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   const ICON = {
     left: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     right: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+    check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    ...Object.fromEntries(Object.entries({
+      sunrise: '<path d="M3 19h18M7 19a5 5 0 0 1 10 0M12 11V3M9.5 5.5 12 3l2.5 2.5M4.6 12.6l1.4 1.4M19.4 12.6 18 14"/>',
+      sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+      sunset: '<path d="M3 19h18M7 19a5 5 0 0 1 10 0M12 3v8M9.5 8.5 12 11l2.5-2.5M4.6 12.6l1.4 1.4M19.4 12.6 18 14"/>',
+      moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+      visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
+      drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>'
+    }).map(([k, d]) => [k, trusted(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`)]))
   };
+  const MOMENT_ICON = { matin: ICON.sunrise, midi: ICON.sun, aprem: ICON.sunset, soir: ICON.moon };
   /* Une note de 1 à 5, sinon null (protège l'affichage contre une donnée abîmée). */
   const scaleValue = (v) => (Number.isInteger(v) && v >= 1 && v <= 5 ? v : null);
 
@@ -508,6 +582,12 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     id: String(f.id || newId()), name: String(f.name || '').trim().slice(0, 80) || 'Aliment',
     kcal: round1(posNum(f.kcal) ?? 0), p: round1(posNum(f.p) ?? 0), g: round1(posNum(f.g) ?? 0), l: round1(posNum(f.l) ?? 0)
   });
+  /* Visite médicale (prise de sang, pesée, médecin) : première le lundi 28 septembre 2026, puis toutes les 4 semaines. */
+  const VISIT_START = '2026-09-28';
+  function normalizeVisit(v) {
+    const every = Math.round(num(v && v.every) || 28);
+    return { start: v && isKey(v.start) ? v.start : VISIT_START, every: every >= 7 && every <= 120 ? every : 28, notify: !(v && v.notify === false) };
+  }
   const isClaudeUrl = (u) => /^https:\/\/claude\.ai\/[^\s"'<>]*$/.test(String(u || ''));
   function normalizeSettings(raw) {
     const created = raw && isKey(raw.created) ? raw.created : todayKey();
@@ -519,6 +599,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       foods: (raw && Array.isArray(raw.foods) ? raw.foods : []).filter(isObj).map(normalizeFood),
       profile: String((raw && raw.profile) || '').slice(0, 4000),
       claudeUrl: raw && isClaudeUrl(raw.claudeUrl) ? raw.claudeUrl : '',
+      visit: normalizeVisit(raw && raw.visit),
       supplements: sups.filter(isObj).map((s) => ({
         id: String(s.id || newId()),
         name: String(s.name || 'Sans nom'),
@@ -551,7 +632,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     ui: {
       view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null,
-      restoreOpen: false, restoreText: '', foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
+      restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
+      foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null }
     }
@@ -601,18 +683,52 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
   }
   const fmtAvg = (v) => String(Math.round(v * 10) / 10).replace('.', ',');
-  /* Durée de la nuit : coucher noté la veille (avant midi = après minuit), réveil noté ce jour-là. */
-  function nightLength(bed, wake) {
+  function nightMinutes(bed, wake) {
     const b = toMin(bed), w = toMin(wake);
-    if (b === null || w === null) return '';
+    if (b === null || w === null) return null;
     const dur = w + 1440 - (b < 720 ? b + 1440 : b);
-    if (dur <= 0 || dur > 20 * 60) return '';
-    return `${Math.floor(dur / 60)} h ${pad(dur % 60)}`;
+    return dur > 0 && dur <= 20 * 60 ? dur : null;
   }
+  const fmtDuration = (min) => `${Math.floor(min / 60)} h ${pad(Math.round(min) % 60)}`;
+  /* Durée de la nuit : coucher noté la veille (avant midi = après minuit), réveil noté ce jour-là. */
+  function nightLength(bed, wake) { const m = nightMinutes(bed, wake); return m == null ? '' : fmtDuration(m); }
   function hasJournal(d) {
-    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.notes) || num(d.weight)));
+    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.notes) || isObj(d.visit) || num(d.weight)));
   }
 
+  /* ---------- Visite médicale ---------- */
+  /* Repères habituels (adulte homme) ; le labo donne ses propres normes. Valeurs saisies telles quelles, avec l'unité. */
+  const LABS = [
+    ['vitD', 'Vitamine D (25-OH)', '30 à 100 ng/mL'], ['b12', 'Vitamine B12', '200 à 900 pg/mL'], ['folates', 'Folates (B9)', '> 4 ng/mL'],
+    ['ferritin', 'Ferritine', '30 à 300 µg/L'], ['iron', 'Fer', '60 à 170 µg/dL'], ['hb', 'Hémoglobine', '13 à 17 g/dL'],
+    ['mg', 'Magnésium', '1,7 à 2,4 mg/dL'], ['k', 'Potassium', '3,5 à 5 mmol/L'], ['zinc', 'Zinc', '70 à 120 µg/dL'],
+    ['glucose', 'Glycémie à jeun', '70 à 100 mg/dL'], ['hba1c', 'HbA1c', '< 5,7 %'], ['tsh', 'TSH', '0,4 à 4 mUI/L'],
+    ['ldl', 'Cholestérol LDL', '< 115 mg/dL'], ['tg', 'Triglycérides', '< 150 mg/dL'], ['creat', 'Créatinine', '0,7 à 1,3 mg/dL'],
+    ['alt', 'ALAT (foie)', '< 45 U/L']
+  ];
+  const visitOf = (d) => (d && isObj(d.visit) ? d.visit : null);
+  function ensureVisit(d) {
+    if (!isObj(d.visit)) d.visit = { weight: null, blood: false, doctor: false, labs: {}, labsText: '', notes: '' };
+    if (!isObj(d.visit.labs)) d.visit.labs = {};
+    return d.visit;
+  }
+  const daysBetween = (a, b) => dayNum(b) - dayNum(a);
+  function isVisitDay(k) { const v = S.settings.visit, diff = daysBetween(v.start, k); return diff >= 0 && diff % v.every === 0; }
+  const hasVisit = (k) => isVisitDay(k) || !!visitOf(peekDay(k));
+  /* Prochaine visite à partir de ce jour (inclus), et dernière visite avant ce jour (exclu). */
+  function nextVisit(from) { const v = S.settings.visit, diff = daysBetween(v.start, from); return diff <= 0 ? v.start : addDays(v.start, Math.ceil(diff / v.every) * v.every); }
+  function prevVisit(k) { const v = S.settings.visit, diff = daysBetween(v.start, k); return diff <= 0 ? null : addDays(v.start, Math.floor((diff - 1) / v.every) * v.every); }
+  const weightOf = (d) => { const vis = visitOf(d); return num(vis && vis.weight) ?? num(d && d.weight); };
+  const labsFilled = (vis) => !!vis && (Object.values(isObj(vis.labs) ? vis.labs : {}).some((x) => str(x).trim()) || !!str(vis.labsText).trim());
+  const cycleLabel = () => { const e = S.settings.visit.every; return e % 7 === 0 ? `toutes les ${e / 7} semaines` : `tous les ${e} jours`; };
+  const whenLabel = (n) => (n === 0 ? 'aujourd’hui' : n === 1 ? 'demain' : `dans ${n} jours`);
+  const shortDate = (k) => { const d = fromKey(k); return `${dayNumber(d.getDate())} ${MONTHS[d.getMonth()]}${yearSuffix(d)}`; };
+  /* Pesées notées, la plus ancienne d'abord. */
+  function weighIns() {
+    const out = [];
+    Object.keys(S.months).sort().forEach((mk) => Object.keys(S.months[mk].days || {}).sort().forEach((dk) => { const w = weightOf(peekDay(dk)); if (w) out.push({ k: dk, w }); }));
+    return out;
+  }
   /* ---------- Nutrition ---------- */
   const MACROS = [['p', 'Protéines'], ['g', 'Glucides'], ['l', 'Lipides']];
   const kcalOf = (p, g, l) => round1(4 * p + 4 * g + 9 * l);
@@ -1000,6 +1116,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     else { S.settings = freshSettings(); S.months = {}; persistNow(); }
     S.ready = true;
     render(); refreshSync();
+    scheduleVisitReminders();
   }
   function startFromCache(cache) {
     S.settings = normalizeSettings(cache.settings);
@@ -1062,6 +1179,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   function renderDay() {
     const k = S.ui.date, isToday = k === todayKey();
     const d = peekDay(k) || {};
+    const visit = hasVisit(k);
     return html`<section class="dayhead"><div class="datebar">
         <h1 class="date">${longDate(k)}</h1>
         <div class="daynav">
@@ -1071,18 +1189,66 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         </div>
       </div>${weekStrip(k)}</section>
       ${weeklyBanner()}
+      ${isToday ? visitBanners(k) : ''}
+      ${visit ? visitCard(k, d) : ''}
       <div class="daygrid">
         <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}${symptomBlock(k, d)}</div>
-        <div class="col">${checkinBlock(k, d, isToday)}${mealBlock(k, d)}${notesBlock(k, d)}${claudeBlock('day', k)}</div>
+        <div class="col">${checkinBlock(k, d, isToday)}${mealBlock(k, d)}${notesBlock(k, d)}${claudeBlock(visit ? 'visit' : 'day', k)}</div>
       </div>`;
+  }
+  /* Rappels du jour : visite dans la semaine, résultats de prise de sang à noter. */
+  function visitBanners(k) {
+    const out = [];
+    const nv = nextVisit(k), n = daysBetween(k, nv);
+    const banner = (icon, title, text, action) => html`<div class="banner remind m-soir" role="note"><span class="mico" aria-hidden="true">${icon}</span><p class="btxt"><b>${title}</b><span>${text}</span></p>${action}</div>`;
+    if (n >= 1 && n <= 7) {
+      out.push(banner(ICON.visit, `Visite médicale ${whenLabel(n)} : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}`,
+        'Prise de sang (souvent à jeun, vérifie avec le labo), pesée et médecin. Note tes questions pour le médecin.',
+        html`<button type="button" class="ghost" data-act="goto" data-date="${nv}">Voir ce jour</button>`));
+    }
+    const pv = prevVisit(k);
+    if (pv && daysBetween(pv, k) <= 10 && !labsFilled(visitOf(peekDay(pv)))) {
+      out.push(banner(ICON.drop, `Résultats de la prise de sang du ${shortDate(pv)} ?`,
+        'Note-les dans la visite pour les envoyer à Claude avec ton bilan du mois.',
+        html`<button type="button" class="ghost" data-act="goto-labs" data-date="${pv}">Noter les résultats</button>`));
+    }
+    return out;
+  }
+  function visitCard(k, d) {
+    const vis = visitOf(d) || {};
+    const labs = isObj(vis.labs) ? vis.labs : {};
+    const w = weightOf(d);
+    const before = weighIns().filter((x) => x.k < k);
+    const prev = before[before.length - 1];
+    const delta = w && prev ? round1(w - prev.w) : null;
+    const filled = LABS.filter(([key]) => str(labs[key]).trim()).length;
+    const check = (key, label) => html`<button type="button" class="vcheck" data-act="visit-check" data-v="${key}" data-date="${k}" aria-pressed="${bool(!!vis[key])}"><span class="vbox" aria-hidden="true">${vis[key] ? ICON.check : ''}</span>${label}</button>`;
+    return html`<section class="card visit" id="visit" aria-labelledby="visit-title">
+      <div class="visit-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><div><h2 id="visit-title">Visite médicale</h2><p>${k === todayKey() ? 'Aujourd’hui · ' : ''}prise de sang, pesée et médecin, ${cycleLabel()}</p></div></div>
+      <div class="vchecks">${check('blood', 'Prise de sang faite')}${check('doctor', 'Vu le médecin')}</div>
+      <div class="vweight">
+        <label class="field"><span>Poids (kg)</span><input type="text" inputmode="decimal" id="vw-${k}" data-visit="weight" data-date="${k}" value="${w ? fmtDec(w) : ''}" placeholder="—" autocomplete="off"></label>
+        ${delta != null ? html`<p class="delta">${delta === 0 ? 'Stable' : `${delta > 0 ? '+' : '−'}${fmtDec(Math.abs(delta))} kg`} depuis le ${shortDate(prev.k)}</p>`
+          : !before.length ? html`<p class="delta muted">Première pesée : ton point de départ.</p>` : ''}
+      </div>
+      ${before.length ? html`<p class="vhist">Pesées d’avant : ${before.slice(-4).map((x) => `${shortDate(x.k)} · ${fmtDec(x.w)} kg`).join('  —  ')}</p>` : ''}
+      <details class="labs" data-toggle="labs"${S.ui.labsOpen || filled ? html` open` : ''}>
+        <summary>Résultats de la prise de sang${filled ? html`<span class="pill">${filled} noté${filled > 1 ? 's' : ''}</span>` : ''}</summary>
+        <p class="hint">Recopie chaque valeur avec son unité. En gris, le repère habituel ; ton labo indique ses propres normes.</p>
+        <div class="vgrid">${LABS.map(([key, label, ref]) => html`<label class="field"><span>${label}</span><input type="text" id="lab-${key}-${k}" data-visit="labs.${key}" data-date="${k}" value="${str(labs[key])}" placeholder="${ref}" autocomplete="off"></label>`)}</div>
+        <label class="field"><span>Autres résultats ou compte rendu du labo</span><textarea id="vlabs-${k}" data-visit="labsText" data-date="${k}" rows="3" placeholder="Colle ici le reste du compte rendu…">${str(vis.labsText)}</textarea></label>
+      </details>
+      <label class="field"><span>Ce que dit le médecin</span><textarea id="vnotes-${k}" data-visit="notes" data-date="${k}" rows="3" placeholder="Conseils, changement de dose, examens à faire…">${str(vis.notes)}</textarea></label>
+      <p class="hint" style="margin:12px 0 0">Les résultats arrivent souvent un ou deux jours après : reviens les noter ici. Ton bilan du mois pour Claude est en bas de la page.</p>
+    </section>`;
   }
   function weekStrip(k) {
     const start = startOfWeek(k), t = todayKey();
     const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
     return html`<div class="strip" role="group" aria-label="Jours de la semaine">${days.map((dk, i) => {
-      const st = stats(dk), pct = st.total ? Math.round((st.taken / st.total) * 100) : 0;
-      const label = longDate(dk) + (st.total ? `, ${st.taken} sur ${st.total} compléments` : '');
-      return html`<button type="button" class="lid${dk === t ? ' today' : ''}" data-act="goto" data-date="${dk}"${dk === k ? html` aria-current="date"` : ''} aria-label="${label}"><span class="wd">${WD_SHORT[i]}</span><span class="dn">${fromKey(dk).getDate()}</span><span class="bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
+      const st = stats(dk), pct = st.total ? Math.round((st.taken / st.total) * 100) : 0, v = hasVisit(dk);
+      const label = longDate(dk) + (st.total ? `, ${st.taken} sur ${st.total} compléments` : '') + (v ? ', visite médicale' : '');
+      return html`<button type="button" class="lid${dk === t ? ' today' : ''}${v ? ' visit' : ''}" data-act="goto" data-date="${dk}"${dk === k ? html` aria-current="date"` : ''} aria-label="${label}"><span class="wd">${WD_SHORT[i]}</span><span class="dn">${fromKey(dk).getDate()}</span><span class="bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
     })}</div>`;
   }
   function weeklyBanner() {
@@ -1093,28 +1259,37 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
   function sleepBlock(k, d, isToday) {
     const prev = peekDay(addDays(k, -1));
-    const wake = str(d.wake), night = nightLength(prev && prev.bed, wake), weight = num(d.weight);
-    return html`<section class="sleep" aria-label="Sommeil et poids">
-      <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
-      <label class="field"><span>Coucher</span><input type="time" id="bed-${k}" data-bind="bed" data-date="${k}" value="${str(d.bed)}"></label>
-      <label class="field"><span>Poids (kg)</span><input type="text" inputmode="decimal" id="weight-${k}" data-bind="weight" data-date="${k}" value="${weight ? fmtDec(weight) : ''}" placeholder="—" autocomplete="off"></label>
-      ${!wake && isToday ? html`<button type="button" class="chip" data-act="wake-now" data-date="${k}">Je viens de me lever</button>`
-        : night ? html`<p class="night">Nuit de ${night}</p>` : ''}
+    const wake = str(d.wake), night = nightLength(prev && prev.bed, wake);
+    return html`<section class="card" aria-labelledby="sleep-title">
+      <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.moon}</span><h2 id="sleep-title">Sommeil</h2>${night ? html`<span class="pill">Nuit de ${night}</span>` : ''}</div>
+      <div class="sleep">
+        <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
+        <label class="field"><span>Coucher</span><input type="time" id="bed-${k}" data-bind="bed" data-date="${k}" value="${str(d.bed)}"></label>
+        ${!wake && isToday ? html`<button type="button" class="chip" data-act="wake-now" data-date="${k}">Je viens de me lever</button>` : ''}
+      </div>
     </section>`;
   }
   function supplementItem(s, k) {
     const on = isTaken(s.id, k), just = S.ui.just === `${s.id}|${k}`;
-    return html`<button type="button" class="item" data-act="toggle" data-sid="${s.id}" data-date="${k}" aria-pressed="${bool(on)}"><span class="cap${on ? ' on' : ''}${just ? ' just' : ''}" aria-hidden="true">${on ? ICON.check : ''}</span><span class="it-main"><span class="it-name">${s.name}</span>${s.dose ? html`<span class="it-dose">${s.dose}</span>` : ''}${s.note ? html`<span class="it-note">${s.note}</span>` : ''}</span>${FREQ_BADGE[s.freq] ? html`<span class="freq">${FREQ_BADGE[s.freq]}</span>` : ''}</button>`;
+    return html`<button type="button" class="item${on ? ' on' : ''}" data-act="toggle" data-sid="${s.id}" data-date="${k}" aria-pressed="${bool(on)}"><span class="cap${on ? ' on' : ''}${just ? ' just' : ''}" aria-hidden="true">${on ? ICON.check : ''}</span><span class="it-main"><span class="it-name">${s.name}</span>${s.dose ? html`<span class="it-dose">${s.dose}</span>` : ''}${s.note ? html`<span class="it-note">${s.note}</span>` : ''}</span>${FREQ_BADGE[s.freq] ? html`<span class="freq">${FREQ_BADGE[s.freq]}</span>` : ''}</button>`;
   }
   function supplementBlock(k) {
     const items = itemsForDay(k), st = stats(k);
-    const body = items.length
-      ? html`<div class="boxes">${MOMENTS.map((m) => {
-          const list = items.filter((s) => s.moment === m.key);
-          return list.length ? html`<div class="box m-${m.key}"><div class="box-lid"><h3>${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${list.map((s) => supplementItem(s, k))}</div>` : '';
-        })}</div>`
-      : html`<p class="empty">Rien de prévu ce jour-là.${S.settings.supplements.length ? '' : ' Ajoute tes compléments dans Réglages.'}</p>`;
-    return html`<section class="supps"><div class="sec-head"><h2>Compléments</h2>${st.total ? html`<span class="count">${st.taken} sur ${st.total}</span>` : ''}</div>${body}</section>`;
+    const pct = st.total ? st.taken / st.total : 0, all = st.total > 0 && st.taken === st.total;
+    const head = html`<div class="supps-head"><div><h2>Compléments</h2><p class="sub${all ? ' done' : ''}">${!st.total ? 'Rien de prévu ce jour-là' : all ? 'Tout est pris' : `${st.taken} sur ${st.total} pris`}</p></div>${st.total ? html`<div class="ring" style="--p:${pct.toFixed(3)}" role="img" aria-label="${st.taken} sur ${st.total} compléments pris"><span>${Math.round(pct * 100)} %</span></div>` : ''}</div>`;
+    if (!items.length) return html`<section class="card supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}</section>`;
+    return html`<section class="card supps">${head}<div class="moments">${MOMENTS.map((m) => {
+      const list = items.filter((s) => s.moment === m.key);
+      if (!list.length) return '';
+      const sch = list.filter((s) => isScheduled(s, k)), done = sch.filter((s) => isTaken(s.id, k)).length;
+      const status = !sch.length ? ''
+        : done === sch.length ? html`<span class="mdone">${ICON.check}Fait</span>`
+        : html`<span class="mcount" aria-label="${done} sur ${sch.length} pris">${done}/${sch.length}</span><button type="button" class="mall" data-act="moment-all" data-v="${m.key}" data-date="${k}" aria-label="Tout cocher : ${m.label}">Tout cocher</button>`;
+      return html`<div class="moment m-${m.key}" role="group" aria-labelledby="mt-${m.key}">
+        <div class="moment-head"><span class="mico" aria-hidden="true">${MOMENT_ICON[m.key]}</span><div class="mtitle"><h3 id="mt-${m.key}">${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${status}</div>
+        <div class="mitems">${list.map((s) => supplementItem(s, k))}</div>
+      </div>`;
+    })}</div></section>`;
   }
   const FORM_KINDS = { checkin: { act: 'ci', field: 'checkins' }, meal: { act: 'meal', field: 'meals' }, symptom: { act: 'sym', field: 'symptoms' } };
   function rowActions(kind, k, id, what) {
@@ -1327,17 +1502,32 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   const claudeUrl = () => S.settings.claudeUrl || 'https://claude.ai/new';
   /* Ce que fait « … Claude » ici : demander dans la page (artefact), partager (Android) ou copier. */
   const claudeVerb = (prefix = '') => (store.sample ? `${prefix}demander à Claude` : canShare() ? `${prefix}envoyer à Claude` : `${prefix}copier pour Claude`).replace(/^./, (c) => c.toUpperCase());
-  const scopeLabel = (scope, key) => (scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine') : `journée du ${longDate(key).replace(/^./, (c) => c.toLowerCase())}`);
+  const scopeLabel = (scope, key) => (scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine')
+    : scope === 'visit' ? `bilan de la visite du ${shortDate(key)}` : `journée du ${longDate(key).replace(/^./, (c) => c.toLowerCase())}`);
+  const SCOPE_TEXT = {
+    day: {
+      title: 'Faire le point avec Claude',
+      what: 'Claude reçoit tout ce que tu as noté ce jour-là : sommeil, compléments, check-ins, symptômes, repas et macros, notes.',
+      placeholder: 'Pourquoi j’ai mal au dos depuis trois jours ?'
+    },
+    week: {
+      title: 'Faire le point de la semaine avec Claude',
+      what: 'Claude reçoit toute la semaine, jour par jour : sommeil, compléments, check-ins, symptômes, repas et macros, notes.',
+      placeholder: 'Qu’est-ce qui a changé cette semaine ?'
+    },
+    visit: {
+      title: 'Bilan du mois avec Claude',
+      what: 'Claude reçoit ta visite (poids, prise de sang, médecin) et les 4 semaines d’avant : régularité des compléments, sommeil, check-ins, ressenti, repas et macros, notes.',
+      placeholder: 'Est-ce que j’ai des carences ? Quelles questions poser au médecin ?'
+    }
+  };
 
   function claudeBlock(scope, key) {
-    const a = S.ui.ask;
-    const what = scope === 'week'
-      ? 'Claude reçoit toute la semaine, jour par jour : sommeil, poids, compléments, check-ins, symptômes, repas et macros, notes.'
-      : 'Claude reçoit tout ce que tu as noté ce jour-là : sommeil, poids, compléments, check-ins, symptômes, repas et macros, notes.';
+    const a = S.ui.ask, txt = SCOPE_TEXT[scope];
     return html`<section class="jsec claude" id="claude" aria-labelledby="claude-title">
-      <div class="sec-head"><h2 id="claude-title">${scope === 'week' ? 'Faire le point de la semaine avec Claude' : 'Faire le point avec Claude'}</h2></div>
-      <p class="hint">${what}${S.settings.profile ? ' Ce que tu as écrit sur toi dans Réglages est ajouté.' : ' Ajoute ce que Claude doit savoir sur toi dans Réglages (âge, traitements, objectifs).'}</p>
-      <label class="field"><span>Ta question (facultatif)</span><textarea id="ask-q" data-ask="q" rows="2" placeholder="${scope === 'week' ? 'Qu’est-ce qui a changé cette semaine ?' : 'Pourquoi j’ai mal au dos depuis trois jours ?'}">${a.q}</textarea></label>
+      <div class="sec-head"><h2 id="claude-title">${txt.title}</h2></div>
+      <p class="hint">${txt.what}${S.settings.profile ? ' Ce que tu as écrit sur toi dans Réglages est ajouté.' : ' Ajoute ce que Claude doit savoir sur toi dans Réglages (âge, traitements, objectifs).'}</p>
+      <label class="field"><span>Ta question (facultatif)</span><textarea id="ask-q" data-ask="q" rows="2" placeholder="${txt.placeholder}">${a.q}</textarea></label>
       <div class="ask-opts">
         ${scope === 'day' ? html`<label class="switch"><input type="checkbox" id="ask-week" data-ask="withWeek"${a.withWeek ? html` checked` : ''}> Ajouter les 6 jours d’avant</label>` : ''}
         ${store.sample && store.sampleImages ? html`<label class="ghost filebtn">${a.photo ? `Photo : ${a.photo.name}` : 'Joindre une photo (prise de sang, ordonnance…)'}<input type="file" id="ask-photo" data-ask="photo" accept="${store.sampleImages.mediaTypes ? store.sampleImages.mediaTypes.join(',') : 'image/jpeg,image/png,image/webp,image/gif'}" class="sr-only"></label>${a.photo ? html`<button type="button" class="link" data-act="ask-photo-clear">Retirer la photo</button>` : ''}` : ''}
@@ -1349,7 +1539,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   function askArea(scope, key) {
     const a = S.ui.ask, mine = a.scope === scope && a.key === key;
     const busy = mine && (a.status === 'thinking' || a.status === 'streaming');
-    const saved = scope === 'day' && !(mine && (a.text || busy)) ? (peekDay(key) || {}).claude : null;
+    const saved = scope !== 'week' && !(mine && (a.text || busy)) ? (peekDay(key) || {}).claude : null;
     const text = mine && a.text ? a.text : isObj(saved) ? str(saved.text) : '';
     const primary = store.sample ? 'ask' : canShare() ? 'share' : 'copy';
     const btn = (act, label, isPrimary) => html`<button type="button" class="${isPrimary ? 'primary' : 'ghost'}" data-act="${act}" data-scope="${scope}" data-key="${key}">${label}</button>`;
@@ -1398,10 +1588,28 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
 
   /* Rapports texte : ce que Claude lit, et ce qui est copié ou partagé. */
-  function dayReport(k, { compact } = {}) {
+  /* La visite de ce jour : pesée (et évolution), prise de sang, médecin. */
+  function visitLines(k) {
+    const d = peekDay(k) || {}, vis = visitOf(d) || {}, labs = isObj(vis.labs) ? vis.labs : {};
+    const L = [];
+    const done = [vis.blood ? 'prise de sang faite' : '', vis.doctor ? 'médecin vu' : ''].filter(Boolean);
+    L.push(`Visite médicale${done.length ? ` : ${done.join(', ')}` : ''}`);
+    const w = weightOf(d), hist = weighIns().filter((x) => x.k <= k).slice(-6);
+    if (w) L.push(`- Poids : ${fmtDec(w)} kg${hist.length > 1 ? ` (pesées : ${hist.map((x) => `${shortDate(x.k)} ${fmtDec(x.w)} kg`).join(' → ')})` : ''}`);
+    else L.push('- Poids : pas encore noté');
+    const got = LABS.filter(([key]) => str(labs[key]).trim());
+    if (got.length) {
+      L.push('- Prise de sang (valeur notée ; entre parenthèses, repère habituel) :');
+      got.forEach(([key, label, ref]) => L.push(`  - ${label} : ${str(labs[key]).trim()} (${ref})`));
+    } else if (!str(vis.labsText).trim()) L.push('- Prise de sang : résultats pas encore notés');
+    if (str(vis.labsText).trim()) L.push(`- Autres résultats : ${str(vis.labsText).trim()}`);
+    if (str(vis.notes).trim()) L.push(`- Ce que dit le médecin : ${str(vis.notes).trim()}`);
+    return L;
+  }
+  function dayReport(k, { compact, skipVisit } = {}) {
     const d = peekDay(k) || {}, prev = peekDay(addDays(k, -1)) || {};
     const L = [];
-    const night = nightLength(prev.bed, d.wake), weight = num(d.weight);
+    const night = nightLength(prev.bed, d.wake), weight = weightOf(d);
     const sch = scheduledFor(k), taken = sch.filter((s) => isTaken(s.id, k)), missed = sch.filter((s) => !isTaken(s.id, k));
     const extra = S.settings.supplements.filter((s) => !isScheduled(s, k) && isTaken(s.id, k));
     const cis = listOf(d.checkins).sort(byTime), syms = listOf(d.symptoms).sort(byTime), meals = listOf(d.meals).sort(byTime);
@@ -1420,8 +1628,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       return `- ${longDate(k)} : ${parts.length ? parts.join(' · ') : 'rien de noté'}`;
     }
     L.push(`## ${longDate(k)} ${fromKey(k).getFullYear()}`.replace(/(\d{4}) \1$/, '$1'));
+    if (!skipVisit && (visitOf(d) || isVisitDay(k))) L.push(...visitLines(k));
     L.push(`Sommeil : coucher la veille ${str(prev.bed) || 'non noté'}, réveil ${str(d.wake) || 'non noté'}${night ? ` (nuit de ${night})` : ''}`);
-    if (weight) L.push(`Poids : ${fmtDec(weight)} kg`);
     if (sch.length || extra.length) {
       L.push(`Compléments : ${taken.length} sur ${sch.length} pris`);
       const fmtSup = (s) => `${s.name}${s.dose ? ' ' + s.dose : ''} (${MOMENTS.find((m) => m.key === s.moment).label.toLowerCase()})`;
@@ -1443,32 +1651,68 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     if (str(d.notes).trim()) L.push(`Notes du jour : ${str(d.notes).trim()}`);
     return L.join('\n');
   }
-  function claudeReport(scope, key) {
+  /* Les 4 semaines avant une visite : moyennes, régularité des compléments, ressenti, puis jour par jour. */
+  function visitReport(k) {
+    const every = S.settings.visit.every, start = addDays(k, -every);
+    const days = Array.from({ length: every }, (_, i) => addDays(start, i)).filter((dk) => dk <= todayKey());
+    const L = [`# Mon suivi — bilan de la visite médicale du ${longDate(k).toLowerCase()}`, '', ...visitLines(k)];
+    L.push('', `## Les ${every} jours d’avant (du ${shortDate(start)} au ${shortDate(addDays(k, -1))})`);
+    const avg = (vals) => (vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null);
+    const nights = days.map((dk) => nightMinutes((peekDay(addDays(dk, -1)) || {}).bed, (peekDay(dk) || {}).wake)).filter((m) => m != null);
+    const noted = days.filter((dk) => hasJournal(peekDay(dk)) || Object.values((peekDay(dk) || {}).taken || {}).some(Boolean)).length;
+    L.push(`Jours avec quelque chose de noté : ${noted} sur ${days.length}`);
+    if (nights.length) L.push(`Sommeil : ${fmtDuration(Math.round(avg(nights)))} en moyenne (${plural(nights.length, 'nuit')} notée${nights.length > 1 ? 's' : ''})`);
+    const cis = days.flatMap((dk) => listOf((peekDay(dk) || {}).checkins));
+    const scales = SCALES.map((sc) => { const v = avg(cis.map((c) => scaleValue(c[sc.key])).filter((x) => x != null)); return v != null ? `${sc.label.toLowerCase()} ${fmtAvg(v)}` : ''; }).filter(Boolean);
+    if (scales.length) L.push(`Check-ins (${plural(cis.length, 'check-in')}, moyennes sur 5) : ${scales.join(', ')}`);
+    const eaten = days.map((dk) => sumMacros(dayItems(peekDay(dk)))).filter((t) => t.n);
+    if (eaten.length) L.push(`Alimentation (${plural(eaten.length, 'jour')} avec les macros) : ${fmtInt(avg(eaten.map((t) => t.kcal)))} kcal, protéines ${fmtG(avg(eaten.map((t) => t.p)))} g, glucides ${fmtG(avg(eaten.map((t) => t.g)))} g, lipides ${fmtG(avg(eaten.map((t) => t.l)))} g par jour en moyenne`);
+    const sups = S.settings.supplements.map((sp) => {
+      const sch = days.filter((dk) => isScheduled(sp, dk));
+      return sch.length ? `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pris ${sch.filter((dk) => isTaken(sp.id, dk)).length} fois sur ${sch.length} prévue${sch.length > 1 ? 's' : ''}` : '';
+    }).filter(Boolean);
+    if (sups.length) L.push('Régularité des compléments :', ...sups);
+    const syms = days.flatMap((dk) => listOf((peekDay(dk) || {}).symptoms).map((x) => `- ${shortDate(dk)} ${str(x.time)} : ${str(x.text).trim()}${scaleValue(x.intensity) ? ` (${x.intensity}/5)` : ''}`));
+    L.push(syms.length ? 'Ce que j’ai ressenti :' : 'Ressenti : rien de noté', ...syms);
+    L.push('', '## Jour par jour', ...days.map((dk) => dayReport(dk, { compact: true })));
+    L.push('', '## Le jour de la visite', dayReport(k, { skipVisit: true }));
+    return L.join('\n');
+  }
+  function claudeReport(scope, key, withWeek = S.ui.ask.withWeek) {
+    if (scope === 'visit') return visitReport(key);
     if (scope === 'week') {
       const days = Array.from({ length: 7 }, (_, i) => addDays(key, i)).filter((dk) => dk <= todayKey());
       return `# Mon suivi — ${weekTitle(key).toLowerCase()}\n\n${days.map((dk) => dayReport(dk)).join('\n\n')}`;
     }
-    const before = S.ui.ask.withWeek ? Array.from({ length: 6 }, (_, i) => dayReport(addDays(key, i - 6), { compact: true })) : [];
+    const before = withWeek ? Array.from({ length: 6 }, (_, i) => dayReport(addDays(key, i - 6), { compact: true })) : [];
     return `# Mon suivi — ${longDate(key).toLowerCase()}\n\n${dayReport(key)}${before.length ? `\n\n## Les 6 jours d’avant (résumé)\n${before.join('\n')}` : ''}`;
   }
   const profileText = () => (S.settings.profile.trim() ? `Ce qu’il faut savoir sur moi : ${S.settings.profile.trim()}\n\n` : '');
   /* Texte copié ou partagé : pour un projet Claude « état et santé », prêt à coller. */
-  function claudeText(scope, key) {
-    const q = S.ui.ask.q.trim();
-    const ask = q || (scope === 'week'
-      ? 'Fais le point sur ma semaine à partir de ce suivi : comment je vais, les tendances, les liens possibles, et ce que je peux améliorer.'
-      : 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.');
-    return `${ask}\n\n${profileText()}${claudeReport(scope, key)}`;
+  function claudeText(scope, key, q = S.ui.ask.q.trim(), withWeek = S.ui.ask.withWeek) {
+    const ask = q || {
+      week: 'Fais le point sur ma semaine à partir de ce suivi : comment je vais, les tendances, les liens possibles, et ce que je peux améliorer.',
+      visit: 'Voici ma visite médicale et mes 4 dernières semaines. Analyse ma prise de sang (carences ?) en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon alimentation et mon état, et dis-moi quelles questions poser à mon médecin.',
+      day: 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.'
+    }[scope];
+    return `${ask}\n\n${profileText()}${claudeReport(scope, key, withWeek)}`;
   }
   /* Consigne complète quand la page demande elle-même à Claude (artefact). */
   function claudePrompt(scope, key) {
     const q = S.ui.ask.q.trim();
-    const week = scope === 'week';
+    const words = { day: 300, week: 350, visit: 450 }[scope];
+    const titles = {
+      day: '## Mon état\n## Ce que je remarque\n## Alimentation\n## Pour demain\n## À surveiller',
+      week: '## Ma semaine\n## Tendances\n## Alimentation\n## Pour la semaine prochaine\n## À surveiller',
+      visit: '## Bilan du mois\n## Prise de sang et carences\n## Poids et alimentation\n## Compléments\n## Questions pour le médecin\n## À surveiller'
+    }[scope];
     return [
       'Tu es mon assistant santé dans l’app « Mon suivi ». Tu n’es pas médecin et tu ne poses pas de diagnostic : tu m’aides à comprendre mon état à partir de mon journal.',
-      `Réponds en français, en me tutoyant, simplement et sans jargon, en ${week ? 350 : 300} mots maximum, avec ces titres Markdown (##) :`,
-      week ? '## Ma semaine\n## Tendances\n## Alimentation\n## Pour la semaine prochaine\n## À surveiller' : '## Mon état\n## Ce que je remarque\n## Alimentation\n## Pour demain\n## À surveiller',
+      `Réponds en français, en me tutoyant, simplement et sans jargon, en ${words} mots maximum, avec ces titres Markdown (##) :`,
+      titles,
       'Règles :',
+      scope === 'visit' ? '- Compare chaque valeur de la prise de sang à la norme (celle du labo si elle est notée, sinon le repère donné) et relie-la aux compléments pris et à leur régularité ; signale les carences possibles et ce qui est en excès.' : '',
+      scope === 'visit' ? '- Ne propose jamais de changer un traitement prescrit (par exemple Mounjaro) ni d’arrêter un complément sans le médecin : formule plutôt des questions à lui poser.' : '',
       '- Relie ce qui peut l’être (sommeil, repas et macros, compléments, traitement, stress, douleurs) sans inventer de valeurs absentes du journal ; dis ce qui manque pour mieux juger.',
       '- Si quelque chose peut être urgent (douleur dans la poitrine, essoufflement, malaise, sang, fièvre forte, idées noires…), commence par là et conseille d’appeler le 112.',
       '- Si un symptôme dure ou revient, ou si une valeur de prise de sang sort des normes, conseille d’en parler à un médecin.',
@@ -1503,7 +1747,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       if (a.ctl !== ctl) return;
       a.text = res.text + (res.truncated ? '\n\n*(Réponse coupée : pose une question plus précise pour la suite.)*' : '');
       a.status = 'done';
-      if (scope === 'day') mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
+      if (scope !== 'week') mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
     } catch (e) {
       if (a.ctl !== ctl) return;
       const code = (e && e.code) || 'upstream_error';
@@ -1560,9 +1804,10 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
   /* Le bouton « … Claude » du check-in : la meilleure action possible ici. */
   function claudeGo(k) {
-    if (store.sample) { askClaude('day', k); scrollToClaude(); }
-    else if (canShare()) shareClaude('day', k);
-    else { copyClaude('day', k); scrollToClaude(); }
+    const scope = hasVisit(k) ? 'visit' : 'day';
+    if (store.sample) { askClaude(scope, k); scrollToClaude(); }
+    else if (canShare()) shareClaude(scope, k);
+    else { copyClaude(scope, k); scrollToClaude(); }
   }
 
   /* ---------- Rendu : Semaine ---------- */
@@ -1582,7 +1827,6 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const summary = [
       html`<tr><th scope="row">Pris</th>${cell((dk) => { const st = stats(dk); return st.total ? `${st.taken}/${st.total}` : ''; })}</tr>`,
       html`<tr><th scope="row">Réveil</th>${cell((dk, d) => str(d.wake))}</tr>`,
-      html`<tr><th scope="row">Poids <small>kg</small></th>${cell((dk, d) => (num(d.weight) ? fmtDec(num(d.weight)) : ''))}</tr>`,
       html`<tr><th scope="row">Calories</th>${cell((dk, d) => { const x = sumMacros(dayItems(d)); return x.n ? fmtInt(x.kcal) : ''; })}</tr>`,
       html`<tr><th scope="row">Protéines <small>g</small></th>${cell((dk, d) => { const x = sumMacros(dayItems(d)); return x.n ? fmtG(x.p) : ''; })}</tr>`,
       SCALES.map((sc) => html`<tr><th scope="row">${sc.label}${sc.faces ? '' : html` <small>sur 5</small>`}</th>${days.map((dk) => {
@@ -1599,7 +1843,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         <button type="button" class="icon" data-act="week-next" aria-label="Semaine suivante">${ICON.right}</button>
       </div></div>
       <p class="hint">Touche une gélule pour la cocher, ou un jour pour ouvrir son journal.</p>
-      <div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>${days.map((dk, i) => html`<th scope="col"${dk === t ? html` class="today"` : ''}><button type="button" data-act="goto" data-date="${dk}" aria-label="${longDate(dk)}"><span>${WD_SHORT[i]}</span><b>${fromKey(dk).getDate()}</b></button></th>`)}</tr></thead>
+      <div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>${days.map((dk, i) => html`<th scope="col"${dk === t ? html` class="today"` : ''}><button type="button" data-act="goto" data-date="${dk}" aria-label="${longDate(dk)}${hasVisit(dk) ? ', visite médicale' : ''}"><span>${WD_SHORT[i]}</span><b>${fromKey(dk).getDate()}</b>${hasVisit(dk) ? html`<small class="vtag" aria-hidden="true">Visite</small>` : ''}</button></th>`)}</tr></thead>
       <tbody>${rows}</tbody><tbody class="sum">${summary}</tbody></table></div>
       ${S.settings.supplements.length ? '' : html`<p class="empty">Ta liste est vide. Ajoute tes compléments dans Réglages.</p>`}
       <div class="week-claude">${start <= t ? claudeBlock('week', start) : ''}</div>`;
@@ -1613,11 +1857,11 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       const offset = (new Date(y, m, 1).getDay() + 6) % 7, nDays = new Date(y, m + 1, 0).getDate();
       const cells = [];
       for (let dn = 1; dn <= nDays; dn++) {
-        const k = `${y}-${pad(m + 1)}-${pad(dn)}`, st = stats(k), j = hasJournal(peekDay(k));
+        const k = `${y}-${pad(m + 1)}-${pad(dn)}`, st = stats(k), j = hasJournal(peekDay(k)), v = hasVisit(k);
         const future = k > t, p = st.total ? st.taken / st.total : 0;
         if (!future && st.total) { tracked++; if (p >= 1) full++; }
-        const cls = 'bub' + (future ? ' future' : '') + (!st.total ? ' none' : p >= 1 ? ' full' : p > 0 ? ' part' : '') + (j ? ' j' : '') + (k === t ? ' today' : '');
-        const label = `${longDate(k)} : ${st.total ? `${st.taken} sur ${st.total} compléments` : 'rien de prévu'}${j ? ', journal rempli' : ''}`;
+        const cls = 'bub' + (future ? ' future' : '') + (!st.total ? ' none' : p >= 1 ? ' full' : p > 0 ? ' part' : '') + (j ? ' j' : '') + (v ? ' v' : '') + (k === t ? ' today' : '');
+        const label = `${longDate(k)} : ${st.total ? `${st.taken} sur ${st.total} compléments` : 'rien de prévu'}${j ? ', journal rempli' : ''}${v ? ', visite médicale' : ''}`;
         cells.push(html`<button type="button" class="${cls}" style="--p:${p.toFixed(3)}" data-act="goto" data-date="${k}" aria-label="${label}"></button>`);
       }
       return html`<section class="month"><h3>${cap1(name)}</h3><div class="blister">${WD_LETTER.map((l) => html`<span class="wdh" aria-hidden="true">${l}</span>`)}${Array.from({ length: offset }, () => html`<span aria-hidden="true"></span>`)}${cells}</div></section>`;
@@ -1628,7 +1872,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         <button type="button" class="icon" data-act="year-next" aria-label="Année suivante">${ICON.right}</button>
       </div></div>
       <p class="yr-sum">${tracked ? `Tout pris ${plural(full, 'jour')} sur ${plural(tracked, 'suivi')}.` : 'Rien de suivi cette année pour l’instant.'}</p>
-      <div class="legend" aria-hidden="true"><span><i class="bub"></i>Rien pris</span><span><i class="bub part" style="--p:.5"></i>En partie</span><span><i class="bub full"></i>Tout pris</span><span><i class="bub j"></i>Journal rempli</span></div>
+      <div class="legend" aria-hidden="true"><span><i class="bub"></i>Rien pris</span><span><i class="bub part" style="--p:.5"></i>En partie</span><span><i class="bub full"></i>Tout pris</span><span><i class="bub j"></i>Journal rempli</span><span><i class="bub v"></i>Visite médicale</span></div>
       <div class="months">${months}</div>`;
   }
 
@@ -1683,39 +1927,79 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       </div>
     </section>`;
   }
+  function visitSettings() {
+    const v = S.settings.visit, t = todayKey();
+    const nv = nextVisit(t), n = daysBetween(t, nv);
+    const after = [1, 2, 3].map((i) => shortDate(addDays(nv, i * v.every)));
+    return html`<section class="set-sec"><div class="sec-head"><h2>Visite médicale</h2></div>
+      <p class="next-visit m-soir"><span class="mico" aria-hidden="true">${ICON.visit}</span><span><b>Prochaine visite : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}</b><span>${cap1(whenLabel(n))} · prise de sang, pesée et médecin</span></span></p>
+      <div class="set-grid">
+        <label class="field"><span>Première visite</span><input type="date" id="visit-start" data-vset="start" value="${v.start}"></label>
+        <label class="field"><span>Tous les (jours)</span><input type="number" inputmode="numeric" min="7" max="120" id="visit-every" data-vset="every" value="${v.every}"></label>
+      </div>
+      <p class="hint">Ensuite : ${after.join(' · ')}. La semaine d’avant, un rappel s’affiche sur la page du jour. Le jour même, la page montre la visite (poids, prise de sang, médecin) et le bilan des ${v.every} jours à envoyer à Claude.</p>
+      ${PLATFORM.native ? html`<label class="switch"><input type="checkbox" id="visit-notify" data-vset="notify"${v.notify ? html` checked` : ''}> Notification la veille à 19:00 et le matin à 7:30</label>
+        ${store.notifyDenied ? html`<p class="hint">Les notifications sont bloquées : autorise-les pour Mon suivi dans les réglages Android.</p>` : ''}` : ''}
+    </section>`;
+  }
+  function dataSettings() {
+    const dk = S.ui.dataDate && S.ui.dataDate <= todayKey() ? S.ui.dataDate : S.ui.date <= todayKey() ? S.ui.date : todayKey();
+    const pr = S.ui.pendingRestore;
+    const fileVerb = PLATFORM.native ? 'Enregistrer' : 'Télécharger';
+    const where = store.mode === 'cloud'
+      ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre tes appareils qui ouvrent cette page dans Claude. Sans connexion, tes modifications restent sur l’appareil et partent dès que possible.'
+      : `Enregistrées sur cet appareil${PLATFORM.native ? ' (app Android)' : PLATFORM.electron ? ' (app PC)' : ''}, uniquement ici. Pour les retrouver ailleurs (tablette, PC, artefact Claude) : sauvegarde complète ici, puis « Restaurer » là-bas.`;
+    return html`<section class="set-sec"><div class="sec-head"><h2>Tes données</h2></div>
+      <p class="muted">${where}</p>
+      <div class="dgroups">
+        <div class="dgroup"><h3>Sauvegarde complète</h3>
+          <p>Ta liste, tes réglages et tout ton journal. Pour garder une copie, ou passer à un autre appareil.</p>
+          <div class="actions"><button type="button" class="primary" data-act="backup-file">${fileVerb} la sauvegarde</button><button type="button" class="ghost" data-act="backup-copy">Copier le texte</button></div>
+        </div>
+        <div class="dgroup"><h3>Une journée</h3>
+          <p>Le texte de la journée pour Claude, ou une sauvegarde de ce jour seul (elle s’ajoute sur l’autre appareil sans toucher au reste).</p>
+          <label class="field day-pick"><span>Jour</span><input type="date" id="data-date" data-ui="dataDate" value="${dk}" max="${todayKey()}"></label>
+          <div class="actions"><button type="button" class="primary" data-act="day-file" data-date="${dk}">${fileVerb} pour Claude</button><button type="button" class="ghost" data-act="day-copy" data-date="${dk}">Copier pour Claude</button><button type="button" class="ghost" data-act="day-backup" data-date="${dk}">Sauvegarde de la journée</button></div>
+        </div>
+        <div class="dgroup"><h3>Restaurer</h3>
+          <p>Une sauvegarde complète remplace ta liste et tes réglages, et remet les jours qu’elle contient. Une sauvegarde de journée remet seulement ce jour-là.</p>
+          <div class="actions"><label class="ghost filebtn">Choisir un fichier<input type="file" id="import-file" accept=".json,application/json,text/plain" data-file="import" class="sr-only"></label><button type="button" class="ghost" data-act="restore-open" aria-expanded="${bool(S.ui.restoreOpen)}">Coller le texte</button></div>
+          ${S.ui.restoreOpen && !pr ? html`<div class="restore"><label class="field"><span>Texte de la sauvegarde</span><textarea id="restore-text" class="export" data-restore="text" rows="6" placeholder="Colle ici le texte copié sur l’autre appareil">${S.ui.restoreText}</textarea></label><div class="actions"><button type="button" class="primary" data-act="restore-text">Vérifier ce texte</button><button type="button" class="link" data-act="restore-close">Fermer</button></div></div>` : ''}
+          ${pr ? html`<div class="confirm-box" role="alert"><p><b>${pr.title}</b></p><p>${pr.detail}</p><div class="actions"><button type="button" class="danger" data-act="restore-yes">Restaurer</button><button type="button" class="ghost" data-act="restore-no">Annuler</button></div></div>` : ''}
+        </div>
+        <div class="dgroup"><h3>Tableau</h3>
+          <p>Tout ton journal, un jour par ligne, pour Excel ou Numbers.</p>
+          <div class="actions"><button type="button" class="ghost" data-act="export-csv">${fileVerb} le tableau (.csv)</button></div>
+        </div>
+      </div>
+      ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">Copie ce texte et garde-le (notes, e-mail, Drive…) ; sur l’autre appareil, colle-le dans « Restaurer → Coller le texte ».</p><textarea readonly class="export" id="export-text" rows="8">${S.ui.exportText}</textarea>
+        <div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button>${canShare() ? html`<button type="button" class="ghost" data-act="share-export">Partager</button>` : ''}<button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
+    </section>`;
+  }
   function renderSettings() {
     const sups = S.settings.supplements;
     const groups = MOMENTS.map((m) => {
       const list = sups.filter((s) => s.moment === m.key);
       return list.length ? html`<h3 class="m-title m-${m.key}">${m.label}${m.hint ? html` <span>${m.hint}</span>` : ''}</h3>${list.map(supRow)}` : '';
     });
-    const where = store.mode === 'cloud'
-      ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre tes appareils qui ouvrent cette page dans Claude. Sans connexion, tes modifications restent sur l’appareil et partent dès que possible.'
-      : `Enregistrées sur cet appareil${PLATFORM.native ? ' (app Android)' : PLATFORM.electron ? ' (app PC)' : ''}, uniquement ici. Pour les retrouver sur un autre appareil ou dans l’artefact Claude : « Faire une sauvegarde » ici, puis « Restaurer » là-bas.`;
     return html`<h1 class="set-title">Réglages</h1>
-      <section class="set-sec"><div class="sec-head"><h2>Ta liste</h2><button type="button" class="primary" data-act="sup-add">Ajouter un complément</button></div>
+      ${visitSettings()}
+      <section class="set-sec"><div class="sec-head"><h2>Compléments</h2><button type="button" class="primary" data-act="sup-add">Ajouter</button></div>
         <p class="hint">Touche un complément pour le modifier. Tout est enregistré au fur et à mesure. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p>
         ${groups}${sups.length ? '' : html`<p class="empty">Ta liste est vide.</p>`}
-      </section>
-      ${nutritionSettings()}
-      <section class="set-sec"><div class="sec-head"><h2>Claude</h2></div>
-        <label class="field"><span>Ce que Claude doit savoir sur toi</span><textarea id="set-profile" data-setting="profile" rows="4" placeholder="Âge, taille, objectif (perte de poids…), traitements (Mounjaro 2,5 mg depuis…), problèmes de santé, dernières prises de sang…">${S.settings.profile}</textarea></label>
-        <p class="hint">Ajouté à chaque envoi à Claude (copie, partage ou question).</p>
-        <label class="field"><span>Lien de ton projet Claude (facultatif)</span><input type="url" id="set-claude-url" data-setting="claudeUrl" value="${S.settings.claudeUrl}" placeholder="https://claude.ai/project/…" autocomplete="off"></label>
-        <p class="hint">Crée un projet « État et santé » dans Claude, colle son lien ici : le bouton « Ouvrir mon projet Claude » y mènera directement.</p>
-      </section>
-      <section class="set-sec"><div class="sec-head"><h2>Tes données</h2></div>
-        <p class="muted">${where}</p>
-        <div class="actions"><button type="button" class="ghost" data-act="export-json">Faire une sauvegarde</button><button type="button" class="ghost" data-act="export-csv">Exporter le journal en tableau</button><label class="ghost filebtn">Restaurer une sauvegarde<input type="file" id="import-file" accept=".json,application/json,text/plain" data-file="import" class="sr-only"></label><button type="button" class="link" data-act="restore-open" aria-expanded="${bool(S.ui.restoreOpen)}">Coller une sauvegarde</button></div>
-        ${S.ui.restoreOpen ? html`<div class="restore"><label class="field"><span>Texte de la sauvegarde</span><textarea id="restore-text" class="export" data-restore="text" rows="6" placeholder="Colle ici le texte copié depuis un autre appareil">${S.ui.restoreText}</textarea></label><div class="actions"><button type="button" class="primary" data-act="restore-text">Restaurer ce texte</button><button type="button" class="link" data-act="restore-close">Fermer</button></div></div>` : ''}
-        ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">${PLATFORM.native ? 'Copie ce texte ou partage-le (e-mail, Drive, Claude…), puis colle-le dans « Coller une sauvegarde » sur l’autre appareil.' : 'Le téléchargement n’est pas disponible ici. Copie ce texte et garde-le quelque part.'}</p><textarea readonly class="export" id="export-text" rows="8">${S.ui.exportText}</textarea>
-          <div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button>${canShare() ? html`<button type="button" class="ghost" data-act="share-export">Partager</button>` : ''}<button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
         <div class="reset">${S.ui.confirm === 'reset'
           ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
           : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
-      </section>`;
+      </section>
+      ${nutritionSettings()}
+      <section class="set-sec"><div class="sec-head"><h2>Claude</h2></div>
+        <label class="field"><span>Ce que Claude doit savoir sur toi</span><textarea id="set-profile" data-setting="profile" rows="4" placeholder="Âge, taille, objectif (perte de poids…), traitements (Mounjaro 2,5 mg depuis…), problèmes de santé…">${S.settings.profile}</textarea></label>
+        <p class="hint">Ajouté à chaque envoi à Claude (copie, partage, question ou bilan du mois).</p>
+        <label class="field"><span>Lien de ton projet Claude (facultatif)</span><input type="url" id="set-claude-url" data-setting="claudeUrl" value="${S.settings.claudeUrl}" placeholder="https://claude.ai/project/…" autocomplete="off"></label>
+        <p class="hint">Crée un projet « État et santé » dans Claude, colle son lien ici : le bouton « Ouvrir mon projet Claude » y mènera directement.</p>
+      </section>
+      ${dataSettings()}`;
   }
-
   /* ---------- Rendu général ---------- */
   const view = document.getElementById('view');
   const VIEWS = { jour: renderDay, semaine: renderWeek, annee: renderYear, reglages: renderSettings };
@@ -1841,7 +2125,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         const sy = listOf(d.symptoms).sort(byTime).map((s) => `${str(s.time)} ${str(s.text)}${scaleValue(s.intensity) ? ` (${s.intensity}/5)` : ''}`).join(' | ');
         const ml = listOf(d.meals).sort(byTime).map((x) => `${str(x.time)} ${str(x.kind) || 'Repas'} : ${[str(x.text), mealItems(x).map((it) => `${it.name}${num(it.grams) ? ` ${it.grams} g` : ''}`).join(', ')].filter(Boolean).join(' — ')}`).join(' | ');
         const hasTaken = isObj(d.taken) && Object.values(d.taken).some(Boolean);
-        const t = sumMacros(dayItems(d)), w = num(d.weight);
+        const t = sumMacros(dayItems(d)), w = weightOf(d);
         if (!str(d.wake) && !str(d.bed) && !w && !ci && !sy && !ml && !str(d.notes) && !hasTaken) return;
         const st = stats(k);
         rows.push([k, str(d.wake), str(d.bed), w ? fmtDec(w) : '', st.taken, st.total, ci, sy, ml, t.n ? Math.round(t.kcal) : '', t.n ? fmtDec(t.p) : '', t.n ? fmtDec(t.g) : '', t.n ? fmtDec(t.l) : '', str(d.notes)]);
@@ -1849,15 +2133,29 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     });
     return '﻿' + rows.map((r) => r.map(csvCell).join(';')).join('\r\n');
   }
+  const MIME = { json: 'application/json', csv: 'text/csv;charset=utf-8', md: 'text/markdown;charset=utf-8', txt: 'text/plain;charset=utf-8' };
   function downloadBlob(name, data) {
     try {
-      const url = URL.createObjectURL(new Blob([data], { type: name.endsWith('.csv') ? 'text/csv;charset=utf-8' : 'application/json' }));
+      const url = URL.createObjectURL(new Blob([data], { type: MIME[name.split('.').pop()] || 'text/plain' }));
       const a = document.createElement('a');
       a.href = url; a.download = name;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       return true;
     } catch (e) { return false; }
+  }
+  /* App Android : on écrit le fichier dans le cache de l'app, puis la feuille de partage propose de
+     l'enregistrer (Fichiers, Drive…) ou de l'envoyer (Claude, e-mail…). */
+  async function saveFileNative(name, data) {
+    const FS = capPlugin('Filesystem'), Share = capPlugin('Share');
+    if (!FS || !Share) return false;
+    try {
+      const res = await FS.writeFile({ path: name, data, directory: 'CACHE', encoding: 'utf8' });
+      await Share.share({ title: name, files: [res.uri], dialogTitle: 'Enregistrer ou envoyer' });
+      return true;
+    } catch (e) {
+      return /cancel/i.test(String((e && (e.message || e.name)) || e));
+    }
   }
   async function offerFile(name, data) {
     if (store.downloads) {
@@ -1870,7 +2168,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         if (code === 'declined') return;
         if (code === 'rate_limited') { toast('Réessaie dans un instant.'); return; }
       }
-    } else if (!PLATFORM.artifact && !PLATFORM.native && downloadBlob(name, data)) {
+    } else if (PLATFORM.native) {
+      if (await saveFileNative(name, data)) return;
+    } else if (!PLATFORM.artifact && downloadBlob(name, data)) {
       return; // navigateur ou app PC : le fichier est téléchargé
     }
     S.ui.exportText = data;
@@ -1879,6 +2179,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     render();
   }
   const backupJSON = () => JSON.stringify({ app: 'mon-suivi', version: 1, exported: new Date().toISOString(), settings: S.settings, months: S.months }, null, 2);
+  const dayBackupJSON = (k) => JSON.stringify({ app: 'mon-suivi', version: 1, scope: 'day', exported: new Date().toISOString(), days: { [k]: peekDay(k) } }, null, 2);
+  const scopeFor = (k) => (hasVisit(k) ? 'visit' : 'day');
   function exportJSON() { offerFile(`mon-suivi-sauvegarde-${todayKey()}.json`, backupJSON()); }
   function exportCSV() { offerFile(`mon-suivi-journal-${todayKey()}.csv`, buildCSV()); }
   function copyExport() {
@@ -1889,36 +2191,70 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       toast('Sélectionne le texte et copie-le.');
     });
   }
-  function restoreBackup(raw) {
+  /* Lit une sauvegarde (complète ou d'une journée) et prépare le message de confirmation ; null si ce n'en est pas une. */
+  function parseBackup(raw) {
     let obj = null;
     try { obj = JSON.parse(String(raw).trim()); } catch (e) { obj = null; }
-    if (!isObj(obj) || !isObj(obj.settings) || !Array.isArray(obj.settings.supplements) || !isObj(obj.months)) {
-      toast('Ce n’est pas une sauvegarde de Mon suivi.');
-      return false;
+    if (!isObj(obj)) return null;
+    const exp = new Date(obj.exported);
+    const when = Number.isNaN(exp.getTime()) ? '' : ` du ${exp.getDate()} ${MONTHS[exp.getMonth()]} ${exp.getFullYear()}`;
+    if (obj.scope === 'day' && isObj(obj.days)) {
+      const days = sanitizeDays(obj.days), keys = Object.keys(days).sort();
+      if (!keys.length) return null;
+      return {
+        kind: 'day', days,
+        title: keys.length === 1 ? `Journée du ${longDate(keys[0]).replace(/^./, (c) => c.toLowerCase())}` : plural(keys.length, 'journée'),
+        detail: 'Elle remplacera ce jour-là sur cet appareil. Ta liste, tes réglages et les autres jours ne bougent pas.'
+      };
     }
-    S.settings = normalizeSettings(obj.settings);
-    store.trusted = true;
-    markDirty('settings');
-    const months = sanitizeMonths(obj.months);
-    let n = 0;
-    Object.keys(months).forEach((mk) => {
-      S.months[mk] = months[mk];
-      Object.keys(months[mk].days).forEach((dk) => { touchDay(dk); n++; });
-      markDirty('m' + mk);
-    });
-    S.ui.form = null; S.ui.confirm = null; S.ui.openSup = null; S.ui.restoreOpen = false; S.ui.restoreText = '';
+    if (!isObj(obj.settings) || !Array.isArray(obj.settings.supplements) || !isObj(obj.months)) return null;
+    const days = {}, months = sanitizeMonths(obj.months);
+    Object.keys(months).forEach((mk) => Object.assign(days, months[mk].days));
+    return {
+      kind: 'full', settings: obj.settings, days,
+      title: `Sauvegarde complète${when}`,
+      detail: `${plural(obj.settings.supplements.length, 'complément')}, ${plural(Object.keys(days).length, 'jour')} de journal. Ta liste et tes réglages actuels seront remplacés ; les jours de la sauvegarde remplaceront les mêmes jours ici, les autres ne bougent pas.`
+    };
+  }
+  function sanitizeDays(days) {
+    const out = {};
+    if (isObj(days)) Object.keys(days).forEach((dk) => { if (isKey(dk) && isObj(days[dk])) out[dk] = days[dk]; });
+    return out;
+  }
+  function askRestore(raw) {
+    const pr = parseBackup(raw);
+    if (!pr) { toast('Ce n’est pas une sauvegarde de Mon suivi.'); return; }
+    S.ui.pendingRestore = pr;
+    S.ui.focus = '[data-act="restore-yes"]';
     render();
-    toast(`Sauvegarde restaurée (${plural(n, 'jour')})`);
-    return true;
+  }
+  function applyRestore(pr) {
+    if (pr.kind === 'full') {
+      S.settings = normalizeSettings(pr.settings);
+      store.trusted = true;
+      markDirty('settings');
+    }
+    const keys = Object.keys(pr.days);
+    keys.forEach((dk) => {
+      const mk = monthKey(dk);
+      const month = S.months[mk] || (S.months[mk] = { days: {} });
+      if (!isObj(month.days)) month.days = {};
+      month.days[dk] = clone(pr.days[dk]);
+      touchDay(dk);
+    });
+    new Set(keys.map(monthDocId)).forEach((id) => markDirty(id));
+    Object.assign(S.ui, { form: null, confirm: null, openSup: null, restoreOpen: false, restoreText: '', pendingRestore: null });
+    render();
+    toast(pr.kind === 'full' ? `Sauvegarde restaurée (${plural(keys.length, 'jour')})` : 'Journée restaurée');
+    scheduleVisitReminders();
   }
   function importFile(file) {
     if (!file) return;
     const r = new FileReader();
-    r.onload = () => restoreBackup(r.result);
+    r.onload = () => askRestore(r.result);
     r.onerror = () => toast('Impossible de lire ce fichier.');
     r.readAsText(file);
   }
-
   /* ---------- Actions (boutons data-act) ---------- */
   const askDelete = (kind, id, focus) => { S.ui.confirm = `${kind}:${id}`; S.ui.focus = focus; render(); };
   function deleteEntry(field, k, id) {
@@ -1946,6 +2282,23 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     toggle: (d) => {
       S.ui.just = `${d.sid}|${d.date}`;
       mutateDay(d.date, 'taken:' + d.sid, (day) => { day.taken[d.sid] = !day.taken[d.sid]; });
+    },
+    'moment-all': (d) => {
+      const sids = scheduledFor(d.date).filter((sp) => sp.moment === d.v && !isTaken(sp.id, d.date)).map((sp) => sp.id);
+      if (!sids.length) return;
+      sids.forEach((sid) => touchDay(d.date, 'taken:' + sid));
+      mutateDay(d.date, 'taken:' + sids[0], (day) => { sids.forEach((sid) => { day.taken[sid] = true; }); });
+      toast(`${MOMENTS.find((m) => m.key === d.v).label} : tout est coché`);
+    },
+    'visit-check': (d) => {
+      mutateDay(d.date, 'visit', (day) => { const vis = ensureVisit(day); vis[d.v] = !vis[d.v]; });
+    },
+    'goto-labs': (d) => {
+      S.ui.view = 'jour'; S.ui.labsOpen = true;
+      S.ui.focus = `#lab-vitD-${d.date}`;
+      go(d.date);
+      const el = document.getElementById('visit');
+      if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
     },
     'wake-now': (d) => {
       const t = nowTime();
@@ -2070,13 +2423,31 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       toast('Liste de départ remise');
     },
     'export-json': () => exportJSON(),
+    'backup-file': () => exportJSON(),
+    'backup-copy': () => {
+      const data = backupJSON();
+      copyText(data).then((ok) => {
+        if (ok) { toast('Sauvegarde copiée. Sur l’autre appareil : Restaurer → Coller le texte.'); return; }
+        S.ui.exportText = data; S.ui.focus = '#export-text'; S.ui.select = true; render();
+      });
+    },
+    'day-file': (d) => offerFile(`mon-suivi-${d.date}.md`, claudeText(scopeFor(d.date), d.date, '', false)),
+    'day-copy': (d) => {
+      copyText(claudeText(scopeFor(d.date), d.date, '', false)).then((ok) => toast(ok ? 'Journée copiée pour Claude' : 'Impossible de copier ici : utilise « Télécharger pour Claude ».'));
+    },
+    'day-backup': (d) => {
+      if (!hasJournal(peekDay(d.date)) && !Object.values((peekDay(d.date) || {}).taken || {}).some(Boolean)) { toast('Rien de noté ce jour-là.'); return; }
+      offerFile(`mon-suivi-journee-${d.date}.json`, dayBackupJSON(d.date));
+    },
+    'restore-yes': () => { if (S.ui.pendingRestore) applyRestore(S.ui.pendingRestore); },
+    'restore-no': () => { S.ui.pendingRestore = null; render(); },
     'export-csv': () => exportCSV(),
     'copy-export': () => copyExport(),
     'share-export': () => { shareText('Mon suivi — sauvegarde', S.ui.exportText || '').then((ok) => { if (!ok) copyExport(); }); },
     'close-export': () => { S.ui.exportText = null; render(); },
-    'restore-open': () => { S.ui.restoreOpen = !S.ui.restoreOpen; if (S.ui.restoreOpen) S.ui.focus = '#restore-text'; render(); },
+    'restore-open': () => { S.ui.restoreOpen = !S.ui.restoreOpen; S.ui.pendingRestore = null; if (S.ui.restoreOpen) S.ui.focus = '#restore-text'; render(); },
     'restore-close': () => { S.ui.restoreOpen = false; render(); },
-    'restore-text': () => { if (!String(S.ui.restoreText).trim()) { toast('Colle d’abord le texte de la sauvegarde.'); return; } restoreBackup(S.ui.restoreText); }
+    'restore-text': () => { if (!String(S.ui.restoreText).trim()) { toast('Colle d’abord le texte de la sauvegarde.'); return; } askRestore(S.ui.restoreText); }
   };
 
   /* ---------- Événements ---------- */
@@ -2106,11 +2477,22 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       const field = ds.bind, val = t.value;
       mutateDay(ds.date, field, (d) => { d[field] = val; }, false);
       safeRender();
-    } else if (ds.bind === 'weight') {
+    } else if (ds.visit === 'weight') {
       const w = num(t.value);
       if (String(t.value).trim() && (w == null || w < 20 || w > 400)) { toast('Écris ton poids en kilos, par exemple 82,5.'); return; }
-      mutateDay(ds.date, 'weight', (d) => { d.weight = w == null ? null : round1(w); }, false);
+      mutateDay(ds.date, 'visit', (d) => { ensureVisit(d).weight = w == null ? null : round1(w); }, false);
       if (w != null) t.value = fmtDec(round1(w));
+      safeRender(); // évolution depuis la dernière pesée
+    } else if (ds.vset) {
+      const key = ds.vset;
+      if (key === 'start' && !isKey(t.value)) { toast('Choisis la date de ta première visite.'); return; }
+      const every = Math.round(num(t.value) || 0);
+      if (key === 'every' && (every < 7 || every > 120)) { toast('Entre 7 et 120 jours.'); t.value = S.settings.visit.every; return; }
+      mutateSettings((st) => { st.visit[key] = key === 'notify' ? t.checked : key === 'every' ? every : t.value; });
+      scheduleVisitReminders();
+    } else if (ds.ui === 'dataDate') {
+      S.ui.dataDate = isKey(t.value) ? t.value : null;
+      render();
     } else if (ds.draft && S.ui.form) {
       S.ui.form.draft[ds.draft] = t.value;
     } else if (ds.item) {
@@ -2154,6 +2536,12 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       S.ui.form.draft[ds.draft] = t.value;
     } else if (ds.item && t.type !== 'checkbox') {
       onItemInput(ds.item, t.value);
+    } else if (ds.visit && ds.visit !== 'weight') {
+      const path = ds.visit, val = t.value;
+      mutateDay(ds.date, 'visit', (d) => {
+        const vis = ensureVisit(d);
+        if (path.startsWith('labs.')) vis.labs[path.slice(5)] = val; else vis[path] = val;
+      }, false);
     } else if (ds.ask === 'q') {
       S.ui.ask.q = t.value;
       refreshReport();
@@ -2178,7 +2566,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
   app.addEventListener('toggle', (e) => {
     const t = e.target;
-    if (!t.dataset || t.dataset.toggle !== 'report') return;
+    if (!t.dataset) return;
+    if (t.dataset.toggle === 'labs') { S.ui.labsOpen = t.open; return; }
+    if (t.dataset.toggle !== 'report') return;
     S.ui.ask.showReport = t.open;
     refreshReport();
   }, true); // « toggle » ne remonte pas : on l'écoute à la descente
@@ -2205,6 +2595,35 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   window.addEventListener('online', resume);
   window.addEventListener('pagehide', flushAll);
   setInterval(checkRollover, 60000);
+
+  /* App Android : rappels de la visite médicale (la veille à 19:00, le matin à 7:30), pour les 6 prochaines.
+     Identifiants 7000 à 7099 réservés à ces rappels : on les annule tous puis on les recrée. */
+  async function scheduleVisitReminders() {
+    const LN = capPlugin('LocalNotifications');
+    if (!LN || !S.settings) return;
+    const v = S.settings.visit;
+    try {
+      const pending = await LN.getPending();
+      const ours = ((pending && pending.notifications) || []).filter((n) => n.id >= 7000 && n.id < 7100);
+      if (ours.length) await LN.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
+      if (!v.notify) return;
+      let perm = await LN.checkPermissions();
+      if (perm.display !== 'granted' && perm.display !== 'denied') perm = await LN.requestPermissions();
+      const denied = perm.display !== 'granted';
+      if (denied !== !!store.notifyDenied) { store.notifyDenied = denied; if (S.ui.view === 'reglages') safeRender(); }
+      if (denied) return;
+      const now = Date.now(), list = [];
+      let k = nextVisit(todayKey());
+      for (let i = 0; i < 6; i++, k = addDays(k, v.every)) {
+        const eve = fromKey(addDays(k, -1)); eve.setHours(19, 0, 0, 0);
+        const morning = fromKey(k); morning.setHours(7, 30, 0, 0);
+        const common = { isExactNotification: false, smallIcon: 'ic_stat_monsuivi' };
+        if (eve.getTime() > now) list.push({ ...common, id: 7000 + i * 2, title: 'Demain : visite médicale', body: 'Prise de sang (souvent à jeun, vérifie avec le labo), pesée et médecin. Note tes questions.', schedule: { at: eve, allowWhileIdle: true } });
+        if (morning.getTime() > now) list.push({ ...common, id: 7001 + i * 2, title: 'Aujourd’hui : visite médicale', body: 'Prise de sang, pesée, médecin. Note tout dans Mon suivi pour ton bilan du mois avec Claude.', schedule: { at: morning, allowWhileIdle: true } });
+      }
+      if (list.length) await LN.schedule({ notifications: list });
+    } catch (e) { /* notifications indisponibles : les rappels restent dans l'app */ }
+  }
 
   /* App Android : le bouton retour ferme le formulaire ouvert, revient à la vue Jour, puis met l'app en arrière-plan. */
   const capApp = capPlugin('App');

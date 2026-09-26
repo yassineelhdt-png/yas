@@ -1,8 +1,12 @@
 # Mon suivi
 
-Journal santé quotidien : compléments (matin, midi, 16h, soir), sommeil et poids, check-ins (humeur, énergie,
+Journal santé quotidien : compléments (matin, midi, 16h, soir), sommeil, check-ins (humeur, énergie,
 concentration, stress, douleur, faim), ce que je ressens (douleurs, sensations, effets secondaires), repas avec
 aliments et macros (protéines, glucides, lipides, calories) et notes. Vues Jour, Semaine, Année et Réglages.
+
+**Visite médicale toutes les 4 semaines** (première le lundi 28 septembre 2026, réglable) : pesée, prise de sang
+(valeurs avec repères habituels), avis du médecin, et bilan des 28 jours d'avant à envoyer à Claude. Rappel sur la page
+du jour la semaine d'avant, notification la veille à 19:00 et le matin à 7:30 dans l'app Android.
 
 **Faire le point avec Claude** : chaque journée (ou semaine) devient un texte structuré, prêt à coller dans un
 projet Claude. Selon l'endroit où l'app tourne :
@@ -13,8 +17,9 @@ projet Claude. Selon l'endroit où l'app tourne :
 | App Android (APK) | « Envoyer à Claude » ouvre le menu de partage : choisir l'app Claude | sur la tablette |
 | App Windows | « Copier pour Claude », puis « Ouvrir mon projet Claude » | sur le PC |
 
-Pour passer d'un appareil à l'autre : Réglages → *Faire une sauvegarde*, puis *Restaurer une sauvegarde*
-(fichier) ou *Coller une sauvegarde* (texte) sur l'autre appareil.
+Réglages → *Tes données* : sauvegarde complète (fichier ou texte), une journée (texte pour Claude en `.md`, ou
+sauvegarde de ce jour seul en `.json`), restauration depuis un fichier ou un texte collé (avec confirmation), tableau
+`.csv`. Sur Android, les fichiers passent par le menu de partage (Fichiers, Drive, Claude…).
 
 ## Installer
 
@@ -30,7 +35,7 @@ modification de `diet/` (workflow « Mon suivi ») :
 
 - `mon-suivi.html` : l'app entière, source de l'artefact Claude « Mon suivi » (capacités `db`, `user`,
   `downloads`, `sample`). Pas de `<!doctype>` ni de `<head>` : l'artefact les ajoute à la publication.
-- `app/` : les apps Android (Capacitor, `com.yas.monsuivi`) et Windows (Electron).
+- `app/` : les apps Android (Capacitor, `com.yas.monsuivi` ; plugins partage, fichiers, notifications) et Windows (Electron).
   `npm run www` fabrique `app/www/index.html` à partir de `mon-suivi.html` (polices embarquées, hors ligne) ;
   `npm run android:apk`, `npm run desktop`, `npm run icons` (depuis `assets/icon.svg`).
   L'APK est signé avec `app/android/app/monsuivi.keystore` (clé publique dans le dépôt : usage perso, pas le
@@ -39,7 +44,7 @@ modification de `diet/` (workflow « Mon suivi ») :
 ## Données
 
 - **Compte Claude** : `data/users/<id>/settings` (liste, objectifs, mes aliments, profil) et un document par mois,
-  `data/users/<id>/mAAAA-MM` (`{ days: { "AAAA-MM-JJ": { taken, wake, bed, weight, checkins, symptoms, meals, notes, claude } } }`).
+  `data/users/<id>/mAAAA-MM` (`{ days: { "AAAA-MM-JJ": { taken, wake, bed, checkins, symptoms, meals, notes, visit, claude } } }`).
   Seuls les champs modifiés sont envoyés, pour ne pas écraser ce qu'un autre appareil écrit en même temps.
 - **Copie sur l'appareil** (`localStorage`, clé `mon-suivi-cloud-v1`) : affichage immédiat au chargement et
   modifications pas encore confirmées par le compte, renvoyées au prochain chargement ou au retour du réseau.

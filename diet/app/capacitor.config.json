@@ -9,6 +9,10 @@
     "SystemBars": {
       "insetsHandling": "native",
       "initialViewportFitValueHint": "cover"
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_monsuivi",
+      "iconColor": "#1F9C93"
     }
   }
 }
