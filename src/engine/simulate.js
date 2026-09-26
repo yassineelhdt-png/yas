@@ -23,7 +23,9 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   let hi = 0, guard = 0;
 
   const push = (it) => { if (it.e > it.s) items.push(it); };
-  const loc = () => (onCampus ? "campus" : "maison");
+  // lieu d'étude hors séances : la maison, ou la bibliothèque d'Erasme (init.at = "bibli", pas de trajets)
+  const home = init.at || "maison";
+  const loc = () => (onCampus ? "campus" : home);
   const markMissed = (h) => missed.push({ ...h, missed: true });
 
   // minutes de séances fixes encore à venir (elles comptent dans l'objectif)

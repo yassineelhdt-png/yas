@@ -1,6 +1,6 @@
 // Le moteur réécrit doit produire exactement les mêmes plannings que la v1 (legacy/horaire-9h-v1.html),
 // pour tous les jours du quadrimestre et plusieurs profils de réglages / saisies,
-// quand les ajouts de la v2 (heure de fin, retour de la bibliothèque) sont désactivés.
+// quand les ajouts de la v2 (heure de fin, journées à la bibliothèque) sont désactivés.
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { describe, expect, it } from "vitest";
@@ -55,9 +55,9 @@ const PROFILES = {
   "saisies aléatoires #2": [{ travel: 20, lunch: 60, bigPause: 30, targetH: 8.5 }, randomDays(42)]
 };
 
-// La v1 n'a pas d'heure de fin ni de retour de la bibliothèque : on les désactive pour comparer.
-const V1 = { endAt: "", libTravel: 0 };
-const NEW_KEYS = ["endAt", "endSet", "workEnd", "fit"];
+// La v1 n'a ni heure de fin ni journées à la bibliothèque : on les désactive pour comparer.
+const V1 = { endAt: "", weekdayLib: false };
+const NEW_KEYS = ["endAt", "endSet", "workEnd", "fit", "atLib", "libSet"];
 // retire les clés à valeur undefined (JSON) et les champs ajoutés en v2, pour comparer les données
 const plain = (x) => JSON.parse(JSON.stringify(x, (k, v) => (NEW_KEYS.includes(k) ? undefined : v)));
 

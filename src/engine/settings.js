@@ -1,12 +1,12 @@
 // Réglages par défaut du planning. Durées en minutes, sauf mention contraire.
 export const DEFAULTS = Object.freeze({
-  // Journée — endAt : heure de fin du programme (vide = dès que l'objectif est atteint) ;
-  // libTravel : retour de la bibliothèque à la maison, du lundi au vendredi, avant le sport
-  wake: "07:30", prep: 20, targetH: 9, sleepH: 8, endAt: "21:00", libTravel: 30,
+  // Journée — endAt : heure de fin du programme (vide = dès que l'objectif est atteint)
+  wake: "07:30", prep: 20, targetH: 9, sleepH: 8, endAt: "21:00",
   // Rythme
   session: 90, pause: 10, bigPause: 20, lunch: 45, dinner: 45, sport: 30, shower: 15,
-  // Unif · Erasme
-  travel: 30,
+  // Unif · Erasme — travel : trajet maison ↔ Erasme (aller simple) ;
+  // weekdayLib : du lundi au vendredi (hors congés), journée entière à la bibliothèque d'Erasme
+  travel: 30, weekdayLib: true,
   guidChimDay: 4, guidChimDur: 120,
   permPhysDay: 3, permPhysStart: "10:00", permPhysDur: 120,
   appuiMath: true, appuiBio: true, attendTheory: false,

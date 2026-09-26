@@ -19,7 +19,8 @@ function minorLabel(it, st) {
     case "dinner": return ["Dîner", ""];
     case "sport": return ["Sport " + st.sport + " min + douche", "Dernier truc de la journée"];
     case "travel":
-      if (it.dir === "home") return ["Retour à la maison", "La bibliothèque ferme : sport en rentrant"];
+      if (it.dir === "home") return ["Retour à la maison", "Sport en rentrant"];
+      if (it.lib) return ["Trajet vers la bibliothèque", "Bibliothèque d'Erasme : tu y restes jusqu'à la fin, cours compris"];
       if (it.dir !== "to") return ["Retour", "Anki sur le téléphone possible (non compté)"];
       return ["Trajet vers Erasme", (it.dest ? it.destLabel + " · " + it.dest : "") + (it.snack ? ". Prends une collation : tu mangeras après les séances" : "") + (it.late ? ". Pars tout de suite" : "")];
     case "free":
@@ -104,6 +105,10 @@ const act = {
     saveDay(state.date, { ov });
   },
   toggleEthique(on) { saveDay(state.date, { ethique: !on }); },
+  toggleLib(atLib) {
+    saveDay(state.date, { lib: !atLib, replan: undefined });
+    toast(atLib ? "Journée à la maison" : "Journée à la bibliothèque d'Erasme");
+  },
   replanClear() {
     state.replanOpen = false;
     saveDay(state.date, { replan: undefined });
@@ -192,7 +197,7 @@ function header(res, st, ctx) {
           <label><span class="lbl">Je commence à</span><input type="time" step="300" .value=${live(E.hm(res.start))} @change=${(e) => act.start(e.target.value)}></label>
           <label><span class="lbl">Je finis à</span><input type="time" step="300" .value=${live(E.hm(res.endAt ?? res.workEnd))} @change=${(e) => act.end(e.target.value)}></label>
           <span class="auto">
-            <span>Début ${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min"}</span>
+            <span>Début ${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min" + (res.atLib ? " + trajet" : "")}</span>
             <span>Fin ${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
           </span>
         </div>
@@ -321,6 +326,14 @@ function aside(res, st, ctx) {
     }
     cards.push(html`<div class="card"><h2>Pris du retard ?</h2><p class="sub">Recalcule la suite de la journée à partir de maintenant, sans perdre ce qui est déjà fait.</p>${inner}</div>`);
   }
+  cards.push(html`
+    <div class="card"><h2>Où tu travailles</h2>
+      <div class="ev" style="--c:var(--accent)"><div class="t"><i></i>Bibliothèque d'Erasme</div>
+        <div class="d">${res.atLib
+          ? "Trajet de " + st.travel + " min le matin et le soir, tu restes sur place entre les cours."
+          : "À la maison : trajets seulement pour les séances à l'unif."}${res.libSet ? " · choisi pour ce jour" : ""}</div>
+        <button class="sw" role="switch" aria-checked=${res.atLib ? "true" : "false"} aria-label="Journée à la bibliothèque d'Erasme" @click=${() => act.toggleLib(res.atLib)}></button></div>
+    </div>`);
   if (res.mode === "concours") {
     cards.push(html`
       <div class="card"><h2>Dimanche concours</h2><p class="sub">Éthique & empathie : un dimanche sur ${st.ethiqueEvery}. Le raisonnement, tous les dimanches.</p>

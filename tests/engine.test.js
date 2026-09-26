@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import * as E from "../src/engine/index.js";
 
+const fin = (p) => E.hm(p.workEnd);
 const days = [];
 for (let d = "2026-09-28"; d <= "2027-01-10"; d = E.addDays(d, 1)) days.push(d);
 
@@ -28,7 +29,7 @@ describe("temps", () => {
 
 describe("plan d'un jour (réglages de base)", () => {
   const plans = days.map((d) => E.planDay(d, {}));
-  const compact = days.map((d) => E.planDay(d, { endAt: "", libTravel: 0 }));
+  const compact = days.map((d) => E.planDay(d, { endAt: "", weekdayLib: false }));
 
   it("les créneaux se suivent sans se chevaucher", () => {
     for (const p of plans) {
@@ -89,7 +90,6 @@ describe("saisies du jour", () => {
 });
 
 describe("heure de fin", () => {
-  const fin = (p) => E.hm(p.workEnd);
   const at = (p, kind) => p.items.find((it) => it.kind === kind);
 
   // journée pleine de cours : l'objectif est atteint à la fin des séances, rien à étirer
@@ -139,13 +139,13 @@ describe("heure de fin", () => {
   });
 
   it("un peu juste : repas raccourcis d'abord, les 9h sont gardées", () => {
-    const p = E.planDay("2026-10-06", {}, () => ({ start: "09:30" }));
+    const p = E.planDay("2026-10-06", {}, () => ({ start: "10:30" }));
     expect(p.fit.mode).toBe("squeeze");
     expect(fin(p)).toBe("21:00");
     expect(p.net).toBeGreaterThanOrEqual(9 * 60);
     expect(p.fit.breaks.pause).toBe(10); // les petites pauses ne bougent pas tant que les repas suffisent
     for (const it of p.items) if (it.kind === "lunch" || it.kind === "dinner") expect(it.e - it.s).toBeGreaterThanOrEqual(30);
-    expect(p.warnings).toContain("Pour faire tes 9h avant 21:00 : repas de 30 min.");
+    expect(p.warnings.some((w) => w.startsWith("Pour faire tes 9h avant 21:00 : repas de 30 min"))).toBe(true);
   });
 
   it("trop peu de temps : objectif réduit et alerte", () => {
@@ -168,6 +168,48 @@ describe("heure de fin", () => {
     expect(tail).toEqual(["travel/home", "sport"]);
     expect(wk.items.at(-2).s).toBe(wk.workEnd);
     for (const d of ["2026-10-10", "2026-10-11"]) expect(E.planDay(d, {}).items.at(-2).kind, d).not.toBe("travel");
+  });
+});
+
+describe("journée à la bibliothèque d'Erasme", () => {
+  const trips = (p) => p.items.filter((it) => it.kind === "travel");
+
+  it("lun–ven : un trajet le matin, un le soir, aucun entre les cours", () => {
+    for (const d of days) {
+      const p = E.planDay(d, {});
+      if (!p.atLib) continue;
+      const t = trips(p);
+      expect(t.map((x) => x.dir), d).toEqual(["to", "home"]);
+      expect(t[0].e, d).toBe(p.start); // on arrive à la bibli au moment de commencer
+      expect(p.items.filter((it) => it.kind === "study").every((it) => it.loc === "bibli"), d).toBe(true);
+    }
+  });
+
+  it("week-end et congés : à la maison, trajets seulement pour les séances", () => {
+    for (const d of ["2026-10-10", "2026-10-11", "2026-11-11", "2026-12-24"]) {
+      const p = E.planDay(d, {});
+      expect(p.atLib, d).toBe(false);
+      expect(p.items.some((it) => it.lib || it.dir === "home"), d).toBe(false);
+    }
+  });
+
+  it("début automatique : lever + préparation + trajet", () => {
+    const p = E.planDay("2026-10-06", {});
+    expect(E.hm(p.start)).toBe("08:20");
+    expect(E.hm(E.planDay("2026-10-10", {}).start)).toBe("07:50");
+  });
+
+  it("choix du jour prioritaire : maison un mardi, bibli un samedi", () => {
+    const home = E.planDay("2026-10-06", {}, () => ({ lib: false }));
+    expect(home.atLib).toBe(false);
+    expect(home.libSet).toBe(true);
+    expect(trips(home).some((t) => t.dir === "to" && !t.lib)).toBe(true); // trajet pour l'appui de midi
+    const sat = E.planDay("2026-10-10", {}, () => ({ lib: true }));
+    expect(trips(sat).map((t) => t.dir)).toEqual(["to", "home"]);
+  });
+
+  it("réglage désactivé : comme avant, à la maison", () => {
+    expect(E.planDay("2026-10-06", { weekdayLib: false }).atLib).toBe(false);
   });
 
   it("la replanification garde l'heure de fin", () => {

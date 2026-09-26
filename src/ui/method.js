@@ -22,7 +22,7 @@ export function methodView() {
         <li>S'il y a de la marge, les pauses et les repas s'allongent (pause jusqu'à 30 min, grande pause jusqu'à 1h, repas jusqu'à 1h15) ; au-delà, un créneau « Temps libre » s'ajoute après le dîner.</li>
         <li>S'il manque du temps (tu commences tard), l'objectif net baisse pour finir à l'heure, et l'app te dit combien d'heures tu fais.</li>
         <li>Quand le programme finit après 20h, le dîner a lieu pendant le programme.</li>
-        <li>Du lundi au vendredi : retour de la bibliothèque (${st.libTravel} min), puis sport à la maison.</li>
+        <li>À la bibliothèque : retour à la maison (${st.travel} min) après la fin, puis sport.</li>
       </ul>
 
       <h2>Ce qui compte dans les ${st.targetH}h</h2>
@@ -46,6 +46,9 @@ export function methodView() {
 
       <h2>Semaine de cours</h2>
       <ul>
+        <li>${st.weekdayLib
+          ? "Du lundi au vendredi (hors congés), tu passes la journée à la bibliothèque d'Erasme : un trajet le matin, un le soir, et tu restes sur place entre les cours. Le week-end, tu travailles à la maison."
+          : "Tu travailles à la maison : un aller-retour à Erasme pour chaque groupe de séances."} Tu peux changer pour un jour donné dans « Où tu travailles ».</li>
         <li>Tu ne vas pas aux cours magistraux : le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l'heure du cours.</li>
         <li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li>
         <li>La veille d'un séminaire : préparation de la série.</li>

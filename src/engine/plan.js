@@ -9,10 +9,10 @@ import { rotKey, prepFor, assign, assignGrouped } from "./tasks.js";
 
 const noDay = () => null;
 
-/** Journée simulée et calée sur l'heure de fin ; en semaine, retour de la bibliothèque avant le sport. */
+/** Journée simulée et calée sur l'heure de fin ; à la bibliothèque, retour à la maison avant le sport. */
 function runDay(res, S, start, hard, init) {
-  const r = fitDay(start, hard, S, init, res.endAt);
-  return res.dow >= 1 && res.dow <= 5 ? goHome(r, +S.libTravel) : r;
+  if (!res.atLib) return fitDay(start, hard, S, init, res.endAt);
+  return goHome(fitDay(start, hard, S, { ...init, at: "bibli" }, res.endAt), +S.travel);
 }
 const freshWeekMin = () => ({ CHIM: 0, PHYS: 0, MATH: 0, BIO: 0 });
 
@@ -123,15 +123,21 @@ function planOne(ds, S, getDay, backlog, weekMin) {
   const day = getDay(ds) || {};
   const w = dow(ds);
   const wake = m(day.wake || S.wake);
-  const start = day.start ? m(day.start) : wake + +S.prep;
+  // journée à la bibliothèque d'Erasme : choix du jour, sinon lun–ven hors congés (réglage)
+  const atLib = typeof day.lib === "boolean" ? day.lib : !!S.weekdayLib && w >= 1 && w <= 5 && !H.closed[ds];
+  const trip = atLib ? +S.travel : 0; // trajet du matin vers la bibliothèque
+  // début de l'étude : saisi, sinon lever + préparation (+ trajet) ; jamais avant d'avoir pu arriver
+  const start = Math.max(day.start ? m(day.start) : wake + +S.prep + trip, wake + trip);
   // heure de fin : celle du jour, sinon celle des réglages (vide = dès que l'objectif est atteint)
   const endStr = day.end || S.endAt;
   const res = {
     date: ds, dow: w, week: weekNo(ds), wake, start, startSet: !!day.start,
-    endAt: endStr ? m(endStr) : null, endSet: !!day.end,
+    endAt: endStr ? m(endStr) : null, endSet: !!day.end, atLib, libSet: typeof day.lib === "boolean",
     closed: H.closed[ds] || null, blocus: isBlocus(ds), events: [], warnings: []
   };
-  const pre = start > wake ? [{ kind: "prep", s: wake, e: start, long: start - wake > +S.prep + 10 }] : [];
+  const leave = start - trip;
+  const pre = leave > wake ? [{ kind: "prep", s: wake, e: leave, long: leave - wake > +S.prep + 10 }] : [];
+  if (trip > 0) pre.push({ kind: "travel", dir: "to", lib: true, s: leave, e: start });
   if (w === 0) return planSunday(res, S, day, pre, weekMin);
 
   res.events = dayEvents(ds, S, day.ov);
@@ -139,7 +145,8 @@ function planOne(ds, S, getDay, backlog, weekMin) {
   if (w === 6) queue = saturdayQueue(res, S, getDay, backlog);
   else {
     queue = weekdayQueue(res, S, getDay, backlog);
-    hard = buildHard(res.events, S);
+    // à la bibliothèque d'Erasme, les séances sont sur place : pas de trajets entre elles
+    hard = buildHard(res.events, atLib ? { ...S, travel: 0 } : S);
   }
 
   const rp = day.replan;

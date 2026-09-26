@@ -13,7 +13,6 @@ const FORM = [
     ["prep", "Préparation après le lever", "min"],
     ["targetH", "Objectif net par jour", "h", { min: 1, max: 14 }],
     ["endAt", "Heure de fin du programme (vide = dès que l'objectif est atteint)", "time"],
-    ["libTravel", "Retour de la bibliothèque, lun–ven, avant le sport (0 si tu étudies chez toi)", "min"],
     ["sleepH", "Sommeil visé", "h", { min: 4, max: 12 }]
   ]],
   ["Rythme", [
@@ -26,7 +25,8 @@ const FORM = [
     ["shower", "Douche après le sport", "min"]
   ]],
   ["Unif · Erasme", [
-    ["travel", "Trajet aller simple", "min"],
+    ["weekdayLib", "Lun–ven : journée à la bibliothèque d'Erasme", "bool"],
+    ["travel", "Trajet maison ↔ Erasme (aller simple)", "min"],
     ["guidChimDay", "Guidance chimie : jour", "sel", { choices: [[2, "Mardi"], [3, "Mercredi"], [4, "Jeudi"]] }],
     ["guidChimDur", "Guidance chimie : durée", "min", { min: 15 }],
     ["permPhysDay", "Permanence physique : jour", "sel", { choices: [[1, "Lundi"], [2, "Mardi"], [3, "Mercredi"], [4, "Jeudi"], [5, "Vendredi"]] }],

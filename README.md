@@ -44,7 +44,9 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   s'il y a de la marge, pauses et repas s'allongent pour finir pile à l'heure (au-delà : « Temps libre »
   après le dîner) ; s'il en manque, les repas puis les pauses raccourcissent, et en dernier recours
   l'objectif net baisse (avec une alerte). Le dîner a lieu pendant le programme quand il finit après 20h.
-- Du lundi au vendredi : retour de la bibliothèque à la maison après la fin, puis sport.
+- **Journée à la bibliothèque d'Erasme** du lundi au vendredi (hors congés) : un trajet le matin, un le soir
+  (retour à la maison puis sport), aucun aller-retour entre les cours. Le week-end : à la maison.
+  Modifiable pour un jour donné (carte « Où tu travailles ») ou pour toute la semaine (Réglages).
 
 - Carte **« En ce moment »** : le créneau en cours, le temps restant et ce qui suit.
 - Barre de navigation en bas sur téléphone, onglets en haut sur tablette / PC ; le bouton retour ramène à la vue Jour.
@@ -55,7 +57,7 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - Sauvegarde / restauration des données.
 - Réglages protégés : un champ vidé revient à la valeur par défaut au lieu de casser le planning.
 
-Sans heure de fin, le moteur de planification est **identique à la v1** : un test compare, jour par jour
+Sans heure de fin ni journée à la bibliothèque, le moteur de planification est **identique à la v1** : un test compare, jour par jour
 et sur tout le quadrimestre, les plannings produits par la v2 et par l'app d'origine (`legacy/horaire-9h-v1.html`).
 
 ## Développement
