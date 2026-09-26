@@ -1,0 +1,14 @@
+{
+  "appId": "com.yas.monsuivi",
+  "appName": "Mon suivi",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#EDF1F5"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}

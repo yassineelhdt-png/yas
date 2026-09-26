@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mon suivi</string>
+    <string name="title_activity_main">Mon suivi</string>
+    <string name="package_name">com.yas.monsuivi</string>
+    <string name="custom_url_scheme">com.yas.monsuivi</string>
+</resources>

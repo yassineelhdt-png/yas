@@ -137,7 +137,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .it-dose{ font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
 .it-note{ flex-basis:100%; font-size:14px; color:var(--muted); line-height:1.35; }
 .freq{ flex:none; font-size:12px; font-weight:800; padding:3px 9px; border-radius:999px; background:var(--surface); border:1px solid var(--ml); white-space:nowrap; }
-.jsec + .jsec{ margin-top:34px; }
+.jsec + .jsec,.supps + .jsec{ margin-top:34px; }
 .list{ list-style:none; margin:0; padding:0; }
 .entry{ display:grid; grid-template-columns:52px minmax(0,1fr) auto; gap:4px 12px; padding:12px 0; border-top:1px solid var(--line); align-items:start; }
 .list > li:first-child{ border-top:0; }
@@ -239,6 +239,66 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .reset{ margin-top:22px; }
 .reset p{ margin:0 0 10px; font-weight:600; }
 
+/* Ce que je ressens */
+.chips{ display:flex; flex-wrap:wrap; gap:6px; }
+.chips button{ border:1px solid var(--line); background:var(--surface-2); color:var(--ink); border-radius:999px; padding:6px 12px; font-weight:700; font-size:14px; min-height:36px; }
+.chips .chips-lbl{ align-self:center; font-size:13px; font-weight:700; color:var(--muted); margin-right:2px; }
+.level{ flex:none; font-size:12px; font-weight:800; padding:2px 8px; border-radius:999px; background:var(--aprem-tint); border:1px solid var(--aprem-line); color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.to-claude{ margin-top:10px; }
+
+/* Nutrition */
+.nutri{ display:grid; gap:10px; padding:14px; margin-bottom:14px; background:var(--surface); border:1px solid var(--line); border-radius:16px; }
+.nutri-top{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; }
+.nutri-top b{ font-family:var(--font-display); font-weight:600; font-size:26px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.nutri-top span{ color:var(--muted); font-weight:700; font-size:14px; }
+.nutri-top .over{ color:var(--danger); }
+.mbars{ display:grid; gap:6px; }
+.mbar{ display:grid; grid-template-columns:88px minmax(0,1fr) auto; align-items:center; gap:10px; font-size:13px; font-weight:700; }
+.mbar > span:first-child{ color:var(--muted); }
+.mbar .track{ height:8px; border-radius:4px; background:var(--bub); overflow:hidden; }
+.mbar .track i{ display:block; height:100%; border-radius:4px; background:var(--c); width:var(--w); }
+.mbar b{ font-variant-numeric:tabular-nums; min-width:92px; text-align:right; }
+.c-kcal{ --c:var(--fill); } .c-p{ --c:var(--soir); } .c-g{ --c:var(--matin); } .c-l{ --c:var(--aprem); }
+.items{ list-style:none; margin:6px 0 0; padding:0; display:grid; gap:2px; font-size:14px; }
+.items li{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:0 10px; }
+.items li span{ color:var(--muted); font-variant-numeric:tabular-nums; }
+.macros{ margin:4px 0 0; font-size:13px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+.foods{ display:grid; gap:12px; padding:12px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; }
+.foods-head{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 12px; font-weight:800; }
+.foods-head span{ color:var(--muted); font-size:14px; font-variant-numeric:tabular-nums; }
+.food-list{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.food-list li{ display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; padding:8px 10px; background:var(--surface); border:1px solid var(--line); border-radius:10px; }
+.food-list .fl-name{ font-weight:800; flex:1 1 140px; min-width:0; }
+.food-list .fl-vals{ color:var(--muted); font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
+.food-add{ display:grid; gap:10px; }
+.food-add .row{ display:grid; grid-template-columns:minmax(0,1fr) 110px; gap:10px; }
+.food-add .row4{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; }
+@media (max-width:460px){ .food-add .row4{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+.food-add .field span{ font-size:13px; }
+.per100{ margin:0; font-size:13px; font-weight:600; color:var(--muted); }
+
+/* Claude */
+.claude{ padding:16px; background:var(--surface); border:1.5px solid var(--aprem-line); border-radius:18px; }
+.claude .sec-head h2{ font-family:var(--font-display); font-weight:600; font-size:18px; }
+.claude > .field{ margin-bottom:10px; }
+.ask-opts{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:14px; }
+.ask-area{ display:grid; gap:12px; }
+.linkbtn{ display:inline-flex; align-items:center; text-decoration:none; color:var(--ink); }
+.thinking{ margin:0; font-weight:700; color:var(--aprem); }
+.answer{ padding:14px 16px; background:var(--aprem-tint); border:1px solid var(--aprem-line); border-radius:14px; max-width:68ch; overflow-wrap:anywhere; }
+.answer h3{ font-size:16px; font-weight:800; margin:14px 0 4px; }
+.answer h3:first-child,.answer .answer-meta + h3{ margin-top:0; }
+.answer p{ margin:0 0 8px; }
+.answer ul,.answer ol{ margin:0 0 8px; padding-left:22px; }
+.answer li{ margin:2px 0; }
+.answer-meta{ font-size:13px; font-weight:700; color:var(--muted); }
+.ask-error{ margin:0; font-weight:700; color:var(--danger); }
+.report-box{ margin-top:14px; }
+.report-box summary{ cursor:pointer; font-weight:700; color:var(--muted); font-size:14px; padding:6px 0; }
+.report-box .export{ margin-top:8px; font-family:ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size:12.5px; line-height:1.45; }
+.set-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; margin-bottom:10px; }
+.restore{ margin-top:14px; }
+
 /* Messages */
 .toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(18px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
 #toast{ background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-weight:700; font-size:15px; opacity:0; transform:translateY(12px); transition:opacity .18s ease, transform .18s ease; max-width:100%; text-align:center; }
@@ -312,6 +372,18 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   const attr = (name, value) => `[${name}="${CSS.escape(String(value))}"]`;
   /* Souris ou pavé tactile : on peut déplacer le focus sans ouvrir de clavier à l'écran. */
   const finePointer = () => { try { return matchMedia('(pointer: fine)').matches; } catch (e) { return false; } };
+  /* Nombres saisis à la française (« 92,4 ») ; null si ce n'est pas un nombre. */
+  const num = (v) => {
+    const n = typeof v === 'number' ? v : parseFloat(String(v ?? '').replace(',', '.').replace(/\s/g, ''));
+    return Number.isFinite(n) ? n : null;
+  };
+  const posNum = (v) => { const n = num(v); return n != null && n >= 0 ? n : null; };
+  const round1 = (n) => Math.round(n * 10) / 10;
+  const fmtDec = (n, d = 1) => { const f = 10 ** d; return String(Math.round(n * f) / f).replace('.', ','); };
+  const fmtInt = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+  const fmtG = (n) => fmtDec(n, n >= 100 ? 0 : 1);
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+  const reducedMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
   function stable(v) {
     if (Array.isArray(v)) return '[' + v.map(stable).join(',') + ']';
     if (v && typeof v === 'object') {
@@ -361,10 +433,45 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     { key: 'mood', label: 'Humeur', lo: 'au plus bas', hi: 'au top', faces: ['😞', '😕', '😐', '🙂', '😄'] },
     { key: 'energy', label: 'Énergie', lo: 'à plat', hi: 'à fond' },
     { key: 'focus', label: 'Concentration', lo: 'dispersé', hi: 'focus total' },
+    { key: 'stress', label: 'Stress', lo: 'calme', hi: 'très stressé' },
+    { key: 'pain', label: 'Douleur', lo: 'aucune', hi: 'très forte' },
     { key: 'hunger', label: 'Faim', lo: 'aucune', hi: 'très forte' }
   ];
   const FACES = SCALES[0].faces;
-  const MEAL_KINDS = ['Repas', 'Collation'];
+  const INTENSITY = { key: 'intensity', label: 'Intensité', lo: 'légère', hi: 'très forte' };
+  const SYMPTOM_CHIPS = ['Mal de tête', 'Mal au dos', 'Mal au ventre', 'Nausée', 'Fatigue', 'Ballonnements', 'Brûlures d’estomac', 'Constipation', 'Vertiges', 'Anxiété', 'Palpitations', 'Crampes'];
+  const MEAL_KINDS = ['Petit-déjeuner', 'Déjeuner', 'Collation', 'Dîner'];
+  const mealKindAt = (time) => { const m = toMin(time) ?? 0; return m < 630 ? 'Petit-déjeuner' : m < 900 ? 'Déjeuner' : m < 1080 ? 'Collation' : 'Dîner'; };
+  /* Valeurs moyennes pour 100 g (tables CIQUAL / USDA, glucides hors fibres), à ajuster avec l'étiquette :
+     [nom, kcal, protéines, glucides, lipides]. Les féculents sont pesés cuits. */
+  const FOODS = [
+    ['Riz blanc cuit', 130, 2.7, 28, 0.3], ['Riz complet cuit', 123, 2.7, 24, 1], ['Pâtes cuites', 150, 5.5, 29, 0.9],
+    ['Pâtes complètes cuites', 149, 6, 26, 1.7], ['Semoule / couscous cuit', 112, 3.8, 22, 0.2], ['Quinoa cuit', 120, 4.4, 18.5, 1.9],
+    ['Pomme de terre cuite', 86, 1.9, 18, 0.1], ['Patate douce cuite', 90, 2, 17.5, 0.2], ['Frites', 312, 3.4, 38, 15],
+    ['Pain blanc / baguette', 270, 9, 55, 1.5], ['Pain complet', 240, 9, 44, 2.5], ['Pain de mie', 280, 8.5, 50, 4.5],
+    ['Flocons d’avoine', 370, 13, 59, 7], ['Lentilles cuites', 116, 9, 12, 0.4], ['Pois chiches cuits', 164, 8.9, 20, 2.6],
+    ['Haricots rouges cuits', 127, 8.7, 16, 0.5],
+    ['Blanc de poulet cuit', 165, 31, 0, 3.6], ['Blanc de dinde cuit', 147, 30, 0, 2], ['Steak haché 5 % (cru)', 125, 21, 0, 5],
+    ['Steak haché 15 % (cru)', 207, 18, 0, 15], ['Jambon blanc', 115, 20, 1, 3.5], ['Saumon (cru)', 208, 20, 0, 13],
+    ['Thon au naturel (conserve)', 116, 26, 0, 1], ['Cabillaud (cru)', 82, 18, 0, 0.7], ['Crevettes cuites', 99, 24, 0.2, 0.3],
+    ['Œuf entier', 143, 12.6, 0.7, 9.5], ['Blanc d’œuf', 52, 11, 0.7, 0.2], ['Tofu nature', 120, 13, 2, 7],
+    ['Lait demi-écrémé', 46, 3.3, 4.8, 1.6], ['Yaourt nature', 61, 3.5, 4.7, 3.3], ['Skyr', 63, 11, 4, 0.2],
+    ['Fromage blanc 0 %', 46, 7.5, 4, 0.2], ['Emmental', 380, 28, 0.5, 29], ['Comté', 410, 27, 0, 34], ['Mozzarella', 250, 18, 1, 19],
+    ['Banane', 90, 1.1, 20, 0.3], ['Pomme', 52, 0.3, 12, 0.2], ['Orange', 47, 0.9, 9, 0.1], ['Fraises', 32, 0.7, 6, 0.3],
+    ['Myrtilles', 57, 0.7, 12, 0.3], ['Avocat', 160, 2, 2, 15], ['Brocoli cuit', 35, 2.4, 4, 0.4], ['Haricots verts cuits', 31, 1.8, 4, 0.2],
+    ['Carotte', 41, 0.9, 7, 0.2], ['Tomate', 18, 0.9, 2.7, 0.2], ['Courgette cuite', 17, 1.2, 2, 0.3], ['Épinards cuits', 23, 3, 1, 0.3],
+    ['Salade verte', 15, 1.4, 1.5, 0.2],
+    ['Huile d’olive', 884, 0, 0, 100], ['Beurre', 717, 0.9, 0.1, 81], ['Amandes', 580, 21, 9, 50], ['Noix', 654, 15, 7, 65],
+    ['Beurre de cacahuète', 590, 25, 14, 50], ['Chocolat noir 70 %', 570, 9, 33, 42], ['Miel', 304, 0.3, 82, 0], ['Sucre', 400, 0, 100, 0],
+    ['Whey (protéine en poudre)', 380, 78, 7, 6], ['Collagène marin', 360, 90, 0, 0]
+  ].map(([name, kcal, p, g, l]) => ({ name, kcal, p, g, l }));
+  /* Où tourne la page : artefact Claude, app Android (Capacitor), app PC (Electron) ou navigateur. */
+  const PLATFORM = {
+    artifact: !!(window.claude && typeof window.claude.use === 'function'),
+    native: !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()),
+    electron: /Electron\//.test(navigator.userAgent)
+  };
+  const capPlugin = (name) => (PLATFORM.native && window.Capacitor.Plugins && window.Capacitor.Plugins[name]) || null;
   const ICON = {
     left: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     right: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
@@ -391,13 +498,27 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       mk('Mounjaro', '2,5 mg', 'matin', 'weekly', 'Dose prescrite par ton médecin')
     ];
   }
-  const freshSettings = () => { const t = todayKey(); return { version: 1, created: t, supplements: defaultSupplements(t) }; };
+  const freshSettings = () => normalizeSettings({ created: todayKey(), supplements: defaultSupplements(todayKey()) });
+  function normalizeGoals(g) {
+    const out = { kcal: null, p: null, g: null, l: null };
+    if (isObj(g)) Object.keys(out).forEach((k) => { const n = posNum(g[k]); out[k] = n ? round1(n) : null; });
+    return out;
+  }
+  const normalizeFood = (f) => ({
+    id: String(f.id || newId()), name: String(f.name || '').trim().slice(0, 80) || 'Aliment',
+    kcal: round1(posNum(f.kcal) ?? 0), p: round1(posNum(f.p) ?? 0), g: round1(posNum(f.g) ?? 0), l: round1(posNum(f.l) ?? 0)
+  });
+  const isClaudeUrl = (u) => /^https:\/\/claude\.ai\/[^\s"'<>]*$/.test(String(u || ''));
   function normalizeSettings(raw) {
     const created = raw && isKey(raw.created) ? raw.created : todayKey();
     const sups = raw && Array.isArray(raw.supplements) ? raw.supplements : [];
     return {
       version: 1,
       created,
+      goals: normalizeGoals(raw && raw.goals),
+      foods: (raw && Array.isArray(raw.foods) ? raw.foods : []).filter(isObj).map(normalizeFood),
+      profile: String((raw && raw.profile) || '').slice(0, 4000),
+      claudeUrl: raw && isClaudeUrl(raw.claudeUrl) ? raw.claudeUrl : '',
       supplements: sups.filter(isObj).map((s) => ({
         id: String(s.id || newId()),
         name: String(s.name || 'Sans nom'),
@@ -427,7 +548,13 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   /* ---------- État ---------- */
   const S = {
     settings: null, months: {}, ready: false,
-    ui: { view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(), form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null }
+    ui: {
+      view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
+      form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null,
+      restoreOpen: false, restoreText: '', foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
+      // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
+      ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null }
+    }
   };
   let localData = null;
 
@@ -437,10 +564,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const month = S.months[mk] || (S.months[mk] = { days: {} });
     if (!isObj(month.days)) month.days = {};
     let d = month.days[k];
-    if (!isObj(d)) d = month.days[k] = { taken: {}, wake: '', bed: '', checkins: [], meals: [], notes: '' };
+    if (!isObj(d)) d = month.days[k] = { taken: {}, wake: '', bed: '', checkins: [], symptoms: [], meals: [], notes: '' };
     if (!isObj(d.taken)) d.taken = {};
-    if (!Array.isArray(d.checkins)) d.checkins = [];
-    if (!Array.isArray(d.meals)) d.meals = [];
+    ['checkins', 'symptoms', 'meals'].forEach((f) => { if (!Array.isArray(d[f])) d[f] = []; });
     return d;
   }
   function mutateDay(k, field, fn, rerender = true) {
@@ -484,7 +610,41 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return `${Math.floor(dur / 60)} h ${pad(dur % 60)}`;
   }
   function hasJournal(d) {
-    return !!(d && (listOf(d.checkins).length || listOf(d.meals).length || str(d.wake) || str(d.notes)));
+    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.notes) || num(d.weight)));
+  }
+
+  /* ---------- Nutrition ---------- */
+  const MACROS = [['p', 'Protéines'], ['g', 'Glucides'], ['l', 'Lipides']];
+  const kcalOf = (p, g, l) => round1(4 * p + 4 * g + 9 * l);
+  function sumMacros(items) {
+    const t = { kcal: 0, p: 0, g: 0, l: 0, n: 0 };
+    items.forEach((it) => { ['kcal', 'p', 'g', 'l'].forEach((k) => { t[k] += posNum(it[k]) ?? 0; }); t.n++; });
+    return t;
+  }
+  const mealItems = (m) => listOf(m && m.items);
+  const dayItems = (d) => (d ? listOf(d.meals).flatMap(mealItems) : []);
+  const macroLine = (t) => `P ${fmtG(t.p)} · G ${fmtG(t.g)} · L ${fmtG(t.l)}`;
+  /* Mes aliments d'abord, puis la table intégrée. */
+  const allFoods = () => [...S.settings.foods, ...FOODS];
+  const findFood = (name) => { const n = norm(name); return n ? allFoods().find((f) => norm(f.name) === n) || null : null; };
+  function scaleFood(f, grams) {
+    const k = (grams ?? 100) / 100;
+    return { kcal: round1(f.kcal * k), p: round1(f.p * k), g: round1(f.g * k), l: round1(f.l * k) };
+  }
+  /* Aliments notés ces 30 derniers jours, le plus récent d'abord : un appui pour les remettre. */
+  function recentFoods(k) {
+    const seen = new Set(), out = [];
+    for (let i = 0; i < 30 && out.length < 8; i++) {
+      const d = peekDay(addDays(k, -i));
+      if (!d) continue;
+      listOf(d.meals).slice().sort(byTime).reverse().forEach((m) => mealItems(m).forEach((it) => {
+        const n = norm(it.name);
+        if (!n || seen.has(n) || out.length >= 8) return;
+        seen.add(n);
+        out.push(it);
+      }));
+    }
+    return out;
   }
 
   /* ---------- Enregistrement ----------
@@ -497,7 +657,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
      à afficher tes données tout de suite, avant la réponse du compte. */
   const store = {
     mode: 'local', online: false, connecting: false, stopped: false, failed: false,
-    col: null, uid: null, downloads: null, unsub: null,
+    col: null, uid: null, downloads: null, sample: null, sampleImages: null, unsub: null,
     trusted: true,        // false : la liste affichée n'est pas (encore) celle du compte
     dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {},
     dirtyDays: {},        // { 'm2026-09': { '2026-09-26': { 'taken:abc': true, notes: true } } }
@@ -869,14 +1029,14 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
 
   async function getCapabilities() {
-    const none = { db: null, downloads: null, uid: null };
+    const none = { db: null, downloads: null, sample: null, uid: null };
     const claude = window.claude;
     if (!claude || typeof claude.use !== 'function') return none;
     const use = (name) => Promise.resolve().then(() => claude.use(name)).catch(() => null);
     try {
-      const [db, user, downloads] = await withTimeout(Promise.all([use('db'), use('user'), use('downloads')]), CAPS_TIMEOUT, [null, null, null]);
+      const [db, user, downloads, sample] = await withTimeout(Promise.all([use('db'), use('user'), use('downloads'), use('sample')]), CAPS_TIMEOUT, [null, null, null, null]);
       const uid = user && typeof user.id === 'function' ? await withTimeout(user.id().catch(() => null), 5000, null) : null;
-      return { db, downloads, uid };
+      return { db, downloads, sample: typeof sample === 'function' ? sample : null, uid };
     } catch (e) { return none; }
   }
   async function init() {
@@ -884,6 +1044,10 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     localData = lsGet(LS_KEY);
     const caps = await getCapabilities();
     store.downloads = caps.downloads || null;
+    store.sample = caps.sample;
+    if (store.sample && typeof store.sample.limits === 'function') {
+      store.sample.limits().then((l) => { store.sampleImages = (l && l.images) || null; if (S.ready && store.sampleImages) safeRender(); }).catch(() => {});
+    }
     if (!caps.db || !caps.uid) { startLocal(); return; }
     try { store.col = caps.db.collection('data/users/' + caps.uid); } catch (e) { startLocal(); return; }
     store.mode = 'cloud';
@@ -908,8 +1072,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       </div>${weekStrip(k)}</section>
       ${weeklyBanner()}
       <div class="daygrid">
-        <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}</div>
-        <div class="col">${checkinBlock(k, d, isToday)}${mealBlock(k, d)}${notesBlock(k, d)}</div>
+        <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}${symptomBlock(k, d)}</div>
+        <div class="col">${checkinBlock(k, d, isToday)}${mealBlock(k, d)}${notesBlock(k, d)}${claudeBlock('day', k)}</div>
       </div>`;
   }
   function weekStrip(k) {
@@ -929,10 +1093,11 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
   function sleepBlock(k, d, isToday) {
     const prev = peekDay(addDays(k, -1));
-    const wake = str(d.wake), night = nightLength(prev && prev.bed, wake);
-    return html`<section class="sleep" aria-label="Sommeil">
+    const wake = str(d.wake), night = nightLength(prev && prev.bed, wake), weight = num(d.weight);
+    return html`<section class="sleep" aria-label="Sommeil et poids">
       <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
       <label class="field"><span>Coucher</span><input type="time" id="bed-${k}" data-bind="bed" data-date="${k}" value="${str(d.bed)}"></label>
+      <label class="field"><span>Poids (kg)</span><input type="text" inputmode="decimal" id="weight-${k}" data-bind="weight" data-date="${k}" value="${weight ? fmtDec(weight) : ''}" placeholder="—" autocomplete="off"></label>
       ${!wake && isToday ? html`<button type="button" class="chip" data-act="wake-now" data-date="${k}">Je viens de me lever</button>`
         : night ? html`<p class="night">Nuit de ${night}</p>` : ''}
     </section>`;
@@ -951,6 +1116,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       : html`<p class="empty">Rien de prévu ce jour-là.${S.settings.supplements.length ? '' : ' Ajoute tes compléments dans Réglages.'}</p>`;
     return html`<section class="supps"><div class="sec-head"><h2>Compléments</h2>${st.total ? html`<span class="count">${st.taken} sur ${st.total}</span>` : ''}</div>${body}</section>`;
   }
+  const FORM_KINDS = { checkin: { act: 'ci', field: 'checkins' }, meal: { act: 'meal', field: 'meals' }, symptom: { act: 'sym', field: 'symptoms' } };
   function rowActions(kind, k, id, what) {
     if (S.ui.confirm === `${kind}:${id}`) {
       return html`<span class="row-actions"><button type="button" class="link danger" data-act="${kind}-del" data-date="${k}" data-id="${id}" aria-label="Oui, supprimer ${what}">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>`;
@@ -958,6 +1124,12 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return html`<span class="row-actions"><button type="button" class="link" data-act="${kind}-edit" data-date="${k}" data-id="${id}" aria-label="Modifier ${what}">Modifier</button><button type="button" class="link" data-act="${kind}-ask" data-date="${k}" data-id="${id}" aria-label="Supprimer ${what}">Supprimer</button></span>`;
   }
   const openForm = (type, k) => (S.ui.form && S.ui.form.type === type && S.ui.form.date === k ? S.ui.form : null);
+  const formActions = (extra) => html`<div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button>${extra || ''}<button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>`;
+  function scaleField(sc, value) {
+    return html`<fieldset class="scale"><legend>${sc.label}</legend><div class="dots">${[1, 2, 3, 4, 5].map((i) => html`<button type="button" class="dot${sc.faces ? ' emoji' : ''}" data-act="rate" data-scale="${sc.key}" data-v="${i}" aria-pressed="${bool(value === i)}" aria-label="${sc.label} ${i} sur 5">${sc.faces ? sc.faces[i - 1] : i}</button>`)}</div><div class="ends" aria-hidden="true"><span>${sc.lo}</span><span>${sc.hi}</span></div></fieldset>`;
+  }
+
+  /* Check-ins */
   function checkinBlock(k, d, isToday) {
     const list = listOf(d.checkins).sort(byTime);
     const f = openForm('checkin', k);
@@ -972,6 +1144,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       ${f && !f.id ? checkinForm(f) : ''}
       ${list.length ? html`<ul class="list">${list.map((c) => (f && f.id === c.id ? html`<li class="editing">${checkinForm(f)}</li>` : checkinEntry(c, k)))}</ul>`
         : f ? '' : html`<p class="empty">Aucun check-in pour l’instant.</p>`}
+      ${!f && hasJournal(d) ? html`<button type="button" class="link to-claude" data-act="to-claude">Faire le point avec Claude ↓</button>` : ''}
     </section>`;
   }
   function checkinEntry(c, k) {
@@ -988,34 +1161,408 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const dr = f.draft;
     return html`<div class="form" role="group" aria-label="Check-in">
       <label class="field field-time"><span>Heure</span><input type="time" id="draft-time" data-draft="time" value="${str(dr.time)}"></label>
-      ${SCALES.map((sc) => html`<fieldset class="scale"><legend>${sc.label}</legend><div class="dots">${[1, 2, 3, 4, 5].map((i) => html`<button type="button" class="dot${sc.faces ? ' emoji' : ''}" data-act="rate" data-scale="${sc.key}" data-v="${i}" aria-pressed="${bool(dr[sc.key] === i)}" aria-label="${sc.label} ${i} sur 5">${sc.faces ? sc.faces[i - 1] : i}</button>`)}</div><div class="ends" aria-hidden="true"><span>${sc.lo}</span><span>${sc.hi}</span></div></fieldset>`)}
-      <label class="field"><span>Note</span><textarea id="draft-note" data-draft="note" rows="2" placeholder="Ce qui se passe, ce qui joue sur ton état">${str(dr.note)}</textarea></label>
-      <div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button><button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>
+      ${SCALES.map((sc) => scaleField(sc, dr[sc.key]))}
+      <label class="field"><span>Précisions</span><textarea id="draft-note" data-draft="note" rows="3" placeholder="Ce qui se passe, ce qui joue sur ton état, où tu as mal…">${str(dr.note)}</textarea></label>
+      ${formActions(html`<button type="button" class="ghost" data-act="form-save-claude">${claudeVerb('Enregistrer et ')}</button>`)}
+    </div>`;
+  }
+
+  /* Ce que je ressens (symptômes, sensations, effets secondaires) */
+  function symptomBlock(k, d) {
+    const list = listOf(d.symptoms).sort(byTime);
+    const f = openForm('symptom', k);
+    const entry = (s) => {
+      const lv = scaleValue(s.intensity);
+      return html`<li class="entry"><span class="t">${str(s.time)}</span><div class="e-body">${lv ? html`<span class="kind">Intensité ${lv}/5</span>` : ''}<p class="note">${s.text}</p></div>${rowActions('sym', k, s.id, `« ${str(s.text).slice(0, 40)} »`)}</li>`;
+    };
+    return html`<section class="jsec"><div class="sec-head"><h2>Ce que je ressens</h2>${f ? '' : html`<button type="button" class="primary" data-act="sym-new" data-date="${k}">Noter</button>`}</div>
+      ${f && !f.id ? symptomForm(f) : ''}
+      ${list.length ? html`<ul class="list">${list.map((s) => (f && f.id === s.id ? html`<li class="editing">${symptomForm(f)}</li>` : entry(s)))}</ul>`
+        : f ? '' : html`<p class="empty">Une douleur, une sensation, un effet secondaire ? Note-le ici, avec l’heure.</p>`}
+    </section>`;
+  }
+  function symptomForm(f) {
+    const dr = f.draft;
+    return html`<div class="form" role="group" aria-label="Ce que je ressens">
+      <label class="field field-time"><span>Heure</span><input type="time" id="draft-time" data-draft="time" value="${str(dr.time)}"></label>
+      <div class="chips" role="group" aria-label="Raccourcis">${SYMPTOM_CHIPS.map((c) => html`<button type="button" data-act="sym-chip" data-v="${c}">${c}</button>`)}</div>
+      <label class="field"><span>Qu’est-ce que tu ressens ?</span><textarea id="sym-text" data-draft="text" rows="3" placeholder="J’ai mal au bas du dos depuis ce matin, surtout assis…">${str(dr.text)}</textarea></label>
+      ${scaleField(INTENSITY, dr.intensity)}
+      ${formActions()}
+    </div>`;
+  }
+
+  /* Repas et macros */
+  function nutritionSummary(d) {
+    const t = sumMacros(dayItems(d)), goals = S.settings.goals;
+    const hasGoals = Object.values(goals).some((v) => v);
+    if (!t.n && !hasGoals) return '';
+    const bar = (cls, label, val, goal, unit) => {
+      const w = goal ? Math.min(100, Math.round((val / goal) * 100)) : 0;
+      return html`<div class="mbar ${cls}"><span>${label}</span><span class="track" aria-hidden="true"><i style="--w:${w}%"></i></span><b>${unit === 'kcal' ? fmtInt(val) : fmtG(val)}${goal ? ` / ${unit === 'kcal' ? fmtInt(goal) : fmtG(goal)}` : ''} ${unit}</b></div>`;
+    };
+    const over = goals.kcal && t.kcal > goals.kcal;
+    return html`<div class="nutri" aria-label="Total du jour">
+      <div class="nutri-top"><b class="${over ? 'over' : ''}">${fmtInt(t.kcal)}</b><span>${goals.kcal ? `sur ${fmtInt(goals.kcal)} kcal${over ? ` · ${fmtInt(t.kcal - goals.kcal)} de plus` : ` · reste ${fmtInt(goals.kcal - t.kcal)}`}` : 'kcal aujourd’hui'}</span></div>
+      <div class="mbars">${MACROS.map(([key, label]) => bar('c-' + key, label, t[key], goals[key], 'g'))}</div>
+      ${hasGoals ? '' : html`<p class="per100">Fixe tes objectifs (calories, protéines…) dans Réglages pour suivre ta progression.</p>`}
     </div>`;
   }
   function mealBlock(k, d) {
     const list = listOf(d.meals).sort(byTime);
     const f = openForm('meal', k);
-    const entry = (m) => html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${m.kind || 'Repas'}</span><p class="note">${m.text}</p></div>${rowActions('meal', k, m.id, `${m.kind === 'Collation' ? 'la collation' : 'le repas'} de ${str(m.time)}`)}</li>`;
+    const entry = (m) => {
+      const items = mealItems(m), t = sumMacros(items);
+      const kind = str(m.kind) || 'Repas';
+      return html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${kind}${t.n ? ` · ${fmtInt(t.kcal)} kcal` : ''}</span>${m.text ? html`<p class="note">${m.text}</p>` : ''}${items.length ? html`<ul class="items">${items.map((it) => html`<li>${it.name}<span>${num(it.grams) ? `${fmtDec(num(it.grams), 0)} g · ` : ''}${fmtInt(posNum(it.kcal) ?? 0)} kcal</span></li>`)}</ul><p class="macros">${macroLine(t)}</p>` : ''}</div>${rowActions('meal', k, m.id, `${kind.toLowerCase()} de ${str(m.time)}`)}</li>`;
+    };
     return html`<section class="jsec"><div class="sec-head"><h2>Ce que j’ai mangé</h2>${f ? '' : html`<button type="button" class="primary" data-act="meal-new" data-date="${k}">Ajouter</button>`}</div>
+      ${nutritionSummary(d)}
       ${f && !f.id ? mealForm(f) : ''}
       ${list.length ? html`<ul class="list">${list.map((m) => (f && f.id === m.id ? html`<li class="editing">${mealForm(f)}</li>` : entry(m)))}</ul>`
         : f ? '' : html`<p class="empty">Rien de noté pour l’instant.</p>`}
     </section>`;
   }
   function mealForm(f) {
-    const dr = f.draft;
+    const dr = f.draft, it = dr.item, t = sumMacros(dr.items);
+    const kinds = MEAL_KINDS.includes(dr.kind) ? MEAL_KINDS : [...MEAL_KINDS, dr.kind];
+    const recents = recentFoods(f.date).filter((r) => !dr.items.some((x) => norm(x.name) === norm(r.name))).slice(0, 6);
+    const food = findFood(it.name);
     return html`<div class="form" role="group" aria-label="Repas">
       <div class="form-row">
         <label class="field field-time"><span>Heure</span><input type="time" id="draft-time" data-draft="time" value="${str(dr.time)}"></label>
-        <div class="field"><span id="kind-lbl">Type</span><div class="seg" role="group" aria-labelledby="kind-lbl">${MEAL_KINDS.map((v) => html`<button type="button" data-act="meal-kind" data-v="${v}" aria-pressed="${bool(dr.kind === v)}">${v}</button>`)}</div></div>
+        <div class="field"><span id="kind-lbl">Type</span><div class="seg" role="group" aria-labelledby="kind-lbl">${kinds.map((v) => html`<button type="button" data-act="meal-kind" data-v="${v}" aria-pressed="${bool(dr.kind === v)}">${v}</button>`)}</div></div>
       </div>
-      <label class="field"><span>Qu’est-ce que tu as mangé ?</span><textarea id="meal-text" data-draft="text" rows="3" placeholder="Riz complet, poulet, brocolis…">${str(dr.text)}</textarea></label>
-      <div class="actions"><button type="button" class="primary" data-act="form-save">Enregistrer</button><button type="button" class="ghost" data-act="form-cancel">Annuler</button></div>
+      <div class="foods">
+        <div class="foods-head">Aliments${t.n ? html`<span>${fmtInt(t.kcal)} kcal · ${macroLine(t)}</span>` : ''}</div>
+        ${dr.items.length ? html`<ul class="food-list">${dr.items.map((x) => html`<li><span class="fl-name">${x.name}${num(x.grams) ? ` · ${fmtDec(num(x.grams), 0)} g` : ''}</span><span class="fl-vals">${fmtInt(x.kcal)} kcal · ${macroLine(x)}</span><button type="button" class="link" data-act="item-edit" data-id="${x.id}" aria-label="Modifier ${x.name}">Modifier</button><button type="button" class="link danger" data-act="item-del" data-id="${x.id}" aria-label="Retirer ${x.name}">Retirer</button></li>`)}</ul>` : ''}
+        ${recents.length ? html`<div class="chips" role="group" aria-label="Aliments récents"><span class="chips-lbl">Récents</span>${recents.map((r) => html`<button type="button" data-act="item-recent" data-v="${r.name}">${r.name}${num(r.grams) ? ` · ${fmtDec(num(r.grams), 0)} g` : ''}</button>`)}</div>` : ''}
+        <div class="food-add">
+          <div class="row">
+            <label class="field"><span>Aliment</span><input type="text" id="fi-name" data-item="name" list="food-names" value="${it.name}" placeholder="Riz, poulet, œuf…" autocomplete="off"></label>
+            <label class="field"><span>Quantité (g)</span><input type="text" inputmode="decimal" id="fi-grams" data-item="grams" value="${it.grams}" placeholder="100" autocomplete="off"></label>
+          </div>
+          <div class="row4">
+            <label class="field"><span>Protéines (g)</span><input type="text" inputmode="decimal" id="fi-p" data-item="p" value="${it.p}" autocomplete="off"></label>
+            <label class="field"><span>Glucides (g)</span><input type="text" inputmode="decimal" id="fi-g" data-item="g" value="${it.g}" autocomplete="off"></label>
+            <label class="field"><span>Lipides (g)</span><input type="text" inputmode="decimal" id="fi-l" data-item="l" value="${it.l}" autocomplete="off"></label>
+            <label class="field"><span>Calories (kcal)</span><input type="text" inputmode="decimal" id="fi-kcal" data-item="kcal" value="${it.kcal}" autocomplete="off"></label>
+          </div>
+          <p class="per100" id="fi-per100">${per100Text(food)}</p>
+          <div class="actions">
+            <button type="button" class="ghost" data-act="item-add">${dr.editItem ? 'Mettre à jour l’aliment' : 'Ajouter l’aliment'}</button>
+            <label class="switch"><input type="checkbox" id="fi-save" data-item="save"${it.save ? html` checked` : ''}> Garder dans mes aliments</label>
+          </div>
+        </div>
+        <datalist id="food-names">${allFoods().map((x) => html`<option value="${x.name}"></option>`)}</datalist>
+      </div>
+      <label class="field"><span>Description (facultatif)</span><textarea id="meal-text" data-draft="text" rows="2" placeholder="Bol de riz au poulet, sauce soja…">${str(dr.text)}</textarea></label>
+      ${formActions()}
     </div>`;
   }
+  const per100Text = (food) => (food
+    ? `Pour 100 g : ${fmtInt(food.kcal)} kcal · ${macroLine(food)}${S.settings.foods.includes(food) ? ' (mes aliments)' : ' (valeur moyenne, ajuste avec l’étiquette)'}`
+    : 'Choisis un aliment dans la liste pour remplir les macros, ou saisis-les toi-même : les calories se calculent toutes seules.');
+  const blankItem = () => ({ name: '', grams: '', p: '', g: '', l: '', kcal: '', auto: true, kcalAuto: true, save: false });
+  const valStr = (n) => (n == null ? '' : fmtDec(n));
+  /* Saisie d'un aliment : met à jour les autres champs sans redessiner le formulaire. */
+  function onItemInput(field, value) {
+    const f = S.ui.form;
+    if (!f || f.type !== 'meal') return;
+    const it = f.draft.item;
+    if (field === 'save') { it.save = !!value; return; }
+    it[field] = value;
+    if (field === 'name' || field === 'grams') {
+      const food = findFood(it.name);
+      if (field === 'name' && food) { it.auto = true; it.kcalAuto = true; }
+      if (food && it.auto) {
+        const v = scaleFood(food, posNum(it.grams));
+        it.p = valStr(v.p); it.g = valStr(v.g); it.l = valStr(v.l); it.kcal = valStr(v.kcal);
+      }
+      const hint = document.getElementById('fi-per100');
+      if (hint) hint.textContent = per100Text(food);
+    } else if (field === 'kcal') {
+      it.kcalAuto = !String(value).trim();
+    } else {
+      it.auto = false;
+    }
+    if (it.kcalAuto && field !== 'kcal' && !(findFood(it.name) && it.auto)) {
+      const p = posNum(it.p), g = posNum(it.g), l = posNum(it.l);
+      it.kcal = p == null && g == null && l == null ? '' : valStr(kcalOf(p ?? 0, g ?? 0, l ?? 0));
+    }
+    ['p', 'g', 'l', 'kcal'].forEach((key) => {
+      const el = document.getElementById('fi-' + key);
+      if (el && key !== field && el.value !== it[key]) el.value = it[key];
+    });
+  }
+  /* Ajoute (ou met à jour) l'aliment en cours de saisie ; false s'il n'y a rien à ajouter. */
+  function commitItem({ quiet } = {}) {
+    const f = S.ui.form, dr = f.draft, it = dr.item;
+    const name = String(it.name || '').trim();
+    if (!name) { if (!quiet) toast('Écris le nom de l’aliment.'); return false; }
+    const grams = posNum(it.grams), p = posNum(it.p) ?? 0, g = posNum(it.g) ?? 0, l = posNum(it.l) ?? 0;
+    const kcal = posNum(it.kcal) ?? kcalOf(p, g, l);
+    const entry = { id: dr.editItem || newId(), name: name.slice(0, 80), grams: grams ? round1(grams) : null, kcal: round1(kcal), p: round1(p), g: round1(g), l: round1(l) };
+    const i = dr.items.findIndex((x) => x.id === entry.id);
+    if (i >= 0) dr.items[i] = entry; else dr.items.push(entry);
+    if (it.save && grams) {
+      const per = { name: entry.name, kcal: (entry.kcal * 100) / grams, p: (entry.p * 100) / grams, g: (entry.g * 100) / grams, l: (entry.l * 100) / grams };
+      mutateSettings((st) => {
+        const j = st.foods.findIndex((x) => norm(x.name) === norm(per.name));
+        const food = normalizeFood({ ...per, id: j >= 0 ? st.foods[j].id : newId() });
+        if (j >= 0) st.foods[j] = food; else st.foods.unshift(food);
+      }, false);
+    } else if (it.save && !quiet) toast('Indique la quantité pour garder cet aliment (valeurs pour 100 g).');
+    dr.item = blankItem();
+    dr.editItem = null;
+    return true;
+  }
+
   function notesBlock(k, d) {
     return html`<section class="jsec"><div class="sec-head"><h2><label for="notes-${k}">Notes du jour</label></h2></div><textarea id="notes-${k}" class="notes" data-bind="notes" data-date="${k}" rows="4" placeholder="Cours, révisions, ce qui s’est passé…">${str(d.notes)}</textarea></section>`;
+  }
+
+  /* ---------- Claude ---------- */
+  const canShare = () => !!capPlugin('Share') || (!!navigator.share && !PLATFORM.artifact && !PLATFORM.electron);
+  const claudeUrl = () => S.settings.claudeUrl || 'https://claude.ai/new';
+  /* Ce que fait « … Claude » ici : demander dans la page (artefact), partager (Android) ou copier. */
+  const claudeVerb = (prefix = '') => (store.sample ? `${prefix}demander à Claude` : canShare() ? `${prefix}envoyer à Claude` : `${prefix}copier pour Claude`).replace(/^./, (c) => c.toUpperCase());
+  const scopeLabel = (scope, key) => (scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine') : `journée du ${longDate(key).replace(/^./, (c) => c.toLowerCase())}`);
+
+  function claudeBlock(scope, key) {
+    const a = S.ui.ask;
+    const what = scope === 'week'
+      ? 'Claude reçoit toute la semaine, jour par jour : sommeil, poids, compléments, check-ins, symptômes, repas et macros, notes.'
+      : 'Claude reçoit tout ce que tu as noté ce jour-là : sommeil, poids, compléments, check-ins, symptômes, repas et macros, notes.';
+    return html`<section class="jsec claude" id="claude" aria-labelledby="claude-title">
+      <div class="sec-head"><h2 id="claude-title">${scope === 'week' ? 'Faire le point de la semaine avec Claude' : 'Faire le point avec Claude'}</h2></div>
+      <p class="hint">${what}${S.settings.profile ? ' Ce que tu as écrit sur toi dans Réglages est ajouté.' : ' Ajoute ce que Claude doit savoir sur toi dans Réglages (âge, traitements, objectifs).'}</p>
+      <label class="field"><span>Ta question (facultatif)</span><textarea id="ask-q" data-ask="q" rows="2" placeholder="${scope === 'week' ? 'Qu’est-ce qui a changé cette semaine ?' : 'Pourquoi j’ai mal au dos depuis trois jours ?'}">${a.q}</textarea></label>
+      <div class="ask-opts">
+        ${scope === 'day' ? html`<label class="switch"><input type="checkbox" id="ask-week" data-ask="withWeek"${a.withWeek ? html` checked` : ''}> Ajouter les 6 jours d’avant</label>` : ''}
+        ${store.sample && store.sampleImages ? html`<label class="ghost filebtn">${a.photo ? `Photo : ${a.photo.name}` : 'Joindre une photo (prise de sang, ordonnance…)'}<input type="file" id="ask-photo" data-ask="photo" accept="${store.sampleImages.mediaTypes ? store.sampleImages.mediaTypes.join(',') : 'image/jpeg,image/png,image/webp,image/gif'}" class="sr-only"></label>${a.photo ? html`<button type="button" class="link" data-act="ask-photo-clear">Retirer la photo</button>` : ''}` : ''}
+      </div>
+      ${askArea(scope, key)}
+      <details class="report-box" data-toggle="report"${a.showReport ? html` open` : ''}><summary>Voir le texte pour Claude</summary><textarea readonly id="report-text" class="export" rows="12">${claudeText(scope, key)}</textarea></details>
+    </section>`;
+  }
+  function askArea(scope, key) {
+    const a = S.ui.ask, mine = a.scope === scope && a.key === key;
+    const busy = mine && (a.status === 'thinking' || a.status === 'streaming');
+    const saved = scope === 'day' && !(mine && (a.text || busy)) ? (peekDay(key) || {}).claude : null;
+    const text = mine && a.text ? a.text : isObj(saved) ? str(saved.text) : '';
+    const primary = store.sample ? 'ask' : canShare() ? 'share' : 'copy';
+    const btn = (act, label, isPrimary) => html`<button type="button" class="${isPrimary ? 'primary' : 'ghost'}" data-act="${act}" data-scope="${scope}" data-key="${key}">${label}</button>`;
+    return html`<div id="ask-area" class="ask-area" data-scope="${scope}" data-key="${key}">
+      <div class="actions">
+        ${store.sample ? (busy ? html`<button type="button" class="ghost" data-act="ask-stop">Arrêter</button>` : btn('claude-ask', text ? 'Redemander à Claude' : 'Demander à Claude', true)) : ''}
+        ${canShare() ? btn('claude-share', 'Envoyer à Claude', primary === 'share') : ''}
+        ${btn('claude-copy', 'Copier pour Claude', primary === 'copy')}
+        <a class="ghost linkbtn" href="${claudeUrl()}"${PLATFORM.native ? '' : html` target="_blank" rel="noopener"`}>${S.settings.claudeUrl ? 'Ouvrir mon projet Claude ↗' : 'Ouvrir Claude ↗'}</a>
+      </div>
+      ${mine && a.status === 'thinking' ? html`<p class="thinking" role="status">Claude lit ton journal…</p>` : ''}
+      ${text ? html`<div class="answer"${busy ? html` aria-busy="true"` : ''}>${!mine && isObj(saved) ? html`<p class="answer-meta">Réponse de Claude${saved.at ? ` · ${fmtStamp(saved.at)}` : ''}${saved.q ? ` · « ${str(saved.q).slice(0, 80)} »` : ''}</p>` : ''}${mdToHtml(text)}</div>
+        ${busy ? '' : html`<div class="actions"><button type="button" class="link" data-act="answer-copy" data-scope="${scope}" data-key="${key}">Copier la réponse</button></div>`}` : ''}
+      ${mine && a.error ? html`<p class="ask-error" role="alert">${a.error}</p>` : ''}
+    </div>`;
+  }
+  function renderAsk() {
+    const a = S.ui.ask, el = document.getElementById('ask-area');
+    if (!el || el.dataset.scope !== a.scope || el.dataset.key !== a.key) return;
+    const keep = focusedButton();
+    el.outerHTML = String(askArea(a.scope, a.key));
+    if (keep) { const b = view.querySelector(keep); if (b) b.focus({ preventScroll: true }); }
+  }
+  function fmtStamp(iso) {
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? '' : `le ${d.getDate()} ${MONTHS[d.getMonth()]} à ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  /* Markdown simple (titres, listes, gras) → HTML, après échappement : rien de la réponse n'est interprété comme du code. */
+  function mdToHtml(text) {
+    const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, '$1<em>$2</em>');
+    const out = [];
+    let list = null;
+    const close = () => { if (list) { out.push(`</${list}>`); list = null; } };
+    String(text).replace(/\r/g, '').split('\n').forEach((line) => {
+      const t = line.trim();
+      let m;
+      if (!t) { close(); return; }
+      if ((m = /^#{1,6}\s+(.*)$/.exec(t))) { close(); out.push(`<h3>${inline(m[1])}</h3>`); return; }
+      if ((m = /^[-*•]\s+(.*)$/.exec(t))) { if (list !== 'ul') { close(); out.push('<ul>'); list = 'ul'; } out.push(`<li>${inline(m[1])}</li>`); return; }
+      if ((m = /^\d+[.)]\s+(.*)$/.exec(t))) { if (list !== 'ol') { close(); out.push('<ol>'); list = 'ol'; } out.push(`<li>${inline(m[1])}</li>`); return; }
+      close();
+      out.push(`<p>${inline(t)}</p>`);
+    });
+    close();
+    return trusted(out.join(''));
+  }
+
+  /* Rapports texte : ce que Claude lit, et ce qui est copié ou partagé. */
+  function dayReport(k, { compact } = {}) {
+    const d = peekDay(k) || {}, prev = peekDay(addDays(k, -1)) || {};
+    const L = [];
+    const night = nightLength(prev.bed, d.wake), weight = num(d.weight);
+    const sch = scheduledFor(k), taken = sch.filter((s) => isTaken(s.id, k)), missed = sch.filter((s) => !isTaken(s.id, k));
+    const extra = S.settings.supplements.filter((s) => !isScheduled(s, k) && isTaken(s.id, k));
+    const cis = listOf(d.checkins).sort(byTime), syms = listOf(d.symptoms).sort(byTime), meals = listOf(d.meals).sort(byTime);
+    const tot = sumMacros(dayItems(d));
+    const scoreLine = (c) => SCALES.map((sc) => { const v = scaleValue(c[sc.key]); return v ? `${sc.label.toLowerCase()} ${v}` : ''; }).filter(Boolean).join(', ');
+    if (compact) {
+      const parts = [];
+      if (night) parts.push(`nuit ${night}`);
+      if (weight) parts.push(`${fmtDec(weight)} kg`);
+      if (sch.length) parts.push(`compléments ${taken.length}/${sch.length}`);
+      const avg = SCALES.map((sc) => { const v = avgScale(k, sc.key); return v != null ? `${sc.label.toLowerCase()} ${fmtAvg(v)}` : ''; }).filter(Boolean);
+      if (avg.length) parts.push(avg.join(', '));
+      if (tot.n) parts.push(`${fmtInt(tot.kcal)} kcal (${macroLine(tot)})`);
+      if (syms.length) parts.push('ressenti : ' + syms.map((s) => `${str(s.text)}${scaleValue(s.intensity) ? ` ${s.intensity}/5` : ''}`).join(' ; '));
+      if (str(d.notes).trim()) parts.push(`notes : ${str(d.notes).trim().replace(/\s+/g, ' ').slice(0, 200)}`);
+      return `- ${longDate(k)} : ${parts.length ? parts.join(' · ') : 'rien de noté'}`;
+    }
+    L.push(`## ${longDate(k)} ${fromKey(k).getFullYear()}`.replace(/(\d{4}) \1$/, '$1'));
+    L.push(`Sommeil : coucher la veille ${str(prev.bed) || 'non noté'}, réveil ${str(d.wake) || 'non noté'}${night ? ` (nuit de ${night})` : ''}`);
+    if (weight) L.push(`Poids : ${fmtDec(weight)} kg`);
+    if (sch.length || extra.length) {
+      L.push(`Compléments : ${taken.length} sur ${sch.length} pris`);
+      const fmtSup = (s) => `${s.name}${s.dose ? ' ' + s.dose : ''} (${MOMENTS.find((m) => m.key === s.moment).label.toLowerCase()})`;
+      if (taken.length || extra.length) L.push(`- Pris : ${[...taken, ...extra].map(fmtSup).join(', ')}`);
+      if (missed.length) L.push(`- Pas pris : ${missed.map(fmtSup).join(', ')}`);
+    }
+    L.push(cis.length ? 'Check-ins (notes sur 5 ; pour stress, douleur et faim, 5 = le plus fort) :' : 'Check-ins : aucun');
+    cis.forEach((c) => L.push(`- ${str(c.time)} : ${scoreLine(c) || 'sans note'}${str(c.note).trim() ? ` — « ${str(c.note).trim()} »` : ''}`));
+    L.push(syms.length ? 'Ce que j’ai ressenti :' : 'Symptômes ou sensations : rien de noté');
+    syms.forEach((s) => L.push(`- ${str(s.time)} : ${str(s.text).trim()}${scaleValue(s.intensity) ? ` (intensité ${s.intensity}/5)` : ''}`));
+    const g = S.settings.goals, goalTxt = Object.values(g).some((v) => v)
+      ? ` (objectifs : ${[g.kcal ? `${fmtInt(g.kcal)} kcal` : '', g.p ? `protéines ${fmtG(g.p)} g` : '', g.g ? `glucides ${fmtG(g.g)} g` : '', g.l ? `lipides ${fmtG(g.l)} g` : ''].filter(Boolean).join(', ')})` : '';
+    L.push(meals.length ? `Alimentation${tot.n ? ` : ${fmtInt(tot.kcal)} kcal, protéines ${fmtG(tot.p)} g, glucides ${fmtG(tot.g)} g, lipides ${fmtG(tot.l)} g${goalTxt}` : ''} :` : 'Repas : rien de noté');
+    meals.forEach((m) => {
+      const items = mealItems(m), t = sumMacros(items);
+      const list = items.map((it) => `${it.name}${num(it.grams) ? ` ${fmtDec(num(it.grams), 0)} g` : ''}`).join(', ');
+      L.push(`- ${str(m.time)} ${str(m.kind) || 'Repas'}${t.n ? ` (${fmtInt(t.kcal)} kcal, ${macroLine(t)})` : ''} : ${[str(m.text).trim(), list].filter(Boolean).join(' — ')}`);
+    });
+    if (str(d.notes).trim()) L.push(`Notes du jour : ${str(d.notes).trim()}`);
+    return L.join('\n');
+  }
+  function claudeReport(scope, key) {
+    if (scope === 'week') {
+      const days = Array.from({ length: 7 }, (_, i) => addDays(key, i)).filter((dk) => dk <= todayKey());
+      return `# Mon suivi — ${weekTitle(key).toLowerCase()}\n\n${days.map((dk) => dayReport(dk)).join('\n\n')}`;
+    }
+    const before = S.ui.ask.withWeek ? Array.from({ length: 6 }, (_, i) => dayReport(addDays(key, i - 6), { compact: true })) : [];
+    return `# Mon suivi — ${longDate(key).toLowerCase()}\n\n${dayReport(key)}${before.length ? `\n\n## Les 6 jours d’avant (résumé)\n${before.join('\n')}` : ''}`;
+  }
+  const profileText = () => (S.settings.profile.trim() ? `Ce qu’il faut savoir sur moi : ${S.settings.profile.trim()}\n\n` : '');
+  /* Texte copié ou partagé : pour un projet Claude « état et santé », prêt à coller. */
+  function claudeText(scope, key) {
+    const q = S.ui.ask.q.trim();
+    const ask = q || (scope === 'week'
+      ? 'Fais le point sur ma semaine à partir de ce suivi : comment je vais, les tendances, les liens possibles, et ce que je peux améliorer.'
+      : 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.');
+    return `${ask}\n\n${profileText()}${claudeReport(scope, key)}`;
+  }
+  /* Consigne complète quand la page demande elle-même à Claude (artefact). */
+  function claudePrompt(scope, key) {
+    const q = S.ui.ask.q.trim();
+    const week = scope === 'week';
+    return [
+      'Tu es mon assistant santé dans l’app « Mon suivi ». Tu n’es pas médecin et tu ne poses pas de diagnostic : tu m’aides à comprendre mon état à partir de mon journal.',
+      `Réponds en français, en me tutoyant, simplement et sans jargon, en ${week ? 350 : 300} mots maximum, avec ces titres Markdown (##) :`,
+      week ? '## Ma semaine\n## Tendances\n## Alimentation\n## Pour la semaine prochaine\n## À surveiller' : '## Mon état\n## Ce que je remarque\n## Alimentation\n## Pour demain\n## À surveiller',
+      'Règles :',
+      '- Relie ce qui peut l’être (sommeil, repas et macros, compléments, traitement, stress, douleurs) sans inventer de valeurs absentes du journal ; dis ce qui manque pour mieux juger.',
+      '- Si quelque chose peut être urgent (douleur dans la poitrine, essoufflement, malaise, sang, fièvre forte, idées noires…), commence par là et conseille d’appeler le 112.',
+      '- Si un symptôme dure ou revient, ou si une valeur de prise de sang sort des normes, conseille d’en parler à un médecin.',
+      S.ui.ask.photo ? '- Une photo est jointe (prise de sang, ordonnance ou autre document) : lis-la et commente les valeurs utiles, en rappelant les normes.' : '',
+      q ? `\nMa question : ${q}` : '',
+      '',
+      profileText() + claudeReport(scope, key).slice(0, 50000)
+    ].filter((x) => x !== '').join('\n');
+  }
+  const ASK_ERRORS = {
+    not_granted: 'Tu n’as pas autorisé cette page à utiliser Claude. Utilise « Copier pour Claude ».',
+    rate_limited: 'Trop de demandes pour l’instant. Réessaie dans un moment.',
+    session_expired: 'Reconnecte-toi à Claude, puis réessaie.',
+    image_rejected: 'Cette photo n’est pas acceptée : prends une photo JPEG ou PNG, pas trop lourde.',
+    refused: 'Claude n’a pas répondu à cette demande. Reformule ta question.',
+    empty_completion: 'Claude n’a rien répondu. Réessaie avec une question plus simple.',
+    prompt_too_large: 'Trop de texte d’un coup. Décoche « Ajouter les 6 jours d’avant » ou retire la photo.'
+  };
+  const ASK_GONE = ['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'];
+  async function askClaude(scope, key, fresh) {
+    const a = S.ui.ask;
+    if (!store.sample || a.status === 'thinking' || a.status === 'streaming') return;
+    const prompt = claudePrompt(scope, key), q = a.q.trim();
+    const ctl = new AbortController();
+    Object.assign(a, { scope, key, status: 'thinking', text: '', error: '', ctl });
+    renderAsk();
+    const opts = { signal: ctl.signal, onText: ({ text }) => { if (a.ctl !== ctl) return; a.text = text; a.status = 'streaming'; renderAsk(); } };
+    if (fresh) opts.cache = false;
+    if (a.photo && store.sampleImages) opts.images = [a.photo];
+    try {
+      const res = await store.sample(prompt, opts);
+      if (a.ctl !== ctl) return;
+      a.text = res.text + (res.truncated ? '\n\n*(Réponse coupée : pose une question plus précise pour la suite.)*' : '');
+      a.status = 'done';
+      if (scope === 'day') mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
+    } catch (e) {
+      if (a.ctl !== ctl) return;
+      const code = (e && e.code) || 'upstream_error';
+      a.text = code === 'refused' ? '' : str(e && e.text);
+      a.status = code === 'cancelled' ? 'done' : 'error';
+      a.error = code === 'cancelled' ? '' : ASK_ERRORS[code] || (ASK_GONE.includes(code) ? 'Claude n’est pas disponible ici. Utilise « Copier pour Claude ».' : 'La réponse a été interrompue. Réessaie.');
+      if (ASK_GONE.includes(code)) { store.sample = null; a.status = 'idle'; a.ctl = null; safeRender(); toast(a.error); return; }
+    }
+    a.ctl = null;
+    renderAsk();
+  }
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* on essaie autrement */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch (e) { return false; }
+  }
+  /* Partage natif (Android) : la feuille de partage permet de choisir l'app Claude. */
+  async function shareText(title, text) {
+    const Share = capPlugin('Share');
+    try {
+      if (Share) await Share.share({ title, text, dialogTitle: 'Envoyer à Claude' });
+      else if (navigator.share) await navigator.share({ title, text });
+      else return false;
+      return true;
+    } catch (e) {
+      return /cancel|abort/i.test(String((e && (e.name || e.message)) || e)); // annulé par toi : rien à signaler
+    }
+  }
+  function showReportFallback() {
+    S.ui.ask.showReport = true;
+    S.ui.focus = '#report-text';
+    S.ui.select = true;
+    render();
+    toast('Sélectionne le texte et copie-le.');
+  }
+  function copyClaude(scope, key) {
+    copyText(claudeText(scope, key)).then((ok) => {
+      if (ok) toast(S.settings.claudeUrl ? 'Copié. Colle-le dans ton projet Claude.' : 'Copié. Colle-le dans une conversation avec Claude.');
+      else showReportFallback();
+    });
+  }
+  function shareClaude(scope, key) {
+    shareText(`Mon suivi — ${scopeLabel(scope, key)}`, claudeText(scope, key)).then((ok) => { if (!ok) copyClaude(scope, key); });
+  }
+  function scrollToClaude() {
+    const el = document.getElementById('claude');
+    if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
+  /* Le bouton « … Claude » du check-in : la meilleure action possible ici. */
+  function claudeGo(k) {
+    if (store.sample) { askClaude('day', k); scrollToClaude(); }
+    else if (canShare()) shareClaude('day', k);
+    else { copyClaude('day', k); scrollToClaude(); }
   }
 
   /* ---------- Rendu : Semaine ---------- */
@@ -1031,15 +1578,20 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         return html`<td><button type="button" class="mini${on ? ' on' : ''}" data-act="toggle" data-sid="${s.id}" data-date="${dk}" aria-pressed="${bool(on)}" aria-label="${s.name}, ${longDate(dk)}">${on ? ICON.check : ''}</button></td>`;
       })}</tr>`)}`;
     });
+    const cell = (fn) => days.map((dk) => html`<td>${fn(dk, peekDay(dk) || {})}</td>`);
     const summary = [
-      html`<tr><th scope="row">Pris</th>${days.map((dk) => { const st = stats(dk); return html`<td>${st.total ? `${st.taken}/${st.total}` : ''}</td>`; })}</tr>`,
-      html`<tr><th scope="row">Réveil</th>${days.map((dk) => html`<td>${str((peekDay(dk) || {}).wake)}</td>`)}</tr>`,
+      html`<tr><th scope="row">Pris</th>${cell((dk) => { const st = stats(dk); return st.total ? `${st.taken}/${st.total}` : ''; })}</tr>`,
+      html`<tr><th scope="row">Réveil</th>${cell((dk, d) => str(d.wake))}</tr>`,
+      html`<tr><th scope="row">Poids <small>kg</small></th>${cell((dk, d) => (num(d.weight) ? fmtDec(num(d.weight)) : ''))}</tr>`,
+      html`<tr><th scope="row">Calories</th>${cell((dk, d) => { const x = sumMacros(dayItems(d)); return x.n ? fmtInt(x.kcal) : ''; })}</tr>`,
+      html`<tr><th scope="row">Protéines <small>g</small></th>${cell((dk, d) => { const x = sumMacros(dayItems(d)); return x.n ? fmtG(x.p) : ''; })}</tr>`,
       SCALES.map((sc) => html`<tr><th scope="row">${sc.label}${sc.faces ? '' : html` <small>sur 5</small>`}</th>${days.map((dk) => {
         const v = avgScale(dk, sc.key);
         if (v == null) return html`<td></td>`;
         if (sc.faces) return html`<td><span role="img" aria-label="${sc.label} ${fmtAvg(v)} sur 5">${sc.faces[Math.min(4, Math.max(0, Math.round(v) - 1))]}</span></td>`;
         return html`<td>${fmtAvg(v)}</td>`;
-      })}</tr>`)
+      })}</tr>`),
+      html`<tr><th scope="row">Ressenti</th>${cell((dk, d) => { const n = listOf(d.symptoms).length; return n ? String(n) : ''; })}</tr>`
     ];
     return html`<div class="wk-head"><h1 class="wk-title">${weekTitle(start)}</h1><div class="daynav">
         ${start !== startOfWeek(t) ? html`<button type="button" class="ghost" data-act="week-now">Cette semaine</button>` : ''}
@@ -1049,7 +1601,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       <p class="hint">Touche une gélule pour la cocher, ou un jour pour ouvrir son journal.</p>
       <div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>${days.map((dk, i) => html`<th scope="col"${dk === t ? html` class="today"` : ''}><button type="button" data-act="goto" data-date="${dk}" aria-label="${longDate(dk)}"><span>${WD_SHORT[i]}</span><b>${fromKey(dk).getDate()}</b></button></th>`)}</tr></thead>
       <tbody>${rows}</tbody><tbody class="sum">${summary}</tbody></table></div>
-      ${S.settings.supplements.length ? '' : html`<p class="empty">Ta liste est vide. Ajoute tes compléments dans Réglages.</p>`}`;
+      ${S.settings.supplements.length ? '' : html`<p class="empty">Ta liste est vide. Ajoute tes compléments dans Réglages.</p>`}
+      <div class="week-claude">${start <= t ? claudeBlock('week', start) : ''}</div>`;
   }
 
   /* ---------- Rendu : Année ---------- */
@@ -1112,6 +1665,24 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       </div>
     </div>`;
   }
+  function nutritionSettings() {
+    const g = S.settings.goals, fd = S.ui.foodDraft;
+    const goal = (key, label) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="goal-${key}" data-goal="${key}" value="${g[key] ? fmtDec(g[key]) : ''}" placeholder="—" autocomplete="off"></label>`;
+    const fdField = (key, label) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="fd-${key}" data-fd="${key}" value="${fd[key]}" autocomplete="off"></label>`;
+    return html`<section class="set-sec"><div class="sec-head"><h2>Nutrition</h2></div>
+      <p class="hint">Tes objectifs par jour. Laisse vide ce que tu ne suis pas.</p>
+      <div class="set-grid">${goal('kcal', 'Calories (kcal)')}${goal('p', 'Protéines (g)')}${goal('g', 'Glucides (g)')}${goal('l', 'Lipides (g)')}</div>
+      <h3 class="m-title">Mes aliments <span>valeurs pour 100 g</span></h3>
+      ${S.settings.foods.length ? html`<ul class="food-list">${S.settings.foods.map((x) => html`<li><span class="fl-name">${x.name}</span><span class="fl-vals">${fmtInt(x.kcal)} kcal · ${macroLine(x)}</span>${S.ui.confirm === `food:${x.id}`
+        ? html`<button type="button" class="link danger" data-act="food-del" data-id="${x.id}">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button>`
+        : html`<button type="button" class="link" data-act="food-ask" data-id="${x.id}" aria-label="Supprimer ${x.name}">Supprimer</button>`}</li>`)}</ul>`
+        : html`<p class="empty">Aucun pour l’instant. Ajoute ceux que tu manges souvent (ton pain, ta whey, un plat maison) : ils apparaîtront en premier dans les repas.</p>`}
+      <div class="food-add" style="margin-top:12px">
+        <div class="row"><label class="field"><span>Nouvel aliment</span><input type="text" id="fd-name" data-fd="name" value="${fd.name}" placeholder="Ma whey vanille" autocomplete="off"></label>${fdField('kcal', 'Calories')}</div>
+        <div class="row4">${fdField('p', 'Protéines (g)')}${fdField('g', 'Glucides (g)')}${fdField('l', 'Lipides (g)')}<div class="field"><span>&nbsp;</span><button type="button" class="ghost" data-act="food-add">Ajouter</button></div></div>
+      </div>
+    </section>`;
+  }
   function renderSettings() {
     const sups = S.settings.supplements;
     const groups = MOMENTS.map((m) => {
@@ -1119,17 +1690,26 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       return list.length ? html`<h3 class="m-title m-${m.key}">${m.label}${m.hint ? html` <span>${m.hint}</span>` : ''}</h3>${list.map(supRow)}` : '';
     });
     const where = store.mode === 'cloud'
-      ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre ta tablette et tes autres appareils. Sans connexion, tes modifications restent sur l’appareil et partent dès que possible.'
-      : 'Enregistrées dans ce navigateur, sur cet appareil uniquement. Fais une sauvegarde de temps en temps.';
+      ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre tes appareils qui ouvrent cette page dans Claude. Sans connexion, tes modifications restent sur l’appareil et partent dès que possible.'
+      : `Enregistrées sur cet appareil${PLATFORM.native ? ' (app Android)' : PLATFORM.electron ? ' (app PC)' : ''}, uniquement ici. Pour les retrouver sur un autre appareil ou dans l’artefact Claude : « Faire une sauvegarde » ici, puis « Restaurer » là-bas.`;
     return html`<h1 class="set-title">Réglages</h1>
       <section class="set-sec"><div class="sec-head"><h2>Ta liste</h2><button type="button" class="primary" data-act="sup-add">Ajouter un complément</button></div>
         <p class="hint">Touche un complément pour le modifier. Tout est enregistré au fur et à mesure. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p>
         ${groups}${sups.length ? '' : html`<p class="empty">Ta liste est vide.</p>`}
       </section>
+      ${nutritionSettings()}
+      <section class="set-sec"><div class="sec-head"><h2>Claude</h2></div>
+        <label class="field"><span>Ce que Claude doit savoir sur toi</span><textarea id="set-profile" data-setting="profile" rows="4" placeholder="Âge, taille, objectif (perte de poids…), traitements (Mounjaro 2,5 mg depuis…), problèmes de santé, dernières prises de sang…">${S.settings.profile}</textarea></label>
+        <p class="hint">Ajouté à chaque envoi à Claude (copie, partage ou question).</p>
+        <label class="field"><span>Lien de ton projet Claude (facultatif)</span><input type="url" id="set-claude-url" data-setting="claudeUrl" value="${S.settings.claudeUrl}" placeholder="https://claude.ai/project/…" autocomplete="off"></label>
+        <p class="hint">Crée un projet « État et santé » dans Claude, colle son lien ici : le bouton « Ouvrir mon projet Claude » y mènera directement.</p>
+      </section>
       <section class="set-sec"><div class="sec-head"><h2>Tes données</h2></div>
         <p class="muted">${where}</p>
-        <div class="actions"><button type="button" class="ghost" data-act="export-json">Faire une sauvegarde</button><button type="button" class="ghost" data-act="export-csv">Exporter le journal en tableau</button><label class="ghost filebtn">Restaurer une sauvegarde<input type="file" id="import-file" accept=".json,application/json" data-file="import" class="sr-only"></label></div>
-        ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">Le téléchargement n’est pas disponible ici. Copie ce texte et garde-le quelque part.</p><textarea readonly class="export" id="export-text" rows="8">${S.ui.exportText}</textarea><div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button><button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
+        <div class="actions"><button type="button" class="ghost" data-act="export-json">Faire une sauvegarde</button><button type="button" class="ghost" data-act="export-csv">Exporter le journal en tableau</button><label class="ghost filebtn">Restaurer une sauvegarde<input type="file" id="import-file" accept=".json,application/json,text/plain" data-file="import" class="sr-only"></label><button type="button" class="link" data-act="restore-open" aria-expanded="${bool(S.ui.restoreOpen)}">Coller une sauvegarde</button></div>
+        ${S.ui.restoreOpen ? html`<div class="restore"><label class="field"><span>Texte de la sauvegarde</span><textarea id="restore-text" class="export" data-restore="text" rows="6" placeholder="Colle ici le texte copié depuis un autre appareil">${S.ui.restoreText}</textarea></label><div class="actions"><button type="button" class="primary" data-act="restore-text">Restaurer ce texte</button><button type="button" class="link" data-act="restore-close">Fermer</button></div></div>` : ''}
+        ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">${PLATFORM.native ? 'Copie ce texte ou partage-le (e-mail, Drive, Claude…), puis colle-le dans « Coller une sauvegarde » sur l’autre appareil.' : 'Le téléchargement n’est pas disponible ici. Copie ce texte et garde-le quelque part.'}</p><textarea readonly class="export" id="export-text" rows="8">${S.ui.exportText}</textarea>
+          <div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button>${canShare() ? html`<button type="button" class="ghost" data-act="share-export">Partager</button>` : ''}<button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
         <div class="reset">${S.ui.confirm === 'reset'
           ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
           : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
@@ -1141,7 +1721,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   const VIEWS = { jour: renderDay, semaine: renderWeek, annee: renderYear, reglages: renderSettings };
   let pendingRender = false;
   /* Le bouton qui a le focus est recréé à chaque rendu : on retrouve le même (mêmes data-*) pour garder la place au clavier. */
-  const FOCUS_ATTRS = ['data-act', 'data-sid', 'data-date', 'data-id', 'data-scale', 'data-v'];
+  const FOCUS_ATTRS = ['data-act', 'data-sid', 'data-date', 'data-id', 'data-scale', 'data-v', 'data-scope', 'data-key'];
   function focusedButton() {
     const a = document.activeElement;
     if (!a || a.tagName !== 'BUTTON' || !view.contains(a)) return null;
@@ -1165,7 +1745,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
   function isEditing() {
     const a = document.activeElement;
-    return !!(a && view.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox');
+    return !!(a && view.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox' && a.type !== 'file');
   }
   function safeRender() { if (isEditing()) { pendingRender = true; return; } render(); }
   document.addEventListener('focusout', () => {
@@ -1179,51 +1759,69 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     el.textContent = msg;
     el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
   }
   function toTop() { try { window.scrollTo(0, 0); } catch (e) { /* rien */ } }
   function go(k) { S.ui.date = k; S.ui.form = null; S.ui.confirm = null; render(); }
 
   /* ---------- Formulaires ---------- */
   function startForm(type, k, id) {
+    const d = peekDay(k);
     let draft;
     if (id) {
-      const d = peekDay(k);
-      const it = d ? listOf(type === 'checkin' ? d.checkins : d.meals).find((x) => x.id === id) : null;
+      const it = d ? listOf(d[FORM_KINDS[type].field]).find((x) => x.id === id) : null;
       if (!it) return;
       draft = clone(it);
+    } else if (type === 'checkin') {
+      draft = { time: nowTime(), mood: null, energy: null, focus: null, stress: null, pain: null, hunger: null, note: '' };
+    } else if (type === 'symptom') {
+      draft = { time: nowTime(), text: '', intensity: null };
     } else {
-      draft = type === 'checkin'
-        ? { time: nowTime(), mood: null, energy: null, focus: null, hunger: null, note: '' }
-        : { time: nowTime(), kind: 'Repas', text: '' };
+      draft = { time: nowTime(), kind: mealKindAt(nowTime()), text: '' };
+    }
+    if (type === 'meal') {
+      draft.items = mealItems(draft).map((x) => ({ ...x }));
+      draft.item = blankItem();
+      draft.editItem = null;
     }
     S.ui.confirm = null;
     S.ui.form = { type, date: k, id: id || null, draft };
-    if (type === 'meal') S.ui.focus = '#meal-text';
+    if (type === 'symptom') S.ui.focus = '#sym-text';
+    else if (type === 'meal' && finePointer()) S.ui.focus = '#fi-name';
     render();
   }
   function saveForm() {
     const f = S.ui.form;
-    if (!f) return;
-    const dr = f.draft, isCheckin = f.type === 'checkin';
-    const note = String(dr.note || '').trim(), text = String(dr.text || '').trim();
-    if (toMin(dr.time) === null) { toast('Indique l’heure.'); return; }
-    if (!isCheckin && !text) { toast('Écris ce que tu as mangé.'); return; }
-    const scores = {};
-    SCALES.forEach((sc) => { scores[sc.key] = scaleValue(dr[sc.key]); });
-    if (isCheckin && Object.values(scores).every((v) => v == null) && !note) { toast('Choisis au moins ton humeur.'); return; }
-    const entry = isCheckin
-      ? { id: f.id || newId(), time: dr.time, ...scores, note }
-      : { id: f.id || newId(), time: dr.time, kind: dr.kind === 'Collation' ? 'Collation' : 'Repas', text };
-    const field = isCheckin ? 'checkins' : 'meals';
-    mutateDay(f.date, field, (d) => {
-      const i = d[field].findIndex((x) => x && x.id === entry.id);
-      if (i >= 0) d[field][i] = entry; else d[field].push(entry);
+    if (!f) return false;
+    const dr = f.draft, kind = FORM_KINDS[f.type];
+    if (toMin(dr.time) === null) { toast('Indique l’heure.'); return false; }
+    let entry;
+    if (f.type === 'checkin') {
+      const scores = {};
+      SCALES.forEach((sc) => { scores[sc.key] = scaleValue(dr[sc.key]); });
+      const note = String(dr.note || '').trim();
+      if (Object.values(scores).every((v) => v == null) && !note) { toast('Choisis au moins ton humeur.'); return false; }
+      entry = { id: f.id || newId(), time: dr.time, ...scores, note };
+    } else if (f.type === 'symptom') {
+      const text = String(dr.text || '').trim();
+      if (!text) { toast('Écris ce que tu ressens.'); return false; }
+      entry = { id: f.id || newId(), time: dr.time, text, intensity: scaleValue(dr.intensity) };
+    } else {
+      if (String(dr.item.name || '').trim()) commitItem({ quiet: true }); // aliment saisi mais pas encore ajouté
+      const text = String(dr.text || '').trim();
+      if (!text && !dr.items.length) { toast('Ajoute un aliment ou écris ce que tu as mangé.'); return false; }
+      entry = { id: f.id || newId(), time: dr.time, kind: MEAL_KINDS.includes(dr.kind) || dr.kind === 'Repas' ? dr.kind : 'Repas', text, items: dr.items };
+    }
+    mutateDay(f.date, kind.field, (d) => {
+      const list = d[kind.field];
+      const i = list.findIndex((x) => x && x.id === entry.id);
+      if (i >= 0) list[i] = entry; else list.push(entry);
     }, false);
     S.ui.form = null;
-    S.ui.focus = `[data-act="${isCheckin ? 'ci' : 'meal'}-new"]`;
+    S.ui.focus = `[data-act="${kind.act}-new"]`;
     render();
-    toast(isCheckin ? 'Check-in enregistré' : 'Repas noté');
+    toast(f.type === 'checkin' ? 'Check-in enregistré' : f.type === 'symptom' ? 'Noté' : 'Repas noté');
+    return true;
   }
 
   /* ---------- Sauvegardes ---------- */
@@ -1233,21 +1831,33 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   };
   function buildCSV() {
-    const rows = [['Date', 'Réveil', 'Coucher', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Repas', 'Notes']];
+    const rows = [['Date', 'Réveil', 'Coucher', 'Poids (kg)', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Ressenti', 'Repas', 'Calories', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Notes']];
     const dash = (v) => v ?? '-';
     Object.keys(S.months).sort().forEach((mk) => {
       Object.keys(S.months[mk].days || {}).sort().forEach((k) => {
         const d = peekDay(k);
         if (!d) return;
-        const ci = listOf(d.checkins).sort(byTime).map((c) => `${str(c.time)} humeur ${dash(scaleValue(c.mood))} énergie ${dash(scaleValue(c.energy))} concentration ${dash(scaleValue(c.focus))} faim ${dash(scaleValue(c.hunger))}${c.note ? ` (${c.note})` : ''}`).join(' | ');
-        const ml = listOf(d.meals).sort(byTime).map((x) => `${str(x.time)} ${str(x.kind) || 'Repas'} : ${str(x.text)}`).join(' | ');
+        const ci = listOf(d.checkins).sort(byTime).map((c) => `${str(c.time)} ${SCALES.map((sc) => `${sc.label.toLowerCase()} ${dash(scaleValue(c[sc.key]))}`).join(' ')}${c.note ? ` (${c.note})` : ''}`).join(' | ');
+        const sy = listOf(d.symptoms).sort(byTime).map((s) => `${str(s.time)} ${str(s.text)}${scaleValue(s.intensity) ? ` (${s.intensity}/5)` : ''}`).join(' | ');
+        const ml = listOf(d.meals).sort(byTime).map((x) => `${str(x.time)} ${str(x.kind) || 'Repas'} : ${[str(x.text), mealItems(x).map((it) => `${it.name}${num(it.grams) ? ` ${it.grams} g` : ''}`).join(', ')].filter(Boolean).join(' — ')}`).join(' | ');
         const hasTaken = isObj(d.taken) && Object.values(d.taken).some(Boolean);
-        if (!str(d.wake) && !str(d.bed) && !ci && !ml && !str(d.notes) && !hasTaken) return;
+        const t = sumMacros(dayItems(d)), w = num(d.weight);
+        if (!str(d.wake) && !str(d.bed) && !w && !ci && !sy && !ml && !str(d.notes) && !hasTaken) return;
         const st = stats(k);
-        rows.push([k, str(d.wake), str(d.bed), st.taken, st.total, ci, ml, str(d.notes)]);
+        rows.push([k, str(d.wake), str(d.bed), w ? fmtDec(w) : '', st.taken, st.total, ci, sy, ml, t.n ? Math.round(t.kcal) : '', t.n ? fmtDec(t.p) : '', t.n ? fmtDec(t.g) : '', t.n ? fmtDec(t.l) : '', str(d.notes)]);
       });
     });
     return '﻿' + rows.map((r) => r.map(csvCell).join(';')).join('\r\n');
+  }
+  function downloadBlob(name, data) {
+    try {
+      const url = URL.createObjectURL(new Blob([data], { type: name.endsWith('.csv') ? 'text/csv;charset=utf-8' : 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      return true;
+    } catch (e) { return false; }
   }
   async function offerFile(name, data) {
     if (store.downloads) {
@@ -1260,49 +1870,51 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         if (code === 'declined') return;
         if (code === 'rate_limited') { toast('Réessaie dans un instant.'); return; }
       }
+    } else if (!PLATFORM.artifact && !PLATFORM.native && downloadBlob(name, data)) {
+      return; // navigateur ou app PC : le fichier est téléchargé
     }
     S.ui.exportText = data;
     S.ui.focus = '#export-text';
     S.ui.select = true;
     render();
   }
-  function exportJSON() {
-    const backup = { app: 'mon-suivi', version: 1, exported: new Date().toISOString(), settings: S.settings, months: S.months };
-    offerFile(`mon-suivi-sauvegarde-${todayKey()}.json`, JSON.stringify(backup, null, 2));
-  }
+  const backupJSON = () => JSON.stringify({ app: 'mon-suivi', version: 1, exported: new Date().toISOString(), settings: S.settings, months: S.months }, null, 2);
+  function exportJSON() { offerFile(`mon-suivi-sauvegarde-${todayKey()}.json`, backupJSON()); }
   function exportCSV() { offerFile(`mon-suivi-journal-${todayKey()}.csv`, buildCSV()); }
-  async function copyExport() {
-    try { await navigator.clipboard.writeText(S.ui.exportText || ''); toast('Copié'); }
-    catch (e) {
+  function copyExport() {
+    copyText(S.ui.exportText || '').then((ok) => {
+      if (ok) { toast('Copié'); return; }
       const ta = document.getElementById('export-text');
       if (ta) { ta.focus(); ta.select(); }
       toast('Sélectionne le texte et copie-le.');
+    });
+  }
+  function restoreBackup(raw) {
+    let obj = null;
+    try { obj = JSON.parse(String(raw).trim()); } catch (e) { obj = null; }
+    if (!isObj(obj) || !isObj(obj.settings) || !Array.isArray(obj.settings.supplements) || !isObj(obj.months)) {
+      toast('Ce n’est pas une sauvegarde de Mon suivi.');
+      return false;
     }
+    S.settings = normalizeSettings(obj.settings);
+    store.trusted = true;
+    markDirty('settings');
+    const months = sanitizeMonths(obj.months);
+    let n = 0;
+    Object.keys(months).forEach((mk) => {
+      S.months[mk] = months[mk];
+      Object.keys(months[mk].days).forEach((dk) => { touchDay(dk); n++; });
+      markDirty('m' + mk);
+    });
+    S.ui.form = null; S.ui.confirm = null; S.ui.openSup = null; S.ui.restoreOpen = false; S.ui.restoreText = '';
+    render();
+    toast(`Sauvegarde restaurée (${plural(n, 'jour')})`);
+    return true;
   }
   function importFile(file) {
     if (!file) return;
     const r = new FileReader();
-    r.onload = () => {
-      let obj = null;
-      try { obj = JSON.parse(String(r.result)); } catch (e) { obj = null; }
-      if (!isObj(obj) || !isObj(obj.settings) || !Array.isArray(obj.settings.supplements) || !isObj(obj.months)) {
-        toast('Ce fichier n’est pas une sauvegarde de Mon suivi.');
-        return;
-      }
-      S.settings = normalizeSettings(obj.settings);
-      store.trusted = true;
-      markDirty('settings');
-      const months = sanitizeMonths(obj.months);
-      let n = 0;
-      Object.keys(months).forEach((mk) => {
-        S.months[mk] = months[mk];
-        Object.keys(months[mk].days).forEach((dk) => { touchDay(dk); n++; });
-        markDirty('m' + mk);
-      });
-      S.ui.form = null; S.ui.confirm = null; S.ui.openSup = null;
-      render();
-      toast(`Sauvegarde restaurée (${plural(n, 'jour')})`);
-    };
+    r.onload = () => restoreBackup(r.result);
     r.onerror = () => toast('Impossible de lire ce fichier.');
     r.readAsText(file);
   }
@@ -1314,7 +1926,18 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     mutateDay(k, field, (d) => { d[field] = d[field].filter((x) => !x || x.id !== id); });
     toast('Supprimé');
   }
+  const actForm = (type) => {
+    const { act, field } = FORM_KINDS[type];
+    return {
+      [`${act}-new`]: (d) => startForm(type, d.date),
+      [`${act}-edit`]: (d) => startForm(type, d.date, d.id),
+      [`${act}-ask`]: (d) => askDelete(act, d.id, `[data-act="${act}-del"]${attr('data-id', d.id)}`),
+      [`${act}-del`]: (d) => deleteEntry(field, d.date, d.id)
+    };
+  };
+  const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'),
     tab: (d) => { S.ui.view = d.view; S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); toTop(); },
     'day-prev': () => go(addDays(S.ui.date, -1)),
     'day-next': () => go(addDays(S.ui.date, 1)),
@@ -1329,14 +1952,6 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       mutateDay(d.date, 'wake', (day) => { day.wake = t; });
       toast(`Réveil noté à ${t}`);
     },
-    'ci-new': (d) => startForm('checkin', d.date),
-    'meal-new': (d) => startForm('meal', d.date),
-    'ci-edit': (d) => startForm('checkin', d.date, d.id),
-    'meal-edit': (d) => startForm('meal', d.date, d.id),
-    'ci-ask': (d) => askDelete('ci', d.id, `[data-act="ci-del"]${attr('data-id', d.id)}`),
-    'meal-ask': (d) => askDelete('meal', d.id, `[data-act="meal-del"]${attr('data-id', d.id)}`),
-    'ci-del': (d) => deleteEntry('checkins', d.date, d.id),
-    'meal-del': (d) => deleteEntry('meals', d.date, d.id),
     'confirm-cancel': () => {
       const [kind, id] = String(S.ui.confirm || '').split(/:(.*)/);
       if (kind === 'reset') S.ui.focus = '[data-act="reset-ask"]';
@@ -1352,14 +1967,61 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       f.draft[d.scale] = f.draft[d.scale] === v ? null : v;
       render();
     },
+    'sym-chip': (d) => {
+      const f = S.ui.form;
+      if (!f) return;
+      const cur = String(f.draft.text || '').trim();
+      f.draft.text = cur ? `${cur}, ${d.v.toLowerCase()}` : d.v;
+      render();
+    },
     'meal-kind': (d) => { if (S.ui.form) { S.ui.form.draft.kind = d.v; render(); } },
+    'item-add': () => {
+      if (!mealDraft() || !commitItem()) return;
+      if (finePointer()) S.ui.focus = '#fi-name';
+      render();
+    },
+    'item-edit': (d) => {
+      const dr = mealDraft();
+      const x = dr && dr.items.find((i) => i.id === d.id);
+      if (!x) return;
+      dr.item = { name: x.name, grams: x.grams ? fmtDec(x.grams) : '', p: fmtDec(x.p), g: fmtDec(x.g), l: fmtDec(x.l), kcal: fmtDec(x.kcal), auto: false, kcalAuto: false, save: false };
+      dr.editItem = x.id;
+      S.ui.focus = '#fi-grams';
+      render();
+    },
+    'item-del': (d) => {
+      const dr = mealDraft();
+      if (!dr) return;
+      dr.items = dr.items.filter((i) => i.id !== d.id);
+      if (dr.editItem === d.id) { dr.editItem = null; dr.item = blankItem(); }
+      render();
+    },
+    'item-recent': (d) => {
+      const dr = mealDraft();
+      const r = dr && recentFoods(S.ui.form.date).find((x) => x.name === d.v);
+      if (!r) return;
+      dr.items.push({ id: newId(), name: r.name, grams: posNum(r.grams), kcal: posNum(r.kcal) ?? 0, p: posNum(r.p) ?? 0, g: posNum(r.g) ?? 0, l: posNum(r.l) ?? 0 });
+      render();
+    },
     'form-save': () => saveForm(),
+    'form-save-claude': () => { const k = S.ui.form && S.ui.form.date; if (saveForm() && k) claudeGo(k); },
     'form-cancel': () => {
       const f = S.ui.form;
       S.ui.form = null;
-      if (f) S.ui.focus = f.id ? `[data-act="${f.type === 'checkin' ? 'ci' : 'meal'}-edit"]${attr('data-id', f.id)}` : `[data-act="${f.type === 'checkin' ? 'ci' : 'meal'}-new"]`;
+      if (f) { const act = FORM_KINDS[f.type].act; S.ui.focus = f.id ? `[data-act="${act}-edit"]${attr('data-id', f.id)}` : `[data-act="${act}-new"]`; }
       render();
     },
+    'to-claude': () => scrollToClaude(),
+    'claude-ask': (d) => askClaude(d.scope, d.key, S.ui.ask.scope === d.scope && S.ui.ask.key === d.key && !!S.ui.ask.text),
+    'ask-stop': () => { if (S.ui.ask.ctl) S.ui.ask.ctl.abort(); },
+    'claude-copy': (d) => copyClaude(d.scope, d.key),
+    'claude-share': (d) => shareClaude(d.scope, d.key),
+    'answer-copy': (d) => {
+      const a = S.ui.ask, mine = a.scope === d.scope && a.key === d.key && a.text;
+      const saved = (peekDay(d.key) || {}).claude;
+      copyText(mine ? a.text : isObj(saved) ? str(saved.text) : '').then((ok) => toast(ok ? 'Réponse copiée' : 'Sélectionne la réponse et copie-la.'));
+    },
+    'ask-photo-clear': () => { S.ui.ask.photo = null; render(); },
     'week-prev': () => { S.ui.weekOf = addDays(S.ui.weekOf, -7); render(); },
     'week-next': () => { S.ui.weekOf = addDays(S.ui.weekOf, 7); render(); },
     'week-now': () => { S.ui.weekOf = startOfWeek(todayKey()); render(); },
@@ -1381,6 +2043,26 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       mutateSettings((st) => { st.supplements = st.supplements.filter((x) => x.id !== d.sid); });
       toast('Complément supprimé');
     },
+    'food-add': () => {
+      const fd = S.ui.foodDraft, name = String(fd.name || '').trim();
+      if (!name) { toast('Donne un nom à l’aliment.'); return; }
+      const p = posNum(fd.p) ?? 0, g = posNum(fd.g) ?? 0, l = posNum(fd.l) ?? 0;
+      const food = normalizeFood({ name, p, g, l, kcal: posNum(fd.kcal) ?? kcalOf(p, g, l) });
+      mutateSettings((st) => {
+        const j = st.foods.findIndex((x) => norm(x.name) === norm(name));
+        if (j >= 0) { food.id = st.foods[j].id; st.foods[j] = food; } else st.foods.unshift(food);
+      }, false);
+      S.ui.foodDraft = { name: '', kcal: '', p: '', g: '', l: '' };
+      S.ui.focus = '#fd-name';
+      render();
+      toast(`${name} ajouté à tes aliments`);
+    },
+    'food-ask': (d) => askDelete('food', d.id, `[data-act="food-del"]${attr('data-id', d.id)}`),
+    'food-del': (d) => {
+      S.ui.confirm = null;
+      mutateSettings((st) => { st.foods = st.foods.filter((x) => x.id !== d.id); });
+      toast('Aliment supprimé');
+    },
     'reset-ask': () => { S.ui.confirm = 'reset'; S.ui.focus = '[data-act="reset-yes"]'; render(); },
     'reset-yes': () => {
       S.ui.confirm = null;
@@ -1390,7 +2072,11 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     'export-json': () => exportJSON(),
     'export-csv': () => exportCSV(),
     'copy-export': () => copyExport(),
-    'close-export': () => { S.ui.exportText = null; render(); }
+    'share-export': () => { shareText('Mon suivi — sauvegarde', S.ui.exportText || '').then((ok) => { if (!ok) copyExport(); }); },
+    'close-export': () => { S.ui.exportText = null; render(); },
+    'restore-open': () => { S.ui.restoreOpen = !S.ui.restoreOpen; if (S.ui.restoreOpen) S.ui.focus = '#restore-text'; render(); },
+    'restore-close': () => { S.ui.restoreOpen = false; render(); },
+    'restore-text': () => { if (!String(S.ui.restoreText).trim()) { toast('Colle d’abord le texte de la sauvegarde.'); return; } restoreBackup(S.ui.restoreText); }
   };
 
   /* ---------- Événements ---------- */
@@ -1420,8 +2106,30 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       const field = ds.bind, val = t.value;
       mutateDay(ds.date, field, (d) => { d[field] = val; }, false);
       safeRender();
+    } else if (ds.bind === 'weight') {
+      const w = num(t.value);
+      if (String(t.value).trim() && (w == null || w < 20 || w > 400)) { toast('Écris ton poids en kilos, par exemple 82,5.'); return; }
+      mutateDay(ds.date, 'weight', (d) => { d.weight = w == null ? null : round1(w); }, false);
+      if (w != null) t.value = fmtDec(round1(w));
     } else if (ds.draft && S.ui.form) {
       S.ui.form.draft[ds.draft] = t.value;
+    } else if (ds.item) {
+      onItemInput(ds.item, t.type === 'checkbox' ? t.checked : t.value);
+    } else if (ds.ask === 'withWeek') {
+      S.ui.ask.withWeek = t.checked;
+      refreshReport();
+    } else if (ds.ask === 'photo') {
+      S.ui.ask.photo = (t.files && t.files[0]) || null;
+      render();
+    } else if (ds.goal) {
+      const n = posNum(t.value);
+      mutateSettings((st) => { st.goals[ds.goal] = n ? round1(n) : null; }, false);
+      t.value = n ? fmtDec(round1(n)) : '';
+    } else if (ds.setting === 'claudeUrl') {
+      const v = t.value.trim();
+      if (v && !isClaudeUrl(v)) { toast('Colle un lien qui commence par https://claude.ai/'); return; }
+      mutateSettings((st) => { st.claudeUrl = v; }, false);
+      if (v) toast('Lien enregistré');
     } else if (ds.weekly) {
       const v = t.value;
       mutateSettings((st) => { const s = st.supplements.find((x) => x.id === ds.weekly); if (s) s.weekday = v === '' ? null : Number(v); });
@@ -1444,6 +2152,17 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       mutateDay(ds.date, 'notes', (d) => { d.notes = t.value; }, false);
     } else if (ds.draft && S.ui.form) {
       S.ui.form.draft[ds.draft] = t.value;
+    } else if (ds.item && t.type !== 'checkbox') {
+      onItemInput(ds.item, t.value);
+    } else if (ds.ask === 'q') {
+      S.ui.ask.q = t.value;
+      refreshReport();
+    } else if (ds.fd) {
+      S.ui.foodDraft[ds.fd] = t.value;
+    } else if (ds.restore) {
+      S.ui.restoreText = t.value;
+    } else if (ds.setting === 'profile') {
+      mutateSettings((st) => { st.profile = t.value.slice(0, 4000); }, false);
     } else if (['name', 'dose', 'note'].includes(ds.sset)) {
       const row = t.closest('[data-sid]');
       const s = row && S.settings.supplements.find((x) => x.id === row.dataset.sid);
@@ -1452,6 +2171,17 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       markDirty('settings');
     }
   });
+  /* Le texte pour Claude affiché suit la question et la case « 6 jours d'avant ». */
+  function refreshReport() {
+    const rt = document.getElementById('report-text'), area = document.getElementById('ask-area');
+    if (rt && area && S.ui.ask.showReport) rt.value = claudeText(area.dataset.scope, area.dataset.key);
+  }
+  app.addEventListener('toggle', (e) => {
+    const t = e.target;
+    if (!t.dataset || t.dataset.toggle !== 'report') return;
+    S.ui.ask.showReport = t.open;
+    refreshReport();
+  }, true); // « toggle » ne remonte pas : on l'écoute à la descente
 
   /* Nouveau jour, retour sur la page, connexion retrouvée, fermeture */
   let lastToday = todayKey();
@@ -1475,6 +2205,16 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   window.addEventListener('online', resume);
   window.addEventListener('pagehide', flushAll);
   setInterval(checkRollover, 60000);
+
+  /* App Android : le bouton retour ferme le formulaire ouvert, revient à la vue Jour, puis met l'app en arrière-plan. */
+  const capApp = capPlugin('App');
+  if (capApp && typeof capApp.addListener === 'function') {
+    capApp.addListener('backButton', () => {
+      if (S.ui.form || S.ui.confirm || S.ui.exportText != null) { S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); }
+      else if (S.ui.view !== 'jour') { S.ui.view = 'jour'; render(); toTop(); }
+      else if (typeof capApp.minimizeApp === 'function') capApp.minimizeApp();
+    });
+  }
 
   init();
 })();
