@@ -12,7 +12,18 @@ compléments, mes aliments, Claude, sauvegarde et données).
 **Confort** : « Annuler » quelques secondes après chaque suppression (check-in, repas, ressenti, séance, complément,
 aliment, séance type, séance en direct abandonnée) ; « Premiers pas » pour un profil qui démarre vide ; dans l'app
 sans compte, rappel de sauvegarde tous les 14 jours (le journal n'existe que sur l'appareil) et date de la dernière
-dans *Données* ; Santé → *Sur 30 jours* : sommeil, eau, pas et humeur jour par jour ; deux colonnes dès 760 px (tablette).
+dans *Données* ; deux colonnes dès 760 px (tablette).
+
+**Mes moyennes** (Santé) : semaine, mois ou année, d'une période à l'autre ; huit moyennes avec l'écart à la période
+d'avant (compléments, eau, calories, sport, pas, sommeil, humeur, poids), un graphique par mesure (une colonne par
+jour, ou par mois pour l'année, avec l'objectif) et la régularité de chaque complément. Les jours où l'app n'a pas
+servi ne comptent pas dans les moyennes.
+
+**Dossier complet** (Réglages → *Données*, ou « Dossier de cette période » dans Mes moyennes) : un fichier Markdown
+pour Claude, une autre IA ou un médecin, sur tout le journal, 12 mois, 3 mois, 30 jours ou les dates choisies :
+consigne (bilan général et synthèse pour le médecin, sans diagnostic), profil, traitements et compléments (doses,
+cures), régularité, moyennes par mois et par semaine, visites, pesées et prises de sang, ressentis, sport (séries
+comprises), humeur jour par jour, puis le journal détaillé. Dans l'artefact, Claude peut aussi faire le bilan sur place.
 
 **Profils** (Réglages → *Profils*, ou la pastille en haut à droite) : un journal par personne (moi, ma mère…).
 Chaque profil a ses compléments, repas, sport, visites et réglages ; on passe de l'un à l'autre en un appui.

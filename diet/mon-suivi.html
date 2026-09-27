@@ -11,6 +11,7 @@
   --aprem:#7C5CD6; --aprem-2:#C4B4F1; --aprem-tint:#EDE7FB; --aprem-line:#CFC2F4; --aprem-on:#FFFFFF;
   --soir:#3557C2; --soir-2:#A3B5EC; --soir-tint:#E2E8F8; --soir-line:#B9C7F0; --soir-on:#FFFFFF;
   --fill:#1F9C93; --bub:#EEE8EB; --danger:#BF3A31; --focus:#1A1417;
+  --c-supp:#1F9C93; --c-kcal:#B7770A; --c-water:#3557C2; --c-sport:#D62839; --c-mind:#7C5CD6;
   --chart:#3557C2; --sport:#D62839; --sport-2:#F2A7B0; --sport-tint:#FDECEE; --sport-line:#F5C3C9; --sport-on:#FFFFFF; --shadow:0 1px 2px rgba(26,20,23,.05), 0 8px 24px rgba(26,20,23,.06);
   --font-ui:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display:"Unbounded", "Arial Black", "Helvetica Neue", Arial, sans-serif;
@@ -29,6 +30,7 @@
     --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#0F0C0E;
     --fill:#3CC0B5; --bub:#2B2428; --danger:#F06C62; --focus:#F6F1F3;
     --chart:#6F88E8; --shadow:none;
+    --c-supp:#23A095; --c-kcal:#B98019; --c-water:#6F88E8; --c-sport:#F04B5C; --c-mind:#9272E6;
     --sport:#F04B5C; --sport-2:#6E2530; --sport-tint:#2A1418; --sport-line:#4E232A; --sport-on:#1A0A0D;
     color-scheme:dark;
   }
@@ -42,6 +44,7 @@
   --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#0F0C0E;
   --fill:#3CC0B5; --bub:#2B2428; --danger:#F06C62; --focus:#F6F1F3;
   --chart:#6F88E8; --shadow:none;
+  --c-supp:#23A095; --c-kcal:#B98019; --c-water:#6F88E8; --c-sport:#F04B5C; --c-mind:#9272E6;
   --sport:#F04B5C; --sport-2:#6E2530; --sport-tint:#2A1418; --sport-line:#4E232A; --sport-on:#1A0A0D;
   color-scheme:dark;
 }
@@ -654,18 +657,35 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .banner.backup .mico{ background:var(--matin); color:var(--matin-on); }
 .last-backup{ margin:0 0 10px; font-weight:700; font-size:14px; color:var(--ink); }
 
-/* Tendances */
-.trends{ display:grid; gap:18px 22px; }
-@media (min-width:640px){ .trends{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
-.trend{ margin:0; min-width:0; }
-.trend figcaption{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 10px; margin-bottom:8px; }
-.trend figcaption b{ font-weight:800; }
-.trend figcaption span{ font-size:13.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
-.trend-plot{ position:relative; height:80px; }
-.trend-plot svg{ display:block; width:100%; height:80px; }
-.trend-goal.below{ transform:translateY(25%); }
-.trend-goal{ position:absolute; right:0; transform:translateY(-120%); font-size:11.5px; font-weight:800; color:var(--ink); background:var(--surface); padding:0 3px; border-radius:4px; pointer-events:none; }
-.trend-axis{ display:flex; justify-content:space-between; margin-top:4px; font-size:12px; font-weight:600; color:var(--muted); }
+/* Mes moyennes */
+.bilan-bar{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:10px; }
+.bilan-nav{ display:flex; align-items:center; gap:8px; min-width:0; }
+.bilan-label{ font-weight:800; font-size:16px; min-width:0; text-align:center; }
+.bilan-nav .icon[disabled]{ opacity:.35; cursor:default; }
+.bilan-tiles{ margin:6px 0 20px; grid-template-columns:repeat(2, minmax(0,1fr)); }
+@media (min-width:620px){ .bilan-tiles{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+.bilan-tiles .stat{ position:relative; }
+.delta{ display:inline-block; margin-top:4px; font-style:normal; font-size:12.5px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; }
+.delta.same{ color:var(--muted); font-weight:700; }
+.bcharts{ display:grid; gap:22px 26px; }
+@media (min-width:720px){ .bcharts{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
+.bfig{ margin:0; min-width:0; }
+.bfig figcaption{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 10px; margin-bottom:6px; }
+.bfig figcaption b{ font-weight:800; font-size:16px; }
+.bfig figcaption span{ font-size:13.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+.bchart{ min-height:140px; }
+.bchart svg{ display:block; }
+.adh{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+@media (min-width:720px){ .adh{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:26px; } }
+.adh li{ display:grid; grid-template-columns:minmax(0,1.3fr) minmax(60px,1fr) auto; align-items:center; gap:10px; }
+.adh-name{ font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.adh-name small{ color:var(--muted); font-weight:600; }
+.adh-bar{ height:10px; border-radius:5px; background:var(--bub); overflow:hidden; }
+.adh-bar i{ display:block; height:100%; border-radius:5px; background:var(--m); }
+.adh-val{ font-weight:800; font-variant-numeric:tabular-nums; font-size:14px; min-width:72px; text-align:right; }
+.adh-val small{ color:var(--muted); font-weight:600; }
+.dgroup.dossier{ border-color:var(--accent-line); background:var(--accent-tint); }
+.dossier-meta{ margin:10px 0 12px; font-weight:700; font-size:14px; font-variant-numeric:tabular-nums; }
 
 /* Messages */
 .toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(88px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
@@ -1070,6 +1090,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null,
       restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
       calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', switching: false,
+      bilan: { kind: 'semaine', anchor: todayKey() }, dossier: { range: 'all', from: '', to: '' },
       foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null }
@@ -2104,7 +2125,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const claudeUrl = () => S.settings.claudeUrl || 'https://claude.ai/new';
   /* Ce que fait « … Claude » ici : demander dans la page (artefact), partager (Android) ou copier. */
   const claudeVerb = (prefix = '') => (store.sample ? `${prefix}demander à Claude` : canShare() ? `${prefix}envoyer à Claude` : `${prefix}copier pour Claude`).replace(/^./, (c) => c.toUpperCase());
-  const scopeLabel = (scope, key) => (scope === 'days' ? plural(key.split(',').length, 'journée') : scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine')
+  const scopeLabel = (scope, key) => (scope === 'dossier' ? 'dossier santé' : scope === 'days' ? plural(key.split(',').length, 'journée') : scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine')
     : scope === 'visit' ? `bilan de la visite du ${shortDate(key)}` : `journée du ${longDate(key).replace(/^./, (c) => c.toLowerCase())}`);
   const SCOPE_TEXT = {
     day: {
@@ -2143,7 +2164,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   function askArea(scope, key) {
     const a = S.ui.ask, mine = a.scope === scope && a.key === key;
     const busy = mine && (a.status === 'thinking' || a.status === 'streaming');
-    const saved = scope !== 'week' && !(mine && (a.text || busy)) ? (peekDay(key) || {}).claude : null;
+    const saved = !['week', 'days', 'dossier'].includes(scope) && !(mine && (a.text || busy)) ? (peekDay(key) || {}).claude : null;
     const text = mine && a.text ? a.text : isObj(saved) ? str(saved.text) : '';
     const primary = store.sample ? 'ask' : canShare() ? 'share' : 'copy';
     const btn = (act, label, isPrimary) => html`<button type="button" class="${isPrimary ? 'primary' : 'ghost'}" data-act="${act}" data-scope="${scope}" data-key="${key}">${label}</button>`;
@@ -2347,16 +2368,18 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       visit: 'Voici ma visite médicale et mes 4 dernières semaines. Analyse ma prise de sang (carences ?) en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon alimentation et mon état, et dis-moi quelles questions poser à mon médecin.',
       day: 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.'
     }[scope];
+    if (scope === 'dossier') { const [from, to] = key.split('_'); return dossierText(from, to); }
     return `${ask}\n\n${profileText()}${claudeReport(scope, key, withWeek)}`;
   }
   /* Consigne complète quand la page demande elle-même à Claude (artefact). */
   function claudePrompt(scope, key) {
     const q = S.ui.ask.q.trim();
-    const words = { day: 300, week: 350, days: 350, visit: 450 }[scope];
+    const words = { day: 300, week: 350, days: 350, visit: 450, dossier: 900 }[scope];
     const titles = {
       day: '## Mon état\n## Ce que je remarque\n## Alimentation et activité\n## Pour demain\n## À surveiller',
       week: '## Ma semaine\n## Tendances\n## Alimentation et sport\n## Pour la semaine prochaine\n## À surveiller',
       days: '## Mon état\n## D’un jour à l’autre\n## Alimentation et activité\n## Pour demain\n## À surveiller',
+      dossier: '## Bilan général\n## Traitements et compléments\n## Poids et prises de sang\n## Liens possibles et ce qui manque\n## Synthèse pour mon médecin\n## Questions à lui poser',
       visit: '## Bilan du mois\n## Prise de sang et carences\n## Poids, alimentation et sport\n## Compléments\n## Questions pour le médecin\n## À surveiller'
     }[scope];
     return [
@@ -2373,7 +2396,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.ask.photo ? '- Une photo est jointe (prise de sang, ordonnance ou autre document) : lis-la et commente les valeurs utiles, en rappelant les normes.' : '',
       q ? `\nMa question : ${q}` : '',
       '',
-      profileText() + claudeReport(scope, key).slice(0, 50000)
+      scope === 'dossier' ? claudeText('dossier', key).slice(0, 60000) : profileText() + claudeReport(scope, key).slice(0, 50000)
     ].filter((x) => x !== '').join('\n');
   }
   const ASK_ERRORS = {
@@ -2406,7 +2429,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (a.ctl !== ctl) return;
       a.text = res.text + (res.truncated ? '\n\n*(Réponse coupée : pose une question plus précise pour la suite.)*' : '');
       a.status = 'done';
-      if (scope !== 'week' && scope !== 'days') mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
+      if (!['week', 'days', 'dossier'].includes(scope)) mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
       markSent(scope, key, 'ask');
     } catch (e) {
       if (a.ctl !== ctl) return;
@@ -2462,6 +2485,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
   /* Les journées couvertes par un envoi, puis la marque « envoyée à Claude » sur chacune. */
   function scopeKeys(scope, key) {
+    if (scope === 'dossier') return [];
     if (scope === 'days') return key.split(',').filter(isKey);
     if (scope === 'week') return Array.from({ length: 7 }, (_, i) => addDays(key, i)).filter((dk) => dk <= todayKey() && hasJournal(peekDay(dk)));
     return [key];
@@ -2727,6 +2751,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     return html`<section class="set-sec">
       <p class="muted" style="margin:0">${where}</p>
       <div class="dgroups">
+        ${dossierGroup()}
         <div class="dgroup"><h3>Sauvegarde complète</h3>
           <p>Ta liste, tes réglages, ton profil et tout ton journal. Pour garder une copie, ou passer à un autre appareil.</p>
           ${store.mode === 'local' ? html`<p class="last-backup">${backupInfo().at ? `Dernière sauvegarde ${fmtStamp(backupInfo().at)}` : 'Pas encore de sauvegarde sur cet appareil.'}</p>` : ''}
@@ -3632,6 +3657,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     Object.assign(S.ui, { view: 'jour', date: t, weekOf: startOfWeek(t), monthOf: t.slice(0, 7), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, openSup: null, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
       settingsPage: null, tplEdit: null, profileEdit: null, foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
+      bilan: { kind: 'semaine', anchor: t }, dossier: { range: 'all', from: '', to: '' },
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null } });
   }
   async function switchProfile(pid, { force = false } = {}) {
@@ -3730,40 +3756,356 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     }
   };
 
-  /* Tendances sur 30 jours : une petite colonne par jour (vide si rien de noté), ligne d'objectif fine,
-     moyenne en légende ; chaque colonne porte sa bulle (title). Le dessin s'étire en largeur, le texte reste en HTML. */
-  function trendsCard() {
-    const t = todayKey(), days = Array.from({ length: 30 }, (_, i) => addDays(t, i - 29));
-    const g = S.settings.goals, sp = S.settings.sport;
-    const series = [
-      { title: 'Sommeil', color: 'var(--aprem)', unit: 'nuit', vals: days.map((dk) => { const m = nightMinutes((peekDay(addDays(dk, -1)) || {}).bed, (peekDay(dk) || {}).wake); return m == null ? null : m / 60; }), fmt: (v) => fmtDuration(Math.round(v * 60)), goal: 8, goalLabel: '8 h' },
-      { title: 'Eau', color: 'var(--soir)', unit: 'jour', vals: days.map((dk) => { const ml = waterOf(peekDay(dk)); return ml ? ml / 1000 : null; }), fmt: (v) => `${fmtL(v * 1000)} L`, goal: g.water, goalLabel: `${fmtDec(g.water)} L` },
-      { title: 'Pas', color: 'var(--sport)', unit: 'jour', vals: days.map((dk) => stepsOf(peekDay(dk)) || null), fmt: (v) => fmtInt(v), goal: sp.steps, goalLabel: fmtInt(sp.steps) },
-      { title: 'Humeur', color: 'var(--matin)', unit: 'jour', vals: days.map((dk) => avgScale(dk, 'mood')), fmt: (v) => `${fmtAvg(v)}/5`, top: 5 }
-    ];
-    if (!series.some((x) => x.vals.some((v) => v != null))) return '';
-    const W = 300, H = 80, gap = 1.6, slot = W / days.length;
-    const chart = (x) => {
-      const got = x.vals.filter((v) => v != null), avg = got.reduce((a, b) => a + b, 0) / (got.length || 1);
-      const top = (x.top || Math.max(x.goal || 0, ...got) * 1.12) || 1;
-      const Y = (v) => H - (Math.min(v, top) / top) * H;
-      const bars = x.vals.map((v, i) => (v == null ? '' : `<rect x="${(i * slot + gap / 2).toFixed(2)}" y="${Y(v).toFixed(2)}" width="${(slot - gap).toFixed(2)}" height="${Math.max(1, H - Y(v)).toFixed(2)}" rx="1" fill="${x.color}"${i === days.length - 1 ? '' : ' fill-opacity=".72"'}/>`)).join('');
-      const hits = x.vals.map((v, i) => `<rect x="${(i * slot).toFixed(2)}" y="0" width="${slot.toFixed(2)}" height="${H}" fill="transparent"><title>${esc(`${tinyDate(days[i])} : ${v == null ? 'rien de noté' : x.fmt(v)}`)}</title></rect>`).join('');
-      const goalY = x.goal ? Y(x.goal) : null;
-      const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(`${x.title} sur 30 jours, moyenne ${got.length ? x.fmt(avg) : 'inconnue'}`)}">`
-        + `<line x1="0" x2="${W}" y1="${H - 0.5}" y2="${H - 0.5}" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>`
-        + (goalY != null ? `<line x1="0" x2="${W}" y1="${goalY.toFixed(2)}" y2="${goalY.toFixed(2)}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>` : '')
-        + bars + hits + '</svg>';
-      return html`<figure class="trend">
-        <figcaption><b>${x.title}</b><span>${got.length ? `${x.fmt(avg)} en moyenne · ${plural(got.length, x.unit)}` : 'rien de noté'}</span></figcaption>
-        <div class="trend-plot">${trusted(svg)}${goalY != null ? html`<span class="trend-goal${goalY / H < 0.3 ? ' below' : ''}" style="top:${((goalY / H) * 100).toFixed(1)}%">${x.goalLabel}</span>` : ''}</div>
-        <div class="trend-axis"><span>${tinyDate(days[0])}</span><span>Aujourd’hui</span></div>
-      </figure>`;
+  /* ---------- Bilans : moyennes de la semaine, du mois ou de l'année ----------
+     Une journée compte quand l'app a servi ce jour-là (une case cochée ou quelque chose de noté) :
+     un jour oublié ne tire pas les moyennes vers zéro. */
+  const mean = (xs) => { const v = xs.filter((x) => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const metricsCache = new Map();
+  function dayMetrics(k) {
+    if (metricsCache.has(k)) return metricsCache.get(k);
+    const d = peekDay(k) || {};
+    const sch = scheduledFor(k), took = sch.filter((s) => isTaken(s.id, k)).length;
+    const used = took > 0 || hasJournal(d);
+    const tot = sumMacros(dayItems(d)), acts = sportOf(d), night = nightMinutes((peekDay(addDays(k, -1)) || {}).bed, d.wake);
+    const m = {
+      k, used, suppTook: used ? took : 0, suppSch: used ? sch.length : 0, supp: used && sch.length ? took / sch.length : null,
+      water: waterOf(d) ? waterOf(d) / 1000 : null, kcal: tot.n ? tot.kcal : null, p: tot.n ? tot.p : null,
+      sport: acts.length ? minutesOf(acts) : null, sessions: sessionsOf(d).length, steps: stepsOf(d) || null,
+      sleep: night != null ? night / 60 : null, mood: avgScale(k, 'mood'), stress: avgScale(k, 'stress'), pain: avgScale(k, 'pain'), energy: avgScale(k, 'energy')
     };
-    return html`<section class="card wide" aria-labelledby="h-trends">
-      <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.chart}</span><h2 id="h-trends">Sur 30 jours</h2></div>
-      <div class="trends">${series.map(chart)}</div>
+    metricsCache.set(k, m);
+    return m;
+  }
+  function summarize(keys) {
+    const ms = keys.map(dayMetrics), pick = (f) => ms.map((m) => m[f]);
+    const sch = ms.reduce((a, m) => a + m.suppSch, 0), took = ms.reduce((a, m) => a + m.suppTook, 0);
+    return {
+      days: ms.length, filled: ms.filter((m) => m.used).length, supp: sch ? took / sch : null, suppTook: took, suppSch: sch,
+      water: mean(pick('water')), waterHit: ms.filter((m) => m.water != null && m.water >= S.settings.goals.water).length,
+      kcal: mean(pick('kcal')), p: mean(pick('p')), sessions: ms.reduce((a, m) => a + m.sessions, 0), sportMin: ms.reduce((a, m) => a + (m.sport || 0), 0),
+      steps: mean(pick('steps')), sleep: mean(pick('sleep')), mood: mean(pick('mood')), stress: mean(pick('stress')), pain: mean(pick('pain')), energy: mean(pick('energy'))
+    };
+  }
+  const daysIn = (a, b) => { const out = []; for (let k = a; k <= b; k = addDays(k, 1)) out.push(k); return out; };
+  function periodOf(kind, anchor) {
+    if (kind === 'semaine') { const s = startOfWeek(anchor); return { kind, start: s, end: addDays(s, 6), label: weekTitle(s) }; }
+    const y = Number(anchor.slice(0, 4));
+    if (kind === 'mois') {
+      const m = Number(anchor.slice(5, 7)), s = `${y}-${pad(m)}-01`;
+      return { kind, start: s, end: addDays(m === 12 ? `${y + 1}-01-01` : `${y}-${pad(m + 1)}-01`, -1), label: cap1(`${MONTHS[m - 1]} ${y}`) };
+    }
+    return { kind: 'annee', start: `${y}-01-01`, end: `${y}-12-31`, label: String(y) };
+  }
+  const shiftPeriod = (p, dir) => (dir < 0 ? addDays(p.start, -1) : addDays(p.end, 1));
+  /* Les graphiques : une colonne par jour (par mois pour l'année). Couleurs de graphique vérifiées (clair et sombre). */
+  const BILAN_CHARTS = [
+    { id: 'supp', title: 'Compléments', color: 'var(--c-supp)', big: true, top: 100, val: (m) => (m.supp == null ? null : m.supp * 100), fmt: (v) => `${Math.round(v)} %`,
+      head: (s) => (s.supp == null ? 'rien de coché' : `${Math.round(s.supp * 100)} % pris · ${s.suppTook} sur ${s.suppSch}`) },
+    { id: 'water', title: 'Eau', color: 'var(--c-water)', big: true, val: (m) => m.water, goal: () => S.settings.goals.water, goalFmt: (v) => `${fmtDec(v)} L`, fmt: (v) => `${fmtL(v * 1000)} L`,
+      head: (s) => (s.water == null ? 'rien noté' : `${fmtL(s.water * 1000)} L par jour · objectif atteint ${plural(s.waterHit, 'jour')}`) },
+    { id: 'kcal', title: 'Calories', color: 'var(--c-kcal)', big: true, val: (m) => m.kcal, goal: () => S.settings.goals.kcal, goalFmt: (v) => `${fmtInt(v)} kcal`, fmt: (v) => `${fmtInt(v)} kcal`,
+      head: (s) => (s.kcal == null ? 'rien noté' : `${fmtInt(s.kcal)} kcal par jour · protéines ${fmtG(s.p)} g`) },
+    { id: 'prot', title: 'Protéines', color: 'var(--c-kcal)', val: (m) => m.p, goal: () => S.settings.goals.p, goalFmt: (v) => `${fmtG(v)} g`, fmt: (v) => `${fmtG(v)} g`,
+      head: (s) => (s.p == null ? 'rien noté' : `${fmtG(s.p)} g par jour`) },
+    { id: 'sport', title: 'Sport', color: 'var(--c-sport)', big: true, val: (m) => m.sport, yearVal: (s) => s.sportMin || null, fmt: (v) => `${fmtInt(v)} min`,
+      head: (s, p) => `${plural(s.sessions, 'séance')} · ${fmtInt(s.sportMin)} min${p.kind !== 'semaine' && s.days >= 7 ? ` · ${fmtDec(s.sessions / (s.days / 7))} séance${s.sessions / (s.days / 7) >= 2 ? 's' : ''} par semaine` : ''}` },
+    { id: 'steps', title: 'Pas', color: 'var(--c-sport)', val: (m) => m.steps, goal: () => S.settings.sport.steps, goalFmt: (v) => fmtInt(v), fmt: (v) => `${fmtInt(v)} pas`,
+      head: (s) => (s.steps == null ? 'rien noté' : `${fmtInt(s.steps)} par jour`) },
+    { id: 'sleep', title: 'Sommeil', color: 'var(--c-mind)', val: (m) => m.sleep, goal: () => 8, goalFmt: () => '8 h', fmt: (v) => fmtDuration(Math.round(v * 60)),
+      head: (s) => (s.sleep == null ? 'rien noté' : `${fmtDuration(Math.round(s.sleep * 60))} par nuit`) },
+    { id: 'mood', title: 'Humeur', color: 'var(--c-kcal)', top: 5, val: (m) => m.mood, fmt: (v) => `${fmtAvg(v)}/5`,
+      head: (s) => (s.mood == null ? 'pas de check-in' : `${fmtAvg(s.mood)}/5${s.stress != null ? ` · stress ${fmtAvg(s.stress)}` : ''}${s.pain != null ? ` · douleur ${fmtAvg(s.pain)}` : ''}`) }
+  ];
+  const MONTH_INITIALS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+  /* Écart avec la période d'avant, sans jugement de couleur (plus n'est pas toujours mieux). */
+  function deltaText(a, b, kind) {
+    if (a == null || b == null) return null;
+    const f = {
+      supp: () => { const d = Math.round((a - b) * 100); return [d, `${Math.abs(d)} pt${Math.abs(d) > 1 ? 's' : ''}`]; },
+      water: () => { const d = Math.round((a - b) * 100) / 100; return [d, `${fmtL(Math.abs(d) * 1000)} L`]; },
+      kcal: () => { const d = Math.round(a - b); return [d, `${fmtInt(Math.abs(d))} kcal`]; },
+      sessions: () => { const d = a - b; return [d, plural(Math.abs(d), 'séance')]; },
+      steps: () => { const d = Math.round((a - b) / 10) * 10; return [d, `${fmtInt(Math.abs(d))} pas`]; },
+      sleep: () => { const d = Math.round((a - b) * 60); return [d, `${Math.abs(d)} min`]; },
+      mood: () => { const d = Math.round((a - b) * 10) / 10; return [d, fmtAvg(Math.abs(d))]; },
+      weight: () => { const d = round1(a - b); return [d, `${fmtDec(Math.abs(d))} kg`]; }
+    }[kind]();
+    return f[0] === 0 ? { cls: 'same', text: '= pareil' } : { cls: f[0] > 0 ? 'up' : 'down', text: `${f[0] > 0 ? '▲ +' : '▼ −'}${f[1]}` };
+  }
+  function bilanCard() {
+    metricsCache.clear();
+    const t = todayKey(), bs = S.ui.bilan, p = periodOf(bs.kind, bs.anchor);
+    const past = daysIn(p.start, p.end < t ? p.end : t).filter((k) => k <= t);
+    const pp = periodOf(bs.kind, shiftPeriod(p, -1)), prevDays = daysIn(pp.start, pp.end).filter((k) => k <= t);
+    const s = summarize(past), ps = summarize(prevDays);
+    const isCurrent = p.start <= t && t <= p.end, canNext = p.end < t;
+    const vsLabel = `par rapport à ${bs.kind === 'semaine' ? 'la semaine' : bs.kind === 'mois' ? 'le mois' : 'l’année'} d’avant`;
+    // poids : dernière pesée de la période, comparée à la précédente
+    const wins = weighIns(), wIn = wins.filter((x) => x.k >= p.start && x.k <= p.end), wLast = wIn[wIn.length - 1], wBefore = wLast ? wins.filter((x) => x.k < wLast.k).pop() : null;
+    const cmp = ps.filled > 0, dt = (a, b, kind) => (cmp ? deltaText(a, b, kind) : null);
+    const tile = (label, value, sub, dl) => html`<div class="stat"><span>${label}</span><b>${value}</b>${sub ? html`<small>${sub}</small>` : ''}${dl ? html`<em class="delta ${dl.cls}" title="${vsLabel}">${dl.text}</em>` : ''}</div>`;
+    const perWeek = s.days >= 7 ? s.sessions / (s.days / 7) : null;
+    const tiles = html`<div class="stats bilan-tiles">
+      ${tile('Compléments', s.supp == null ? '—' : `${Math.round(s.supp * 100)} %`, s.suppSch ? `${s.suppTook} pris sur ${s.suppSch}` : 'rien de coché', dt(s.supp, ps.supp, 'supp'))}
+      ${tile('Eau', s.water == null ? '—' : `${fmtL(s.water * 1000)} L`, s.water == null ? 'rien noté' : `par jour · objectif ${fmtDec(S.settings.goals.water)} L`, dt(s.water, ps.water, 'water'))}
+      ${tile('Calories', s.kcal == null ? '—' : fmtInt(s.kcal), s.kcal == null ? 'rien noté' : `kcal par jour · protéines ${fmtG(s.p)} g`, dt(s.kcal, ps.kcal, 'kcal'))}
+      ${tile('Sport', plural(s.sessions, 'séance'), `${fmtInt(s.sportMin)} min${perWeek != null ? ` · ${fmtDec(perWeek)} par semaine` : ` · objectif ${S.settings.sport.perWeek}`}`, dt(s.sessions, ps.sessions, 'sessions'))}
+      ${tile('Pas', s.steps == null ? '—' : fmtInt(s.steps), s.steps == null ? 'rien noté' : 'par jour', dt(s.steps, ps.steps, 'steps'))}
+      ${tile('Sommeil', s.sleep == null ? '—' : fmtDuration(Math.round(s.sleep * 60)), s.sleep == null ? 'rien noté' : 'par nuit', dt(s.sleep, ps.sleep, 'sleep'))}
+      ${tile('Humeur', s.mood == null ? '—' : `${fmtAvg(s.mood)}/5`, s.stress != null ? `stress ${fmtAvg(s.stress)}/5` : 'pas de check-in', dt(s.mood, ps.mood, 'mood'))}
+      ${tile('Poids', wLast ? `${fmtDec(wLast.w)} kg` : '—', wLast ? `pesée du ${shortDate(wLast.k)}` : 'pas de pesée', wLast && wBefore ? deltaText(wLast.w, wBefore.w, 'weight') : null)}
+    </div>`;
+    // colonnes des graphiques
+    let points;
+    if (p.kind === 'annee') {
+      const y = Number(p.start.slice(0, 4));
+      points = MONTH_INITIALS.map((ini, i) => {
+        const mp = periodOf('mois', `${y}-${pad(i + 1)}-01`), md = daysIn(mp.start, mp.end).filter((k) => k <= t);
+        return { label: ini, tip: mp.label, s: md.length ? summarize(md) : null, now: t.slice(0, 7) === `${y}-${pad(i + 1)}` };
+      });
+    } else {
+      points = daysIn(p.start, p.end).map((k) => {
+        const dn = fromKey(k).getDate();
+        const label = p.kind === 'semaine' ? WD_SHORT[weekdayOf(k)] : dn % 7 === 1 ? String(dn) : '';
+        return { label, tip: cap1(longDate(k)), m: k <= t ? dayMetrics(k) : null, now: k === t };
+      });
+    }
+    const charts = BILAN_CHARTS.map((c) => {
+      const vals = points.map((pt) => (p.kind === 'annee' ? (pt.s ? (c.yearVal ? c.yearVal(pt.s) : c.val(pt.s)) : null) : pt.m ? c.val(pt.m) : null));
+      const got = vals.map((v, i) => [v, i]).filter(([v]) => v != null);
+      const maxI = got.length ? got.reduce((a, b) => (b[0] > a[0] ? b : a))[1] : -1;
+      const goal = c.goal ? c.goal() : null;
+      const spec = { color: c.color, top: c.top || null, goal: goal || null, goalLabel: goal ? `Objectif ${c.goalFmt(goal)}` : '', vals: vals.map((v) => (v == null ? null : Math.round(v * 100) / 100)),
+        labels: points.map((pt) => pt.label), tips: points.map((pt, i) => `${pt.tip} : ${vals[i] == null ? 'rien de noté' : c.fmt(vals[i])}`), now: points.findIndex((pt) => pt.now),
+        maxI, maxLabel: maxI >= 0 ? c.fmt(vals[maxI]) : '' };
+      const aria = `${c.title}, ${p.label.toLowerCase()} : ${c.head(s, p)}`;
+      return html`<figure class="bfig${c.big ? ' big' : ''}"><figcaption><b>${c.title}</b><span>${c.head(s, p)}</span></figcaption><div class="bchart" data-bchart="${JSON.stringify(spec)}" role="img" aria-label="${aria}"></div></figure>`;
+    });
+    // régularité de chaque complément sur la période (jours où l'app a servi)
+    const usedDays = past.filter((k) => dayMetrics(k).used);
+    const adh = S.settings.supplements.map((sp) => { let sch = 0, took = 0; usedDays.forEach((k) => { if (isScheduled(sp, k)) { sch++; if (isTaken(sp.id, k)) took++; } }); return { sp, sch, took }; }).filter((x) => x.sch);
+    return html`<section class="card wide bilan" aria-labelledby="h-bilan">
+      <div class="card-head"><span class="mico m-sport" aria-hidden="true">${ICON.chart}</span><h2 id="h-bilan">Mes moyennes</h2></div>
+      <div class="bilan-bar">
+        <div class="seg" role="group" aria-label="Période">${[['semaine', 'Semaine'], ['mois', 'Mois'], ['annee', 'Année']].map(([v, l]) => html`<button type="button" data-act="bilan-kind" data-v="${v}" aria-pressed="${bool(bs.kind === v)}">${l}</button>`)}</div>
+        <div class="bilan-nav">
+          <button type="button" class="icon" data-act="bilan-move" data-v="-1" aria-label="${{ semaine: 'Semaine précédente', mois: 'Mois précédent', annee: 'Année précédente' }[bs.kind]}">${ICON.left}</button>
+          <b class="bilan-label">${p.label}</b>
+          <button type="button" class="icon" data-act="bilan-move" data-v="1" aria-label="${{ semaine: 'Semaine suivante', mois: 'Mois suivant', annee: 'Année suivante' }[bs.kind]}"${canNext ? '' : html` disabled`}>${ICON.right}</button>
+        </div>
+        ${isCurrent ? '' : html`<button type="button" class="link" data-act="bilan-now">${bs.kind === 'semaine' ? 'Cette semaine' : bs.kind === 'mois' ? 'Ce mois-ci' : 'Cette année'}</button>`}
+      </div>
+      <p class="hint">${s.filled ? `${plural(s.filled, 'jour')} rempli${s.filled > 1 ? 's' : ''} sur ${past.length}${isCurrent ? ' jusqu’à aujourd’hui' : ''}. Les jours sans rien de coché ni noté ne comptent pas dans les moyennes.${cmp ? ` Les flèches comparent ${vsLabel}.` : ''}` : 'Rien de noté sur cette période.'}</p>
+      ${tiles}
+      <div class="bcharts">${charts}</div>
+      ${adh.length ? html`<h3 class="sub-title" style="margin-top:22px">Chaque complément</h3>
+        <ul class="adh">${adh.map(({ sp, sch, took }) => html`<li class="m-${sp.moment}"><span class="adh-name">${sp.name}${sp.dose ? html` <small>${sp.dose}</small>` : ''}</span><span class="adh-bar" role="img" aria-label="${Math.round((took / sch) * 100)} %"><i style="width:${Math.round((took / sch) * 100)}%"></i></span><span class="adh-val">${Math.round((took / sch) * 100)} % <small>${took}/${sch}</small></span></li>`)}</ul>` : ''}
+      <div class="actions" style="margin-top:16px"><button type="button" class="ghost" data-act="dossier-period" data-from="${p.start}" data-to="${p.end < t ? p.end : t}">Dossier de cette période (Claude, médecin)</button></div>
     </section>`;
+  }
+  /* Dessin à la largeur réelle, après l'affichage : colonnes de 24 px au plus, bouts arrondis de 4 px posés sur la base,
+     ligne d'objectif fine avec son libellé, valeur écrite sur la plus haute colonne seulement, bulle au survol partout. */
+  function drawBilanCharts() {
+    document.querySelectorAll('[data-bchart]').forEach((el) => {
+      let sp;
+      try { sp = JSON.parse(el.dataset.bchart); } catch (e) { return; }
+      const W = Math.max(220, Math.round(el.clientWidth)), H = 140;
+      const n = sp.vals.length, padT = 20, padB = 20, base = H - padB;
+      const got = sp.vals.filter((v) => v != null);
+      const top = sp.top || Math.max(sp.goal || 0, ...got, 1) * 1.15;
+      const Y = (v) => padT + (1 - Math.min(v, top) / top) * (base - padT);
+      const slot = W / n, bw = Math.max(2, Math.min(24, slot - Math.max(2, slot * 0.3)));
+      const out = [`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`];
+      if (sp.goal) {
+        const gy = Y(sp.goal).toFixed(1);
+        out.push(`<line x1="0" x2="${W}" y1="${gy}" y2="${gy}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 4"/>`);
+        out.push(`<text x="${W}" y="${(Y(sp.goal) - 5).toFixed(1)}" text-anchor="end" font-size="11" font-weight="700" fill="var(--muted)">${esc(sp.goalLabel)}</text>`);
+      }
+      out.push(`<line x1="0" x2="${W}" y1="${base + 0.5}" y2="${base + 0.5}" stroke="var(--line)" stroke-width="1"/>`);
+      sp.vals.forEach((v, i) => {
+        const cx = i * slot + slot / 2, x = cx - bw / 2;
+        if (v == null) { if (i <= (sp.now >= 0 ? sp.now : n - 1)) out.push(`<rect x="${x.toFixed(1)}" y="${base - 2}" width="${bw.toFixed(1)}" height="2" rx="1" fill="var(--bub)"/>`); }
+        else {
+          const y = Y(v), h = base - y, r = Math.min(4, bw / 2, h);
+          out.push(h < 1.5 ? `<rect x="${x.toFixed(1)}" y="${(base - 1.5).toFixed(1)}" width="${bw.toFixed(1)}" height="1.5" fill="${sp.color}"/>`
+            : `<path d="M${x.toFixed(1)} ${base} V${(y + r).toFixed(1)} Q${x.toFixed(1)} ${y.toFixed(1)} ${(x + r).toFixed(1)} ${y.toFixed(1)} H${(x + bw - r).toFixed(1)} Q${(x + bw).toFixed(1)} ${y.toFixed(1)} ${(x + bw).toFixed(1)} ${(y + r).toFixed(1)} V${base} Z" fill="${sp.color}"/>`);
+          if (i === sp.maxI) out.push(`<text x="${Math.min(W - 2, Math.max(2, cx)).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="${cx < 30 ? 'start' : cx > W - 30 ? 'end' : 'middle'}" font-size="11.5" font-weight="800" fill="var(--ink)">${esc(sp.maxLabel)}</text>`);
+        }
+        if (sp.labels[i]) out.push(`<text x="${cx.toFixed(1)}" y="${H - 5}" text-anchor="middle" font-size="11" font-weight="${i === sp.now ? 800 : 600}" fill="${i === sp.now ? 'var(--ink)' : 'var(--muted)'}">${esc(sp.labels[i])}</text>`);
+        out.push(`<rect x="${(i * slot).toFixed(1)}" y="0" width="${slot.toFixed(1)}" height="${H}" fill="transparent"><title>${esc(sp.tips[i])}</title></rect>`);
+      });
+      out.push('</svg>');
+      el.innerHTML = out.join('');
+    });
+  }
+  const BILAN_ACTIONS = {
+    'bilan-kind': (d) => { S.ui.bilan.kind = d.v; render(); },
+    'bilan-move': (d) => {
+      const p = periodOf(S.ui.bilan.kind, S.ui.bilan.anchor), next = shiftPeriod(p, Number(d.v));
+      if (Number(d.v) > 0 && next > todayKey()) return;
+      S.ui.bilan.anchor = next; render();
+    },
+    'bilan-now': () => { S.ui.bilan.anchor = todayKey(); render(); }
+  };
+  /* ---------- Dossier complet : tout le journal d'une période, rangé pour Claude, une autre IA ou un médecin ---------- */
+  function firstDataDay() {
+    let min = null;
+    Object.keys(S.months).forEach((mk) => Object.keys(isObj(S.months[mk].days) ? S.months[mk].days : {}).forEach((dk) => { if (isKey(dk) && (!min || dk < min)) min = dk; }));
+    return min || (isKey(S.settings.created) ? S.settings.created : todayKey());
+  }
+  /* Période choisie dans Données : tout, 12 mois, 3 mois, 30 jours, ou du… au… */
+  function dossierRange() {
+    const t = todayKey(), dz = S.ui.dossier, first = firstDataDay();
+    let from = first, to = t;
+    if (dz.range === '365') from = addDays(t, -364);
+    else if (dz.range === '90') from = addDays(t, -89);
+    else if (dz.range === '30') from = addDays(t, -29);
+    else if (dz.range === 'custom') { from = isKey(dz.from) ? dz.from : first; to = isKey(dz.to) && dz.to <= t ? dz.to : t; }
+    if (from > to) from = to;
+    return { from, to };
+  }
+  const mdCell = (v) => String(v == null || v === '' ? '—' : v).replace(/\|/g, '/').replace(/\s*\n\s*/g, ' ').trim();
+  const mdRow = (cells) => `| ${cells.map(mdCell).join(' | ')} |`;
+  const mdTable = (head, rows) => [mdRow(head), `|${head.map(() => ' --- ').join('|')}|`, ...rows.map(mdRow)];
+  const fullDate = (k) => `${lowDate(k)} ${fromKey(k).getFullYear()}`;
+  const DOSSIER_ASK = [
+    '> **Consigne pour Claude ou une autre IA.** Ce dossier vient de mon journal de santé (app « Mon suivi »). À partir de ces données seulement :',
+    '> 1. Fais un bilan général : sommeil, hydratation, alimentation (calories, protéines), activité physique, humeur, stress, douleurs, et leur évolution sur la période.',
+    '> 2. Passe en revue mes traitements et compléments : doses, régularité, cures, doublons ou interactions possibles à vérifier.',
+    '> 3. Analyse mes pesées et prises de sang : évolution, valeurs hors des repères.',
+    '> 4. Relève les liens possibles (par exemple sommeil et humeur, compléments et résultats sanguins) et ce qui manque pour mieux juger.',
+    '> 5. Rédige une synthèse d’une page à remettre à mon médecin : ce que je prends exactement et depuis quand, les faits marquants, les points à vérifier et les questions à lui poser.',
+    '>',
+    '> Tu n’es pas médecin : ne pose pas de diagnostic et ne propose pas de changer un traitement prescrit ; formule des hypothèses à discuter avec le médecin. Si quelque chose peut être urgent, dis-le en premier.'
+  ];
+  function dossierText(from, to) {
+    metricsCache.clear();
+    const t = todayKey(); if (to > t) to = t; if (from > to) from = to;
+    const days = daysIn(from, to);
+    const filled = days.filter((k) => dayMetrics(k).used);
+    const L = [];
+    const who = activeProfile().name;
+    L.push(`# Dossier santé${PROFILES.active !== MAIN ? ` — ${who}` : ''}`, '');
+    L.push(`Période : du ${fullDate(from)} au ${fullDate(to)} (${plural(days.length, 'jour')}, ${plural(filled.length, 'jour')} rempli${filled.length > 1 ? 's' : ''}).`);
+    L.push(`Exporté le ${fullDate(t)} à ${nowTime()} depuis l’app « Mon suivi ». Données de santé personnelles.`, '');
+    L.push(...DOSSIER_ASK, '');
+
+    // 1. Qui je suis
+    L.push('## 1. Qui je suis', '', profileText().trim(), '');
+
+    // 2. Ce que je prends
+    const h = S.settings.health, sups = S.settings.supplements;
+    L.push('## 2. Ce que je prends', '');
+    L.push(`Traitements prescrits : ${h.treatments.trim() || 'aucun noté'}`);
+    if (h.conditions.trim()) L.push(`Antécédents : ${h.conditions.trim()}`);
+    if (h.allergies.trim()) L.push(`Allergies : ${h.allergies.trim()}`);
+    L.push('');
+    if (sups.length) {
+      L.push(...mdTable(['Moment', 'Complément', 'Dose', 'Fréquence', 'Depuis', 'Cure', 'Note', 'État'], sups.map((sp) => [
+        MOMENTS.find((m) => m.key === sp.moment).label, sp.name, sp.dose, supSummary({ ...sp, cure: null, active: true }), shortDate(sp.since),
+        sp.cure ? `${cureRule(sp.cure)}, depuis le ${shortDate(sp.cure.start)} ; aujourd’hui : ${cureStatus(sp.cure, t)}` : '', sp.note, sp.active ? 'actif' : 'en pause'])), '');
+    } else L.push('Aucun complément dans la liste.', '');
+
+    // 3. Régularité
+    L.push('## 3. Régularité des compléments sur la période', '', 'Comptée sur les jours où l’app a servi (une case cochée ou quelque chose de noté).', '');
+    const adh = sups.map((sp) => {
+      let sch = 0, took = 0, first = null, last = null;
+      filled.forEach((k) => { const on = isTaken(sp.id, k); if (isScheduled(sp, k)) { sch++; if (on) took++; } if (on) { first = first || k; last = k; } });
+      return { sp, sch, took, first, last };
+    }).filter((x) => x.sch || x.took);
+    if (adh.length) L.push(...mdTable(['Complément', 'Pris', 'Prévu', 'Régularité', 'Première prise notée', 'Dernière prise notée'], adh.map((x) => [
+      `${x.sp.name}${x.sp.dose ? ` ${x.sp.dose}` : ''}`, x.took, x.sch, x.sch ? `${Math.round((x.took / x.sch) * 100)} %` : '', x.first ? shortDate(x.first) : '', x.last ? shortDate(x.last) : ''])), '');
+    else L.push('Rien de coché sur la période.', '');
+
+    // 4 et 5. Moyennes par mois et par semaine
+    const avgRow = (label, keys) => {
+      const s = summarize(keys);
+      return [label, `${s.filled}/${s.days}`, s.supp == null ? '' : `${Math.round(s.supp * 100)} %`, s.water == null ? '' : fmtL(s.water * 1000), s.kcal == null ? '' : fmtInt(s.kcal), s.p == null ? '' : fmtG(s.p),
+        `${s.sessions} · ${fmtInt(s.sportMin)} min`, s.steps == null ? '' : fmtInt(s.steps), s.sleep == null ? '' : fmtDuration(Math.round(s.sleep * 60)),
+        s.mood == null ? '' : fmtAvg(s.mood), s.stress == null ? '' : fmtAvg(s.stress), s.pain == null ? '' : fmtAvg(s.pain)];
+    };
+    const AVG_HEAD = ['Période', 'Jours remplis', 'Compléments', 'Eau (L/j)', 'Calories (/j)', 'Protéines (g/j)', 'Sport (séances · min)', 'Pas (/j)', 'Sommeil (/nuit)', 'Humeur /5', 'Stress /5', 'Douleur /5'];
+    const monthRows = [];
+    for (let k = `${from.slice(0, 7)}-01`; k <= to; k = addDays(periodOf('mois', k).end, 1)) {
+      const p = periodOf('mois', k), keys = daysIn(p.start < from ? from : p.start, p.end > to ? to : p.end);
+      monthRows.push(avgRow(p.label, keys));
+    }
+    L.push('## 4. Moyennes mois par mois', '', ...mdTable(AVG_HEAD, monthRows), '');
+    const weekRows = [];
+    for (let k = startOfWeek(from); k <= to; k = addDays(k, 7)) {
+      const keys = daysIn(k < from ? from : k, addDays(k, 6) > to ? to : addDays(k, 6));
+      weekRows.push(avgRow(`Sem. du ${shortDate(k)}`, keys));
+    }
+    L.push('## 5. Moyennes semaine par semaine', '', ...mdTable(AVG_HEAD, weekRows), '');
+
+    // 6. Visites, poids, prises de sang
+    L.push('## 6. Visites médicales, poids et prises de sang', '');
+    const visits = days.filter((k) => visitOf(peekDay(k)));
+    const wins = weighIns().filter((x) => x.k >= from && x.k <= to);
+    L.push(wins.length ? `Pesées : ${wins.map((x) => `${shortDate(x.k)} ${fmtDec(x.w)} kg`).join(' ; ')}` : 'Pas de pesée sur la période.');
+    const withLabs = visits.filter((k) => labsFilled(visitOf(peekDay(k))));
+    if (withLabs.length) {
+      const rows = LABS.filter(([key]) => withLabs.some((k) => str((visitOf(peekDay(k)).labs || {})[key]).trim()))
+        .map(([key, label, ref]) => [label, ...withLabs.map((k) => str((visitOf(peekDay(k)).labs || {})[key]).trim()), ref]);
+      L.push('', 'Prises de sang (valeur notée ; dernière colonne : repère habituel, le labo donne ses propres normes) :', '', ...mdTable(['Valeur', ...withLabs.map((k) => shortDate(k)), 'Repère'], rows));
+      withLabs.forEach((k) => { const tx = str(visitOf(peekDay(k)).labsText).trim(); if (tx) L.push('', `Autres résultats du ${shortDate(k)} : ${tx}`); });
+    }
+    visits.forEach((k) => { const n = str(visitOf(peekDay(k)).notes).trim(); if (n) L.push(`Médecin, ${shortDate(k)} : ${n}`); });
+    L.push('');
+
+    // 7. Ressentis
+    const syms = days.flatMap((k) => listOf((peekDay(k) || {}).symptoms).sort(byTime).map((x) => [shortDate(k), str(x.time), str(x.text).trim(), scaleValue(x.intensity) ? `${x.intensity}/5` : '']));
+    L.push('## 7. Ce que j’ai ressenti (douleurs, symptômes, effets)', '', ...(syms.length ? mdTable(['Date', 'Heure', 'Ressenti', 'Intensité'], syms) : ['Rien de noté.']), '');
+
+    // 8. Sport
+    const acts = days.flatMap((k) => sportOf(peekDay(k)).sort(byTime).map((a) => [shortDate(k), str(a.time), `${KIND_LABEL[a.kind] ? KIND_LABEL[a.kind].toLowerCase() : 'activité'} : ${entryName(a)}`, a.minutes ? `${a.minutes} min` : '', intensityLabel(a.intensity).toLowerCase(),
+      [listOf(a.exos).length ? listOf(a.exos).map((e) => `${str(e.name)} : ${listOf(e.sets).map((x) => (e.mode === 'time' ? fmtSec(x.sec || 0) : `${x.reps}${x.kg ? `×${fmtKg(x.kg)} kg` : ''}${x.rir != null ? ` (${rirLabel(x.rir)} en réserve)` : ''}`)).join(', ')}`).join(' ; ') : str(a.details), str(a.note)].filter(Boolean).join(' — ')]));
+    const tot = summarize(days);
+    L.push('## 8. Sport et activités', '', `Total : ${plural(tot.sessions, 'séance')}, ${fmtInt(tot.sportMin)} min d’activité${tot.steps != null ? `, ${fmtInt(tot.steps)} pas par jour en moyenne` : ''}.`, '');
+    L.push(...(acts.length ? mdTable(['Date', 'Heure', 'Activité', 'Durée', 'Intensité', 'Détail'], acts) : ['Rien de noté.']), '');
+
+    // 9. Humeur jour par jour
+    const moodRows = filled.map((k) => {
+      const cis = listOf((peekDay(k) || {}).checkins);
+      if (!cis.length) return null;
+      return [shortDate(k), cis.length, ...SCALES.map((sc) => { const v = avgScale(k, sc.key); return v == null ? '' : fmtAvg(v); }), cis.map((c) => str(c.note).trim()).filter(Boolean).join(' ; ')];
+    }).filter(Boolean);
+    L.push('## 9. Humeur et check-ins, jour par jour', '', 'Notes sur 5 (pour stress, douleur et faim, 5 = le plus fort).', '');
+    L.push(...(moodRows.length ? mdTable(['Date', 'Check-ins', ...SCALES.map((sc) => sc.label), 'Notes'], moodRows) : ['Pas de check-in.']), '');
+
+    // 10. Journal détaillé
+    L.push('## 10. Journal détaillé, jour par jour', '');
+    if (filled.length) filled.forEach((k) => L.push(dayReport(k).replace(/^## /gm, '### '), ''));
+    else L.push('Rien de noté sur la période.', '');
+    return L.join('\n').replace(/\n{3,}/g, '\n\n');
+  }
+  function dossierFile(from, to) {
+    offerFile(`mon-suivi-${fileTag()}dossier-${from}-au-${to}.md`, dossierText(from, to)).then((ok) => { if (ok) toast('Dossier prêt : donne-le à Claude ou à ton médecin'); });
+  }
+  const DOSSIER_ACTIONS = {
+    'dossier-range': (d) => { S.ui.dossier.range = d.v; if (d.v === 'custom') { const r = dossierRange(); S.ui.dossier.from = S.ui.dossier.from || r.from; S.ui.dossier.to = S.ui.dossier.to || r.to; } render(); },
+    'dossier-file': () => { const r = dossierRange(); dossierFile(r.from, r.to); },
+    'dossier-copy': () => {
+      const r = dossierRange(), text = dossierText(r.from, r.to);
+      copyText(text).then((ok) => { if (ok) toast('Dossier copié : colle-le dans Claude.'); else { S.ui.exportText = text; S.ui.focus = '#export-text'; S.ui.select = true; render(); } });
+    },
+    'dossier-share': () => { const r = dossierRange(), text = dossierText(r.from, r.to); shareText('Mon suivi — dossier santé', text).then((res) => { if (!res) DOSSIER_ACTIONS['dossier-copy'](); }); },
+    'dossier-period': (d) => dossierFile(d.from, d.to)
+  };
+  function dossierGroup() {
+    const dz = S.ui.dossier, r = dossierRange();
+    const text = dossierText(r.from, r.to), filled = daysIn(r.from, r.to).filter((k) => dayMetrics(k).used).length;
+    const kb = Math.max(1, Math.round(new Blob([text]).size / 1024));
+    const key = `${r.from}_${r.to}`;
+    return html`<div class="dgroup dossier"><h3>Dossier complet</h3>
+      <p>Tout ce que tu as noté, rangé pour Claude, une autre IA ou ton médecin : profil, traitements et compléments (doses, cures, régularité), moyennes par semaine et par mois, visites et prises de sang, ressentis, sport, humeur, puis le journal jour par jour. Une consigne en tête demande un bilan général et une synthèse pour le médecin.</p>
+      <div class="chips" role="group" aria-label="Période du dossier">${[['all', 'Tout'], ['365', '12 mois'], ['90', '3 mois'], ['30', '30 jours'], ['custom', 'Choisir les dates']].map(([v, l]) => html`<button type="button" data-act="dossier-range" data-v="${v}" aria-pressed="${bool(dz.range === v)}">${l}</button>`)}</div>
+      ${dz.range === 'custom' ? html`<div class="form-row" style="margin-top:10px"><label class="field"><span>Du</span><input type="date" id="dossier-from" data-dossier="from" value="${r.from}" max="${todayKey()}"></label><label class="field"><span>Au</span><input type="date" id="dossier-to" data-dossier="to" value="${r.to}" max="${todayKey()}"></label></div>` : ''}
+      <p class="dossier-meta">Du ${fullDate(r.from)} au ${fullDate(r.to)} · ${plural(filled, 'jour')} rempli${filled > 1 ? 's' : ''} · ${kb} Ko</p>
+      <div class="actions"><button type="button" class="primary" data-act="dossier-file">${PLATFORM.native ? 'Enregistrer' : 'Télécharger'} le dossier (.md)</button>${store.sample ? '' : html`<button type="button" class="ghost" data-act="dossier-copy">Copier le texte</button>${canShare() ? html`<button type="button" class="ghost" data-act="dossier-share">Envoyer à Claude</button>` : ''}`}</div>
+      ${store.sample ? html`<p class="hint" style="margin:12px 0 6px">Ou demande le bilan général à Claude ici même :</p>${askArea('dossier', key)}` : ''}
+      <p class="hint" style="margin-top:10px">Ce fichier contient tes données de santé : ne le donne qu’à qui tu veux.</p>
+    </div>`;
   }
 
   /* ---------- Rendu : Santé ---------- */
@@ -3834,19 +4176,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const pct = start && start !== h.targetWeight ? Math.max(0, Math.min(100, Math.round(((start - wNow) / (start - h.targetWeight)) * 100))) : 0;
       goal = html`<div class="goalbar"><p>Objectif ${fmtDec(h.targetWeight)} kg · ${left > 0 ? `encore ${fmtDec(left)} kg` : 'atteint'}${done ? ` · ${done > 0 ? '−' : '+'}${fmtDec(Math.abs(done))} kg depuis le départ` : ''}</p><div class="track" role="img" aria-label="${pct} % du chemin vers l’objectif"><i style="width:${pct}%"></i></div></div>`;
     }
-    // 7 derniers jours
-    const days = Array.from({ length: 7 }, (_, i) => addDays(t, i - 6));
-    const avg = (vals) => (vals.length ? vals.reduce((a, c) => a + c, 0) / vals.length : null);
-    const nights = days.map((dk) => nightMinutes((peekDay(addDays(dk, -1)) || {}).bed, (peekDay(dk) || {}).wake)).filter((m) => m != null);
-    const water = days.map((dk) => waterOf(peekDay(dk))).filter((x) => x > 0);
-    let sch = 0, took = 0;
-    days.forEach((dk) => { const st = stats(dk); sch += st.total; took += st.taken; });
-    const eaten = days.map((dk) => sumMacros(dayItems(peekDay(dk)))).filter((x) => x.n);
-    const cis = days.flatMap((dk) => listOf((peekDay(dk) || {}).checkins));
-    const sAvg = (key) => avg(cis.map((c) => scaleValue(c[key])).filter((x) => x != null));
-    const mood = sAvg('mood'), stress = sAvg('stress'), pain = sAvg('pain');
-    const symCount = days.reduce((a, dk) => a + listOf((peekDay(dk) || {}).symptoms).length, 0);
-    const sess = days.flatMap((dk) => sessionsOf(peekDay(dk))), stepDays = days.map((dk) => stepsOf(peekDay(dk))).filter(Boolean);
     // visites et prises de sang
     const nv = nextVisit(t), n = daysBetween(t, nv), pv = prevVisit(addDays(t, 1));
     const visitDays = [];
@@ -3869,6 +4198,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
           </div>
           ${goal}
         </section>
+        ${bilanCard()}
         <section class="card wide" aria-labelledby="h-weight">
           <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.scale}</span><h2 id="h-weight">Poids aux pesées</h2></div>
           ${weightChart()}
@@ -3879,31 +4209,17 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
           <p class="hint">Prise de sang (souvent à jeun), pesée et médecin, ${cycleLabel()}.</p>
           <div class="actions"><button type="button" class="ghost" data-act="goto" data-date="${nv}">Voir ce jour</button>${pv && pv <= t ? html`<button type="button" class="ghost" data-act="goto" data-date="${pv}">Bilan du ${shortDate(pv)}</button>` : ''}</div>
         </section>
-        <section class="card" aria-labelledby="h-week">
-          <div class="card-head"><span class="mico m-midi" aria-hidden="true">${ICON.chart}</span><h2 id="h-week">7 derniers jours</h2></div>
-          <div class="stats">
-            ${stat('Sommeil', nights.length ? fmtDuration(Math.round(avg(nights))) : '—', nights.length ? `moyenne sur ${plural(nights.length, 'nuit')}` : 'pas de nuit notée')}
-            ${stat('Eau', water.length ? `${fmtL(avg(water))} L` : '—', water.length ? `par jour, objectif ${fmtDec(S.settings.goals.water)} L` : 'rien noté')}
-            ${stat('Compléments', sch ? `${Math.round((took / sch) * 100)} %` : '—', sch ? `${took} pris sur ${sch}` : '')}
-            ${stat('Calories', eaten.length ? fmtInt(avg(eaten.map((x) => x.kcal))) : '—', eaten.length ? `par jour, protéines ${fmtG(avg(eaten.map((x) => x.p)))} g` : 'rien noté')}
-            ${stat('Humeur', mood != null ? `${fmtAvg(mood)}/5` : '—', stress != null ? `stress ${fmtAvg(stress)}/5` : '')}
-            ${stat('Sport', plural(sess.length, 'séance'), sess.length ? `${minutesOf(sess)} min au total` : `objectif ${S.settings.sport.perWeek} par semaine`)}
-            ${stat('Pas', stepDays.length ? fmtInt(avg(stepDays)) : '—', stepDays.length ? 'par jour en moyenne' : 'rien noté')}
-            ${stat('Douleur', pain != null ? `${fmtAvg(pain)}/5` : '—', symCount ? `${plural(symCount, 'ressenti')} noté${symCount > 1 ? 's' : ''}` : 'aucun ressenti noté')}
-          </div>
-        </section>
-        ${trendsCard()}
-        <section class="card wide" aria-labelledby="h-labs">
-          <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.drop}</span><h2 id="h-labs">Prises de sang</h2></div>
-          ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Valeur</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${ref}</small></td></tr>`)}</tbody></table></div>`
-            : html`<p class="empty">Tes résultats apparaîtront ici, visite après visite, dès que tu les notes le jour de la visite.</p>`}
-        </section>
-        <section class="card wide" aria-labelledby="h-visits">
+        <section class="card" aria-labelledby="h-visits">
           <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><h2 id="h-visits">Visites</h2></div>
           ${visitDays.length ? html`<ul class="vlist">${visitDays.map((k) => {
             const vis = visitOf(peekDay(k)) || {}, w = weightOf(peekDay(k)), nl = LABS.filter(([key]) => str((vis.labs || {})[key]).trim()).length;
             return html`<li><button type="button" data-act="goto" data-date="${k}"><b>${longDate(k)}</b><span>${[w ? `${fmtDec(w)} kg` : 'pas de pesée', nl ? `${plural(nl, 'résultat')}` : 'résultats à noter', vis.doctor ? 'médecin vu' : ''].filter(Boolean).join(' · ')}</span></button></li>`;
           })}</ul>` : html`<p class="empty">Ta première visite est le ${shortDate(v.start)}.</p>`}
+        </section>
+        <section class="card wide" aria-labelledby="h-labs">
+          <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.drop}</span><h2 id="h-labs">Prises de sang</h2></div>
+          ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Valeur</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${ref}</small></td></tr>`)}</tbody></table></div>`
+            : html`<p class="empty">Tes résultats apparaîtront ici, visite après visite, dès que tu les notes le jour de la visite.</p>`}
         </section>
       </div>`;
   }
@@ -3933,7 +4249,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (el) { try { el.focus(explicit ? undefined : { preventScroll: true }); if (S.ui.select && el.select) el.select(); } catch (e) { /* rien */ } }
     }
     S.ui.focus = null; S.ui.select = false;
-    if (S.ui.view === 'sante') bindChart();
+    if (S.ui.view === 'sante') { bindChart(); drawBilanCharts(); }
     if (S.live) { startLiveTicker(); keepAwake(true); }
     if (chronoRunning()) startChrono();
     refreshLivebar(); refreshWho();
@@ -4241,7 +4557,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   };
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
-    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...PROFILE_ACTIONS,
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
     'sport-day': (d) => { S.ui.date = d.date; S.ui.form = null; render(); },
     'spt-kind': (d) => {
       const dr = S.ui.form && S.ui.form.draft;
@@ -4621,6 +4937,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (v && (n == null || n === '')) toast(key === 'height' ? 'Taille en centimètres, par exemple 180.' : key === 'birth' ? 'Choisis ta date de naissance.' : 'Poids en kilos, par exemple 82,5.');
       if (key !== 'birth' && key !== 'activity') t.value = n ? fmtDec(n) : '';
       if (key === 'birth') render();
+    } else if (ds.dossier) {
+      if (isKey(t.value)) { S.ui.dossier[ds.dossier] = t.value; render(); }
     } else if (ds.setting === 'cureNotify') {
       mutateSettings((st) => { st.cureNotify = t.checked; }, false);
       scheduleReminders();
