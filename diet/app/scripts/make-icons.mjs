@@ -6,7 +6,7 @@ import sharp from "sharp";
 
 const p = (rel) => fileURLToPath(new URL("../" + rel, import.meta.url));
 const svg = readFileSync(p("assets/icon.svg"), "utf8");
-const INK = "#18222F", BG = "#EDF1F5";
+const INK = "#D62839", BG = "#F5F3F4";
 
 const rounded = Buffer.from(svg);
 // motif seul, fond transparent, un peu réduit pour la zone sûre des icônes adaptatives Android

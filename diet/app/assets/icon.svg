@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Mon suivi : une gélule mi-matin (ambre) mi-midi (sarcelle), comme les cases à cocher de l'app -->
-  <rect width="512" height="512" rx="116" fill="#18222F"/>
+  <!-- Mon suivi : une gélule blanche et rose sur fond rouge, les couleurs de l'app -->
+  <rect width="512" height="512" rx="116" fill="#D62839"/>
   <g id="pill" transform="rotate(-40 256 256)">
     <clipPath id="c"><rect x="100" y="188" width="312" height="136" rx="68"/></clipPath>
     <g clip-path="url(#c)">
-      <rect x="100" y="188" width="156" height="136" fill="#F2BA4E"/>
-      <rect x="256" y="188" width="156" height="136" fill="#3CC0B5"/>
-      <rect x="252" y="188" width="8" height="136" fill="#18222F" fill-opacity=".22"/>
-      <rect x="132" y="208" width="96" height="20" rx="10" fill="#fff" fill-opacity=".38"/>
+      <rect x="100" y="188" width="156" height="136" fill="#FFFFFF"/>
+      <rect x="256" y="188" width="156" height="136" fill="#FFC2C9"/>
+      <rect x="252" y="188" width="8" height="136" fill="#8E1422" fill-opacity=".28"/>
+      <rect x="284" y="208" width="96" height="20" rx="10" fill="#fff" fill-opacity=".55"/>
     </g>
   </g>
 </svg>

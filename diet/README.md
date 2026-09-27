@@ -9,6 +9,12 @@ Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, a
 prises de sang visite par visite) et **Réglages** (profil santé, objectifs du jour, visite médicale, sport,
 compléments, mes aliments, Claude, sauvegarde et données).
 
+**Séance en direct** (onglet Sport) : « Commencer maintenant » (ou la séance prévue) lance le chrono ; pour chaque
+exercice, les séries se notent en répétitions (charge, répétitions en réserve) ou en durée (avec un chrono), et le
+repos démarre tout seul après chaque série (1, 1 min 30, 2 ou 3 min, + 15 s, passer), avec vibration et son. L'écran
+reste allumé, un bandeau rappelle la séance sur les autres onglets, et la séance en cours survit à une fermeture de
+l'app. « Terminer » l'enregistre dans la journée avec le détail des séries, que Claude reçoit.
+
 **Sport** : objectif de 5 séances légères de 30 à 45 min par semaine (réglable), avec la semaine en 7 pastilles, la
 séance prévue du jour (« C'est fait » la note en un appui), les pas du jour (objectif 8 000), les séances et les
 activités du quotidien qui comptent aussi (marche, ménage, déménagement…) avec durée, intensité, détails et dépense
@@ -26,7 +32,9 @@ indique la date de reprise ; la veille d'un début, d'une pause ou d'une reprise
 du jour la semaine d'avant, notification la veille à 19:00 et le matin à 7:30 dans l'app Android.
 
 **Faire le point avec Claude** : chaque journée (ou semaine) devient un texte structuré, prêt à coller dans un
-projet Claude. Selon l'endroit où l'app tourne :
+projet Claude. L'app marche sans réseau ; le soir (à partir de 18 h), l'accueil rappelle les journées pas encore
+envoyées et les envoie en un seul texte. Chaque journée envoyée porte la mention « Envoyée le … ». Selon l'endroit
+où l'app tourne :
 
 | Où | Envoyer à Claude | Données |
 |---|---|---|
@@ -60,9 +68,11 @@ modification de `diet/` (workflow « Mon suivi ») :
 
 ## Données
 
+- **Séance en cours** : sur l'appareil seulement (`localStorage`, clé `mon-suivi-live-v1`) jusqu'à « Terminer ».
 - **Compte Claude** : `data/users/<id>/settings` (liste, objectifs, profil santé, visite, sport, mes aliments) et un
   document par mois, `data/users/<id>/mAAAA-MM`
-  (`{ days: { "AAAA-MM-JJ": { taken, water, steps, sport, wake, bed, checkins, symptoms, meals, notes, visit, claude } } }`).
+  (`{ days: { "AAAA-MM-JJ": { taken, water, steps, sport, wake, bed, checkins, symptoms, meals, notes, visit, claude, sent } } }`).
+  Une séance faite en direct garde ses séries dans `sport[].exos` (`{ name, mode, sets: [{ reps, kg, rir } | { sec }] }`).
   Un complément en cure porte `cure: { start, on, off }` (premier jour, semaines de prise, semaines de pause).
   Seuls les champs modifiés sont envoyés, pour ne pas écraser ce qu'un autre appareil écrit en même temps.
 - **Copie sur l'appareil** (`localStorage`, clé `mon-suivi-cloud-v1`) : affichage immédiat au chargement et

@@ -4,13 +4,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EDF1F5; --surface:#FFFFFF; --surface-2:#F5F7FA; --ink:#18222F; --muted:#5A6778; --line:#D5DCE4;
-  --matin:#E9A62B; --matin-2:#F6D48A; --matin-tint:#FCF2DC; --matin-line:#F0D49B; --matin-on:#18222F;
-  --midi:#1F9C93; --midi-2:#94D8D1; --midi-tint:#DFF2EF; --midi-line:#ABDDD7; --midi-on:#18222F;
+  --bg:#F5F3F4; --surface:#FFFFFF; --surface-2:#FAF7F8; --ink:#1A1417; --muted:#6B6166; --line:#E7E0E3;
+  --accent:#D62839; --accent-2:#B51F2F; --on-accent:#FFFFFF; --accent-tint:#FDECEE; --accent-line:#F5C3C9;
+  --matin:#E9A62B; --matin-2:#F6D48A; --matin-tint:#FCF2DC; --matin-line:#F0D49B; --matin-on:#1A1417;
+  --midi:#1F9C93; --midi-2:#94D8D1; --midi-tint:#DFF2EF; --midi-line:#ABDDD7; --midi-on:#1A1417;
   --aprem:#7C5CD6; --aprem-2:#C4B4F1; --aprem-tint:#EDE7FB; --aprem-line:#CFC2F4; --aprem-on:#FFFFFF;
   --soir:#3557C2; --soir-2:#A3B5EC; --soir-tint:#E2E8F8; --soir-line:#B9C7F0; --soir-on:#FFFFFF;
-  --fill:#1F9C93; --bub:#DCE3EA; --danger:#BF3A31; --focus:#3557C2;
-  --chart:#3557C2; --accent-tint:#DFF2EF; --sport:#2F9E5E; --sport-2:#A6DDB9; --sport-tint:#E3F3E8; --sport-line:#B5DEC3; --sport-on:#FFFFFF; --shadow:0 1px 2px rgba(24,34,47,.05), 0 6px 18px rgba(24,34,47,.05);
+  --fill:#1F9C93; --bub:#EEE8EB; --danger:#BF3A31; --focus:#1A1417;
+  --chart:#3557C2; --sport:#D62839; --sport-2:#F2A7B0; --sport-tint:#FDECEE; --sport-line:#F5C3C9; --sport-on:#FFFFFF; --shadow:0 1px 2px rgba(26,20,23,.05), 0 8px 24px rgba(26,20,23,.06);
   --font-ui:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display:"Unbounded", "Arial Black", "Helvetica Neue", Arial, sans-serif;
   color-scheme:light;
@@ -20,26 +21,28 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#10161F; --surface:#18212D; --surface-2:#1D2735; --ink:#E7ECF2; --muted:#9AA7B6; --line:#2C3747;
-    --matin:#F2BA4E; --matin-2:#8C6B2B; --matin-tint:#272115; --matin-line:#4A3D1F; --matin-on:#10161F;
-    --midi:#3CC0B5; --midi-2:#1F6E68; --midi-tint:#122725; --midi-line:#1F4643; --midi-on:#10161F;
-    --aprem:#A78CF3; --aprem-2:#5A4990; --aprem-tint:#1E1A31; --aprem-line:#3A305E; --aprem-on:#10161F;
-    --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#10161F;
-    --fill:#3CC0B5; --bub:#263142; --danger:#F06C62; --focus:#7C95F3;
-    --chart:#6F88E8; --accent-tint:#122725; --shadow:none;
-    --sport:#38A665; --sport-2:#1F5A37; --sport-tint:#132A1C; --sport-line:#24452F; --sport-on:#10161F;
+    --bg:#0F0C0E; --surface:#1A1618; --surface-2:#221D20; --ink:#F6F1F3; --muted:#ABA0A6; --line:#332C30;
+    --accent:#F04B5C; --accent-2:#FF8A96; --on-accent:#1A0A0D; --accent-tint:#2E1519; --accent-line:#5A262E;
+    --matin:#F2BA4E; --matin-2:#8C6B2B; --matin-tint:#272115; --matin-line:#4A3D1F; --matin-on:#0F0C0E;
+    --midi:#3CC0B5; --midi-2:#1F6E68; --midi-tint:#122725; --midi-line:#1F4643; --midi-on:#0F0C0E;
+    --aprem:#A78CF3; --aprem-2:#5A4990; --aprem-tint:#1E1A31; --aprem-line:#3A305E; --aprem-on:#0F0C0E;
+    --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#0F0C0E;
+    --fill:#3CC0B5; --bub:#2B2428; --danger:#F06C62; --focus:#F6F1F3;
+    --chart:#6F88E8; --shadow:none;
+    --sport:#F04B5C; --sport-2:#6E2530; --sport-tint:#2A1418; --sport-line:#4E232A; --sport-on:#1A0A0D;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#10161F; --surface:#18212D; --surface-2:#1D2735; --ink:#E7ECF2; --muted:#9AA7B6; --line:#2C3747;
-  --matin:#F2BA4E; --matin-2:#8C6B2B; --matin-tint:#272115; --matin-line:#4A3D1F; --matin-on:#10161F;
-  --midi:#3CC0B5; --midi-2:#1F6E68; --midi-tint:#122725; --midi-line:#1F4643; --midi-on:#10161F;
-  --aprem:#A78CF3; --aprem-2:#5A4990; --aprem-tint:#1E1A31; --aprem-line:#3A305E; --aprem-on:#10161F;
-  --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#10161F;
-  --fill:#3CC0B5; --bub:#263142; --danger:#F06C62; --focus:#7C95F3;
-  --chart:#6F88E8; --accent-tint:#122725; --shadow:none;
-  --sport:#38A665; --sport-2:#1F5A37; --sport-tint:#132A1C; --sport-line:#24452F; --sport-on:#10161F;
+  --bg:#0F0C0E; --surface:#1A1618; --surface-2:#221D20; --ink:#F6F1F3; --muted:#ABA0A6; --line:#332C30;
+  --accent:#F04B5C; --accent-2:#FF8A96; --on-accent:#1A0A0D; --accent-tint:#2E1519; --accent-line:#5A262E;
+  --matin:#F2BA4E; --matin-2:#8C6B2B; --matin-tint:#272115; --matin-line:#4A3D1F; --matin-on:#0F0C0E;
+  --midi:#3CC0B5; --midi-2:#1F6E68; --midi-tint:#122725; --midi-line:#1F4643; --midi-on:#0F0C0E;
+  --aprem:#A78CF3; --aprem-2:#5A4990; --aprem-tint:#1E1A31; --aprem-line:#3A305E; --aprem-on:#0F0C0E;
+  --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#0F0C0E;
+  --fill:#3CC0B5; --bub:#2B2428; --danger:#F06C62; --focus:#F6F1F3;
+  --chart:#6F88E8; --shadow:none;
+  --sport:#F04B5C; --sport-2:#6E2530; --sport-tint:#2A1418; --sport-line:#4E232A; --sport-on:#1A0A0D;
   color-scheme:dark;
 }
 .m-matin{ --m:var(--matin); --m2:var(--matin-2); --mt:var(--matin-tint); --ml:var(--matin-line); --mo:var(--matin-on); }
@@ -56,13 +59,15 @@ button,input,select,textarea{ font:inherit; color:inherit; }
 button{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
 :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
 h1,h2,h3{ margin:0; text-wrap:balance; }
+[hidden]{ display:none !important; }
 .sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
 /* Barre du haut */
-.top{ position:sticky; top:env(safe-area-inset-top, 0px); z-index:10; background:var(--bg); border-bottom:1px solid var(--line); }
+.top{ position:sticky; top:env(safe-area-inset-top, 0px); z-index:10; background:var(--surface); background:color-mix(in srgb, var(--surface) 90%, transparent); -webkit-backdrop-filter:saturate(1.4) blur(14px); backdrop-filter:saturate(1.4) blur(14px); border-bottom:1px solid var(--line); }
 .top-in{ max-width:1120px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px 16px; min-height:54px; }
 .brand{ display:inline-flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-.01em; }
-.brand svg{ width:26px; height:26px; }
+.brand svg{ width:28px; height:28px; }
+.brand .b-bg{ fill:var(--accent); }
 .sync{ margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--muted); }
 .sync::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--dot, var(--muted)); }
 
@@ -71,8 +76,8 @@ h1,h2,h3{ margin:0; text-wrap:balance; }
 .nav button{ border:0; background:transparent; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 0 6px; border-radius:14px; font-size:11.5px; min-width:0; font-weight:700; color:var(--muted); min-height:56px; }
 .nav-ico{ display:grid; place-items:center; width:100%; max-width:58px; height:30px; border-radius:999px; transition:background-color .15s ease; }
 .nav-ico svg{ width:23px; height:23px; }
-.nav button[aria-current="page"]{ color:var(--ink); }
-.nav button[aria-current="page"] .nav-ico{ background:var(--accent-tint); color:var(--fill); }
+.nav button[aria-current="page"]{ color:var(--accent-2); }
+.nav button[aria-current="page"] .nav-ico{ background:var(--accent-tint); color:var(--accent); }
 @media (hover:hover){ .nav button:not([aria-current]):hover{ color:var(--ink); } }
 
 main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
@@ -89,7 +94,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 /* Boutons */
 .icon{ flex:none; width:42px; height:42px; border-radius:50%; border:1px solid var(--line); background:var(--surface); display:inline-grid; place-items:center; color:var(--ink); padding:0; }
 .ghost{ border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:9px 16px; font-weight:700; font-size:15px; min-height:42px; }
-.primary{ border:0; background:var(--ink); color:var(--bg); border-radius:999px; padding:10px 18px; font-weight:700; font-size:15px; min-height:42px; }
+.primary{ border:0; background:var(--accent); color:var(--on-accent); border-radius:999px; padding:10px 18px; font-weight:700; font-size:15px; min-height:42px; }
+@media (hover:hover){ .primary:hover{ background:var(--accent-2); } }
+.primary:active{ transform:scale(.98); }
+.big{ min-height:54px; font-size:17px; padding:12px 22px; }
 .danger{ border:0; background:var(--danger); color:#fff; border-radius:999px; padding:10px 18px; font-weight:700; min-height:42px; }
 .link{ border:0; background:transparent; color:var(--muted); font-weight:700; font-size:14px; padding:6px 8px; border-radius:8px; }
 .link:hover{ color:var(--ink); }
@@ -115,7 +123,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .lid .dn{ font-size:18px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.3; }
 .lid .bar{ width:64%; height:4px; border-radius:2px; background:var(--bub); overflow:hidden; margin-top:3px; }
 .lid .bar i{ display:block; height:100%; background:var(--fill); border-radius:2px; }
-.lid[aria-current="date"]{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
+.lid[aria-current="date"]{ background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.lid[aria-current="date"] .bar i{ background:var(--on-accent); }
 .lid[aria-current="date"] .wd{ color:inherit; opacity:.7; }
 .lid[aria-current="date"] .bar{ background:rgba(127,127,127,.4); }
 .lid.today .dn{ text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; }
@@ -191,6 +200,13 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .cure-notes .ctxt{ min-width:0; }
 .cure-notes .ctxt span{ display:block; font-size:13.5px; font-weight:600; color:var(--muted); }
 .banner.remind.cure{ border-color:var(--ml); background:var(--mt); }
+.banner.send{ border:1.5px solid var(--accent-line); background:var(--accent-tint); }
+.banner.send .mico{ background:var(--accent); color:var(--on-accent); }
+.pill.sent{ display:inline-flex; align-items:center; gap:5px; background:var(--accent-tint); border-color:var(--accent-line); color:var(--accent-2); font-size:12.5px; white-space:normal; }
+.pill.sent svg{ width:13px; height:13px; }
+.hint.offline{ padding:10px 12px; border-radius:12px; background:var(--surface-2); border:1px dashed var(--line); }
+.livebar:not([hidden]) ~ .toast-wrap{ padding-bottom:calc(142px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width:1000px){ .livebar:not([hidden]) ~ .toast-wrap{ padding-bottom:calc(80px + env(safe-area-inset-bottom, 0px)); } }
 .cure-box{ display:flex; flex-direction:column; gap:10px; padding:12px; border-radius:14px; border:1px solid var(--line); background:var(--surface); }
 .cure-box .hint{ margin:0; }
 
@@ -306,7 +322,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .srow-line select{ min-width:130px; }
 .srow-foot{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
 .switch{ display:inline-flex; align-items:center; gap:8px; font-weight:700; }
-.switch input{ width:22px; height:22px; accent-color:var(--ink); margin:0; }
+.switch input{ width:22px; height:22px; accent-color:var(--accent); margin:0; }
 .filebtn{ display:inline-flex; align-items:center; cursor:pointer; position:relative; }
 .filebtn:focus-within{ outline:3px solid var(--focus); outline-offset:2px; }
 .exportbox{ margin-top:16px; }
@@ -400,7 +416,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 /* Accueil */
 .hero{ margin-bottom:18px; }
 .hero-top{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
-.eyebrow{ margin:0 0 2px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--fill); }
+.eyebrow{ margin:0 0 2px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-2); }
 .hero .strip{ margin:16px 0 0; }
 .tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-bottom:18px; }
 @media (min-width:620px){ .tiles{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
@@ -482,7 +498,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .chev{ flex:none; color:var(--muted); }
 .chev svg{ width:20px; height:20px; }
 .sub-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-.back{ display:inline-flex; align-items:center; gap:4px; border:0; background:transparent; color:var(--fill); font-weight:800; font-size:15px; padding:8px 6px; border-radius:10px; min-height:42px; }
+.back{ display:inline-flex; align-items:center; gap:4px; border:0; background:transparent; color:var(--accent-2); font-weight:800; font-size:15px; padding:8px 6px; border-radius:10px; min-height:42px; }
 .back svg{ width:20px; height:20px; }
 .form-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; margin-bottom:14px; }
 .set-sec .field + .field{ margin-top:12px; }
@@ -513,6 +529,64 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .food-list li.tpl-edit{ display:block; padding:0; border:0; background:transparent; }
 .note.muted{ color:var(--muted); }
 
+/* Séance en direct */
+.live-start{ display:flex; flex-wrap:wrap; align-items:center; gap:14px 16px; padding:16px 18px; margin-bottom:22px; border-radius:22px; background:var(--accent-tint); border:1px solid var(--accent-line); }
+.live-start-ico{ flex:none; width:48px; height:48px; border-radius:15px; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; }
+.live-start-ico svg{ width:28px; height:28px; }
+.ls-txt{ flex:1 1 220px; min-width:0; }
+.ls-txt h2{ font-size:20px; font-weight:800; letter-spacing:-.01em; }
+.ls-txt p{ margin:2px 0 0; color:var(--muted); font-weight:600; font-size:14.5px; }
+.live{ margin-bottom:26px; border-radius:24px; overflow:hidden; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
+.live-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px; background:var(--accent); color:var(--on-accent); }
+.live-id{ display:flex; align-items:center; gap:12px; min-width:0; }
+.live-id h2{ font-size:17px; font-weight:800; }
+.live-since{ display:block; font-size:13px; font-weight:700; opacity:.85; }
+.live-dot{ flex:none; width:10px; height:10px; border-radius:50%; background:currentColor; animation:livepulse 1.6s ease-in-out infinite; }
+@keyframes livepulse{ 50%{ opacity:.3; } }
+@media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+.live-clock{ font-family:var(--font-display); font-size:clamp(34px, 9vw, 52px); font-weight:600; letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
+.live-body{ display:flex; flex-direction:column; gap:16px; padding:16px 18px 18px; }
+.rest{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:12px 14px; border-radius:18px; background:var(--surface-2); border:1px solid var(--line); }
+.rest-lbl{ font-weight:800; }
+.rest .chips button{ min-height:44px; padding:8px 16px; font-size:15px; }
+.rest.on{ justify-content:center; gap:16px 22px; padding:16px; background:var(--accent-tint); border-color:var(--accent-line); }
+.rest-ring{ --p:1; flex:none; width:132px; height:132px; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--p) * 1turn), var(--bub) 0); display:grid; place-items:center; }
+.rest-ring > span{ width:112px; height:112px; border-radius:50%; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.rest-ring small{ font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.rest-ring b{ font-family:var(--font-display); font-size:32px; font-weight:600; line-height:1.1; font-variant-numeric:tabular-nums; }
+.rest-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+.rest-actions button{ min-height:50px; font-size:16px; padding:10px 18px; }
+.switch.small{ font-size:14px; color:var(--muted); }
+.exo-tabs button{ min-height:44px; font-size:15px; }
+.exo-tabs .n{ display:inline-grid; place-items:center; min-width:22px; height:22px; margin-left:4px; padding:0 6px; border-radius:999px; background:var(--accent); color:var(--on-accent); font-size:12px; font-variant-numeric:tabular-nums; }
+.exo-tabs .add{ border-style:dashed; }
+.exo-add{ display:flex; flex-direction:column; gap:10px; }
+.exo-add .row{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px; }
+.exo-add .row .primary{ min-height:46px; }
+.exo{ display:flex; flex-direction:column; gap:12px; padding:14px; border-radius:18px; border:1px solid var(--line); background:var(--surface-2); }
+.exo-head{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
+.exo-head h3{ font-family:var(--font-display); font-size:21px; font-weight:600; letter-spacing:-.01em; }
+.sets{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.sets li{ display:flex; align-items:center; gap:12px; padding:8px 8px 8px 10px; border-radius:12px; background:var(--surface); border:1px solid var(--line); }
+.sets .sn{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--accent-tint); color:var(--accent-2); font-weight:800; display:grid; place-items:center; font-variant-numeric:tabular-nums; }
+.sets .sv{ flex:1; min-width:0; font-weight:700; font-variant-numeric:tabular-nums; }
+.set-form{ display:flex; flex-direction:column; gap:12px; }
+.steps{ display:flex; flex-wrap:wrap; gap:12px 18px; }
+.stepper span small, .field span small{ font-weight:600; color:var(--muted); }
+.step{ display:flex; align-items:center; gap:8px; }
+.step .icon{ width:52px; height:52px; font-size:26px; font-weight:700; line-height:1; }
+.step input{ width:92px; min-height:52px; text-align:center; font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; border-radius:14px; border:1px solid var(--line); background:var(--surface); color:var(--ink); padding:6px; }
+.step input::placeholder{ font-size:12px; font-weight:600; }
+.chips.rir button{ min-width:48px; min-height:46px; font-size:16px; }
+.chrono{ display:flex; align-items:center; gap:10px; min-height:52px; }
+.chrono b{ font-family:var(--font-display); font-size:26px; font-weight:600; min-width:74px; font-variant-numeric:tabular-nums; }
+.wide{ width:100%; }
+.live-foot{ display:flex; flex-direction:column; gap:10px; }
+.finish{ display:flex; flex-direction:column; gap:14px; }
+.finish h3{ font-size:20px; font-weight:800; }
+.livebar{ position:fixed; z-index:25; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom, 0px)); display:inline-flex; align-items:center; gap:9px; max-width:calc(100% - 32px); padding:11px 18px; border:0; border-radius:999px; background:var(--accent); color:var(--on-accent); font-weight:800; font-size:15px; font-variant-numeric:tabular-nums; box-shadow:0 8px 24px rgba(26,20,23,.22); white-space:nowrap; }
+@media (min-width:1000px){ .livebar{ left:calc(50% + 50px); bottom:calc(24px + env(safe-area-inset-bottom, 0px)); } }
+
 /* Messages */
 .toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(88px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
 @media (min-width:1000px){ .toast-wrap{ padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px)); left:100px; } }
@@ -524,7 +598,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 <div id="app">
   <header class="top">
     <div class="top-in">
-      <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect width="512" height="512" rx="116" fill="#18222F"/><g transform="rotate(-40 256 256)"><rect x="100" y="188" width="156" height="136" rx="68" fill="#F2BA4E"/><rect x="178" y="188" width="78" height="136" fill="#F2BA4E"/><rect x="256" y="188" width="156" height="136" rx="68" fill="#3CC0B5"/><rect x="256" y="188" width="78" height="136" fill="#3CC0B5"/></g></svg>Mon suivi</span>
+      <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect class="b-bg" width="512" height="512" rx="116"/><g transform="rotate(-40 256 256)"><rect x="100" y="188" width="156" height="136" rx="68" fill="#FFFFFF"/><rect x="178" y="188" width="78" height="136" fill="#FFFFFF"/><rect x="256" y="188" width="156" height="136" rx="68" fill="#FFC2C9"/><rect x="256" y="188" width="78" height="136" fill="#FFC2C9"/></g></svg>Mon suivi</span>
       <span class="sync" id="sync">Chargement…</span>
     </div>
   </header>
@@ -536,6 +610,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     <button type="button" data-act="tab" data-view="sante"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.4 12.6 12 21l-8.4-8.4A5 5 0 0 1 12 6.3a5 5 0 0 1 8.4 6.3z"/><path d="M3.8 12.5h4.4l1.8-3 3 6 1.8-3h5.4"/></svg></span>Santé</button>
     <button type="button" data-act="tab" data-view="reglages"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>Réglages</button>
   </nav>
+  <button type="button" id="livebar" class="livebar" data-act="tab" data-view="sport" hidden><span class="live-dot" aria-hidden="true"></span><span class="lb-txt">Séance en cours</span></button>
   <div class="toast-wrap"><div id="toast" role="status" aria-live="polite"></div></div>
 </div>
 
@@ -711,6 +786,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
       dumbbell: '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
       pause: '<path d="M9 5.5v13M15 5.5v13"/>',
+      send: '<path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5z"/>',
+      timer: '<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M9.5 2.5h5M12 2.5v3.5M18.3 6.7l1.4-1.4"/>',
       steps: '<path d="M8.2 3.5c1.6 0 2.4 1.7 2.4 3.8s-.9 3.7-2.4 3.7-2.4-1.3-2.4-3.7.8-3.8 2.4-3.8zM6 13.5h4.2v2.2a2.1 2.1 0 0 1-4.2 0zM15.8 8c1.6 0 2.4 1.7 2.4 3.8s-.9 3.7-2.4 3.7-2.4-1.3-2.4-3.7.8-3.8 2.4-3.8zM13.7 18h4.2v.4a2.1 2.1 0 0 1-4.2 0z"/>',
       target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
       pill: '<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="m9.5 9.5 5 5"/>',
@@ -1147,12 +1224,13 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     saved: ['Enregistré', 'var(--fill)', 'Enregistré sur ton compte Claude.'],
     saving: ['Enregistrement…', 'var(--matin)', ''],
     local: ['Sur cet appareil', 'var(--muted)', 'Enregistré dans ce navigateur uniquement.'],
+    localOffline: ['Hors ligne', 'var(--muted)', 'Pas de réseau : tout est enregistré sur cet appareil. Envoie ta journée à Claude quand tu retrouves du réseau.'],
     offline: ['Hors ligne', 'var(--matin)', 'Pas de connexion à ton compte Claude pour l’instant. Tes modifications sont gardées sur cet appareil et partiront dès que possible.'],
     error: ['Pas enregistré en ligne', 'var(--danger)', 'L’enregistrement en ligne a échoué. Tes modifications sont gardées sur cet appareil et repartiront au prochain essai.'],
     localError: ['Pas enregistré', 'var(--danger)', 'Ce navigateur refuse d’enregistrer (stockage plein ou bloqué). Fais une sauvegarde depuis Réglages.']
   };
   function syncState() {
-    if (store.mode === 'local') return !S.ready ? 'loading' : store.failed ? 'localError' : 'local';
+    if (store.mode === 'local') return !S.ready ? 'loading' : store.failed ? 'localError' : navigator.onLine === false ? 'localOffline' : 'local';
     if (store.stopped) return 'error';
     if (!store.online) return store.connectTry ? 'offline' : 'loading';
     if (store.failed) return 'error';
@@ -1509,6 +1587,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       ${weeklyBanner()}
       ${isToday ? visitBanners(k) : ''}
       ${isToday ? cureBanners(k) : ''}
+      ${isToday ? sendBanner() : ''}
       ${summaryTiles(k, d)}
       ${visit ? visitCard(k, d) : ''}
       <div class="daygrid">
@@ -1878,7 +1957,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const claudeUrl = () => S.settings.claudeUrl || 'https://claude.ai/new';
   /* Ce que fait « … Claude » ici : demander dans la page (artefact), partager (Android) ou copier. */
   const claudeVerb = (prefix = '') => (store.sample ? `${prefix}demander à Claude` : canShare() ? `${prefix}envoyer à Claude` : `${prefix}copier pour Claude`).replace(/^./, (c) => c.toUpperCase());
-  const scopeLabel = (scope, key) => (scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine')
+  const scopeLabel = (scope, key) => (scope === 'days' ? plural(key.split(',').length, 'journée') : scope === 'week' ? weekTitle(key).replace(/^Semaine/, 'semaine')
     : scope === 'visit' ? `bilan de la visite du ${shortDate(key)}` : `journée du ${longDate(key).replace(/^./, (c) => c.toLowerCase())}`);
   const SCOPE_TEXT = {
     day: {
@@ -1900,8 +1979,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 
   function claudeBlock(scope, key) {
     const a = S.ui.ask, txt = SCOPE_TEXT[scope];
+    const sent = scope !== 'week' ? (peekDay(key) || {}).sent : null;
     return html`<section class="jsec claude" id="claude" aria-labelledby="claude-title">
-      <div class="sec-head"><h2 id="claude-title">${txt.title}</h2></div>
+      <div class="sec-head"><h2 id="claude-title">${txt.title}</h2>${isObj(sent) ? html`<span class="pill sent">${ICON.check}Envoyée ${fmtStamp(sent.at)}</span>` : ''}</div>
+      ${navigator.onLine === false ? html`<p class="hint offline">Hors ligne : tout est enregistré sur cet appareil. Envoie à Claude dès que tu retrouves du réseau, ce soir avec le wifi par exemple.</p>` : ''}
       <p class="hint">${txt.what}${hasProfile() ? ' Ton profil santé est ajouté.' : ' Remplis ton profil santé (Réglages) pour que Claude te connaisse : âge, taille, traitements.'}</p>
       <label class="field"><span>Ta question (facultatif)</span><textarea id="ask-q" data-ask="q" rows="2" placeholder="${txt.placeholder}">${a.q}</textarea></label>
       <div class="ask-opts">
@@ -2013,7 +2094,12 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const acts = sportOf(d).sort(byTime), pl = plannedFor(k);
     L.push(`Pas : ${stepsOf(d) ? fmtInt(stepsOf(d)) : 'non notés'} (objectif ${fmtInt(S.settings.sport.steps)})`);
     L.push(acts.length ? 'Activité physique :' : `Activité physique : rien de noté${pl ? ` (séance prévue : ${pl.name}, ${pl.minutes} min)` : ''}`);
-    acts.forEach((a) => { const kc = kcalBurned(a); L.push(`- ${str(a.time)} ${KIND_LABEL[a.kind] ? KIND_LABEL[a.kind].toLowerCase() : 'activité'} : ${entryName(a)}${a.minutes ? `, ${a.minutes} min` : ''}, ${intensityLabel(a.intensity).toLowerCase()}${a.details ? ` — ${a.details}` : ''}${kc ? ` (≈ ${kc} kcal)` : ''}`); });
+    acts.forEach((a) => {
+      const kc = kcalBurned(a), exos = listOf(a.exos).filter((e) => isObj(e) && listOf(e.sets).length);
+      L.push(`- ${str(a.time)} ${KIND_LABEL[a.kind] ? KIND_LABEL[a.kind].toLowerCase() : 'activité'} : ${entryName(a)}${a.minutes ? `, ${a.minutes} min` : ''}, ${intensityLabel(a.intensity).toLowerCase()}${a.details && !exos.length ? ` — ${a.details}` : ''}${kc ? ` (≈ ${kc} kcal)` : ''}`);
+      exos.forEach((e) => L.push(`  - ${str(e.name)} : ${listOf(e.sets).map((x) => (e.mode === 'time' ? fmtSec(x.sec || 0) : `${x.reps} rép.${x.kg ? ` à ${fmtKg(x.kg)} kg` : ''}${x.rir != null ? ` (${rirLabel(x.rir)} en réserve)` : ''}`)).join(', ')}`));
+      if (str(a.note).trim()) L.push(`  Notes de séance : ${str(a.note).trim()}`);
+    });
     if (sch.length || extra.length) {
       L.push(`Compléments : ${taken.length} sur ${sch.length} pris`);
       const fmtSup = (s) => `${s.name}${s.dose ? ' ' + s.dose : ''} (${MOMENTS.find((m) => m.key === s.moment).label.toLowerCase()})`;
@@ -2074,6 +2160,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
   function claudeReport(scope, key, withWeek = S.ui.ask.withWeek) {
     if (scope === 'visit') return visitReport(key);
+    if (scope === 'days') {
+      const ks = key.split(',').filter(isKey).sort();
+      return `# Mon suivi — ${plural(ks.length, 'journée')}, du ${shortDate(ks[0])} au ${shortDate(ks[ks.length - 1])}\n\n${ks.map((dk) => dayReport(dk)).join('\n\n')}`;
+    }
     if (scope === 'week') {
       const days = Array.from({ length: 7 }, (_, i) => addDays(key, i)).filter((dk) => dk <= todayKey());
       const wk = sportWeek(key);
@@ -2105,6 +2195,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   function claudeText(scope, key, q = S.ui.ask.q.trim(), withWeek = S.ui.ask.withWeek) {
     const ask = q || {
       week: 'Fais le point sur ma semaine à partir de ce suivi : comment je vais, les tendances, les liens possibles, et ce que je peux améliorer.',
+      days: 'Voici mes dernières journées, que je ne t’avais pas encore envoyées. Fais le point : comment je vais, ce qui a changé d’un jour à l’autre, les liens possibles, et ce que je peux faire demain.',
       visit: 'Voici ma visite médicale et mes 4 dernières semaines. Analyse ma prise de sang (carences ?) en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon alimentation et mon état, et dis-moi quelles questions poser à mon médecin.',
       day: 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.'
     }[scope];
@@ -2113,10 +2204,11 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   /* Consigne complète quand la page demande elle-même à Claude (artefact). */
   function claudePrompt(scope, key) {
     const q = S.ui.ask.q.trim();
-    const words = { day: 300, week: 350, visit: 450 }[scope];
+    const words = { day: 300, week: 350, days: 350, visit: 450 }[scope];
     const titles = {
       day: '## Mon état\n## Ce que je remarque\n## Alimentation et activité\n## Pour demain\n## À surveiller',
       week: '## Ma semaine\n## Tendances\n## Alimentation et sport\n## Pour la semaine prochaine\n## À surveiller',
+      days: '## Mon état\n## D’un jour à l’autre\n## Alimentation et activité\n## Pour demain\n## À surveiller',
       visit: '## Bilan du mois\n## Prise de sang et carences\n## Poids, alimentation et sport\n## Compléments\n## Questions pour le médecin\n## À surveiller'
     }[scope];
     return [
@@ -2149,6 +2241,11 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   async function askClaude(scope, key, fresh) {
     const a = S.ui.ask;
     if (!store.sample || a.status === 'thinking' || a.status === 'streaming') return;
+    if (navigator.onLine === false) {
+      Object.assign(a, { scope, key, status: 'error', text: '', error: 'Pas de réseau : ta journée est bien enregistrée. Demande à Claude dès que tu as du réseau.' });
+      renderAsk();
+      return;
+    }
     const prompt = claudePrompt(scope, key), q = a.q.trim();
     const ctl = new AbortController();
     Object.assign(a, { scope, key, status: 'thinking', text: '', error: '', ctl });
@@ -2161,7 +2258,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (a.ctl !== ctl) return;
       a.text = res.text + (res.truncated ? '\n\n*(Réponse coupée : pose une question plus précise pour la suite.)*' : '');
       a.status = 'done';
-      if (scope !== 'week') mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
+      if (scope !== 'week' && scope !== 'days') mutateDay(key, 'claude', (d) => { d.claude = { at: new Date().toISOString(), q: q.slice(0, 300), text: a.text.slice(0, 8000) }; }, false);
+      markSent(scope, key, 'ask');
     } catch (e) {
       if (a.ctl !== ctl) return;
       const code = (e && e.code) || 'upstream_error';
@@ -2193,7 +2291,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       else return false;
       return true;
     } catch (e) {
-      return /cancel|abort/i.test(String((e && (e.name || e.message)) || e)); // annulé par toi : rien à signaler
+      // annulé par toi (Android : message « Share canceled », navigateur : AbortError) : rien à signaler
+      const why = e && typeof e === 'object' ? `${e.name || ''} ${e.message || ''} ${e.code || ''}` : String(e);
+      return /cancel|abort/i.test(why) ? 'cancel' : false;
     }
   }
   function showReportFallback() {
@@ -2205,12 +2305,44 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
   function copyClaude(scope, key) {
     copyText(claudeText(scope, key)).then((ok) => {
-      if (ok) toast(S.settings.claudeUrl ? 'Copié. Colle-le dans ton projet Claude.' : 'Copié. Colle-le dans une conversation avec Claude.');
+      if (ok) { markSent(scope, key, 'copy'); toast(S.settings.claudeUrl ? 'Copié. Colle-le dans ton projet Claude.' : 'Copié. Colle-le dans une conversation avec Claude.'); }
       else showReportFallback();
     });
   }
   function shareClaude(scope, key) {
-    shareText(`Mon suivi — ${scopeLabel(scope, key)}`, claudeText(scope, key)).then((ok) => { if (!ok) copyClaude(scope, key); });
+    shareText(`Mon suivi — ${scopeLabel(scope, key)}`, claudeText(scope, key)).then((r) => { if (r === true) markSent(scope, key, 'share'); else if (!r) copyClaude(scope, key); });
+  }
+  /* Les journées couvertes par un envoi, puis la marque « envoyée à Claude » sur chacune. */
+  function scopeKeys(scope, key) {
+    if (scope === 'days') return key.split(',').filter(isKey);
+    if (scope === 'week') return Array.from({ length: 7 }, (_, i) => addDays(key, i)).filter((dk) => dk <= todayKey() && hasJournal(peekDay(dk)));
+    return [key];
+  }
+  function markSent(scope, key, how) {
+    const at = new Date().toISOString();
+    scopeKeys(scope, key).forEach((dk) => mutateDay(dk, 'sent', (d) => { d.sent = { at, how }; }, false));
+    safeRender();
+  }
+  /* Journées remplies des 7 derniers jours pas encore envoyées, et aujourd'hui à partir de 18 h. */
+  function unsentDays() {
+    const t = todayKey(), out = [];
+    for (let i = 7; i >= 1; i--) { const dk = addDays(t, -i), d = peekDay(dk); if (hasJournal(d) && !isObj(d.sent)) out.push(dk); }
+    const d = peekDay(t);
+    if (new Date().getHours() >= 18 && hasJournal(d) && !isObj(d.sent)) out.push(t);
+    return out;
+  }
+  function sendBanner() {
+    const days = unsentDays();
+    if (!days.length) return '';
+    const t = todayKey(), onlyToday = days.length === 1 && days[0] === t;
+    const scope = days.length === 1 ? (hasVisit(days[0]) ? 'visit' : 'day') : 'days', key = days.join(',');
+    const names = days.map((dk) => (dk === t ? 'aujourd’hui' : dk === addDays(t, -1) ? 'hier' : `${WD_LONG[weekdayOf(dk)]} ${fromKey(dk).getDate()}`));
+    const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${names[names.length - 1]}` : names[0];
+    const off = navigator.onLine === false;
+    const title = onlyToday ? 'Ce soir : envoie ta journée à Claude' : `${plural(days.length, 'journée')} pas encore envoyée${days.length > 1 ? 's' : ''} à Claude`;
+    const text = `${onlyToday ? 'Tout ce que tu as noté aujourd’hui part en un seul texte.' : `${cap1(list)}, en un seul envoi.`}${off ? ' Pas de réseau pour l’instant : c’est enregistré, envoie dès que tu as le wifi.' : ''}`;
+    const label = canShare() ? 'Envoyer à Claude' : store.sample && scope !== 'days' ? 'Demander à Claude' : 'Copier pour Claude';
+    return html`<div class="banner send" role="note"><span class="mico" aria-hidden="true">${ICON.send}</span><p class="btxt"><b>${title}</b><span>${text}</span></p><div class="actions"><button type="button" class="primary" data-act="send-pending" data-scope="${scope}" data-key="${key}">${label}</button><button type="button" class="link" data-act="send-done" data-key="${key}">Déjà fait</button></div></div>`;
   }
   function scrollToClaude() {
     const el = document.getElementById('claude');
@@ -2570,9 +2702,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const planDone = plan && sessionsOf(d).some((a) => a.tpl === plan.id);
     const entry = (a) => {
       const kc = kcalBurned(a);
-      return html`<li class="entry"><span class="t">${str(a.time)}</span><div class="e-body"><span class="kind">${KIND_LABEL[a.kind] || 'Activité'} · ${intensityLabel(a.intensity).toLowerCase()}</span><p class="note"><b>${entryName(a)}</b>${a.minutes ? ` · ${a.minutes} min` : ''}${kc ? ` · ≈ ${kc} kcal` : ''}</p>${a.details ? html`<p class="note muted">${a.details}</p>` : ''}</div>${rowActions('spt', k, a.id, `${entryName(a)} de ${str(a.time)}`)}</li>`;
+      return html`<li class="entry"><span class="t">${str(a.time)}</span><div class="e-body"><span class="kind">${KIND_LABEL[a.kind] || 'Activité'} · ${intensityLabel(a.intensity).toLowerCase()}</span><p class="note"><b>${entryName(a)}</b>${a.minutes ? ` · ${a.minutes} min` : ''}${kc ? ` · ≈ ${kc} kcal` : ''}</p>${a.details ? html`<p class="note muted">${a.details}</p>` : ''}${a.note ? html`<p class="note muted">${a.note}</p>` : ''}</div>${rowActions('spt', k, a.id, `${entryName(a)} de ${str(a.time)}`)}</li>`;
     };
     return html`<h1 class="page-title">Sport</h1>
+      ${S.live ? livePanel() : isToday ? liveLauncher(plan, planDone) : ''}
       <div class="sport-day"><div><p class="eyebrow">${rel}</p><h2 class="date-sm">${longDate(k)}</h2></div>
         <div class="daynav">
           ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
@@ -2705,6 +2838,392 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       <div class="form-grid">${WD_LONG.map((w, i) => html`<label class="field"><span>${cap1(w)}</span><select id="plan-${i}" data-plan="${i}"><option value="">Repos</option>${sp.templates.map((tp) => html`<option value="${tp.id}"${sp.plan[i] === tp.id ? html` selected` : ''}>${tp.name}</option>`)}</select></label>`)}</div>
     </section>`;
   }
+
+  /* ---------- Séance en direct ---------- */
+  /* La séance en cours vit sur cet appareil (LIVE_KEY) jusqu'à « Enregistrer » : elle survit à une fermeture de l'app.
+     Chrono et repos se calculent à partir des heures de début, jamais en comptant les secondes. */
+  const LIVE_KEY = 'mon-suivi-live-v1';
+  const REST_CHOICES = [60, 90, 120, 180];
+  // Exercices proposés : nom, et « time » quand il se compte en secondes plutôt qu'en répétitions.
+  const EXOS = [
+    ['Squats', 'reps'], ['Pompes', 'reps'], ['Fentes', 'reps'], ['Gainage', 'time'], ['Gainage latéral', 'time'],
+    ['Pont fessier', 'reps'], ['Hip thrust', 'reps'], ['Tractions', 'reps'], ['Dips', 'reps'], ['Rowing haltère', 'reps'],
+    ['Développé couché', 'reps'], ['Développé militaire', 'reps'], ['Soulevé de terre', 'reps'], ['Curl biceps', 'reps'],
+    ['Extensions triceps', 'reps'], ['Crunchs', 'reps'], ['Mollets', 'reps'], ['Burpees', 'reps'],
+    ['Mountain climbers', 'time'], ['Corde à sauter', 'time'], ['Jumping jacks', 'time'], ['Chaise', 'time'], ['Vélo', 'time'], ['Rameur', 'time']
+  ];
+  const exoMode = (name) => { const e = EXOS.find(([n]) => norm(n) === norm(name)); return e ? e[1] : 'reps'; };
+  function loadLive() {
+    const l = lsGet(LIVE_KEY);
+    if (!isObj(l) || !Number.isFinite(l.start) || !isKey(l.date) || !Array.isArray(l.exos)) return null;
+    l.exos = l.exos.filter(isObj).map((e) => ({ id: String(e.id || newId()), name: str(e.name) || 'Exercice', mode: e.mode === 'time' ? 'time' : 'reps', sets: Array.isArray(e.sets) ? e.sets.filter(isObj) : [] }));
+    l.draft = isObj(l.draft) ? l.draft : { exo: '', reps: 10, kg: '', rir: null, sec: 30 };
+    return l;
+  }
+  function saveLive() {
+    if (S.live) { if (!lsSet(LIVE_KEY, S.live)) toast('Cet appareil refuse d’enregistrer la séance en cours : ne ferme pas l’app avant de l’enregistrer.'); }
+    else { try { localStorage.removeItem(LIVE_KEY); } catch (e) { /* rien */ } }
+  }
+  S.live = loadLive();
+  const liveExo = (l = S.live) => (l && l.exos.find((e) => e.id === l.cur)) || null;
+  const fmtClock = (ms, up) => {
+    const t = Math.max(0, up ? Math.ceil(ms / 1000) : Math.floor(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+    return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  };
+  const fmtSec = (sec) => (sec >= 60 ? `${Math.floor(sec / 60)} min${sec % 60 ? ` ${pad(sec % 60)}` : ''}` : `${sec} s`);
+  const fmtRest = (sec) => (sec % 60 ? fmtSec(sec) : `${sec / 60} min`);
+  const fmtKg = (kg) => fmtDec(kg, 2);
+  const rirLabel = (r) => (r >= 4 ? '4+' : String(r));
+  function setText(st, mode) {
+    if (mode === 'time') return fmtSec(st.sec || 0);
+    return `${st.reps} rép.${st.kg ? ` · ${fmtKg(st.kg)} kg` : ''}${st.rir != null ? ` · ${rirLabel(st.rir)} en réserve` : ''}`;
+  }
+  /* « Squats 3 × 8 à 20 kg · Pompes 10, 10, 8 · Gainage 3 × 45 s » : pour la liste, le tableau et Claude. */
+  function exoSummary(e) {
+    const sets = e.sets;
+    if (!sets.length) return '';
+    if (e.mode === 'time') {
+      const same = sets.every((x) => x.sec === sets[0].sec);
+      return `${e.name} ${same && sets.length > 1 ? `${sets.length} × ${fmtSec(sets[0].sec)}` : sets.map((x) => fmtSec(x.sec)).join(', ')}`;
+    }
+    const same = sets.every((x) => x.reps === sets[0].reps && (x.kg || 0) === (sets[0].kg || 0));
+    if (same && sets.length > 1) return `${e.name} ${sets.length} × ${sets[0].reps}${sets[0].kg ? ` à ${fmtKg(sets[0].kg)} kg` : ''}`;
+    return `${e.name} ${sets.map((x) => `${x.reps}${x.kg ? ` × ${fmtKg(x.kg)} kg` : ''}`).join(', ')}`;
+  }
+  const liveSummary = (l) => l.exos.map(exoSummary).filter(Boolean).join(' · ');
+  function liveTotals(l) {
+    const sets = l.exos.flatMap((e) => e.sets.map((x) => ({ ...x, mode: e.mode })));
+    return { exos: l.exos.filter((e) => e.sets.length).length, sets: sets.length, reps: sets.reduce((a, x) => a + (x.mode === 'reps' ? x.reps || 0 : 0), 0) };
+  }
+  /* Intensité proposée d'après les répétitions en réserve : 0-1 intense, 2 modérée, 3 et plus légère. */
+  function suggestIntensity(l) {
+    const rirs = l.exos.flatMap((e) => e.sets.map((x) => x.rir)).filter((x) => x != null);
+    if (!rirs.length) { const tp = S.settings.sport.templates.find((x) => x.id === l.tpl); return tp ? tp.intensity : 1; }
+    const a = rirs.reduce((x, y) => x + y, 0) / rirs.length;
+    return a <= 1.2 ? 3 : a <= 2.5 ? 2 : 1;
+  }
+
+  /* Son, vibration, écran allumé, notification Android quand le repos se termine en arrière-plan. */
+  let audioCtx = null, wakeLock = null, liveTimer = null;
+  function unlockAudio() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { audioCtx = null; }
+  }
+  function beep() {
+    if (!audioCtx) return;
+    try {
+      const t0 = audioCtx.currentTime;
+      [0, 0.3, 0.6].forEach((dt, i) => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = 'sine'; o.frequency.value = i === 2 ? 1175 : 880;
+        g.gain.setValueAtTime(0.0001, t0 + dt);
+        g.gain.exponentialRampToValueAtTime(0.4, t0 + dt + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + 0.24);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t0 + dt); o.stop(t0 + dt + 0.26);
+      });
+    } catch (e) { /* pas de son sur cet appareil */ }
+  }
+  function buzz() { try { if (navigator.vibrate) navigator.vibrate([300, 120, 300, 120, 300]); } catch (e) { /* rien */ } }
+  let wakeAsking = false;
+  async function keepAwake(on) {
+    try {
+      if (on && !wakeLock && !wakeAsking && navigator.wakeLock && document.visibilityState === 'visible') {
+        wakeAsking = true;
+        try { wakeLock = await navigator.wakeLock.request('screen'); } finally { wakeAsking = false; }
+        if (!S.live) { const w = wakeLock; wakeLock = null; await w.release(); return; }
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+      } else if (!on && wakeLock) { const w = wakeLock; wakeLock = null; await w.release(); }
+    } catch (e) { wakeLock = null; }
+  }
+  const REST_NOTIF = 7300;
+  async function restNotify() {
+    const LN = capPlugin('LocalNotifications');
+    if (!LN) return;
+    try {
+      await LN.cancel({ notifications: [{ id: REST_NOTIF }] });
+      const l = S.live;
+      if (!l || !l.rest) return;
+      const perm = await LN.checkPermissions();
+      if (perm.display !== 'granted') return;
+      const exo = liveExo(l);
+      await LN.schedule({ notifications: [{ id: REST_NOTIF, title: 'Repos terminé', body: exo ? `Série suivante : ${exo.name}` : 'À toi pour la série suivante', isExactNotification: false, smallIcon: 'ic_stat_monsuivi', schedule: { at: new Date(l.rest.start + l.rest.dur * 1000), allowWhileIdle: true } }] });
+    } catch (e) { /* le minuteur de l'app reste là */ }
+  }
+  function startRest(dur) {
+    const l = S.live;
+    l.rest = { start: Date.now(), dur };
+    saveLive(); restNotify();
+  }
+  function restDone(late) {
+    const l = S.live;
+    l.rest = null;
+    saveLive(); restNotify();
+    if (!late) { buzz(); if (l.sound !== false) beep(); }
+    toast('Repos terminé : série suivante');
+    safeRender();
+  }
+  function liveTick() {
+    const l = S.live;
+    if (!l) { stopLiveTicker(); return; }
+    const now = Date.now();
+    const elapsed = fmtClock(now - l.start);
+    document.querySelectorAll('[data-tick="elapsed"]').forEach((el) => { if (el.textContent !== elapsed) el.textContent = elapsed; });
+    if (l.chrono) document.querySelectorAll('[data-tick="chrono"]').forEach((el) => { el.textContent = fmtClock(now - l.chrono); });
+    let restTxt = '';
+    if (l.rest) {
+      const left = l.rest.start + l.rest.dur * 1000 - now;
+      if (left <= 0) { restDone(left < -8000); return; }
+      restTxt = fmtClock(left, true);
+      document.querySelectorAll('[data-tick="rest"]').forEach((el) => { if (el.textContent !== restTxt) el.textContent = restTxt; });
+      document.querySelectorAll('[data-tick="rest-ring"]').forEach((el) => el.style.setProperty('--p', (left / (l.rest.dur * 1000)).toFixed(4)));
+    }
+    const bar = document.getElementById('livebar');
+    if (bar && !bar.hidden) bar.querySelector('.lb-txt').textContent = `Séance ${elapsed}${restTxt ? ` · repos ${restTxt}` : ''}`;
+  }
+  function startLiveTicker() { if (!liveTimer) liveTimer = setInterval(liveTick, 250); liveTick(); }
+  function stopLiveTicker() { clearInterval(liveTimer); liveTimer = null; }
+  function refreshLivebar() {
+    const bar = document.getElementById('livebar');
+    if (!bar) return;
+    bar.hidden = !S.live || S.ui.view === 'sport';
+    if (!bar.hidden) liveTick();
+  }
+
+  /* Rendu : bouton de départ (onglet Sport, aujourd'hui) et séance en cours. */
+  function liveLauncher(plan, planDone) {
+    return html`<section class="live-start" aria-labelledby="ls-title">
+      <span class="live-start-ico" aria-hidden="true">${ICON.timer}</span>
+      <div class="ls-txt"><h2 id="ls-title">Séance en direct</h2><p>Chrono, repos entre les séries, et chaque série notée pendant que tu t’entraînes.</p></div>
+      <div class="actions">
+        ${plan && !planDone ? html`<button type="button" class="primary big" data-act="live-start" data-tpl="${plan.id}">Commencer : ${plan.name}</button><button type="button" class="ghost big" data-act="live-start">Autre séance</button>`
+          : html`<button type="button" class="primary big" data-act="live-start">Commencer maintenant</button>`}
+      </div>
+    </section>`;
+  }
+  function stepper(f, label, value, step, ph) {
+    return html`<div class="field stepper"><span id="st-${f}">${label}</span><div class="step" role="group" aria-labelledby="st-${f}">
+      <button type="button" class="icon" data-act="live-step" data-f="${f}" data-v="${-step}" aria-label="${label} : moins ${String(step).replace('.', ',')}">−</button>
+      <input type="text" inputmode="decimal" id="live-${f}" data-live="${f}" value="${value === '' || value == null ? '' : String(value).replace('.', ',')}" placeholder="${ph || '0'}" autocomplete="off" aria-labelledby="st-${f}">
+      <button type="button" class="icon" data-act="live-step" data-f="${f}" data-v="${step}" aria-label="${label} : plus ${String(step).replace('.', ',')}">+</button>
+    </div></div>`;
+  }
+  function livePanel() {
+    const l = S.live, exo = liveExo(l), dr = l.draft, tot = liveTotals(l), fin = l.finishing;
+    const tp = S.settings.sport.templates.find((x) => x.id === l.tpl);
+    const rest = l.rest
+      ? html`<div class="rest on" role="group" aria-label="Repos en cours">
+          <div class="rest-ring" data-tick="rest-ring" style="--p:1"><span><small>Repos</small><b data-tick="rest">${fmtClock(l.rest.start + l.rest.dur * 1000 - Date.now(), true)}</b></span></div>
+          <div class="rest-actions"><button type="button" class="ghost" data-act="live-rest-add" data-v="-15">− 15 s</button><button type="button" class="ghost" data-act="live-rest-add" data-v="15">+ 15 s</button><button type="button" class="primary" data-act="live-rest-skip">Passer</button></div>
+        </div>`
+      : html`<div class="rest" role="group" aria-labelledby="rest-lbl"><span class="rest-lbl" id="rest-lbl">Repos</span>
+          <div class="chips">${REST_CHOICES.map((v) => html`<button type="button" data-act="live-rest" data-v="${v}" aria-pressed="${bool(l.restDur === v)}">${fmtRest(v)}</button>`)}</div>
+          <label class="switch small"><input type="checkbox" id="live-auto" data-live="auto"${l.autoRest !== false ? html` checked` : ''}> Après chaque série</label>
+        </div>`;
+    const tabs = html`<div class="exo-tabs chips" role="group" aria-label="Exercices de la séance">${l.exos.map((e) => html`<button type="button" data-act="live-exo" data-id="${e.id}" aria-pressed="${bool(e.id === l.cur)}">${e.name}${e.sets.length ? html` <span class="n">${e.sets.length}</span>` : ''}</button>`)}<button type="button" class="add" data-act="live-exo-new" aria-pressed="${bool(!!l.adding)}">+ Exercice</button></div>`;
+    const inSession = new Set(l.exos.map((e) => norm(e.name)));
+    const adding = l.adding || !l.exos.length ? html`<div class="exo-add">
+        <div class="row"><label class="field grow"><span>Exercice</span><input type="text" id="live-exo" data-live="exo" list="exo-list" value="${str(dr.exo)}" placeholder="Squats, pompes, corde à sauter…" autocomplete="off" enterkeyhint="done"></label><button type="button" class="primary" data-act="live-exo-add">Ajouter</button></div>
+        <datalist id="exo-list">${EXOS.map(([n]) => html`<option value="${n}"></option>`)}</datalist>
+        <div class="chips">${EXOS.filter(([n]) => !inSession.has(norm(n))).slice(0, 12).map(([n]) => html`<button type="button" data-act="live-exo-pick" data-v="${n}">${n}</button>`)}</div>
+      </div>` : '';
+    const exoBlock = exo && !l.adding ? html`<div class="exo">
+        <div class="exo-head"><h3>${exo.name}</h3>
+          <div class="seg" role="group" aria-label="Compter en"><button type="button" data-act="live-mode" data-v="reps" aria-pressed="${bool(exo.mode === 'reps')}">Répétitions</button><button type="button" data-act="live-mode" data-v="time" aria-pressed="${bool(exo.mode === 'time')}">Durée</button></div>
+        </div>
+        ${exo.sets.length ? html`<ol class="sets">${exo.sets.map((x, i) => html`<li><span class="sn" aria-hidden="true">${i + 1}</span><span class="sv">${setText(x, exo.mode)}</span><button type="button" class="link" data-act="live-set-del" data-id="${x.id}" aria-label="Supprimer la série ${i + 1}">Retirer</button></li>`)}</ol>`
+          : html`<p class="hint" style="margin:0">Règle ta première série puis valide-la.${exo.sets.length ? '' : html` <button type="button" class="link" data-act="live-exo-del">Retirer l’exercice</button>`}</p>`}
+        <div class="set-form">
+          ${exo.mode === 'reps' ? html`<div class="steps">${stepper('reps', 'Répétitions', dr.reps, 1)}${stepper('kg', 'Charge (kg)', dr.kg, 2.5, '—')}</div>
+            <div class="field"><span id="rir-lbl">En réserve <small>répétitions que tu aurais encore pu faire</small></span>
+              <div class="chips rir" role="group" aria-labelledby="rir-lbl">${[0, 1, 2, 3, 4].map((v) => html`<button type="button" data-act="live-rir" data-v="${v}" aria-pressed="${bool(dr.rir === v)}" aria-label="${v === 4 ? '4 ou plus' : v} en réserve">${v === 4 ? '4+' : v}</button>`)}</div></div>
+            <p class="hint" style="margin:-4px 0 0">Charge vide : poids du corps.</p>`
+            : html`<div class="steps">${stepper('sec', 'Durée (s)', dr.sec, 5)}
+              <div class="field"><span id="chrono-lbl">Chrono</span><div class="chrono" role="group" aria-labelledby="chrono-lbl"><b data-tick="chrono">${l.chrono ? fmtClock(Date.now() - l.chrono) : '0:00'}</b><button type="button" class="${l.chrono ? 'primary' : 'ghost'}" data-act="live-chrono">${l.chrono ? 'Arrêter' : 'Lancer'}</button></div></div></div>`}
+          <button type="button" class="primary big wide" data-act="live-set">Valider la série ${exo.sets.length + 1}</button>
+        </div>
+      </div>` : '';
+    const finish = fin ? html`<div class="finish" role="group" aria-labelledby="fin-title">
+        <h3 id="fin-title">Terminer la séance</h3>
+        <p class="hint" style="margin:0">${tot.sets ? `${plural(tot.exos, 'exercice')} · ${plural(tot.sets, 'série')}${tot.reps ? ` · ${fmtInt(tot.reps)} répétitions` : ''}` : 'Aucune série notée : la séance sera enregistrée avec sa durée.'}</p>
+        <div class="form-row">
+          <label class="field field-time"><span>Durée (min)</span><input type="text" inputmode="numeric" id="live-fin-min" data-live="finMinutes" value="${fin.minutes == null ? '' : String(fin.minutes)}" autocomplete="off"></label>
+          <label class="field grow"><span>Nom</span><input type="text" id="live-fin-name" data-live="finName" value="${str(fin.name)}" autocomplete="off"></label>
+        </div>
+        <div class="chips" role="group" aria-label="Activité">${SPORT_TYPES.seance.map(([key, name]) => html`<button type="button" data-act="live-fin-type" data-v="${key}" aria-pressed="${bool(fin.type === key)}">${name}</button>`)}</div>
+        <div class="field"><span id="fin-int">Intensité</span><div class="seg" role="group" aria-labelledby="fin-int">${INTENSITIES.map(([v, t]) => html`<button type="button" data-act="live-fin-int" data-v="${v}" aria-pressed="${bool(fin.intensity === v)}">${t}</button>`)}</div></div>
+        <div class="actions"><button type="button" class="primary big" data-act="live-save">Enregistrer la séance</button><button type="button" class="ghost big" data-act="live-finish-cancel">Continuer</button></div>
+      </div>` : '';
+    return html`<section class="live" id="live" aria-labelledby="live-title">
+      <div class="live-top">
+        <div class="live-id"><span class="live-dot" aria-hidden="true"></span><div><h2 id="live-title">Séance en cours</h2><span class="live-since">depuis ${cap1(timeOf(l.start))}${l.date !== todayKey() ? ` · ${lowDate(l.date)}` : ''}</span></div></div>
+        <b class="live-clock" data-tick="elapsed" role="timer" aria-label="Durée de la séance">${fmtClock(Date.now() - l.start)}</b>
+      </div>
+      <div class="live-body">
+        <label class="field"><span>Séance</span><input type="text" id="live-name" data-live="name" value="${str(l.name)}" autocomplete="off"></label>
+        ${tp && tp.details ? html`<p class="hint" style="margin:0"><b>Au programme :</b> ${tp.details}</p>` : ''}
+        ${fin ? '' : rest}
+        ${fin ? '' : html`${l.exos.length ? tabs : ''}${adding}${exoBlock}`}
+        ${fin ? finish : html`<label class="field"><span>Notes de séance</span><textarea id="live-note" data-live="note" rows="2" placeholder="Sensations, douleurs, énergie…">${str(l.note)}</textarea></label>
+        <div class="live-foot">
+          ${tot.sets ? html`<p class="hint" style="margin:0">${plural(tot.exos, 'exercice')} · ${plural(tot.sets, 'série')}${tot.reps ? ` · ${fmtInt(tot.reps)} répétitions` : ''}</p>` : ''}
+          <div class="actions">
+            <button type="button" class="primary big" data-act="live-finish">Terminer la séance</button>
+            <label class="switch small"><input type="checkbox" id="live-sound" data-live="sound"${l.sound !== false ? html` checked` : ''}> Son à la fin du repos</label>
+            ${S.ui.confirm === 'live' ? html`<span class="row-actions"><button type="button" class="link danger" data-act="live-abandon">Oui, abandonner</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>`
+              : html`<button type="button" class="link" data-act="live-abandon-ask">Abandonner</button>`}
+          </div>
+        </div>`}
+      </div>
+    </section>`;
+  }
+  const timeOf = (ms) => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+
+  /* Actions de la séance en direct. */
+  function liveDraftNum(f) { const n = num(S.live.draft[f]); return n == null ? null : n; }
+  function pickExo(name) {
+    const l = S.live, nm = String(name || '').trim().slice(0, 40);
+    if (!nm) { toast('Écris le nom de l’exercice.'); return; }
+    let e = l.exos.find((x) => norm(x.name) === norm(nm));
+    if (!e) { e = { id: newId(), name: cap1(nm), mode: exoMode(nm), sets: [] }; l.exos.push(e); }
+    selectExo(e);
+    l.adding = false; l.draft.exo = '';
+    saveLive(); render();
+  }
+  function selectExo(e) {
+    const l = S.live, last = e.sets[e.sets.length - 1];
+    l.cur = e.id;
+    if (last && e.mode === 'reps') Object.assign(l.draft, { reps: last.reps, kg: last.kg || '', rir: last.rir });
+    else if (last) l.draft.sec = last.sec;
+    else if (e.mode === 'time' && !(num(l.draft.sec) > 0)) l.draft.sec = 30;
+  }
+  const LIVE_ACTIONS = {
+    'live-start': (d) => {
+      if (S.live) { S.ui.view = 'sport'; render(); toTop(); return; }
+      const tp = d.tpl ? S.settings.sport.templates.find((x) => x.id === d.tpl) : null;
+      S.live = { v: 1, date: todayKey(), start: Date.now(), name: tp ? tp.name : 'Séance', tpl: tp ? tp.id : null, type: tp ? tp.type : 'renfo',
+        exos: [], cur: null, adding: true, rest: null, restDur: 90, autoRest: true, sound: true, chrono: null, note: '', finishing: null,
+        draft: { exo: '', reps: 10, kg: '', rir: null, sec: 30 } };
+      unlockAudio(); keepAwake(true);
+      saveLive();
+      Object.assign(S.ui, { view: 'sport', date: todayKey(), form: null, confirm: null, focus: '#live-exo' });
+      render(); toTop(); startLiveTicker();
+      toast('Séance commencée');
+    },
+    'live-exo': (d) => { const e = S.live.exos.find((x) => x.id === d.id); if (e) { selectExo(e); S.live.adding = false; saveLive(); render(); } },
+    'live-exo-new': () => { S.live.adding = !S.live.adding || !S.live.exos.length; S.ui.focus = S.live.adding ? '#live-exo' : null; saveLive(); render(); },
+    'live-exo-add': () => pickExo(S.live.draft.exo),
+    'live-exo-pick': (d) => pickExo(d.v),
+    'live-exo-del': () => {
+      const l = S.live, e = liveExo(l);
+      if (!e || e.sets.length) return;
+      l.exos = l.exos.filter((x) => x !== e);
+      l.cur = l.exos.length ? l.exos[l.exos.length - 1].id : null;
+      l.adding = !l.exos.length;
+      saveLive(); render();
+    },
+    'live-mode': (d) => { const e = liveExo(); if (e) { e.mode = d.v === 'time' ? 'time' : 'reps'; if (e.mode === 'time' && !(num(S.live.draft.sec) > 0)) S.live.draft.sec = 30; saveLive(); render(); } },
+    'live-step': (d) => {
+      const l = S.live, f = d.f, step = Number(d.v);
+      const lim = { reps: [0, 300], kg: [0, 500], sec: [0, 3600] }[f];
+      const cur = liveDraftNum(f) || 0;
+      let v = Math.min(lim[1], Math.max(lim[0], cur + step));
+      if (f === 'kg') v = Math.round(v * 4) / 4;
+      l.draft[f] = f === 'kg' && v === 0 ? '' : v;
+      saveLive();
+      const input = document.getElementById(`live-${f}`);
+      if (input) input.value = l.draft[f] === '' ? '' : String(l.draft[f]).replace('.', ',');
+    },
+    'live-rir': (d) => { const v = Number(d.v); S.live.draft.rir = S.live.draft.rir === v ? null : v; saveLive(); render(); },
+    'live-chrono': () => {
+      const l = S.live;
+      if (l.chrono) { l.draft.sec = Math.max(1, Math.round((Date.now() - l.chrono) / 1000)); l.chrono = null; }
+      else { l.chrono = Date.now(); unlockAudio(); }
+      saveLive(); render();
+    },
+    'live-set': () => {
+      const l = S.live, e = liveExo(l), dr = l.draft;
+      if (!e) return;
+      unlockAudio();
+      let set;
+      if (e.mode === 'time') {
+        if (l.chrono) { dr.sec = Math.max(1, Math.round((Date.now() - l.chrono) / 1000)); l.chrono = null; }
+        const sec = Math.round(num(dr.sec) || 0);
+        if (!(sec > 0)) { toast('Indique la durée de la série.'); return; }
+        set = { id: newId(), sec, at: Date.now() };
+      } else {
+        const reps = Math.round(num(dr.reps) || 0), kg = posNum(dr.kg);
+        if (!(reps > 0)) { toast('Indique le nombre de répétitions.'); return; }
+        set = { id: newId(), reps, kg: kg ? Math.round(kg * 4) / 4 : null, rir: dr.rir == null ? null : dr.rir, at: Date.now() };
+      }
+      e.sets.push(set);
+      if (l.autoRest !== false) startRest(l.restDur);
+      saveLive();
+      S.ui.focus = '[data-act="live-set"]';
+      render();
+      toast(`${e.name} : série ${e.sets.length} notée`);
+    },
+    'live-set-del': (d) => { const e = liveExo(); if (e) { e.sets = e.sets.filter((x) => x.id !== d.id); saveLive(); render(); } },
+    'live-rest': (d) => { const l = S.live; l.restDur = Number(d.v); unlockAudio(); startRest(l.restDur); render(); },
+    'live-rest-add': (d) => {
+      const l = S.live;
+      if (!l.rest) return;
+      const spent = (Date.now() - l.rest.start) / 1000;
+      l.rest.dur = Math.max(Math.ceil(spent) + 1, l.rest.dur + Number(d.v));
+      saveLive(); restNotify(); liveTick();
+    },
+    'live-rest-skip': () => { S.live.rest = null; saveLive(); restNotify(); S.ui.focus = '[data-act="live-set"]'; render(); },
+    'live-finish': () => {
+      const l = S.live, min = Math.max(1, Math.round((Date.now() - l.start) / 60000));
+      l.finishing = { minutes: min <= 300 ? min : null, name: l.name, type: l.type, intensity: suggestIntensity(l) };
+      l.rest = null; l.chrono = null; restNotify();
+      saveLive(); S.ui.focus = '[data-act="live-save"]'; render();
+    },
+    'live-finish-cancel': () => { S.live.finishing = null; saveLive(); render(); },
+    'live-fin-type': (d) => { S.live.finishing.type = d.v; saveLive(); render(); },
+    'live-fin-int': (d) => { S.live.finishing.intensity = Number(d.v); saveLive(); render(); },
+    'live-save': () => {
+      const l = S.live, fin = l.finishing;
+      const minutes = Math.round(num(fin.minutes) || 0);
+      if (!(minutes > 0) || minutes > 600) { toast('Indique la durée de la séance en minutes.'); return; }
+      const exos = l.exos.filter((e) => e.sets.length).map((e) => ({ name: e.name, mode: e.mode, sets: e.sets.map((x) => (e.mode === 'time' ? { sec: x.sec } : { reps: x.reps, kg: x.kg || null, rir: x.rir == null ? null : x.rir })) }));
+      const entry = { id: newId(), time: timeOf(l.start), kind: 'seance', type: sportType(fin.type) ? fin.type : 'renfo', name: String(fin.name || '').trim().slice(0, 60) || 'Séance',
+        minutes, intensity: intIn(fin.intensity, 1, 3, 1), details: liveSummary(l).slice(0, 500), note: String(l.note || '').trim().slice(0, 1000), tpl: l.tpl || null, exos, live: true };
+      mutateDay(l.date, 'sport', (day) => { day.sport.push(entry); }, false);
+      const date = l.date;
+      S.live = null; saveLive(); stopLiveTicker(); keepAwake(false); restNotify();
+      Object.assign(S.ui, { view: 'sport', date, confirm: null });
+      render(); toTop();
+      toast(`Séance enregistrée : ${entry.name}, ${minutes} min`);
+    },
+    'live-abandon-ask': () => { S.ui.confirm = 'live'; S.ui.focus = '[data-act="live-abandon"]'; render(); },
+    'live-abandon': () => {
+      S.live = null; S.ui.confirm = null; saveLive(); stopLiveTicker(); keepAwake(false); restNotify();
+      render(); toast('Séance abandonnée');
+    }
+  };
+  /* Champs de la séance (saisie directe) : gardés au fil de l'eau, sans redessiner la page. */
+  function onLiveInput(f, t) {
+    const l = S.live;
+    if (!l) return;
+    if (f === 'auto') l.autoRest = t.checked;
+    else if (f === 'sound') { l.sound = t.checked; if (t.checked) unlockAudio(); }
+    else if (f === 'name') l.name = t.value.slice(0, 60);
+    else if (f === 'note') l.note = t.value.slice(0, 1000);
+    else if (f === 'exo') l.draft.exo = t.value;
+    else if (f === 'finMinutes') { if (l.finishing) l.finishing.minutes = t.value; }
+    else if (f === 'finName') { if (l.finishing) l.finishing.name = t.value; }
+    else if (['reps', 'kg', 'sec'].includes(f)) l.draft[f] = t.value;
+    saveLive();
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!S.live) return;
+    if (document.visibilityState === 'visible') { keepAwake(true); liveTick(); } else saveLive();
+  });
 
   /* ---------- Rendu : Santé ---------- */
   const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
@@ -2873,6 +3392,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     }
     S.ui.focus = null; S.ui.select = false;
     if (S.ui.view === 'sante') bindChart();
+    if (S.live) { startLiveTicker(); keepAwake(true); }
+    refreshLivebar();
   }
   function isEditing() {
     const a = document.activeElement;
@@ -2943,7 +3464,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const minutes = Math.round(posNum(dr.minutes) || 0), details = String(dr.details || '').trim().slice(0, 500);
       if (!minutes && !details) { toast('Indique la durée ou ce que tu as fait.'); return false; }
       const sportKind = dr.kind === 'quotidien' ? 'quotidien' : 'seance';
+      const prev = f.id ? sportOf(peekDay(f.date)).find((x) => x.id === f.id) : null;
       entry = {
+        ...(prev && prev.live ? { exos: prev.exos, note: prev.note, live: true } : {}),
         id: f.id || newId(), time: dr.time, kind: sportKind,
         type: sportType(dr.type) ? dr.type : sportKind === 'quotidien' ? 'autre-q' : 'autre',
         name: String(dr.name || '').trim().slice(0, 60), minutes: minutes || null,
@@ -3133,7 +3656,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   };
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
-    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'),
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS,
     'sport-day': (d) => { S.ui.date = d.date; S.ui.form = null; render(); },
     'spt-kind': (d) => {
       const dr = S.ui.form && S.ui.form.draft;
@@ -3306,6 +3829,12 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     'claude-ask': (d) => askClaude(d.scope, d.key, S.ui.ask.scope === d.scope && S.ui.ask.key === d.key && !!S.ui.ask.text),
     'ask-stop': () => { if (S.ui.ask.ctl) S.ui.ask.ctl.abort(); },
     'claude-copy': (d) => copyClaude(d.scope, d.key),
+    'send-pending': (d) => {
+      if (canShare()) shareClaude(d.scope, d.key);
+      else if (store.sample && d.scope !== 'days') claudeGo(d.key);
+      else copyClaude(d.scope, d.key);
+    },
+    'send-done': (d) => { markSent('days', d.key, 'manual'); toast('C’est noté'); },
     'claude-share': (d) => shareClaude(d.scope, d.key),
     'answer-copy': (d) => {
       const a = S.ui.ask, mine = a.scope === d.scope && a.key === d.key && a.text;
@@ -3430,6 +3959,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const field = ds.bind, val = t.value;
       mutateDay(ds.date, field, (d) => { d[field] = val; }, false);
       safeRender();
+    } else if (ds.live) {
+      onLiveInput(ds.live, t);
     } else if (ds.bind === 'steps') {
       const n = Math.round(num(String(t.value).replace(/[\s.,]/g, '')) || 0);
       if (String(t.value).trim() && (n < 0 || n > 100000)) { toast('Entre 0 et 100 000 pas.'); return; }
@@ -3527,6 +4058,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       }, false);
     } else if (ds.tpl && S.ui.tplEdit) {
       S.ui.tplEdit.draft[ds.tpl] = t.value;
+    } else if (ds.live) {
+      onLiveInput(ds.live, t);
     } else if (ds.ask === 'q') {
       S.ui.ask.q = t.value;
       refreshReport();
@@ -3545,6 +4078,11 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       s[ds.sset] = t.value;
       markDirty('settings');
     }
+  });
+  // Entrée dans le champ « Exercice » de la séance en direct : l'ajoute.
+  app.addEventListener('keydown', (e) => {
+    const t = e.target;
+    if (e.key === 'Enter' && t && t.dataset && t.dataset.live === 'exo' && S.live) { e.preventDefault(); pickExo(t.value); }
   });
   /* Le texte pour Claude affiché suit la question et la case « 6 jours d'avant ». */
   function refreshReport() {
@@ -3581,6 +4119,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     else flushAll();
   });
   window.addEventListener('online', resume);
+  // réseau perdu ou retrouvé : le statut en haut et le rappel d'envoi à Claude suivent
+  const netChanged = () => { refreshSync(); if (S.ready) safeRender(); };
+  window.addEventListener('online', netChanged);
+  window.addEventListener('offline', netChanged);
   window.addEventListener('pagehide', flushAll);
   setInterval(checkRollover, 60000);
   // la courbe du poids se recalcule à la largeur de l'écran

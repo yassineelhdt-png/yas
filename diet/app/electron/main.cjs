@@ -21,7 +21,7 @@ function createWindow() {
     minWidth: 380,
     minHeight: 560,
     title: "Mon suivi",
-    backgroundColor: nativeTheme.shouldUseDarkColors ? "#10161F" : "#EDF1F5",
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#0F0C0E" : "#F5F3F4",
     autoHideMenuBar: true,
     icon: path.join(__dirname, "..", "build", "icon.png"),
     show: false,
