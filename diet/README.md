@@ -15,6 +15,12 @@ activités du quotidien qui comptent aussi (marche, ménage, déménagement…) 
 estimée (MET × poids × durée), et un graphique des séances sur 8 semaines. Réglages → *Sport* : objectifs, séances
 types (cardio doux, renfo maison, marche rapide, corde à sauter, mobilité) et programme lundi → dimanche.
 
+**Cures** : un complément peut se prendre en cure, avec des semaines de prise puis des semaines de pause, en boucle
+(Réglages → *Compléments* → « Prendre en cure »). Pendant la pause, il sort de la liste du jour et une ligne
+indique la date de reprise ; la veille d'un début, d'une pause ou d'une reprise, un rappel s'affiche sur l'accueil
+(et une notification à 19:00 dans l'app Android). L'omberacetam est réglé sur 6 semaines de prise puis 4 de pause
+à partir du 10 octobre 2026 (notice du Noopept : cure de 1,5 à 3 mois, puis 1 mois de pause avant la suivante).
+
 **Visite médicale toutes les 4 semaines** (première le lundi 28 septembre 2026, réglable) : pesée, prise de sang
 (valeurs avec repères habituels), avis du médecin, et bilan des 28 jours d'avant à envoyer à Claude. Rappel sur la page
 du jour la semaine d'avant, notification la veille à 19:00 et le matin à 7:30 dans l'app Android.
@@ -57,6 +63,7 @@ modification de `diet/` (workflow « Mon suivi ») :
 - **Compte Claude** : `data/users/<id>/settings` (liste, objectifs, profil santé, visite, sport, mes aliments) et un
   document par mois, `data/users/<id>/mAAAA-MM`
   (`{ days: { "AAAA-MM-JJ": { taken, water, steps, sport, wake, bed, checkins, symptoms, meals, notes, visit, claude } } }`).
+  Un complément en cure porte `cure: { start, on, off }` (premier jour, semaines de prise, semaines de pause).
   Seuls les champs modifiés sont envoyés, pour ne pas écraser ce qu'un autre appareil écrit en même temps.
 - **Copie sur l'appareil** (`localStorage`, clé `mon-suivi-cloud-v1`) : affichage immédiat au chargement et
   modifications pas encore confirmées par le compte, renvoyées au prochain chargement ou au retour du réseau.

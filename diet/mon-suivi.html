@@ -180,6 +180,19 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .it-dose{ font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
 .it-note{ flex-basis:100%; font-size:14px; color:var(--muted); line-height:1.35; }
 .freq{ flex:none; font-size:12px; font-weight:800; padding:3px 9px; border-radius:999px; background:var(--surface); border:1px solid var(--ml); white-space:nowrap; }
+.it-cure{ flex-basis:100%; display:flex; margin-top:5px; }
+.freq.cure{ background:var(--mt); border-color:var(--m); }
+.freq.cure.last{ background:var(--m); color:var(--mo); }
+.cure-notes{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.cure-notes li{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:14px; border:1.5px dashed var(--ml); background:var(--surface); }
+.cure-notes .mico{ width:30px; height:30px; border-radius:10px; background:var(--mt); color:var(--m); }
+.cure-notes .mico svg{ width:17px; height:17px; }
+.cure-notes b{ display:block; font-weight:800; }
+.cure-notes .ctxt{ min-width:0; }
+.cure-notes .ctxt span{ display:block; font-size:13.5px; font-weight:600; color:var(--muted); }
+.banner.remind.cure{ border-color:var(--ml); background:var(--mt); }
+.cure-box{ display:flex; flex-direction:column; gap:10px; padding:12px; border-radius:14px; border:1px solid var(--line); background:var(--surface); }
+.cure-box .hint{ margin:0; }
 
 .list{ list-style:none; margin:0; padding:0; }
 .entry{ display:grid; grid-template-columns:52px minmax(0,1fr) auto; gap:4px 12px; padding:12px 0; border-top:1px solid var(--line); align-items:start; }
@@ -360,6 +373,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .labs .count{ font-size:13px; }
 .vgrid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:10px; margin-bottom:10px; }
 .vgrid .field span{ font-size:13px; }
+.lab-note{ font-size:12px; font-weight:600; color:var(--muted); line-height:1.3; }
 
 /* Claude */
 .claude{ border:1.5px solid var(--aprem-line); }
@@ -631,6 +645,15 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const MOMENT_KEYS = MOMENTS.map((m) => m.key);
   const FREQS = { daily: 'Tous les jours', alt: 'Un jour sur deux', weekly: 'Une fois par semaine' };
   const FREQ_BADGE = { alt: '1 jour sur 2', weekly: '1 fois par semaine' };
+  /* Cures : des semaines de prise, puis des semaines de pause, en boucle à partir du premier jour de la cure.
+     Omberacetam (Noopept) : la notice russe prévoit une cure de 1,5 à 3 mois, puis 1 mois de pause avant la suivante.
+     On garde le bas de la fourchette (6 semaines) et le mois de pause (4 semaines). Première cure le 10 octobre 2026. */
+  const CURE_HINTS = [
+    { re: /omb[eé]racetam|noopept/i, on: 6, off: 4, start: '2026-10-10',
+      why: 'Notice du Noopept (omberacetam) : cure de 6 à 12 semaines, puis 1 mois de pause avant la suivante.' }
+  ];
+  const cureHint = (name) => CURE_HINTS.find((h) => h.re.test(String(name || ''))) || null;
+  const hintCure = (name, since) => { const h = cureHint(name); return h ? { start: h.start || since, on: h.on, off: h.off } : null; };
   const SCALES = [
     { key: 'mood', label: 'Humeur', lo: 'au plus bas', hi: 'au top', faces: ['😞', '😕', '😐', '🙂', '😄'] },
     { key: 'energy', label: 'Énergie', lo: 'à plat', hi: 'à fond' },
@@ -687,6 +710,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>',
       person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
       dumbbell: '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
+      pause: '<path d="M9 5.5v13M15 5.5v13"/>',
       steps: '<path d="M8.2 3.5c1.6 0 2.4 1.7 2.4 3.8s-.9 3.7-2.4 3.7-2.4-1.3-2.4-3.7.8-3.8 2.4-3.8zM6 13.5h4.2v2.2a2.1 2.1 0 0 1-4.2 0zM15.8 8c1.6 0 2.4 1.7 2.4 3.8s-.9 3.7-2.4 3.7-2.4-1.3-2.4-3.7.8-3.8 2.4-3.8zM13.7 18h4.2v.4a2.1 2.1 0 0 1-4.2 0z"/>',
       target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
       pill: '<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="m9.5 9.5 5 5"/>',
@@ -707,7 +731,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 
   /* ---------- Liste de départ ---------- */
   function defaultSupplements(since) {
-    const mk = (name, dose, moment, freq, note) => ({ id: newId(), name, dose, moment, freq, note, since, active: true, weekday: null });
+    const mk = (name, dose, moment, freq, note) => ({ id: newId(), name, dose, moment, freq, note, since, active: true, weekday: null, cure: hintCure(name, since) });
     return [
       mk('L-théanine', '200 mg', 'matin', 'daily', 'Avec le café'),
       mk('Citicoline', '250 mg', 'matin', 'daily', ''),
@@ -813,9 +837,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         freq: FREQS[s.freq] ? s.freq : 'daily',
         since: isKey(s.since) ? s.since : created,
         active: s.active !== false,
-        weekday: s.weekday == null || s.weekday === '' ? null : Math.min(6, Math.max(0, Math.round(Number(s.weekday)) || 0))
-      }))
+        weekday: s.weekday == null || s.weekday === '' ? null : Math.min(6, Math.max(0, Math.round(Number(s.weekday)) || 0)),
+        // Sans champ « cure » (liste d'avant les cures) : on applique le repère connu, par exemple l'omberacetam.
+        cure: 'cure' in s ? normalizeCure(s.cure) : hintCure(s.name, isKey(s.since) ? s.since : created)
+      })),
+      cureNotify: !(raw && raw.cureNotify === false)
     };
+  }
+  function normalizeCure(c) {
+    if (!isObj(c) || !isKey(c.start)) return null;
+    return { start: c.start, on: intIn(c.on, 1, 52, 6), off: intIn(c.off, 1, 52, 4) };
   }
   /* Garde les mois « AAAA-MM » et, dedans, les jours « AAAA-MM-JJ » de ce mois. */
   function sanitizeMonths(m) {
@@ -868,9 +899,41 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     if (rerender) render();
   }
 
+  /* Où en est la cure ce jour-là : pas commencée, semaine de prise ou de pause ; « next » est le premier jour
+     de la période suivante, « left » le nombre de jours d'ici là. */
+  function curePhase(c, k) {
+    if (!c) return null;
+    const d = daysBetween(c.start, k);
+    if (d < 0) return { phase: 'avant', next: c.start, left: -d };
+    const len = (c.on + c.off) * 7, i = d % len, onDays = c.on * 7;
+    return i < onDays
+      ? { phase: 'prise', week: Math.floor(i / 7) + 1, of: c.on, next: addDays(k, onDays - i), left: onDays - i }
+      : { phase: 'pause', week: Math.floor((i - onDays) / 7) + 1, of: c.off, next: addDays(k, len - i), left: len - i };
+  }
+  const deName = (n) => (/^[aeiouyhàâéèêîôû]/i.test(n) ? `d’${n}` : `de ${n}`);
+  const cureRule = (c) => `${c.on} semaine${c.on > 1 ? 's' : ''} de prise, puis ${c.off} semaine${c.off > 1 ? 's' : ''} de pause`;
+  function cureStatus(c, k) {
+    const ph = curePhase(c, k);
+    if (ph.phase === 'avant') return `cure pas encore commencée, début le ${shortDate(ph.next)}`;
+    if (ph.phase === 'prise') return ph.left === 1 ? `dernier jour de la cure, pause à partir du ${shortDate(ph.next)}` : `semaine ${ph.week} sur ${ph.of} de la cure, pause à partir du ${shortDate(ph.next)}`;
+    return `en pause (semaine ${ph.week} sur ${ph.of}), reprise le ${shortDate(ph.next)}`;
+  }
+  /* Les trois prochaines périodes, pour les réglages : « cure du 10 octobre au 20 novembre · pause du … ». */
+  function curePlan(c, from) {
+    const ph = curePhase(c, from), out = [];
+    if (ph.phase !== 'avant') out.push(`${ph.phase === 'prise' ? 'En cure' : 'En pause'} jusqu’au ${shortDate(addDays(ph.next, -1))}`);
+    let k = ph.next, kind = ph.phase === 'prise' ? 'pause' : 'prise';
+    for (let i = 0; i < (ph.phase === 'avant' ? 3 : 2); i++) {
+      const len = (kind === 'prise' ? c.on : c.off) * 7;
+      out.push(`${kind === 'prise' ? 'cure' : 'pause'} du ${shortDate(k)} au ${shortDate(addDays(k, len - 1))}`);
+      k = addDays(k, len); kind = kind === 'prise' ? 'pause' : 'prise';
+    }
+    return cap1(out.join(' · '));
+  }
   function isScheduled(s, k) {
     if (!s || s.active === false) return false;
     if (s.since && k < s.since) return false;
+    if (s.cure && curePhase(s.cure, k).phase !== 'prise') return false;
     if (s.freq === 'alt') return Math.abs(dayNum(k) - dayNum(s.since || k)) % 2 === 0;
     if (s.freq === 'weekly') return s.weekday != null && weekdayOf(k) === Number(s.weekday);
     return true;
@@ -902,13 +965,14 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
 
   /* ---------- Visite médicale ---------- */
-  /* Repères habituels (adulte homme) ; le labo donne ses propres normes. Valeurs saisies telles quelles, avec l'unité. */
+  /* Repères habituels (adulte homme) ; le labo donne ses propres normes. Valeurs saisies telles quelles, avec l'unité.
+     4e case facultative : une remarque montrée sous le champ et envoyée à Claude. */
   const LABS = [
     ['vitD', 'Vitamine D (25-OH)', '30 à 100 ng/mL'], ['b12', 'Vitamine B12', '200 à 900 pg/mL'], ['folates', 'Folates (B9)', '> 4 ng/mL'],
     ['ferritin', 'Ferritine', '30 à 300 µg/L'], ['iron', 'Fer', '60 à 170 µg/dL'], ['hb', 'Hémoglobine', '13 à 17 g/dL'],
-    ['mg', 'Magnésium', '1,7 à 2,4 mg/dL'], ['k', 'Potassium', '3,5 à 5 mmol/L'], ['zinc', 'Zinc', '70 à 120 µg/dL'],
+    ['mg', 'Magnésium', '1,7 à 2,4 mg/dL'], ['k', 'Potassium', '3,5 à 5 mmol/L'], ['zinc', 'Zinc', '70 à 120 µg/dL'], ['copper', 'Cuivre', '70 à 140 µg/dL'],
     ['glucose', 'Glycémie à jeun', '70 à 100 mg/dL'], ['hba1c', 'HbA1c', '< 5,7 %'], ['tsh', 'TSH', '0,4 à 4 mUI/L'],
-    ['ldl', 'Cholestérol LDL', '< 115 mg/dL'], ['tg', 'Triglycérides', '< 150 mg/dL'], ['creat', 'Créatinine', '0,7 à 1,3 mg/dL'],
+    ['ldl', 'Cholestérol LDL', '< 115 mg/dL'], ['tg', 'Triglycérides', '< 150 mg/dL'], ['creat', 'Créatinine', '0,7 à 1,3 mg/dL', 'Un peu plus haute quand on prend de la créatine'],
     ['alt', 'ALAT (foie)', '< 45 U/L']
   ];
   const visitOf = (d) => (d && isObj(d.visit) ? d.visit : null);
@@ -1370,7 +1434,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     else { S.settings = freshSettings(); S.months = {}; persistNow(); }
     S.ready = true;
     render(); refreshSync();
-    scheduleVisitReminders();
+    scheduleReminders();
   }
   function startFromCache(cache) {
     S.settings = normalizeSettings(cache.settings);
@@ -1444,6 +1508,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       </div>${weekStrip(k)}</section>
       ${weeklyBanner()}
       ${isToday ? visitBanners(k) : ''}
+      ${isToday ? cureBanners(k) : ''}
       ${summaryTiles(k, d)}
       ${visit ? visitCard(k, d) : ''}
       <div class="daygrid">
@@ -1502,6 +1567,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     }
     return out;
   }
+  /* La veille d'un début, d'une pause ou d'une reprise de cure. */
+  function cureBanners(k) {
+    return S.settings.supplements.filter((s) => s.active && s.cure && curePhase(s.cure, k).left === 1).map((s) => {
+      const c = s.cure, ph = curePhase(c, k), day = ph.next;
+      const [title, text] = ph.phase === 'prise'
+        ? [`Demain : pause ${deName(s.name)}`, `${c.off} semaine${c.off > 1 ? 's' : ''} sans, reprise le ${lowDate(addDays(day, c.off * 7))}. Continue tes check-ins : tu verras ce que ça change.`]
+        : [`Demain : ${ph.phase === 'avant' ? 'début de ta cure' : 'reprise'} ${deName(s.name)}`, `${c.on} semaine${c.on > 1 ? 's' : ''} de prise${s.dose ? ` (${s.dose})` : ''}, jusqu’au ${lowDate(addDays(day, c.on * 7 - 1))} inclus.`];
+      return html`<div class="banner remind cure m-${s.moment}" role="note"><span class="mico" aria-hidden="true">${ph.phase === 'prise' ? ICON.pause : ICON.pill}</span><p class="btxt"><b>${title}</b><span>${text}</span></p></div>`;
+    });
+  }
   function visitCard(k, d) {
     const vis = visitOf(d) || {};
     const labs = isObj(vis.labs) ? vis.labs : {};
@@ -1523,7 +1598,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       <details class="labs" data-toggle="labs"${S.ui.labsOpen || filled ? html` open` : ''}>
         <summary>Résultats de la prise de sang${filled ? html`<span class="pill">${filled} noté${filled > 1 ? 's' : ''}</span>` : ''}</summary>
         <p class="hint">Recopie chaque valeur avec son unité. En gris, le repère habituel ; ton labo indique ses propres normes.</p>
-        <div class="vgrid">${LABS.map(([key, label, ref]) => html`<label class="field"><span>${label}</span><input type="text" id="lab-${key}-${k}" data-visit="labs.${key}" data-date="${k}" value="${str(labs[key])}" placeholder="${ref}" autocomplete="off"></label>`)}</div>
+        <div class="vgrid">${LABS.map(([key, label, ref, note]) => html`<label class="field"><span>${label}</span><input type="text" id="lab-${key}-${k}" data-visit="labs.${key}" data-date="${k}" value="${str(labs[key])}" placeholder="${ref}" autocomplete="off">${note ? html`<small class="lab-note">${note}</small>` : ''}</label>`)}</div>
         <label class="field"><span>Autres résultats ou compte rendu du labo</span><textarea id="vlabs-${k}" data-visit="labsText" data-date="${k}" rows="3" placeholder="Colle ici le reste du compte rendu…">${str(vis.labsText)}</textarea></label>
       </details>
       <label class="field"><span>Ce que dit le médecin</span><textarea id="vnotes-${k}" data-visit="notes" data-date="${k}" rows="3" placeholder="Conseils, changement de dose, examens à faire…">${str(vis.notes)}</textarea></label>
@@ -1559,13 +1634,26 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
   function supplementItem(s, k) {
     const on = isTaken(s.id, k), just = S.ui.just === `${s.id}|${k}`;
-    return html`<button type="button" class="item${on ? ' on' : ''}" data-act="toggle" data-sid="${s.id}" data-date="${k}" aria-pressed="${bool(on)}"><span class="cap${on ? ' on' : ''}${just ? ' just' : ''}" aria-hidden="true">${on ? ICON.check : ''}</span><span class="it-main"><span class="it-name">${s.name}</span>${s.dose ? html`<span class="it-dose">${s.dose}</span>` : ''}${s.note ? html`<span class="it-note">${s.note}</span>` : ''}</span>${FREQ_BADGE[s.freq] ? html`<span class="freq">${FREQ_BADGE[s.freq]}</span>` : ''}</button>`;
+    const ph = s.cure && curePhase(s.cure, k), inCure = ph && ph.phase === 'prise';
+    return html`<button type="button" class="item${on ? ' on' : ''}" data-act="toggle" data-sid="${s.id}" data-date="${k}" aria-pressed="${bool(on)}"><span class="cap${on ? ' on' : ''}${just ? ' just' : ''}" aria-hidden="true">${on ? ICON.check : ''}</span><span class="it-main"><span class="it-name">${s.name}</span>${s.dose ? html`<span class="it-dose">${s.dose}</span>` : ''}${s.note ? html`<span class="it-note">${s.note}</span>` : ''}${inCure ? html`<span class="it-cure"><span class="freq cure${ph.left === 1 ? ' last' : ''}">${ph.left === 1 ? 'Dernier jour de cure' : `Cure · semaine ${ph.week} sur ${ph.of}`}</span></span>` : ''}</span>${FREQ_BADGE[s.freq] ? html`<span class="freq">${FREQ_BADGE[s.freq]}</span>` : ''}</button>`;
+  }
+  const lowDate = (k) => longDate(k).replace(/^./, (c) => c.toLowerCase());
+  /* Compléments en pause de cure (ou pas encore commencés) ce jour-là : une ligne chacun, avec la date de reprise. */
+  function cureNotes(k) {
+    const list = S.settings.supplements.filter((s) => s.active && s.cure && !isTaken(s.id, k) && curePhase(s.cure, k).phase !== 'prise' && !(s.since && k < s.since));
+    if (!list.length) return '';
+    return html`<ul class="cure-notes">${list.map((s) => {
+      const ph = curePhase(s.cure, k), when = whenLabel(ph.left);
+      const txt = ph.phase === 'avant' ? `Début de la cure le ${lowDate(ph.next)} (${when}) · ${cureRule(s.cure)}`
+        : `En pause, semaine ${ph.week} sur ${ph.of} · reprise le ${lowDate(ph.next)} (${when})`;
+      return html`<li class="m-${s.moment}"><span class="mico" aria-hidden="true">${ph.phase === 'avant' ? ICON.pill : ICON.pause}</span><span class="ctxt"><b>${s.name}${s.dose ? ` ${s.dose}` : ''}</b><span>${txt}</span></span></li>`;
+    })}</ul>`;
   }
   function supplementBlock(k) {
     const items = itemsForDay(k), st = stats(k);
     const pct = st.total ? st.taken / st.total : 0, all = st.total > 0 && st.taken === st.total;
     const head = html`<div class="supps-head"><div><h2>Compléments</h2><p class="sub${all ? ' done' : ''}">${!st.total ? 'Rien de prévu ce jour-là' : all ? 'Tout est pris' : `${st.taken} sur ${st.total} pris`}</p></div>${st.total ? html`<div class="ring" style="--p:${pct.toFixed(3)}" role="img" aria-label="${st.taken} sur ${st.total} compléments pris"><span>${Math.round(pct * 100)} %</span></div>` : ''}</div>`;
-    if (!items.length) return html`<section class="card supps" id="sec-supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}</section>`;
+    if (!items.length) return html`<section class="card supps" id="sec-supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}${cureNotes(k)}</section>`;
     return html`<section class="card supps" id="sec-supps">${head}<div class="moments">${MOMENTS.map((m) => {
       const list = items.filter((s) => s.moment === m.key);
       if (!list.length) return '';
@@ -1577,7 +1665,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         <div class="moment-head"><span class="mico" aria-hidden="true">${MOMENT_ICON[m.key]}</span><div class="mtitle"><h3 id="mt-${m.key}">${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${status}</div>
         <div class="mitems">${list.map((s) => supplementItem(s, k))}</div>
       </div>`;
-    })}</div></section>`;
+    })}</div>${cureNotes(k)}</section>`;
   }
   const FORM_KINDS = { checkin: { act: 'ci', field: 'checkins' }, meal: { act: 'meal', field: 'meals' }, symptom: { act: 'sym', field: 'symptoms' }, sport: { act: 'spt', field: 'sport' } };
   function rowActions(kind, k, id, what) {
@@ -1888,7 +1976,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const got = LABS.filter(([key]) => str(labs[key]).trim());
     if (got.length) {
       L.push('- Prise de sang (valeur notée ; entre parenthèses, repère habituel) :');
-      got.forEach(([key, label, ref]) => L.push(`  - ${label} : ${str(labs[key]).trim()} (${ref})`));
+      got.forEach(([key, label, ref, note]) => L.push(`  - ${label} : ${str(labs[key]).trim()} (${ref})${note ? ` — ${note.toLowerCase()}` : ''}`));
     } else if (!str(vis.labsText).trim()) L.push('- Prise de sang : résultats pas encore notés');
     if (str(vis.labsText).trim()) L.push(`- Autres résultats : ${str(vis.labsText).trim()}`);
     if (str(vis.notes).trim()) L.push(`- Ce que dit le médecin : ${str(vis.notes).trim()}`);
@@ -1932,6 +2020,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (taken.length || extra.length) L.push(`- Pris : ${[...taken, ...extra].map(fmtSup).join(', ')}`);
       if (missed.length) L.push(`- Pas pris : ${missed.map(fmtSup).join(', ')}`);
     }
+    const cures = S.settings.supplements.filter((s) => s.active && s.cure);
+    if (cures.length) L.push(`En cure : ${cures.map((s) => `${s.name} (${cureRule(s.cure)}) : ${cureStatus(s.cure, k)}`).join(' ; ')}`);
     L.push(cis.length ? 'Check-ins (notes sur 5 ; pour stress, douleur et faim, 5 = le plus fort) :' : 'Check-ins : aucun');
     cis.forEach((c) => L.push(`- ${str(c.time)} : ${scoreLine(c) || 'sans note'}${str(c.note).trim() ? ` — « ${str(c.note).trim()} »` : ''}`));
     L.push(syms.length ? 'Ce que j’ai ressenti :' : 'Symptômes ou sensations : rien de noté');
@@ -1971,7 +2061,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     if (eaten.length) L.push(`Alimentation (${plural(eaten.length, 'jour')} avec les macros) : ${fmtInt(avg(eaten.map((t) => t.kcal)))} kcal, protéines ${fmtG(avg(eaten.map((t) => t.p)))} g, glucides ${fmtG(avg(eaten.map((t) => t.g)))} g, lipides ${fmtG(avg(eaten.map((t) => t.l)))} g par jour en moyenne`);
     const sups = S.settings.supplements.map((sp) => {
       const sch = days.filter((dk) => isScheduled(sp, dk));
-      return sch.length ? `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pris ${sch.filter((dk) => isTaken(sp.id, dk)).length} fois sur ${sch.length} prévue${sch.length > 1 ? 's' : ''}` : '';
+      const cure = sp.active && sp.cure ? ` — en cure (${cureRule(sp.cure)}), au jour de la visite : ${cureStatus(sp.cure, k)}` : '';
+      if (!sch.length) return cure ? `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pas prévu sur ces ${days.length} jours${cure}` : '';
+      return `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pris ${sch.filter((dk) => isTaken(sp.id, dk)).length} fois sur ${sch.length} prévue${sch.length > 1 ? 's' : ''}${cure}`;
     }).filter(Boolean);
     if (sups.length) L.push('Régularité des compléments :', ...sups);
     const syms = days.flatMap((dk) => listOf((peekDay(dk) || {}).symptoms).map((x) => `- ${shortDate(dk)} ${str(x.time)} : ${str(x.text).trim()}${scaleValue(x.intensity) ? ` (${x.intensity}/5)` : ''}`));
@@ -2204,9 +2296,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   /* ---------- Rendu : Réglages ---------- */
   function supSummary(s) {
     if (!s.active) return 'En pause';
-    if (s.freq === 'alt') return 'Un jour sur deux';
-    if (s.freq === 'weekly') return s.weekday == null ? 'Jour à choisir' : 'Chaque ' + WD_LONG[s.weekday];
-    return 'Tous les jours';
+    const base = s.freq === 'alt' ? 'Un jour sur deux' : s.freq === 'weekly' ? (s.weekday == null ? 'Jour à choisir' : 'Chaque ' + WD_LONG[s.weekday]) : 'Tous les jours';
+    if (!s.cure) return base;
+    const ph = curePhase(s.cure, todayKey());
+    return `${base} · cure ${s.cure.on} sem. / pause ${s.cure.off} sem. · ${ph.phase === 'avant' ? `dès le ${tinyDate(ph.next)}` : ph.phase === 'prise' ? `sem. ${ph.week}/${ph.of}` : `reprise le ${tinyDate(ph.next)}`}`;
   }
   function supRow(s) {
     const cls = `srow m-${s.moment}${s.active ? '' : ' paused'}`;
@@ -2225,6 +2318,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         <label class="field"><span>Fréquence</span><select id="${id('freq')}" data-sset="freq">${options(Object.entries(FREQS), s.freq)}</select></label>
         ${s.freq === 'weekly' ? html`<label class="field"><span>Jour</span><select id="${id('weekday')}" data-sset="weekday">${options([['', 'Choisir'], ...WD_LONG.map((w, i) => [i, cap1(w)])], s.weekday == null ? '' : s.weekday)}</select></label>` : ''}
         <label class="field"><span>${s.freq === 'alt' ? 'Premier jour' : 'Depuis le'}</span><input type="date" id="${id('since')}" data-sset="since" value="${s.since}"></label>
+      </div>
+      <div class="cure-box">
+        <label class="switch"><input type="checkbox" id="${id('cure')}" data-sset="cure"${s.cure ? html` checked` : ''}> Prendre en cure (des semaines de prise, puis de pause)</label>
+        ${s.cure ? html`<div class="srow-line">
+          <label class="field"><span>Semaines de prise</span><input type="number" inputmode="numeric" min="1" max="52" id="${id('cureOn')}" data-sset="cureOn" value="${s.cure.on}"></label>
+          <label class="field"><span>Semaines de pause</span><input type="number" inputmode="numeric" min="1" max="52" id="${id('cureOff')}" data-sset="cureOff" value="${s.cure.off}"></label>
+          <label class="field"><span>Début de la cure</span><input type="date" id="${id('cureStart')}" data-sset="cureStart" value="${s.cure.start}"></label>
+        </div>
+        <p class="hint">${curePlan(s.cure, todayKey())}.</p>` : ''}
+        ${cureHint(s.name) ? html`<p class="hint">${cureHint(s.name).why}${s.cure ? '' : html` <button type="button" class="link" data-act="sup-cure" data-sid="${s.id}">Programmer la cure</button>`}</p>` : ''}
       </div>
       <label class="field"><span>Note</span><input type="text" id="${id('note')}" data-sset="note" value="${s.note}" placeholder="Optionnel" autocomplete="off"></label>
       <div class="srow-foot"><label class="switch"><input type="checkbox" id="${id('active')}" data-sset="active"${s.active ? html` checked` : ''}> Actif</label>
@@ -2303,6 +2406,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       <div class="reset">${S.ui.confirm === 'reset'
         ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
         : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
+      ${PLATFORM.native && sups.some((x) => x.cure) ? html`<label class="switch" style="margin-top:14px"><input type="checkbox" id="cure-notify" data-setting="cureNotify"${S.settings.cureNotify ? html` checked` : ''}> Notification la veille d’un début, d’une pause ou d’une reprise de cure (19:00)</label>
+        ${store.notifyDenied ? html`<p class="hint">Les notifications sont bloquées : autorise-les pour Mon suivi dans les réglages Android.</p>` : ''}` : ''}
     </section>`;
   }
   function foodSettings() {
@@ -3001,7 +3106,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     Object.assign(S.ui, { form: null, confirm: null, openSup: null, restoreOpen: false, restoreText: '', pendingRestore: null });
     render();
     toast(pr.kind === 'full' ? `Sauvegarde restaurée (${plural(keys.length, 'jour')})` : 'Journée restaurée');
-    scheduleVisitReminders();
+    scheduleReminders();
   }
   function importFile(file) {
     if (!file) return;
@@ -3215,7 +3320,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     'year-next': () => { S.ui.year++; render(); },
     'year-now': () => { S.ui.year = new Date().getFullYear(); render(); },
     'sup-add': () => {
-      const s = { id: newId(), name: 'Nouveau complément', dose: '', note: '', moment: 'matin', freq: 'daily', since: todayKey(), active: true, weekday: null };
+      const s = { id: newId(), name: 'Nouveau complément', dose: '', note: '', moment: 'matin', freq: 'daily', since: todayKey(), active: true, weekday: null, cure: null };
       S.ui.openSup = s.id;
       S.ui.focus = `#sup-${CSS.escape(s.id)}-name`;
       S.ui.select = true;
@@ -3224,6 +3329,12 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     'sup-open': (d) => { S.ui.openSup = d.sid; S.ui.confirm = null; if (finePointer()) S.ui.focus = `#sup-${CSS.escape(d.sid)}-name`; render(); },
     'sup-close': (d) => { S.ui.openSup = null; S.ui.confirm = null; S.ui.focus = `[data-act="sup-open"]${attr('data-sid', d.sid)}`; render(); },
     'sup-ask': (d) => askDelete('sup', d.sid, `[data-act="sup-del"]${attr('data-sid', d.sid)}`),
+    'sup-cure': (d) => {
+      mutateSettings((st) => { const x = st.supplements.find((y) => y.id === d.sid); if (x) x.cure = newCure(x); });
+      S.ui.focus = `#sup-${CSS.escape(d.sid)}-cureStart`;
+      render();
+      scheduleReminders();
+    },
     'sup-del': (d) => {
       S.ui.confirm = null;
       mutateSettings((st) => { st.supplements = st.supplements.filter((x) => x.id !== d.sid); });
@@ -3254,6 +3365,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.confirm = null;
       mutateSettings((st) => { st.supplements = defaultSupplements(todayKey()); });
       toast('Liste de départ remise');
+      scheduleReminders();
     },
     'export-json': () => exportJSON(),
     'backup-file': () => exportJSON(),
@@ -3291,6 +3403,11 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const fn = actions[b.dataset.act];
     if (fn) fn(b.dataset);
   });
+  /* Nouvelle cure : le repère connu s'il y en a un (et sa date s'il n'est pas passé), sinon 6 semaines / 4 semaines dès aujourd'hui. */
+  function newCure(s) {
+    const h = cureHint(s.name), t = todayKey(), from = s.since && s.since > t ? s.since : t;
+    return { start: h && h.start && h.start >= t ? h.start : from, on: h ? h.on : 6, off: h ? h.off : 4 };
+  }
   function setSupplementField(sid, f, v) {
     const s = S.settings.supplements.find((x) => x.id === sid);
     if (!s) return;
@@ -3299,6 +3416,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     else if (f === 'since') { if (isKey(v)) s.since = v; }
     else if (f === 'moment') { if (MOMENT_KEYS.includes(v)) s.moment = v; }
     else if (f === 'freq') { if (FREQS[v]) s.freq = v; }
+    else if (f === 'cure') s.cure = v ? newCure(s) : null;
+    else if (f === 'cureOn' || f === 'cureOff') { if (s.cure) { const key = f === 'cureOn' ? 'on' : 'off'; s.cure[key] = intIn(v, 1, 52, s.cure[key]); } }
+    else if (f === 'cureStart') { if (s.cure && isKey(v)) s.cure.start = v; }
     else if (f === 'name') s.name = String(v).trim() || 'Sans nom';
     else if (f === 'dose' || f === 'note') s[f] = String(v);
   }
@@ -3334,7 +3454,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const every = Math.round(num(t.value) || 0);
       if (key === 'every' && (every < 7 || every > 120)) { toast('Entre 7 et 120 jours.'); t.value = S.settings.visit.every; return; }
       mutateSettings((st) => { st.visit[key] = key === 'notify' ? t.checked : key === 'every' ? every : t.value; });
-      scheduleVisitReminders();
+      scheduleReminders();
     } else if (ds.ui === 'dataDate') {
       S.ui.dataDate = isKey(t.value) ? t.value : null;
       render();
@@ -3366,6 +3486,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (v && (n == null || n === '')) toast(key === 'height' ? 'Taille en centimètres, par exemple 180.' : key === 'birth' ? 'Choisis ta date de naissance.' : 'Poids en kilos, par exemple 82,5.');
       if (key !== 'birth' && key !== 'activity') t.value = n ? fmtDec(n) : '';
       if (key === 'birth') render();
+    } else if (ds.setting === 'cureNotify') {
+      mutateSettings((st) => { st.cureNotify = t.checked; }, false);
+      scheduleReminders();
     } else if (ds.setting === 'claudeUrl') {
       const v = t.value.trim();
       if (v && !isClaudeUrl(v)) { toast('Colle un lien qui commence par https://claude.ai/'); return; }
@@ -3378,9 +3501,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     } else if (ds.sset) {
       const row = t.closest('[data-sid]');
       if (!row) return;
-      const structural = ['moment', 'freq', 'active'].includes(ds.sset); // ceux qui changent la fiche affichée
+      const structural = ['moment', 'freq', 'active', 'cure', 'cureOn', 'cureOff', 'cureStart'].includes(ds.sset); // ceux qui changent la fiche affichée
       if (structural && (t.type === 'checkbox' || finePointer())) S.ui.focus = `#${CSS.escape(t.id)}`;
       mutateSettings(() => setSupplementField(row.dataset.sid, ds.sset, t.type === 'checkbox' ? t.checked : t.value), structural);
+      if (structural || ds.sset === 'name') scheduleReminders();
     } else if (ds.file === 'import') {
       importFile(t.files && t.files[0]);
       t.value = '';
@@ -3465,15 +3589,15 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 
   /* App Android : rappels de la visite médicale (la veille à 19:00, le matin à 7:30), pour les 6 prochaines.
      Identifiants 7000 à 7099 réservés à ces rappels : on les annule tous puis on les recrée. */
-  async function scheduleVisitReminders() {
+  async function scheduleReminders() {
     const LN = capPlugin('LocalNotifications');
     if (!LN || !S.settings) return;
-    const v = S.settings.visit;
+    const v = S.settings.visit, cures = S.settings.cureNotify ? S.settings.supplements.filter((s) => s.active && s.cure) : [];
     try {
       const pending = await LN.getPending();
-      const ours = ((pending && pending.notifications) || []).filter((n) => n.id >= 7000 && n.id < 7100);
+      const ours = ((pending && pending.notifications) || []).filter((n) => n.id >= 7000 && n.id < 7200);
       if (ours.length) await LN.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
-      if (!v.notify) return;
+      if (!v.notify && !cures.length) return;
       let perm = await LN.checkPermissions();
       if (perm.display !== 'granted' && perm.display !== 'denied') perm = await LN.requestPermissions();
       const denied = perm.display !== 'granted';
@@ -3481,13 +3605,27 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (denied) return;
       const now = Date.now(), list = [];
       let k = nextVisit(todayKey());
-      for (let i = 0; i < 6; i++, k = addDays(k, v.every)) {
+      for (let i = 0; i < (v.notify ? 6 : 0); i++, k = addDays(k, v.every)) {
         const eve = fromKey(addDays(k, -1)); eve.setHours(19, 0, 0, 0);
         const morning = fromKey(k); morning.setHours(7, 30, 0, 0);
         const common = { isExactNotification: false, smallIcon: 'ic_stat_monsuivi' };
         if (eve.getTime() > now) list.push({ ...common, id: 7000 + i * 2, title: 'Demain : visite médicale', body: 'Prise de sang (souvent à jeun, vérifie avec le labo), pesée et médecin. Note tes questions.', schedule: { at: eve, allowWhileIdle: true } });
         if (morning.getTime() > now) list.push({ ...common, id: 7001 + i * 2, title: 'Aujourd’hui : visite médicale', body: 'Prise de sang, pesée, médecin. Note tout dans Mon suivi pour ton bilan du mois avec Claude.', schedule: { at: morning, allowWhileIdle: true } });
       }
+      // Cures : la veille de chacun des 4 prochains changements (début, pause, reprise), à 19:00 ; ids 7100 à 7199.
+      let id = 7100;
+      cures.forEach((s) => {
+        let from = todayKey();
+        for (let i = 0; i < 4 && id < 7200; i++) {
+          const ph = curePhase(s.cure, from), day = ph.next, eve = fromKey(addDays(day, -1));
+          eve.setHours(19, 0, 0, 0);
+          const pause = ph.phase === 'prise';
+          const title = pause ? `Demain : pause ${deName(s.name)}` : `Demain : ${ph.phase === 'avant' ? 'début de la cure' : 'reprise'} ${deName(s.name)}`;
+          const body = pause ? `${s.cure.off} semaines sans, reprise le ${shortDate(addDays(day, s.cure.off * 7))}.` : `${s.cure.on} semaines de prise, jusqu’au ${shortDate(addDays(day, s.cure.on * 7 - 1))} inclus.`;
+          if (eve.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: id++, title, body, schedule: { at: eve, allowWhileIdle: true } });
+          from = day;
+        }
+      });
       if (list.length) await LN.schedule({ notifications: list });
     } catch (e) { /* notifications indisponibles : les rappels restent dans l'app */ }
   }
