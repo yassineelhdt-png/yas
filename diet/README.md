@@ -9,6 +9,11 @@ Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, a
 prises de sang visite par visite) et **Réglages** (profil santé, objectifs du jour, visite médicale, sport,
 compléments, mes aliments, Claude, sauvegarde et données).
 
+**Confort** : « Annuler » quelques secondes après chaque suppression (check-in, repas, ressenti, séance, complément,
+aliment, séance type, séance en direct abandonnée) ; « Premiers pas » pour un profil qui démarre vide ; dans l'app
+sans compte, rappel de sauvegarde tous les 14 jours (le journal n'existe que sur l'appareil) et date de la dernière
+dans *Données* ; Santé → *Sur 30 jours* : sommeil, eau, pas et humeur jour par jour ; deux colonnes dès 760 px (tablette).
+
 **Profils** (Réglages → *Profils*, ou la pastille en haut à droite) : un journal par personne (moi, ma mère…).
 Chaque profil a ses compléments, repas, sport, visites et réglages ; on passe de l'un à l'autre en un appui.
 Un nouveau profil démarre vide. Avec un compte Claude, la liste des profils suit le compte d'un appareil à l'autre.

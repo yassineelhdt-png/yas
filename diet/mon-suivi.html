@@ -136,7 +136,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .banner p{ margin:0; font-weight:700; }
 .banner select{ background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:8px 10px; min-height:42px; }
 .daygrid{ display:grid; gap:36px; }
-@media (min-width:900px){ .daygrid{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:44px; align-items:start; } }
+@media (min-width:760px){ .daygrid{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; align-items:start; } }
+@media (min-width:1100px){ .daygrid{ gap:44px; } }
 .sec-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; min-height:42px; }
 .sec-head h2{ font-size:20px; font-weight:800; letter-spacing:-.01em; min-width:0; }
 .sec-head .primary,.sec-head .ghost{ white-space:nowrap; flex:none; }
@@ -637,11 +638,42 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .it-ring small:first-child{ color:var(--ph); font-size:15px; }
 .it-ring .chr-time{ font-size:52px; }
 
+/* Premiers pas, sauvegarde */
+.first-steps{ margin-bottom:18px; }
+.fs-list{ list-style:none; margin:0 0 6px; padding:0; display:flex; flex-direction:column; gap:8px; }
+.fs-list button{ width:100%; display:flex; align-items:center; gap:12px; padding:10px 12px; min-height:56px; border-radius:14px; border:1px solid var(--line); background:var(--surface-2); text-align:left; }
+.fs-list .ck{ flex:none; width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:grid; place-items:center; color:var(--on-accent); }
+.fs-list .ck svg{ width:15px; height:15px; }
+.fs-list li.done .ck{ background:var(--accent); border-color:var(--accent); }
+.fs-list li.done b{ color:var(--muted); text-decoration:line-through; text-decoration-thickness:1.5px; }
+.fs-txt{ flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
+.fs-txt b{ font-weight:800; }
+.fs-txt small{ color:var(--muted); font-weight:600; font-size:13.5px; }
+.fs-list .chev{ color:var(--muted); display:grid; }
+.banner.backup{ border:1.5px solid var(--matin-line); background:var(--matin-tint); }
+.banner.backup .mico{ background:var(--matin); color:var(--matin-on); }
+.last-backup{ margin:0 0 10px; font-weight:700; font-size:14px; color:var(--ink); }
+
+/* Tendances */
+.trends{ display:grid; gap:18px 22px; }
+@media (min-width:640px){ .trends{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); } }
+.trend{ margin:0; min-width:0; }
+.trend figcaption{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 10px; margin-bottom:8px; }
+.trend figcaption b{ font-weight:800; }
+.trend figcaption span{ font-size:13.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+.trend-plot{ position:relative; height:80px; }
+.trend-plot svg{ display:block; width:100%; height:80px; }
+.trend-goal.below{ transform:translateY(25%); }
+.trend-goal{ position:absolute; right:0; transform:translateY(-120%); font-size:11.5px; font-weight:800; color:var(--ink); background:var(--surface); padding:0 3px; border-radius:4px; pointer-events:none; }
+.trend-axis{ display:flex; justify-content:space-between; margin-top:4px; font-size:12px; font-weight:600; color:var(--muted); }
+
 /* Messages */
 .toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(88px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
 @media (min-width:1000px){ .toast-wrap{ padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px)); left:100px; } }
 #toast{ background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-weight:700; font-size:15px; opacity:0; transform:translateY(12px); transition:opacity .18s ease, transform .18s ease; max-width:100%; text-align:center; }
 #toast.show{ opacity:1; transform:none; }
+#toast .toast-act{ margin-left:8px; border:0; border-radius:999px; padding:4px 12px; min-height:32px; background:var(--accent); color:var(--on-accent); font-weight:800; font-size:14px; pointer-events:auto; }
+#toast:not(.show) .toast-act{ pointer-events:none; }
 @media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation:none !important; transition:none !important; } }
 </style>
 
@@ -1008,7 +1040,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         // Sans champ « cure » (liste d'avant les cures) : on applique le repère connu, par exemple l'omberacetam.
         cure: 'cure' in s ? normalizeCure(s.cure) : hintCure(s.name, isKey(s.since) ? s.since : created)
       })),
-      cureNotify: !(raw && raw.cureNotify === false)
+      cureNotify: !(raw && raw.cureNotify === false),
+      onboardDone: !!(raw && raw.onboardDone),
+      onboard: raw && isObj(raw.onboard) ? Object.fromEntries(Object.entries(raw.onboard).filter(([k2, v]) => /^[a-z]{2,20}$/.test(k2) && v === true)) : {}
     };
   }
   function normalizeCure(c) {
@@ -1695,6 +1729,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       ${isToday ? visitBanners(k) : ''}
       ${isToday ? cureBanners(k) : ''}
       ${isToday ? sendBanner() : ''}
+      ${isToday ? backupBanner() : ''}
+      ${isToday ? firstSteps() : ''}
       ${summaryTiles(k, d)}
       ${visit ? visitCard(k, d) : ''}
       <div class="daygrid">
@@ -1873,8 +1909,12 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     let hint = '';
     if (isToday && !f) {
       const last = list.length ? toMin(list[list.length - 1].time) : null;
-      if (!list.length) hint = 'Premier check-in : comment tu te sens au réveil ?';
-      else if (last != null && last + 180 < 23 * 60) hint = `Prochain check-in entre ${fromMin(last + 180)} et ${fromMin(Math.min(last + 240, 23 * 60 + 59))}`;
+      const now = toMin(nowTime());
+      if (!list.length) hint = now < 11 * 60 ? 'Premier check-in : comment tu te sens au réveil ?' : 'Pas encore de check-in aujourd’hui : comment tu te sens ?';
+      else if (last != null && now < 23 * 60) {
+        if (now >= last + 180) hint = `Un check-in maintenant ? Le dernier date de ${fromMin(last)}.`;
+        else if (last + 180 < 23 * 60) hint = `Prochain check-in vers ${fromMin(last + 180)}`;
+      }
     }
     return html`<section class="jsec" id="sec-checkins"><div class="sec-head"><h2>Comment je me sens</h2>${f ? '' : html`<button type="button" class="primary" data-act="ci-new" data-date="${k}">Nouveau check-in</button>`}</div>
       ${hint ? html`<p class="hint">${hint}</p>` : ''}
@@ -2445,7 +2485,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const t = todayKey(), onlyToday = days.length === 1 && days[0] === t;
     const scope = days.length === 1 ? (hasVisit(days[0]) ? 'visit' : 'day') : 'days', key = days.join(',');
     const names = days.map((dk) => (dk === t ? 'aujourd’hui' : dk === addDays(t, -1) ? 'hier' : `${WD_LONG[weekdayOf(dk)]} ${fromKey(dk).getDate()}`));
-    const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${names[names.length - 1]}` : names[0];
+    const list = names.length > 3 ? `du ${names[0]} à ${names[names.length - 1]}` : names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${names[names.length - 1]}` : names[0];
     const off = navigator.onLine === false;
     const title = onlyToday ? 'Ce soir : envoie ta journée à Claude' : `${plural(days.length, 'journée')} pas encore envoyée${days.length > 1 ? 's' : ''} à Claude`;
     const text = `${onlyToday ? 'Tout ce que tu as noté aujourd’hui part en un seul texte.' : `${cap1(list)}, en un seul envoi.`}${off ? ' Pas de réseau pour l’instant : c’est enregistré, envoie dès que tu as le wifi.' : ''}`;
@@ -2689,6 +2729,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       <div class="dgroups">
         <div class="dgroup"><h3>Sauvegarde complète</h3>
           <p>Ta liste, tes réglages, ton profil et tout ton journal. Pour garder une copie, ou passer à un autre appareil.</p>
+          ${store.mode === 'local' ? html`<p class="last-backup">${backupInfo().at ? `Dernière sauvegarde ${fmtStamp(backupInfo().at)}` : 'Pas encore de sauvegarde sur cet appareil.'}</p>` : ''}
           <div class="actions"><button type="button" class="primary" data-act="backup-file">${fileVerb} la sauvegarde</button><button type="button" class="ghost" data-act="backup-copy">Copier le texte</button></div>
         </div>
         <div class="dgroup"><h3>Une journée</h3>
@@ -3314,8 +3355,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     },
     'live-abandon-ask': () => { S.ui.confirm = 'live'; S.ui.focus = '[data-act="live-abandon"]'; render(); },
     'live-abandon': () => {
+      const back = S.live;
       S.live = null; S.ui.confirm = null; saveLive(); stopLiveTicker(); keepAwake(false); restNotify();
-      render(); toast('Séance abandonnée');
+      render();
+      toast('Séance abandonnée', () => { if (S.live) return; S.live = back; saveLive(); render(); toast('Séance reprise'); });
     }
   };
   /* Champs de la séance (saisie directe) : gardés au fil de l'eau, sans redessiner la page. */
@@ -3687,6 +3730,42 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     }
   };
 
+  /* Tendances sur 30 jours : une petite colonne par jour (vide si rien de noté), ligne d'objectif fine,
+     moyenne en légende ; chaque colonne porte sa bulle (title). Le dessin s'étire en largeur, le texte reste en HTML. */
+  function trendsCard() {
+    const t = todayKey(), days = Array.from({ length: 30 }, (_, i) => addDays(t, i - 29));
+    const g = S.settings.goals, sp = S.settings.sport;
+    const series = [
+      { title: 'Sommeil', color: 'var(--aprem)', unit: 'nuit', vals: days.map((dk) => { const m = nightMinutes((peekDay(addDays(dk, -1)) || {}).bed, (peekDay(dk) || {}).wake); return m == null ? null : m / 60; }), fmt: (v) => fmtDuration(Math.round(v * 60)), goal: 8, goalLabel: '8 h' },
+      { title: 'Eau', color: 'var(--soir)', unit: 'jour', vals: days.map((dk) => { const ml = waterOf(peekDay(dk)); return ml ? ml / 1000 : null; }), fmt: (v) => `${fmtL(v * 1000)} L`, goal: g.water, goalLabel: `${fmtDec(g.water)} L` },
+      { title: 'Pas', color: 'var(--sport)', unit: 'jour', vals: days.map((dk) => stepsOf(peekDay(dk)) || null), fmt: (v) => fmtInt(v), goal: sp.steps, goalLabel: fmtInt(sp.steps) },
+      { title: 'Humeur', color: 'var(--matin)', unit: 'jour', vals: days.map((dk) => avgScale(dk, 'mood')), fmt: (v) => `${fmtAvg(v)}/5`, top: 5 }
+    ];
+    if (!series.some((x) => x.vals.some((v) => v != null))) return '';
+    const W = 300, H = 80, gap = 1.6, slot = W / days.length;
+    const chart = (x) => {
+      const got = x.vals.filter((v) => v != null), avg = got.reduce((a, b) => a + b, 0) / (got.length || 1);
+      const top = (x.top || Math.max(x.goal || 0, ...got) * 1.12) || 1;
+      const Y = (v) => H - (Math.min(v, top) / top) * H;
+      const bars = x.vals.map((v, i) => (v == null ? '' : `<rect x="${(i * slot + gap / 2).toFixed(2)}" y="${Y(v).toFixed(2)}" width="${(slot - gap).toFixed(2)}" height="${Math.max(1, H - Y(v)).toFixed(2)}" rx="1" fill="${x.color}"${i === days.length - 1 ? '' : ' fill-opacity=".72"'}/>`)).join('');
+      const hits = x.vals.map((v, i) => `<rect x="${(i * slot).toFixed(2)}" y="0" width="${slot.toFixed(2)}" height="${H}" fill="transparent"><title>${esc(`${tinyDate(days[i])} : ${v == null ? 'rien de noté' : x.fmt(v)}`)}</title></rect>`).join('');
+      const goalY = x.goal ? Y(x.goal) : null;
+      const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(`${x.title} sur 30 jours, moyenne ${got.length ? x.fmt(avg) : 'inconnue'}`)}">`
+        + `<line x1="0" x2="${W}" y1="${H - 0.5}" y2="${H - 0.5}" stroke="var(--line)" stroke-width="1" vector-effect="non-scaling-stroke"/>`
+        + (goalY != null ? `<line x1="0" x2="${W}" y1="${goalY.toFixed(2)}" y2="${goalY.toFixed(2)}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>` : '')
+        + bars + hits + '</svg>';
+      return html`<figure class="trend">
+        <figcaption><b>${x.title}</b><span>${got.length ? `${x.fmt(avg)} en moyenne · ${plural(got.length, x.unit)}` : 'rien de noté'}</span></figcaption>
+        <div class="trend-plot">${trusted(svg)}${goalY != null ? html`<span class="trend-goal${goalY / H < 0.3 ? ' below' : ''}" style="top:${((goalY / H) * 100).toFixed(1)}%">${x.goalLabel}</span>` : ''}</div>
+        <div class="trend-axis"><span>${tinyDate(days[0])}</span><span>Aujourd’hui</span></div>
+      </figure>`;
+    };
+    return html`<section class="card wide" aria-labelledby="h-trends">
+      <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.chart}</span><h2 id="h-trends">Sur 30 jours</h2></div>
+      <div class="trends">${series.map(chart)}</div>
+    </section>`;
+  }
+
   /* ---------- Rendu : Santé ---------- */
   const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
   const tinyDate = (k) => { const d = fromKey(k); return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`; };
@@ -3813,6 +3892,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
             ${stat('Douleur', pain != null ? `${fmtAvg(pain)}/5` : '—', symCount ? `${plural(symCount, 'ressenti')} noté${symCount > 1 ? 's' : ''}` : 'aucun ressenti noté')}
           </div>
         </section>
+        ${trendsCard()}
         <section class="card wide" aria-labelledby="h-labs">
           <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.drop}</span><h2 id="h-labs">Prises de sang</h2></div>
           ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Valeur</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${ref}</small></td></tr>`)}</tbody></table></div>`
@@ -3869,12 +3949,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   });
 
   let toastTimer = null;
-  function toast(msg) {
+  /* Message en bas de l'écran ; avec « undo », un bouton « Annuler » reste 6 secondes. */
+  let undoFn = null;
+  function toast(msg, undo) {
     const el = document.getElementById('toast');
+    undoFn = typeof undo === 'function' ? undo : null;
     el.textContent = msg;
+    if (undoFn) { const b = document.createElement('button'); b.type = 'button'; b.className = 'toast-act'; b.dataset.act = 'undo'; b.textContent = 'Annuler'; el.append(' ', b); }
     el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+    toastTimer = setTimeout(() => { el.classList.remove('show'); undoFn = null; }, undoFn ? 6000 : 2600);
   }
   function toTop() { try { window.scrollTo(0, 0); } catch (e) { /* rien */ } }
   function go(k) { S.ui.date = k; S.ui.form = null; S.ui.confirm = null; render(); }
@@ -4003,21 +4087,22 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       return /cancel/i.test(String((e && (e.message || e.name)) || e));
     }
   }
+  /* Propose le fichier ; renvoie true quand il est parti (enregistré, partagé ou téléchargé). */
   async function offerFile(name, data) {
     if (store.downloads) {
       try {
         const res = await store.downloads.save({ filename: name, data });
         if (!res || res.status !== 'delivered') toast('Fichier enregistré');
-        return;
+        return true;
       } catch (e) {
         const code = e && e.code;
-        if (code === 'declined') return;
-        if (code === 'rate_limited') { toast('Réessaie dans un instant.'); return; }
+        if (code === 'declined') return false;
+        if (code === 'rate_limited') { toast('Réessaie dans un instant.'); return false; }
       }
     } else if (PLATFORM.native) {
-      if (await saveFileNative(name, data)) return;
+      if (await saveFileNative(name, data)) return true;
     } else if (!PLATFORM.artifact && downloadBlob(name, data)) {
-      return; // navigateur ou app PC : le fichier est téléchargé
+      return true; // navigateur ou app PC : le fichier est téléchargé
     }
     S.ui.exportText = data;
     S.ui.focus = '#export-text';
@@ -4028,7 +4113,42 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const dayBackupJSON = (k) => JSON.stringify({ app: 'mon-suivi', version: 1, scope: 'day', exported: new Date().toISOString(), days: { [k]: peekDay(k) } }, null, 2);
   const scopeFor = (k) => (hasVisit(k) ? 'visit' : 'day');
   const fileTag = () => (PROFILES.active === MAIN ? '' : `${norm(activeProfile().name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'profil'}-`);
-  function exportJSON() { offerFile(`mon-suivi-${fileTag()}sauvegarde-${todayKey()}.json`, backupJSON()); }
+  function exportJSON() { offerFile(`mon-suivi-${fileTag()}sauvegarde-${todayKey()}.json`, backupJSON()).then((ok) => { if (ok) { markBackup(); safeRender(); } }); }
+  /* Date de la dernière sauvegarde complète, par profil, sur cet appareil ; « snooze » : rappel reporté. */
+  const BACKUP_KEY = 'mon-suivi-backup-v1';
+  const backupInfo = () => { const all = lsGet(BACKUP_KEY); return isObj(all) && isObj(all[PROFILES.active]) ? all[PROFILES.active] : {}; };
+  function setBackupInfo(patch) { const all = lsGet(BACKUP_KEY); const out = isObj(all) ? all : {}; out[PROFILES.active] = { ...backupInfo(), ...patch }; lsSet(BACKUP_KEY, out); }
+  const markBackup = () => setBackupInfo({ at: new Date().toISOString(), snooze: null });
+  /* Sans compte Claude, le journal n'existe que sur l'appareil : un rappel tous les 14 jours (dès 5 jours remplis). */
+  /* Carte « Premiers pas » tant que le profil n'a ni compléments ni profil santé (un nouveau profil, par exemple). */
+  function firstSteps() {
+    const st = S.settings;
+    if (st.onboardDone || (st.supplements.length && hasProfile())) return '';
+    const seen = (k2) => !!st.onboard[k2];
+    const items = [
+      ['profil', 'Ton profil santé', 'âge, taille, poids, traitements', hasProfile()],
+      ['complements', 'Tes compléments', 'matin, midi, 16h, soir, et leurs cures', st.supplements.length > 0],
+      ['visite', 'Ta visite médicale', `première le ${shortDate(nextVisit(todayKey()))}, à ajuster`, seen('visite')],
+      ['objectifs', 'Tes objectifs du jour', `eau ${fmtDec(st.goals.water)} L, calories, protéines`, seen('objectifs')]
+    ];
+    const done = items.filter((x) => x[3]).length;
+    return html`<section class="card first-steps" aria-labelledby="fs-title">
+      <div class="card-head"><span class="mico" aria-hidden="true">${ICON.spark}</span><h2 id="fs-title">Premiers pas</h2><span class="pill">${done} / ${items.length}</span></div>
+      <ol class="fs-list">${items.map(([page, title, sub, ok]) => html`<li${ok ? html` class="done"` : ''}><button type="button" data-act="onboard-go" data-v="${page}"><span class="ck" aria-hidden="true">${ok ? ICON.check : ''}</span><span class="fs-txt"><b>${title}</b><small>${sub}</small></span><span class="chev" aria-hidden="true">${ICON.right}</span></button></li>`)}</ol>
+      <div class="actions"><button type="button" class="link" data-act="onboard-hide">Masquer</button></div>
+    </section>`;
+  }
+  function backupBanner() {
+    if (store.mode !== 'local') return '';
+    const filled = Object.values(S.months).reduce((n, m) => n + Object.values(isObj(m.days) ? m.days : {}).filter(hasJournal).length, 0);
+    if (filled < 5) return '';
+    const info = backupInfo(), now = Date.now();
+    if (info.snooze && now < Date.parse(info.snooze)) return '';
+    const age = info.at ? Math.floor((now - Date.parse(info.at)) / 864e5) : null;
+    if (age != null && age < 14) return '';
+    const where = PLATFORM.native ? 'cette tablette' : PLATFORM.electron ? 'ce PC' : 'ce navigateur';
+    return html`<div class="banner backup" role="note"><span class="mico" aria-hidden="true">${ICON.save}</span><p class="btxt"><b>${age == null ? 'Fais une première sauvegarde' : `Dernière sauvegarde il y a ${age} jours`}</b><span>Ton journal n’est que sur ${where}. Garde une copie (Drive, e-mail…) au cas où.</span></p><div class="actions"><button type="button" class="primary" data-act="backup-file">Sauvegarder maintenant</button><button type="button" class="link" data-act="backup-later">Plus tard</button></div></div>`;
+  }
   function exportCSV() { offerFile(`mon-suivi-journal-${todayKey()}.csv`, buildCSV()); }
   function copyExport() {
     copyText(S.ui.exportText || '').then((ok) => {
@@ -4106,8 +4226,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const askDelete = (kind, id, focus) => { S.ui.confirm = `${kind}:${id}`; S.ui.focus = focus; render(); };
   function deleteEntry(field, k, id) {
     S.ui.confirm = null;
+    const item = listOf((peekDay(k) || {})[field]).find((x) => x.id === id), back = item ? clone(item) : null;
     mutateDay(k, field, (d) => { d[field] = d[field].filter((x) => !x || x.id !== id); });
-    toast('Supprimé');
+    toast('Supprimé', back && (() => { mutateDay(k, field, (d) => { if (!d[field].some((x) => x && x.id === id)) d[field].push(back); }); toast('Remis'); }));
   }
   const actForm = (type) => {
     const { act, field } = FORM_KINDS[type];
@@ -4170,11 +4291,19 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     'tpl-ask': (d) => askDelete('tpl', d.id, `[data-act="tpl-del"]${attr('data-id', d.id)}`),
     'tpl-del': (d) => {
       S.ui.confirm = null;
+      const sp = S.settings.sport, i = sp.templates.findIndex((x) => x.id === d.id), back = clone(sp.templates[i]);
+      const days = sp.plan.map((v, j) => (v === d.id ? j : -1)).filter((j) => j >= 0);
       mutateSettings((st) => {
         st.sport.templates = st.sport.templates.filter((x) => x.id !== d.id);
         st.sport.plan = st.sport.plan.map((v) => (v === d.id ? null : v));
       });
-      toast('Séance supprimée');
+      toast('Séance supprimée', back && (() => {
+        mutateSettings((st) => {
+          if (!st.sport.templates.some((x) => x.id === back.id)) st.sport.templates.splice(Math.min(i, st.sport.templates.length), 0, back);
+          days.forEach((j) => { if (!st.sport.plan[j]) st.sport.plan[j] = back.id; });
+        });
+        toast('Remise');
+      }));
     },
     tab: (d) => {
       const again = S.ui.view === d.view;
@@ -4330,8 +4459,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     },
     'sup-del': (d) => {
       S.ui.confirm = null;
+      const i = S.settings.supplements.findIndex((x) => x.id === d.sid), back = clone(S.settings.supplements[i]);
+      S.ui.openSup = null;
       mutateSettings((st) => { st.supplements = st.supplements.filter((x) => x.id !== d.sid); });
-      toast('Complément supprimé');
+      toast('Complément supprimé', back && (() => { mutateSettings((st) => { if (!st.supplements.some((x) => x.id === back.id)) st.supplements.splice(Math.min(i, st.supplements.length), 0, back); }); toast('Remis'); }));
     },
     'food-add': () => {
       const fd = S.ui.foodDraft, name = String(fd.name || '').trim();
@@ -4350,9 +4481,11 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     'food-ask': (d) => askDelete('food', d.id, `[data-act="food-del"]${attr('data-id', d.id)}`),
     'food-del': (d) => {
       S.ui.confirm = null;
+      const i = S.settings.foods.findIndex((x) => x.id === d.id), back = clone(S.settings.foods[i]);
       mutateSettings((st) => { st.foods = st.foods.filter((x) => x.id !== d.id); });
-      toast('Aliment supprimé');
+      toast('Aliment supprimé', back && (() => { mutateSettings((st) => { if (!st.foods.some((x) => x.id === back.id)) st.foods.splice(Math.min(i, st.foods.length), 0, back); }); toast('Remis'); }));
     },
+    undo: () => { const fn = undoFn; undoFn = null; document.getElementById('toast').classList.remove('show'); if (fn) fn(); },
     'reset-ask': () => { S.ui.confirm = 'reset'; S.ui.focus = '[data-act="reset-yes"]'; render(); },
     'reset-yes': () => {
       S.ui.confirm = null;
@@ -4361,11 +4494,18 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       scheduleReminders();
     },
     'export-json': () => exportJSON(),
+    'onboard-go': (d) => {
+      mutateSettings((st) => { st.onboard[d.v] = true; }, false);
+      Object.assign(S.ui, { view: 'reglages', settingsPage: d.v, form: null, confirm: null });
+      render(); toTop();
+    },
+    'onboard-hide': () => { mutateSettings((st) => { st.onboardDone = true; }); toast('Tu retrouves tout dans Réglages'); },
+    'backup-later': () => { setBackupInfo({ snooze: new Date(Date.now() + 3 * 864e5).toISOString() }); render(); toast('Rappel dans 3 jours'); },
     'backup-file': () => exportJSON(),
     'backup-copy': () => {
       const data = backupJSON();
       copyText(data).then((ok) => {
-        if (ok) { toast('Sauvegarde copiée. Sur l’autre appareil : Restaurer → Coller le texte.'); return; }
+        if (ok) { markBackup(); toast('Sauvegarde copiée. Sur l’autre appareil : Restaurer → Coller le texte.'); safeRender(); return; }
         S.ui.exportText = data; S.ui.focus = '#export-text'; S.ui.select = true; render();
       });
     },
