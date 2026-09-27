@@ -10,6 +10,7 @@
   --aprem:#7C5CD6; --aprem-2:#C4B4F1; --aprem-tint:#EDE7FB; --aprem-line:#CFC2F4; --aprem-on:#FFFFFF;
   --soir:#3557C2; --soir-2:#A3B5EC; --soir-tint:#E2E8F8; --soir-line:#B9C7F0; --soir-on:#FFFFFF;
   --fill:#1F9C93; --bub:#DCE3EA; --danger:#BF3A31; --focus:#3557C2;
+  --chart:#3557C2; --accent-tint:#DFF2EF; --shadow:0 1px 2px rgba(24,34,47,.05), 0 6px 18px rgba(24,34,47,.05);
   --font-ui:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display:"Unbounded", "Arial Black", "Helvetica Neue", Arial, sans-serif;
   color-scheme:light;
@@ -25,6 +26,7 @@
     --aprem:#A78CF3; --aprem-2:#5A4990; --aprem-tint:#1E1A31; --aprem-line:#3A305E; --aprem-on:#10161F;
     --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#10161F;
     --fill:#3CC0B5; --bub:#263142; --danger:#F06C62; --focus:#7C95F3;
+    --chart:#6F88E8; --accent-tint:#122725; --shadow:none;
     color-scheme:dark;
   }
 }
@@ -35,6 +37,7 @@
   --aprem:#A78CF3; --aprem-2:#5A4990; --aprem-tint:#1E1A31; --aprem-line:#3A305E; --aprem-on:#10161F;
   --soir:#7C95F3; --soir-2:#3E5192; --soir-tint:#171F36; --soir-line:#2D3C66; --soir-on:#10161F;
   --fill:#3CC0B5; --bub:#263142; --danger:#F06C62; --focus:#7C95F3;
+  --chart:#6F88E8; --accent-tint:#122725; --shadow:none;
   color-scheme:dark;
 }
 .m-matin{ --m:var(--matin); --m2:var(--matin-2); --mt:var(--matin-tint); --ml:var(--matin-line); --mo:var(--matin-on); }
@@ -54,21 +57,30 @@ h1,h2,h3{ margin:0; text-wrap:balance; }
 
 /* Barre du haut */
 .top{ position:sticky; top:env(safe-area-inset-top, 0px); z-index:10; background:var(--bg); border-bottom:1px solid var(--line); }
-.top-in{ max-width:1120px; margin:0 auto; padding:10px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; }
-.brand{ font-family:var(--font-display); font-weight:600; font-size:15px; letter-spacing:-.01em; }
+.top-in{ max-width:1120px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px 16px; min-height:54px; }
+.brand{ display:inline-flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-.01em; }
+.brand svg{ width:26px; height:26px; }
 .sync{ margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--muted); }
 .sync::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--dot, var(--muted)); }
-.tabs{ order:3; flex:1 1 100%; display:flex; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; }
-.tabs button{ flex:1; border:0; background:transparent; border-radius:999px; padding:8px 6px; font-weight:700; font-size:15px; color:var(--muted); }
-.tabs button[aria-current="page"]{ background:var(--ink); color:var(--bg); }
-@media (min-width:720px){
-  .tabs{ order:0; flex:0 1 auto; margin-left:auto; }
-  .tabs button{ flex:none; padding:8px 18px; }
-  .sync{ margin-left:0; }
-}
 
-main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
-@media (min-width:720px){ main{ padding:30px 24px 80px; } }
+/* Navigation : en bas sur téléphone et tablette, sur le côté sur grand écran */
+.nav{ position:fixed; left:0; right:0; bottom:0; z-index:20; display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:4px; background:var(--surface); border-top:1px solid var(--line); padding:6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
+.nav button{ border:0; background:transparent; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 2px 6px; border-radius:14px; font-size:12px; font-weight:700; color:var(--muted); min-height:56px; }
+.nav-ico{ display:grid; place-items:center; width:58px; height:30px; border-radius:999px; transition:background-color .15s ease; }
+.nav-ico svg{ width:23px; height:23px; }
+.nav button[aria-current="page"]{ color:var(--ink); }
+.nav button[aria-current="page"] .nav-ico{ background:var(--accent-tint); color:var(--fill); }
+@media (hover:hover){ .nav button:not([aria-current]):hover{ color:var(--ink); } }
+
+main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width:720px){ main{ padding:26px 24px calc(110px + env(safe-area-inset-bottom, 0px)); } }
+@media (min-width:1000px){
+  body{ padding-left:100px; }
+  .nav{ top:0; right:auto; width:100px; grid-template-columns:none; grid-auto-rows:min-content; align-content:start; gap:8px; padding:calc(76px + env(safe-area-inset-top, 0px)) 8px 16px; border-top:0; border-right:1px solid var(--line); }
+  .nav button{ min-height:64px; }
+  main{ padding-bottom:64px; }
+}
+.page-title{ font-family:var(--font-display); font-weight:600; font-size:clamp(26px, 5vw, 38px); letter-spacing:-.025em; line-height:1.1; margin-bottom:18px; }
 .loading{ color:var(--muted); font-weight:600; }
 
 /* Boutons */
@@ -119,7 +131,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .count{ font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
 /* Cartes */
 .col{ display:grid; gap:18px; align-content:start; min-width:0; }
-.card,.jsec{ background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:16px; min-width:0; }
+.card,.jsec{ background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:16px; min-width:0; box-shadow:var(--shadow); }
 @media (min-width:720px){ .card,.jsec{ padding:18px 20px; } }
 .card-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
 .card-head h2{ flex:1; font-size:20px; font-weight:800; letter-spacing:-.01em; }
@@ -246,7 +258,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 
 /* Réglages */
 .set-title{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px, 4.4vw, 40px); letter-spacing:-.025em; margin-bottom:22px; }
-.set-sec{ max-width:820px; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:18px; }
+.set-sec{ max-width:820px; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:18px; box-shadow:var(--shadow); }
 @media (min-width:720px){ .set-sec{ padding:22px 24px; } }
 .set-sec + .set-sec{ margin-top:18px; }
 .next-visit{ display:flex; align-items:center; gap:12px; margin:0 0 14px; padding:12px 14px; background:var(--soir-tint); border:1px solid var(--soir-line); border-radius:14px; }
@@ -364,8 +376,102 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 .set-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; margin-bottom:10px; }
 .restore{ margin-top:14px; }
 
+/* Accueil */
+.hero{ margin-bottom:18px; }
+.hero-top{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+.eyebrow{ margin:0 0 2px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--fill); }
+.hero .strip{ margin:16px 0 0; }
+.tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-bottom:18px; }
+@media (min-width:620px){ .tiles{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+.tile{ display:flex; align-items:center; gap:12px; padding:12px; background:var(--surface); border:1px solid var(--line); border-radius:18px; text-align:left; min-width:0; box-shadow:var(--shadow); }
+.tile .ring{ width:48px; height:48px; background:conic-gradient(var(--c, var(--fill)) calc(var(--p) * 1turn), var(--bub) 0); }
+.tile .ring span{ width:36px; height:36px; font-size:12px; }
+.tile .ring span svg{ width:18px; height:18px; color:var(--c, var(--fill)); }
+.tile-txt{ min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+.tile-txt b{ font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tile-txt span{ font-size:13px; font-weight:700; color:var(--muted); }
+.tile .face{ font-size:24px; }
+.c-water{ --c:var(--soir); } .c-supps{ --c:var(--fill); } .c-kcal2{ --c:var(--matin); } .c-mood{ --c:var(--aprem); }
+
+/* Eau */
+.glasses{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 12px; }
+.glass{ width:26px; height:32px; color:var(--soir); }
+.glass svg{ width:100%; height:100%; }
+.water-sub{ margin:0 0 12px; font-weight:700; color:var(--muted); font-size:14px; }
+.water-sub.done{ color:var(--fill); }
+.wminus{ min-width:44px; font-size:20px; line-height:1; }
+
+/* Calendrier */
+.seg-nav{ display:flex; padding:4px; gap:4px; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; margin-bottom:18px; max-width:420px; }
+.seg-nav button{ flex:1; border:0; background:transparent; border-radius:999px; padding:9px 10px; font-weight:800; color:var(--muted); min-height:40px; }
+.seg-nav button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); }
+.mgrid{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:6px; }
+.mgrid .wdh{ padding-bottom:4px; }
+.mday{ position:relative; display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 2px 8px; min-height:66px; border:1px solid var(--line); border-radius:14px; background:var(--surface); min-width:0; }
+.mday .dn{ font-weight:800; font-variant-numeric:tabular-nums; }
+.mday .bar{ width:62%; height:4px; border-radius:2px; background:var(--bub); overflow:hidden; }
+.mday .bar i{ display:block; height:100%; background:var(--fill); }
+.mday .marks{ display:flex; gap:3px; min-height:7px; }
+.mday .marks i{ width:7px; height:7px; border-radius:50%; }
+.mday .mk-v{ background:var(--soir); } .mday .mk-j{ background:var(--aprem); } .mday .mk-w{ background:var(--soir-2); border:1.5px solid var(--soir); }
+.mday.future{ opacity:.5; }
+.mday.today{ border-color:var(--ink); border-width:2px; }
+.mday.visit{ background:var(--soir-tint); border-color:var(--soir-line); }
+.mday.out{ visibility:hidden; }
+.msum{ margin:14px 0 6px; font-weight:600; }
+.legend i.dot{ display:inline-block; width:9px; height:9px; border-radius:50%; }
+
+/* Santé */
+.stats{ display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px; }
+.stat{ padding:12px 14px; background:var(--surface-2); border:1px solid var(--line); border-radius:14px; min-width:0; }
+.stat span{ display:block; font-size:13px; font-weight:700; color:var(--muted); }
+.stat b{ display:block; font-family:var(--font-display); font-weight:600; font-size:22px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.25; }
+.stat small{ display:block; font-size:13px; font-weight:600; color:var(--muted); }
+.goalbar{ margin-top:14px; }
+.goalbar p{ margin:0 0 6px; font-weight:700; }
+.goalbar .track{ height:10px; border-radius:5px; background:var(--bub); overflow:hidden; }
+.goalbar .track i{ display:block; height:100%; border-radius:5px; background:var(--fill); }
+.hgrid{ display:grid; gap:18px; }
+@media (min-width:900px){ .hgrid{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; } .hgrid .wide{ grid-column:1 / -1; } }
+.chart-wrap{ position:relative; }
+.chart-wrap svg{ display:block; width:100%; height:auto; overflow:visible; }
+.chart-tip{ position:absolute; pointer-events:none; padding:6px 10px; border-radius:10px; background:var(--ink); color:var(--bg); font-size:13px; font-weight:700; white-space:nowrap; transform:translate(-50%, calc(-100% - 12px)); }
+.chart-tip b{ font-size:15px; }
+.vlist{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.vlist button{ width:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; padding:12px 14px; background:var(--surface-2); border:1px solid var(--line); border-radius:14px; text-align:left; }
+.vlist b{ flex:1 1 160px; font-weight:800; }
+.vlist span{ font-size:14px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
+.lab-table{ width:100%; border-collapse:collapse; font-size:14px; }
+.lab-table th,.lab-table td{ padding:8px 10px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; }
+.lab-table thead th{ font-size:13px; color:var(--muted); }
+.lab-table th[scope="row"]{ font-weight:700; }
+.lab-table small{ color:var(--muted); font-weight:600; }
+
+/* Réglages : liste et pages */
+.set-group{ max-width:820px; margin-bottom:22px; }
+.group-title{ margin:0 0 8px 6px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.set-list{ background:var(--surface); border:1px solid var(--line); border-radius:20px; overflow:hidden; box-shadow:var(--shadow); }
+.set-row{ width:100%; display:flex; align-items:center; gap:14px; padding:14px 16px; background:transparent; border:0; border-top:1px solid var(--line); text-align:left; min-height:64px; }
+.set-list > .set-row:first-child{ border-top:0; }
+@media (hover:hover){ .set-row:hover{ background:var(--surface-2); } }
+.sr-txt{ flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
+.sr-txt b{ font-weight:800; }
+.sr-txt span{ font-size:14px; font-weight:600; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.chev{ flex:none; color:var(--muted); }
+.chev svg{ width:20px; height:20px; }
+.sub-head{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.back{ display:inline-flex; align-items:center; gap:4px; border:0; background:transparent; color:var(--fill); font-weight:800; font-size:15px; padding:8px 6px; border-radius:10px; min-height:42px; }
+.back svg{ width:20px; height:20px; }
+.form-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px; margin-bottom:14px; }
+.set-sec .field + .field{ margin-top:12px; }
+.suggest{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; margin:-4px 0 14px; font-size:14px; font-weight:600; color:var(--muted); }
+.sub-title{ font-size:17px; font-weight:800; margin:0 0 10px; }
+.form-grid + .sub-title,.hint + .sub-title,.suggest + .sub-title{ margin-top:22px; }
+.about{ max-width:820px; margin:8px 6px 0; font-size:13px; font-weight:600; color:var(--muted); }
+
 /* Messages */
-.toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(18px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
+.toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(88px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
+@media (min-width:1000px){ .toast-wrap{ padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px)); left:100px; } }
 #toast{ background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-weight:700; font-size:15px; opacity:0; transform:translateY(12px); transition:opacity .18s ease, transform .18s ease; max-width:100%; text-align:center; }
 #toast.show{ opacity:1; transform:none; }
 @media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation:none !important; transition:none !important; } }
@@ -374,17 +480,17 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 <div id="app">
   <header class="top">
     <div class="top-in">
-      <span class="brand">Mon suivi</span>
-      <nav class="tabs" aria-label="Vues">
-        <button type="button" data-act="tab" data-view="jour" aria-current="page">Jour</button>
-        <button type="button" data-act="tab" data-view="semaine">Semaine</button>
-        <button type="button" data-act="tab" data-view="annee">Année</button>
-        <button type="button" data-act="tab" data-view="reglages">Réglages</button>
-      </nav>
+      <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect width="512" height="512" rx="116" fill="#18222F"/><g transform="rotate(-40 256 256)"><rect x="100" y="188" width="156" height="136" rx="68" fill="#F2BA4E"/><rect x="178" y="188" width="78" height="136" fill="#F2BA4E"/><rect x="256" y="188" width="156" height="136" rx="68" fill="#3CC0B5"/><rect x="256" y="188" width="78" height="136" fill="#3CC0B5"/></g></svg>Mon suivi</span>
       <span class="sync" id="sync">Chargement…</span>
     </div>
   </header>
   <main id="view"><p class="loading">Chargement de tes données…</p></main>
+  <nav class="nav" aria-label="Navigation">
+    <button type="button" data-act="tab" data-view="jour" aria-current="page"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/></svg></span>Accueil</button>
+    <button type="button" data-act="tab" data-view="calendrier"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>Calendrier</button>
+    <button type="button" data-act="tab" data-view="sante"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.4 12.6 12 21l-8.4-8.4A5 5 0 0 1 12 6.3a5 5 0 0 1 8.4 6.3z"/><path d="M3.8 12.5h4.4l1.8-3 3 6 1.8-3h5.4"/></svg></span>Santé</button>
+    <button type="button" data-act="tab" data-view="reglages"><span class="nav-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>Réglages</button>
+  </nav>
   <div class="toast-wrap"><div id="toast" role="status" aria-live="polite"></div></div>
 </div>
 
@@ -547,7 +653,19 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       sunset: '<path d="M3 19h18M7 19a5 5 0 0 1 10 0M12 3v8M9.5 8.5 12 11l2.5-2.5M4.6 12.6l1.4 1.4M19.4 12.6 18 14"/>',
       moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
       visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
-      drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>'
+      drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>',
+      person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
+      target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
+      pill: '<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="m9.5 9.5 5 5"/>',
+      flame: '<path d="M12 21a6 6 0 0 0 6-6c0-3.6-2.6-5.6-3.6-9.2-1.5 1.6-2.5 3.6-2.5 5.6-1-1-1.6-2-1.6-3.6C8 10.2 6 12.5 6 15a6 6 0 0 0 6 6z"/>',
+      spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M6.3 17.7l2.8-2.8M14.9 9.1l2.8-2.8"/>',
+      save: '<path d="M12 3.5v11M7.5 10 12 14.5 16.5 10M4.5 16v2.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V16"/>',
+      scale: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 9.5a5.6 5.6 0 0 1 8 0L13 12.5"/>',
+      chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+      smile: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 14.2a4.5 4.5 0 0 0 7 0M9 9.8h.01M15 9.8h.01"/>',
+      glassEmpty: '<path d="M5.5 3.5h13l-1.7 16.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3z"/>',
+      glassHalf: '<path d="M5.5 3.5h13l-1.7 16.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M7.4 13.5h9.2l-.7 6.2H8.1z" fill="currentColor" stroke="none"/>',
+      glassFull: '<path d="M5.5 3.5h13l-1.7 16.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M6.6 7.5h10.8l-1.5 12.2H8.1z" fill="currentColor" stroke="none"/>'
     }).map(([k, d]) => [k, trusted(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`)]))
   };
   const MOMENT_ICON = { matin: ICON.sunrise, midi: ICON.sun, aprem: ICON.sunset, soir: ICON.moon };
@@ -574,9 +692,33 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   }
   const freshSettings = () => normalizeSettings({ created: todayKey(), supplements: defaultSupplements(todayKey()) });
   function normalizeGoals(g) {
-    const out = { kcal: null, p: null, g: null, l: null };
-    if (isObj(g)) Object.keys(out).forEach((k) => { const n = posNum(g[k]); out[k] = n ? round1(n) : null; });
+    const out = { kcal: null, p: null, g: null, l: null, water: 2.5, glass: 250 };
+    if (!isObj(g)) return out;
+    ['kcal', 'p', 'g', 'l'].forEach((k) => { const n = posNum(g[k]); out[k] = n ? round1(n) : null; });
+    const w = posNum(g.water), gl = posNum(g.glass);
+    if (w && w >= 0.5 && w <= 8) out.water = round1(w);
+    if (gl && gl >= 100 && gl <= 1000) out.glass = Math.round(gl);
     return out;
+  }
+  const hasNutriGoals = (g) => ['kcal', 'p', 'g', 'l'].some((k) => g[k]);
+  /* Profil santé : envoyé à Claude avec chaque journée, et base de l'IMC. */
+  const SEXES = ['homme', 'femme', 'autre'];
+  const ACTIVITY = { sedentaire: 'Sédentaire', leger: 'Légère (1 à 2 fois par semaine)', modere: 'Modérée (3 à 4 fois par semaine)', intense: 'Intense (5 fois et plus)' };
+  function normalizeHealth(h) {
+    h = isObj(h) ? h : {};
+    const kg = (v) => { const n = posNum(v); return n && n >= 20 && n <= 400 ? round1(n) : null; };
+    const cm = posNum(h.height);
+    return {
+      birth: isKey(h.birth) ? h.birth : '',
+      sex: SEXES.includes(h.sex) ? h.sex : '',
+      height: cm && cm >= 100 && cm <= 250 ? Math.round(cm) : null,
+      startWeight: kg(h.startWeight),
+      targetWeight: kg(h.targetWeight),
+      activity: ACTIVITY[h.activity] ? h.activity : '',
+      treatments: String(h.treatments || '').slice(0, 2000),
+      conditions: String(h.conditions || '').slice(0, 2000),
+      allergies: String(h.allergies || '').slice(0, 1000)
+    };
   }
   const normalizeFood = (f) => ({
     id: String(f.id || newId()), name: String(f.name || '').trim().slice(0, 80) || 'Aliment',
@@ -596,6 +738,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       version: 1,
       created,
       goals: normalizeGoals(raw && raw.goals),
+      health: normalizeHealth(raw && raw.health),
       foods: (raw && Array.isArray(raw.foods) ? raw.foods : []).filter(isObj).map(normalizeFood),
       profile: String((raw && raw.profile) || '').slice(0, 4000),
       claudeUrl: raw && isClaudeUrl(raw.claudeUrl) ? raw.claudeUrl : '',
@@ -633,6 +776,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null,
       restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
+      calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null,
       foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null }
@@ -693,7 +837,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   /* Durée de la nuit : coucher noté la veille (avant midi = après minuit), réveil noté ce jour-là. */
   function nightLength(bed, wake) { const m = nightMinutes(bed, wake); return m == null ? '' : fmtDuration(m); }
   function hasJournal(d) {
-    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.notes) || isObj(d.visit) || num(d.weight)));
+    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.notes) || isObj(d.visit) || num(d.weight) || waterOf(d)));
   }
 
   /* ---------- Visite médicale ---------- */
@@ -723,6 +867,20 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   const cycleLabel = () => { const e = S.settings.visit.every; return e % 7 === 0 ? `toutes les ${e / 7} semaines` : `tous les ${e} jours`; };
   const whenLabel = (n) => (n === 0 ? 'aujourd’hui' : n === 1 ? 'demain' : `dans ${n} jours`);
   const shortDate = (k) => { const d = fromKey(k); return `${dayNumber(d.getDate())} ${MONTHS[d.getMonth()]}${yearSuffix(d)}`; };
+  function ageOf(birth) {
+    if (!isKey(birth)) return null;
+    const b = fromKey(birth), t = new Date();
+    let a = t.getFullYear() - b.getFullYear();
+    if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--;
+    return a >= 0 && a < 130 ? a : null;
+  }
+  const currentWeight = () => { const w = weighIns(); return w.length ? w[w.length - 1] : null; };
+  const weightNow = () => { const c = currentWeight(); return c ? c.w : S.settings.health.startWeight; };
+  function bmi() { const h = S.settings.health.height, w = weightNow(); return h && w ? round1(w / (h / 100) ** 2) : null; }
+  const bmiLabel = (b) => (b < 18.5 ? 'Maigreur' : b < 25 ? 'Corpulence normale' : b < 30 ? 'Surpoids' : 'Obésité');
+  const fmtHeight = (cm) => `${(cm / 100).toFixed(2).replace('.', ',')} m`;
+  const waterOf = (d) => Math.max(0, Math.round(num(d && d.water) || 0));
+  const fmtL = (ml) => fmtDec(ml / 1000, 2);
   /* Pesées notées, la plus ancienne d'abord. */
   function weighIns() {
     const out = [];
@@ -1177,11 +1335,11 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
 
   /* ---------- Rendu : Jour ---------- */
   function renderDay() {
-    const k = S.ui.date, isToday = k === todayKey();
+    const k = S.ui.date, t = todayKey(), isToday = k === t;
     const d = peekDay(k) || {};
-    const visit = hasVisit(k);
-    return html`<section class="dayhead"><div class="datebar">
-        <h1 class="date">${longDate(k)}</h1>
+    const visit = hasVisit(k), gap = daysBetween(t, k);
+    const rel = isToday ? 'Aujourd’hui' : gap === -1 ? 'Hier' : gap === 1 ? 'Demain' : gap < 0 ? `Il y a ${-gap} jours` : `Dans ${gap} jours`;
+    return html`<section class="hero"><div class="hero-top"><div><p class="eyebrow">${rel}</p><h1 class="date">${longDate(k)}</h1></div>
         <div class="daynav">
           ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
           <button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">${ICON.left}</button>
@@ -1190,11 +1348,42 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       </div>${weekStrip(k)}</section>
       ${weeklyBanner()}
       ${isToday ? visitBanners(k) : ''}
+      ${summaryTiles(k, d)}
       ${visit ? visitCard(k, d) : ''}
       <div class="daygrid">
-        <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}${symptomBlock(k, d)}</div>
-        <div class="col">${checkinBlock(k, d, isToday)}${mealBlock(k, d)}${notesBlock(k, d)}${claudeBlock(visit ? 'visit' : 'day', k)}</div>
+        <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}${waterBlock(k, d)}</div>
+        <div class="col">${checkinBlock(k, d, isToday)}${symptomBlock(k, d)}${mealBlock(k, d)}${notesBlock(k, d)}${claudeBlock(visit ? 'visit' : 'day', k)}</div>
       </div>`;
+  }
+  /* Résumé du jour : quatre anneaux qui mènent chacun à sa section. */
+  function summaryTiles(k, d) {
+    const st = stats(k), ml = waterOf(d), goal = Math.round(S.settings.goals.water * 1000);
+    const tot = sumMacros(dayItems(d)), kcalGoal = S.settings.goals.kcal;
+    const cis = listOf(d.checkins).sort(byTime), last = cis[cis.length - 1], mood = last ? scaleValue(last.mood) : null;
+    const clamp = (x) => Math.max(0, Math.min(1, x)).toFixed(3);
+    const tile = (cls, target, p, inner, big, small, label) => html`<button type="button" class="tile ${cls}" data-act="jump" data-v="${target}" aria-label="${label}"><span class="ring" style="--p:${clamp(p)}"><span>${inner}</span></span><span class="tile-txt"><b>${big}</b><span>${small}</span></span></button>`;
+    return html`<div class="tiles">
+      ${tile('c-supps', 'sec-supps', st.total ? st.taken / st.total : 0, ICON.pill, st.total ? `${st.taken}/${st.total}` : '—', 'compléments', `Compléments : ${st.taken} sur ${st.total}`)}
+      ${tile('c-water', 'sec-water', goal ? ml / goal : 0, ICON.drop, `${fmtL(ml)} L`, `sur ${fmtL(goal)} L d’eau`, `Eau : ${fmtL(ml)} litre sur ${fmtL(goal)}`)}
+      ${tile('c-kcal2', 'sec-meals', kcalGoal ? tot.kcal / kcalGoal : 0, ICON.flame, tot.n ? fmtInt(tot.kcal) : '—', kcalGoal ? `sur ${fmtInt(kcalGoal)} kcal` : 'kcal', `Calories : ${fmtInt(tot.kcal)}${kcalGoal ? ` sur ${fmtInt(kcalGoal)}` : ''}`)}
+      ${tile('c-mood', 'sec-checkins', mood ? mood / 5 : 0, mood ? html`<span class="face">${FACES[mood - 1]}</span>` : ICON.smile, mood ? `${mood}/5` : '—', last ? `humeur à ${str(last.time)}` : 'pas de check-in', mood ? `Humeur ${mood} sur 5` : 'Pas encore de check-in')}
+    </div>`;
+  }
+  function waterBlock(k, d) {
+    const ml = waterOf(d), goal = Math.round(S.settings.goals.water * 1000), glass = S.settings.goals.glass;
+    const filled = ml / glass, n = Math.min(16, Math.max(Math.ceil(goal / glass), Math.ceil(filled)));
+    const left = goal - ml, glassesLeft = Math.ceil(left / glass);
+    const cups = Array.from({ length: n }, (_, i) => html`<span class="glass">${i + 1 <= filled ? ICON.glassFull : i < filled ? ICON.glassHalf : ICON.glassEmpty}</span>`);
+    return html`<section class="card m-soir" id="sec-water" aria-labelledby="water-title">
+      <div class="card-head"><span class="mico" aria-hidden="true">${ICON.drop}</span><h2 id="water-title">Eau</h2><span class="pill">${fmtL(ml)} / ${fmtL(goal)} L</span></div>
+      <div class="glasses" role="img" aria-label="${fmtL(ml)} litre bu sur ${fmtL(goal)}">${cups}</div>
+      <p class="water-sub${left <= 0 ? ' done' : ''}">${left <= 0 ? 'Objectif atteint' : `Encore ${fmtL(left)} L, soit ${plural(glassesLeft, 'verre')}`}</p>
+      <div class="actions">
+        <button type="button" class="primary" data-act="water-add" data-v="${glass}" data-date="${k}">+ 1 verre (${glass / 10} cl)</button>
+        <button type="button" class="ghost" data-act="water-add" data-v="500" data-date="${k}">+ 50 cl</button>
+        <button type="button" class="ghost wminus" data-act="water-add" data-v="${-glass}" data-date="${k}" aria-label="Retirer un verre"${ml ? '' : html` disabled`}>−</button>
+      </div>
+    </section>`;
   }
   /* Rappels du jour : visite dans la semaine, résultats de prise de sang à noter. */
   function visitBanners(k) {
@@ -1277,8 +1466,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const items = itemsForDay(k), st = stats(k);
     const pct = st.total ? st.taken / st.total : 0, all = st.total > 0 && st.taken === st.total;
     const head = html`<div class="supps-head"><div><h2>Compléments</h2><p class="sub${all ? ' done' : ''}">${!st.total ? 'Rien de prévu ce jour-là' : all ? 'Tout est pris' : `${st.taken} sur ${st.total} pris`}</p></div>${st.total ? html`<div class="ring" style="--p:${pct.toFixed(3)}" role="img" aria-label="${st.taken} sur ${st.total} compléments pris"><span>${Math.round(pct * 100)} %</span></div>` : ''}</div>`;
-    if (!items.length) return html`<section class="card supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}</section>`;
-    return html`<section class="card supps">${head}<div class="moments">${MOMENTS.map((m) => {
+    if (!items.length) return html`<section class="card supps" id="sec-supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}</section>`;
+    return html`<section class="card supps" id="sec-supps">${head}<div class="moments">${MOMENTS.map((m) => {
       const list = items.filter((s) => s.moment === m.key);
       if (!list.length) return '';
       const sch = list.filter((s) => isScheduled(s, k)), done = sch.filter((s) => isTaken(s.id, k)).length;
@@ -1314,7 +1503,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       if (!list.length) hint = 'Premier check-in : comment tu te sens au réveil ?';
       else if (last != null && last + 180 < 23 * 60) hint = `Prochain check-in entre ${fromMin(last + 180)} et ${fromMin(Math.min(last + 240, 23 * 60 + 59))}`;
     }
-    return html`<section class="jsec"><div class="sec-head"><h2>Comment je me sens</h2>${f ? '' : html`<button type="button" class="primary" data-act="ci-new" data-date="${k}">Nouveau check-in</button>`}</div>
+    return html`<section class="jsec" id="sec-checkins"><div class="sec-head"><h2>Comment je me sens</h2>${f ? '' : html`<button type="button" class="primary" data-act="ci-new" data-date="${k}">Nouveau check-in</button>`}</div>
       ${hint ? html`<p class="hint">${hint}</p>` : ''}
       ${f && !f.id ? checkinForm(f) : ''}
       ${list.length ? html`<ul class="list">${list.map((c) => (f && f.id === c.id ? html`<li class="editing">${checkinForm(f)}</li>` : checkinEntry(c, k)))}</ul>`
@@ -1370,7 +1559,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   /* Repas et macros */
   function nutritionSummary(d) {
     const t = sumMacros(dayItems(d)), goals = S.settings.goals;
-    const hasGoals = Object.values(goals).some((v) => v);
+    const hasGoals = hasNutriGoals(goals);
     if (!t.n && !hasGoals) return '';
     const bar = (cls, label, val, goal, unit) => {
       const w = goal ? Math.min(100, Math.round((val / goal) * 100)) : 0;
@@ -1380,7 +1569,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return html`<div class="nutri" aria-label="Total du jour">
       <div class="nutri-top"><b class="${over ? 'over' : ''}">${fmtInt(t.kcal)}</b><span>${goals.kcal ? `sur ${fmtInt(goals.kcal)} kcal${over ? ` · ${fmtInt(t.kcal - goals.kcal)} de plus` : ` · reste ${fmtInt(goals.kcal - t.kcal)}`}` : 'kcal aujourd’hui'}</span></div>
       <div class="mbars">${MACROS.map(([key, label]) => bar('c-' + key, label, t[key], goals[key], 'g'))}</div>
-      ${hasGoals ? '' : html`<p class="per100">Fixe tes objectifs (calories, protéines…) dans Réglages pour suivre ta progression.</p>`}
+      ${hasGoals ? '' : html`<p class="per100">Fixe tes objectifs (calories, protéines…) pour suivre ta progression. <button type="button" class="link" data-act="goto-settings" data-v="objectifs">Mes objectifs</button></p>`}
     </div>`;
   }
   function mealBlock(k, d) {
@@ -1391,7 +1580,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       const kind = str(m.kind) || 'Repas';
       return html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${kind}${t.n ? ` · ${fmtInt(t.kcal)} kcal` : ''}</span>${m.text ? html`<p class="note">${m.text}</p>` : ''}${items.length ? html`<ul class="items">${items.map((it) => html`<li>${it.name}<span>${num(it.grams) ? `${fmtDec(num(it.grams), 0)} g · ` : ''}${fmtInt(posNum(it.kcal) ?? 0)} kcal</span></li>`)}</ul><p class="macros">${macroLine(t)}</p>` : ''}</div>${rowActions('meal', k, m.id, `${kind.toLowerCase()} de ${str(m.time)}`)}</li>`;
     };
-    return html`<section class="jsec"><div class="sec-head"><h2>Ce que j’ai mangé</h2>${f ? '' : html`<button type="button" class="primary" data-act="meal-new" data-date="${k}">Ajouter</button>`}</div>
+    return html`<section class="jsec" id="sec-meals"><div class="sec-head"><h2>Ce que j’ai mangé</h2>${f ? '' : html`<button type="button" class="primary" data-act="meal-new" data-date="${k}">Ajouter</button>`}</div>
       ${nutritionSummary(d)}
       ${f && !f.id ? mealForm(f) : ''}
       ${list.length ? html`<ul class="list">${list.map((m) => (f && f.id === m.id ? html`<li class="editing">${mealForm(f)}</li>` : entry(m)))}</ul>`
@@ -1526,7 +1715,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const a = S.ui.ask, txt = SCOPE_TEXT[scope];
     return html`<section class="jsec claude" id="claude" aria-labelledby="claude-title">
       <div class="sec-head"><h2 id="claude-title">${txt.title}</h2></div>
-      <p class="hint">${txt.what}${S.settings.profile ? ' Ce que tu as écrit sur toi dans Réglages est ajouté.' : ' Ajoute ce que Claude doit savoir sur toi dans Réglages (âge, traitements, objectifs).'}</p>
+      <p class="hint">${txt.what}${hasProfile() ? ' Ton profil santé est ajouté.' : ' Remplis ton profil santé (Réglages) pour que Claude te connaisse : âge, taille, traitements.'}</p>
       <label class="field"><span>Ta question (facultatif)</span><textarea id="ask-q" data-ask="q" rows="2" placeholder="${txt.placeholder}">${a.q}</textarea></label>
       <div class="ask-opts">
         ${scope === 'day' ? html`<label class="switch"><input type="checkbox" id="ask-week" data-ask="withWeek"${a.withWeek ? html` checked` : ''}> Ajouter les 6 jours d’avant</label>` : ''}
@@ -1618,6 +1807,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     if (compact) {
       const parts = [];
       if (night) parts.push(`nuit ${night}`);
+      if (waterOf(d)) parts.push(`eau ${fmtL(waterOf(d))} L`);
       if (weight) parts.push(`${fmtDec(weight)} kg`);
       if (sch.length) parts.push(`compléments ${taken.length}/${sch.length}`);
       const avg = SCALES.map((sc) => { const v = avgScale(k, sc.key); return v != null ? `${sc.label.toLowerCase()} ${fmtAvg(v)}` : ''; }).filter(Boolean);
@@ -1630,6 +1820,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     L.push(`## ${longDate(k)} ${fromKey(k).getFullYear()}`.replace(/(\d{4}) \1$/, '$1'));
     if (!skipVisit && (visitOf(d) || isVisitDay(k))) L.push(...visitLines(k));
     L.push(`Sommeil : coucher la veille ${str(prev.bed) || 'non noté'}, réveil ${str(d.wake) || 'non noté'}${night ? ` (nuit de ${night})` : ''}`);
+    L.push(`Eau : ${waterOf(d) ? `${fmtL(waterOf(d))} L` : 'rien noté'} (objectif ${fmtDec(S.settings.goals.water)} L)`);
     if (sch.length || extra.length) {
       L.push(`Compléments : ${taken.length} sur ${sch.length} pris`);
       const fmtSup = (s) => `${s.name}${s.dose ? ' ' + s.dose : ''} (${MOMENTS.find((m) => m.key === s.moment).label.toLowerCase()})`;
@@ -1640,7 +1831,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     cis.forEach((c) => L.push(`- ${str(c.time)} : ${scoreLine(c) || 'sans note'}${str(c.note).trim() ? ` — « ${str(c.note).trim()} »` : ''}`));
     L.push(syms.length ? 'Ce que j’ai ressenti :' : 'Symptômes ou sensations : rien de noté');
     syms.forEach((s) => L.push(`- ${str(s.time)} : ${str(s.text).trim()}${scaleValue(s.intensity) ? ` (intensité ${s.intensity}/5)` : ''}`));
-    const g = S.settings.goals, goalTxt = Object.values(g).some((v) => v)
+    const g = S.settings.goals, goalTxt = hasNutriGoals(g)
       ? ` (objectifs : ${[g.kcal ? `${fmtInt(g.kcal)} kcal` : '', g.p ? `protéines ${fmtG(g.p)} g` : '', g.g ? `glucides ${fmtG(g.g)} g` : '', g.l ? `lipides ${fmtG(g.l)} g` : ''].filter(Boolean).join(', ')})` : '';
     L.push(meals.length ? `Alimentation${tot.n ? ` : ${fmtInt(tot.kcal)} kcal, protéines ${fmtG(tot.p)} g, glucides ${fmtG(tot.g)} g, lipides ${fmtG(tot.l)} g${goalTxt}` : ''} :` : 'Repas : rien de noté');
     meals.forEach((m) => {
@@ -1662,6 +1853,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const noted = days.filter((dk) => hasJournal(peekDay(dk)) || Object.values((peekDay(dk) || {}).taken || {}).some(Boolean)).length;
     L.push(`Jours avec quelque chose de noté : ${noted} sur ${days.length}`);
     if (nights.length) L.push(`Sommeil : ${fmtDuration(Math.round(avg(nights)))} en moyenne (${plural(nights.length, 'nuit')} notée${nights.length > 1 ? 's' : ''})`);
+    const drank = days.map((dk) => waterOf(peekDay(dk))).filter((x) => x > 0);
+    if (drank.length) L.push(`Eau : ${fmtL(avg(drank))} L par jour en moyenne (${plural(drank.length, 'jour')} noté${drank.length > 1 ? 's' : ''}, objectif ${fmtDec(S.settings.goals.water)} L, atteint ${plural(drank.filter((x) => x >= S.settings.goals.water * 1000).length, 'fois')})`);
     const cis = days.flatMap((dk) => listOf((peekDay(dk) || {}).checkins));
     const scales = SCALES.map((sc) => { const v = avg(cis.map((c) => scaleValue(c[sc.key])).filter((x) => x != null)); return v != null ? `${sc.label.toLowerCase()} ${fmtAvg(v)}` : ''; }).filter(Boolean);
     if (scales.length) L.push(`Check-ins (${plural(cis.length, 'check-in')}, moyennes sur 5) : ${scales.join(', ')}`);
@@ -1687,7 +1880,23 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const before = withWeek ? Array.from({ length: 6 }, (_, i) => dayReport(addDays(key, i - 6), { compact: true })) : [];
     return `# Mon suivi — ${longDate(key).toLowerCase()}\n\n${dayReport(key)}${before.length ? `\n\n## Les 6 jours d’avant (résumé)\n${before.join('\n')}` : ''}`;
   }
-  const profileText = () => (S.settings.profile.trim() ? `Ce qu’il faut savoir sur moi : ${S.settings.profile.trim()}\n\n` : '');
+  /* Profil santé pour Claude : qui je suis, poids, objectifs, traitements, antécédents. */
+  function profileText() {
+    const h = S.settings.health, age = ageOf(h.birth), cw = currentWeight(), w = weightNow(), b = bmi(), g = S.settings.goals;
+    const L = [];
+    const who = [h.sex ? cap1(h.sex) : '', age != null ? `${age} ans` : '', h.height ? `${fmtHeight(h.height)}` : '',
+      w ? `${fmtDec(w)} kg${cw ? ` (pesée du ${shortDate(cw.k)})` : ' (poids de départ)'}` : '', b ? `IMC ${fmtDec(b)}` : ''].filter(Boolean);
+    if (who.length) L.push(`Mon profil : ${who.join(', ')}`);
+    if (h.targetWeight) L.push(`Objectif de poids : ${fmtDec(h.targetWeight)} kg${h.startWeight ? ` (départ ${fmtDec(h.startWeight)} kg)` : ''}`);
+    if (h.activity) L.push(`Activité physique : ${ACTIVITY[h.activity].toLowerCase()}`);
+    if (h.treatments.trim()) L.push(`Traitements : ${h.treatments.trim()}`);
+    if (h.conditions.trim()) L.push(`Problèmes de santé, antécédents : ${h.conditions.trim()}`);
+    if (h.allergies.trim()) L.push(`Allergies, intolérances : ${h.allergies.trim()}`);
+    if (S.settings.profile.trim()) L.push(`Autres infos : ${S.settings.profile.trim()}`);
+    L.push(`Objectifs du jour : eau ${fmtDec(g.water)} L${g.kcal ? `, ${fmtInt(g.kcal)} kcal` : ''}${g.p ? `, protéines ${fmtG(g.p)} g` : ''}${g.g ? `, glucides ${fmtG(g.g)} g` : ''}${g.l ? `, lipides ${fmtG(g.l)} g` : ''}`);
+    return L.join('\n') + '\n\n';
+  }
+  const hasProfile = () => { const h = S.settings.health; return !!(h.birth || h.height || h.treatments.trim() || h.conditions.trim() || S.settings.profile.trim()); };
   /* Texte copié ou partagé : pour un projet Claude « état et santé », prêt à coller. */
   function claudeText(scope, key, q = S.ui.ask.q.trim(), withWeek = S.ui.ask.withWeek) {
     const ask = q || {
@@ -1827,6 +2036,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const summary = [
       html`<tr><th scope="row">Pris</th>${cell((dk) => { const st = stats(dk); return st.total ? `${st.taken}/${st.total}` : ''; })}</tr>`,
       html`<tr><th scope="row">Réveil</th>${cell((dk, d) => str(d.wake))}</tr>`,
+      html`<tr><th scope="row">Eau <small>L</small></th>${cell((dk, d) => (waterOf(d) ? fmtL(waterOf(d)) : ''))}</tr>`,
       html`<tr><th scope="row">Calories</th>${cell((dk, d) => { const x = sumMacros(dayItems(d)); return x.n ? fmtInt(x.kcal) : ''; })}</tr>`,
       html`<tr><th scope="row">Protéines <small>g</small></th>${cell((dk, d) => { const x = sumMacros(dayItems(d)); return x.n ? fmtG(x.p) : ''; })}</tr>`,
       SCALES.map((sc) => html`<tr><th scope="row">${sc.label}${sc.faces ? '' : html` <small>sur 5</small>`}</th>${days.map((dk) => {
@@ -1837,7 +2047,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       })}</tr>`),
       html`<tr><th scope="row">Ressenti</th>${cell((dk, d) => { const n = listOf(d.symptoms).length; return n ? String(n) : ''; })}</tr>`
     ];
-    return html`<div class="wk-head"><h1 class="wk-title">${weekTitle(start)}</h1><div class="daynav">
+    return html`<div class="wk-head"><h2 class="wk-title">${weekTitle(start)}</h2><div class="daynav">
         ${start !== startOfWeek(t) ? html`<button type="button" class="ghost" data-act="week-now">Cette semaine</button>` : ''}
         <button type="button" class="icon" data-act="week-prev" aria-label="Semaine précédente">${ICON.left}</button>
         <button type="button" class="icon" data-act="week-next" aria-label="Semaine suivante">${ICON.right}</button>
@@ -1866,7 +2076,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       }
       return html`<section class="month"><h3>${cap1(name)}</h3><div class="blister">${WD_LETTER.map((l) => html`<span class="wdh" aria-hidden="true">${l}</span>`)}${Array.from({ length: offset }, () => html`<span aria-hidden="true"></span>`)}${cells}</div></section>`;
     });
-    return html`<div class="yr-head"><h1 class="yr-title">${y}</h1><div class="daynav">
+    return html`<div class="yr-head"><h2 class="yr-title">${y}</h2><div class="daynav">
         ${y !== new Date().getFullYear() ? html`<button type="button" class="ghost" data-act="year-now">Cette année</button>` : ''}
         <button type="button" class="icon" data-act="year-prev" aria-label="Année précédente">${ICON.left}</button>
         <button type="button" class="icon" data-act="year-next" aria-label="Année suivante">${ICON.right}</button>
@@ -1909,37 +2119,102 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       </div>
     </div>`;
   }
-  function nutritionSettings() {
-    const g = S.settings.goals, fd = S.ui.foodDraft;
-    const goal = (key, label) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="goal-${key}" data-goal="${key}" value="${g[key] ? fmtDec(g[key]) : ''}" placeholder="—" autocomplete="off"></label>`;
-    const fdField = (key, label) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="fd-${key}" data-fd="${key}" value="${fd[key]}" autocomplete="off"></label>`;
-    return html`<section class="set-sec"><div class="sec-head"><h2>Nutrition</h2></div>
-      <p class="hint">Tes objectifs par jour. Laisse vide ce que tu ne suis pas.</p>
-      <div class="set-grid">${goal('kcal', 'Calories (kcal)')}${goal('p', 'Protéines (g)')}${goal('g', 'Glucides (g)')}${goal('l', 'Lipides (g)')}</div>
-      <h3 class="m-title">Mes aliments <span>valeurs pour 100 g</span></h3>
-      ${S.settings.foods.length ? html`<ul class="food-list">${S.settings.foods.map((x) => html`<li><span class="fl-name">${x.name}</span><span class="fl-vals">${fmtInt(x.kcal)} kcal · ${macroLine(x)}</span>${S.ui.confirm === `food:${x.id}`
-        ? html`<button type="button" class="link danger" data-act="food-del" data-id="${x.id}">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button>`
-        : html`<button type="button" class="link" data-act="food-ask" data-id="${x.id}" aria-label="Supprimer ${x.name}">Supprimer</button>`}</li>`)}</ul>`
-        : html`<p class="empty">Aucun pour l’instant. Ajoute ceux que tu manges souvent (ton pain, ta whey, un plat maison) : ils apparaîtront en premier dans les repas.</p>`}
-      <div class="food-add" style="margin-top:12px">
-        <div class="row"><label class="field"><span>Nouvel aliment</span><input type="text" id="fd-name" data-fd="name" value="${fd.name}" placeholder="Ma whey vanille" autocomplete="off"></label>${fdField('kcal', 'Calories')}</div>
-        <div class="row4">${fdField('p', 'Protéines (g)')}${fdField('g', 'Glucides (g)')}${fdField('l', 'Lipides (g)')}<div class="field"><span>&nbsp;</span><button type="button" class="ghost" data-act="food-add">Ajouter</button></div></div>
+  /* ---------- Réglages : une liste, puis une page par sujet ---------- */
+  function profileSettings() {
+    const h = S.settings.health, age = ageOf(h.birth), b = bmi();
+    const numField = (key, label, ph) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="h-${key}" data-hset="${key}" value="${h[key] ? fmtDec(h[key]) : ''}" placeholder="${ph}" autocomplete="off"></label>`;
+    return html`<section class="set-sec">
+      <h2 class="sub-title">Toi</h2>
+      <div class="form-grid">
+        <label class="field"><span>Date de naissance${age != null ? ` · ${age} ans` : ''}</span><input type="date" id="h-birth" data-hset="birth" value="${h.birth}" max="${todayKey()}"></label>
+        <div class="field"><span id="sex-lbl">Sexe</span><div class="seg" role="group" aria-labelledby="sex-lbl">${[['homme', 'Homme'], ['femme', 'Femme'], ['autre', 'Autre']].map(([v, l]) => html`<button type="button" data-act="h-sex" data-v="${v}" aria-pressed="${bool(h.sex === v)}">${l}</button>`)}</div></div>
+        ${numField('height', 'Taille (cm)', '180')}
+        <label class="field"><span>Activité physique</span><select id="h-activity" data-hset="activity"><option value="">Non précisée</option>${Object.entries(ACTIVITY).map(([v, l]) => html`<option value="${v}"${h.activity === v ? html` selected` : ''}>${l}</option>`)}</select></label>
       </div>
+      <h2 class="sub-title">Poids</h2>
+      <div class="form-grid">
+        ${numField('startWeight', 'Poids de départ (kg)', '95')}
+        ${numField('targetWeight', 'Objectif (kg)', '80')}
+      </div>
+      <p class="hint">Ensuite, tu te pèses à chaque visite médicale : ta courbe et ton IMC sont dans l’onglet Santé.${b ? ` IMC actuel : ${fmtDec(b)} (${bmiLabel(b).toLowerCase()}).` : ''}</p>
+      <h2 class="sub-title">Médical</h2>
+      <label class="field"><span>Traitements en cours</span><textarea id="h-treatments" data-hset="treatments" rows="2" placeholder="Mounjaro 2,5 mg une fois par semaine depuis…">${h.treatments}</textarea></label>
+      <label class="field"><span>Problèmes de santé, antécédents</span><textarea id="h-conditions" data-hset="conditions" rows="2" placeholder="Tension, asthme, opération, carence connue…">${h.conditions}</textarea></label>
+      <label class="field"><span>Allergies et intolérances</span><textarea id="h-allergies" data-hset="allergies" rows="2" placeholder="Pénicilline, lactose…">${h.allergies}</textarea></label>
+      <label class="field"><span>Autres infos pour Claude</span><textarea id="set-profile" data-setting="profile" rows="3" placeholder="Ce que tu veux que Claude sache en plus : études, sport, sommeil…">${S.settings.profile}</textarea></label>
+      <p class="hint">Tout ce profil est ajouté à chaque envoi à Claude (journée, semaine, bilan du mois).</p>
+    </section>`;
+  }
+  function goalsSettings() {
+    const g = S.settings.goals, w = weightNow();
+    const suggest = w ? Math.round(w * 0.35) / 10 : null; // 35 mL par kilo, arrondi à 0,1 L
+    const goal = (key, label) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="goal-${key}" data-goal="${key}" value="${g[key] ? fmtDec(g[key]) : ''}" placeholder="—" autocomplete="off"></label>`;
+    return html`<section class="set-sec">
+      <h2 class="sub-title">Eau</h2>
+      <div class="form-grid">
+        <label class="field"><span>Objectif par jour (litres)</span><input type="text" inputmode="decimal" id="goal-water" data-goal="water" value="${fmtDec(g.water)}" autocomplete="off"></label>
+        <label class="field"><span>Taille d’un verre</span><select id="goal-glass" data-goal="glass">${[200, 250, 330, 500].map((v) => html`<option value="${v}"${g.glass === v ? html` selected` : ''}>${v / 10} cl</option>`)}</select></label>
+      </div>
+      ${suggest ? html`<p class="suggest">Repère courant : 35 mL par kilo, soit ${fmtDec(suggest)} L pour ${fmtDec(w)} kg.${suggest !== g.water ? html` <button type="button" class="link" data-act="water-suggest" data-v="${suggest}">Mettre ${fmtDec(suggest)} L</button>` : ''}</p>` : ''}
+      <h2 class="sub-title">Nutrition</h2>
+      <div class="form-grid">${goal('kcal', 'Calories (kcal)')}${goal('p', 'Protéines (g)')}${goal('g', 'Glucides (g)')}${goal('l', 'Lipides (g)')}</div>
+      <p class="hint">Laisse vide ce que tu ne suis pas. Ces objectifs s’affichent sur l’accueil et partent avec tes journées à Claude.</p>
     </section>`;
   }
   function visitSettings() {
     const v = S.settings.visit, t = todayKey();
     const nv = nextVisit(t), n = daysBetween(t, nv);
     const after = [1, 2, 3].map((i) => shortDate(addDays(nv, i * v.every)));
-    return html`<section class="set-sec"><div class="sec-head"><h2>Visite médicale</h2></div>
+    return html`<section class="set-sec">
       <p class="next-visit m-soir"><span class="mico" aria-hidden="true">${ICON.visit}</span><span><b>Prochaine visite : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}</b><span>${cap1(whenLabel(n))} · prise de sang, pesée et médecin</span></span></p>
-      <div class="set-grid">
+      <div class="form-grid">
         <label class="field"><span>Première visite</span><input type="date" id="visit-start" data-vset="start" value="${v.start}"></label>
         <label class="field"><span>Tous les (jours)</span><input type="number" inputmode="numeric" min="7" max="120" id="visit-every" data-vset="every" value="${v.every}"></label>
       </div>
-      <p class="hint">Ensuite : ${after.join(' · ')}. La semaine d’avant, un rappel s’affiche sur la page du jour. Le jour même, la page montre la visite (poids, prise de sang, médecin) et le bilan des ${v.every} jours à envoyer à Claude.</p>
+      <p class="hint">Ensuite : ${after.join(' · ')}. La semaine d’avant, un rappel s’affiche sur l’accueil. Le jour même, l’accueil montre la visite (poids, prise de sang, médecin) et le bilan des ${v.every} jours à envoyer à Claude.</p>
       ${PLATFORM.native ? html`<label class="switch"><input type="checkbox" id="visit-notify" data-vset="notify"${v.notify ? html` checked` : ''}> Notification la veille à 19:00 et le matin à 7:30</label>
         ${store.notifyDenied ? html`<p class="hint">Les notifications sont bloquées : autorise-les pour Mon suivi dans les réglages Android.</p>` : ''}` : ''}
+    </section>`;
+  }
+  function supplementSettings() {
+    const sups = S.settings.supplements;
+    const groups = MOMENTS.map((m) => {
+      const list = sups.filter((s) => s.moment === m.key);
+      return list.length ? html`<h3 class="m-title m-${m.key}">${m.label}${m.hint ? html` <span>${m.hint}</span>` : ''}</h3>${list.map(supRow)}` : '';
+    });
+    return html`<section class="set-sec">
+      <div class="sec-head"><p class="hint" style="margin:0">Touche un complément pour le modifier. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p><button type="button" class="primary" data-act="sup-add">Ajouter</button></div>
+      ${groups}${sups.length ? '' : html`<p class="empty">Ta liste est vide.</p>`}
+      <div class="reset">${S.ui.confirm === 'reset'
+        ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
+        : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
+    </section>`;
+  }
+  function foodSettings() {
+    const fd = S.ui.foodDraft;
+    const fdField = (key, label) => html`<label class="field"><span>${label}</span><input type="text" inputmode="decimal" id="fd-${key}" data-fd="${key}" value="${fd[key]}" autocomplete="off"></label>`;
+    return html`<section class="set-sec">
+      <p class="hint">Valeurs pour 100 g. Tes aliments passent avant la table intégrée quand tu notes un repas.</p>
+      ${S.settings.foods.length ? html`<ul class="food-list">${S.settings.foods.map((x) => html`<li><span class="fl-name">${x.name}</span><span class="fl-vals">${fmtInt(x.kcal)} kcal · ${macroLine(x)}</span>${S.ui.confirm === `food:${x.id}`
+        ? html`<button type="button" class="link danger" data-act="food-del" data-id="${x.id}">Oui, supprimer</button><button type="button" class="link" data-act="confirm-cancel">Non</button>`
+        : html`<button type="button" class="link" data-act="food-ask" data-id="${x.id}" aria-label="Supprimer ${x.name}">Supprimer</button>`}</li>`)}</ul>`
+        : html`<p class="empty">Aucun pour l’instant. Ajoute ceux que tu manges souvent : ton pain, ta whey, un plat maison.</p>`}
+      <h2 class="sub-title" style="margin-top:18px">Nouvel aliment</h2>
+      <div class="food-add">
+        <div class="row"><label class="field"><span>Nom</span><input type="text" id="fd-name" data-fd="name" value="${fd.name}" placeholder="Ma whey vanille" autocomplete="off"></label>${fdField('kcal', 'Calories')}</div>
+        <div class="row4">${fdField('p', 'Protéines (g)')}${fdField('g', 'Glucides (g)')}${fdField('l', 'Lipides (g)')}<div class="field"><span>&nbsp;</span><button type="button" class="ghost" data-act="food-add">Ajouter</button></div></div>
+      </div>
+    </section>`;
+  }
+  function claudeSettings() {
+    return html`<section class="set-sec">
+      <label class="field"><span>Lien de ton projet Claude (facultatif)</span><input type="url" id="set-claude-url" data-setting="claudeUrl" value="${S.settings.claudeUrl}" placeholder="https://claude.ai/project/…" autocomplete="off"></label>
+      <p class="hint">Crée un projet « État et santé » dans Claude, colle son lien ici : le bouton « Ouvrir mon projet Claude » y mènera directement.</p>
+      <h2 class="sub-title" style="margin-top:18px">Envoyer à Claude</h2>
+      <p class="hint">${store.sample ? 'Ici, « Demander à Claude » répond directement dans la page, avec ta journée ou ton bilan du mois ; tu peux joindre une photo de ta prise de sang.'
+        : canShare() ? 'Sur la tablette, « Envoyer à Claude » ouvre le menu de partage : choisis l’app Claude.'
+        : '« Copier pour Claude » copie ta journée : colle-la dans ton projet Claude.'} Ton profil santé part avec chaque envoi.</p>
+      <div class="actions"><button type="button" class="ghost" data-act="goto-settings" data-v="profil">Modifier mon profil santé</button></div>
     </section>`;
   }
   function dataSettings() {
@@ -1949,11 +2224,11 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     const where = store.mode === 'cloud'
       ? 'Enregistrées sur ton compte Claude et privées : toi seul les vois, même si tu partages cette page. Elles se synchronisent entre tes appareils qui ouvrent cette page dans Claude. Sans connexion, tes modifications restent sur l’appareil et partent dès que possible.'
       : `Enregistrées sur cet appareil${PLATFORM.native ? ' (app Android)' : PLATFORM.electron ? ' (app PC)' : ''}, uniquement ici. Pour les retrouver ailleurs (tablette, PC, artefact Claude) : sauvegarde complète ici, puis « Restaurer » là-bas.`;
-    return html`<section class="set-sec"><div class="sec-head"><h2>Tes données</h2></div>
-      <p class="muted">${where}</p>
+    return html`<section class="set-sec">
+      <p class="muted" style="margin:0">${where}</p>
       <div class="dgroups">
         <div class="dgroup"><h3>Sauvegarde complète</h3>
-          <p>Ta liste, tes réglages et tout ton journal. Pour garder une copie, ou passer à un autre appareil.</p>
+          <p>Ta liste, tes réglages, ton profil et tout ton journal. Pour garder une copie, ou passer à un autre appareil.</p>
           <div class="actions"><button type="button" class="primary" data-act="backup-file">${fileVerb} la sauvegarde</button><button type="button" class="ghost" data-act="backup-copy">Copier le texte</button></div>
         </div>
         <div class="dgroup"><h3>Une journée</h3>
@@ -1976,33 +2251,228 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         <div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button>${canShare() ? html`<button type="button" class="ghost" data-act="share-export">Partager</button>` : ''}<button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
     </section>`;
   }
+  const SETTINGS_PAGES = {
+    profil: {
+      title: 'Profil santé', icon: 'person', cls: 'm-midi', render: profileSettings,
+      summary: () => {
+        const h = S.settings.health, age = ageOf(h.birth), w = weightNow();
+        return [age != null ? `${age} ans` : '', h.height ? `${fmtHeight(h.height)}` : '', w ? `${fmtDec(w)} kg` : '', h.targetWeight ? `objectif ${fmtDec(h.targetWeight)} kg` : ''].filter(Boolean).join(' · ') || 'À remplir : âge, taille, poids, traitements';
+      }
+    },
+    objectifs: {
+      title: 'Objectifs du jour', icon: 'target', cls: 'm-matin', render: goalsSettings,
+      summary: () => { const g = S.settings.goals; return [`Eau ${fmtDec(g.water)} L`, g.kcal ? `${fmtInt(g.kcal)} kcal` : '', g.p ? `${fmtG(g.p)} g de protéines` : ''].filter(Boolean).join(' · '); }
+    },
+    visite: {
+      title: 'Visite médicale', icon: 'visit', cls: 'm-soir', render: visitSettings,
+      summary: () => `Prochaine : ${longDate(nextVisit(todayKey())).replace(/^./, (c) => c.toLowerCase())}`
+    },
+    complements: {
+      title: 'Compléments', icon: 'pill', cls: 'm-midi', render: supplementSettings,
+      summary: () => { const a = S.settings.supplements.filter((s) => s.active).length, p = S.settings.supplements.length - a; return `${plural(a, 'actif')}${p ? ` · ${p} en pause` : ''}`; }
+    },
+    aliments: {
+      title: 'Mes aliments', icon: 'flame', cls: 'm-matin', render: foodSettings,
+      summary: () => (S.settings.foods.length ? plural(S.settings.foods.length, 'aliment') : 'Aucun pour l’instant')
+    },
+    claude: {
+      title: 'Claude', icon: 'spark', cls: 'm-aprem', render: claudeSettings,
+      summary: () => (S.settings.claudeUrl ? 'Projet Claude lié' : 'Aucun projet lié')
+    },
+    donnees: {
+      title: 'Sauvegarde et données', icon: 'save', cls: 'm-soir', render: dataSettings,
+      summary: () => (store.mode === 'cloud' ? 'Synchronisées avec ton compte Claude' : 'Sur cet appareil · sauvegarder, restaurer')
+    }
+  };
+  const SETTINGS_GROUPS = [['Moi', ['profil', 'objectifs']], ['Suivi', ['visite', 'complements', 'aliments']], ['Claude et données', ['claude', 'donnees']]];
   function renderSettings() {
-    const sups = S.settings.supplements;
-    const groups = MOMENTS.map((m) => {
-      const list = sups.filter((s) => s.moment === m.key);
-      return list.length ? html`<h3 class="m-title m-${m.key}">${m.label}${m.hint ? html` <span>${m.hint}</span>` : ''}</h3>${list.map(supRow)}` : '';
-    });
-    return html`<h1 class="set-title">Réglages</h1>
-      ${visitSettings()}
-      <section class="set-sec"><div class="sec-head"><h2>Compléments</h2><button type="button" class="primary" data-act="sup-add">Ajouter</button></div>
-        <p class="hint">Touche un complément pour le modifier. Tout est enregistré au fur et à mesure. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p>
-        ${groups}${sups.length ? '' : html`<p class="empty">Ta liste est vide.</p>`}
-        <div class="reset">${S.ui.confirm === 'reset'
-          ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
-          : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
-      </section>
-      ${nutritionSettings()}
-      <section class="set-sec"><div class="sec-head"><h2>Claude</h2></div>
-        <label class="field"><span>Ce que Claude doit savoir sur toi</span><textarea id="set-profile" data-setting="profile" rows="4" placeholder="Âge, taille, objectif (perte de poids…), traitements (Mounjaro 2,5 mg depuis…), problèmes de santé…">${S.settings.profile}</textarea></label>
-        <p class="hint">Ajouté à chaque envoi à Claude (copie, partage, question ou bilan du mois).</p>
-        <label class="field"><span>Lien de ton projet Claude (facultatif)</span><input type="url" id="set-claude-url" data-setting="claudeUrl" value="${S.settings.claudeUrl}" placeholder="https://claude.ai/project/…" autocomplete="off"></label>
-        <p class="hint">Crée un projet « État et santé » dans Claude, colle son lien ici : le bouton « Ouvrir mon projet Claude » y mènera directement.</p>
-      </section>
-      ${dataSettings()}`;
+    const page = SETTINGS_PAGES[S.ui.settingsPage];
+    if (page) {
+      return html`<div class="sub-head"><button type="button" class="back" data-act="settings-page" data-v="">${ICON.left}Réglages</button></div>
+        <h1 class="page-title">${page.title}</h1>${page.render()}`;
+    }
+    const where = PLATFORM.native ? 'app Android' : PLATFORM.electron ? 'app PC' : store.mode === 'cloud' ? 'artefact Claude' : 'navigateur';
+    return html`<h1 class="page-title">Réglages</h1>
+      ${SETTINGS_GROUPS.map(([title, keys]) => html`<section class="set-group"><h2 class="group-title">${title}</h2><div class="set-list">${keys.map((key) => {
+        const pg = SETTINGS_PAGES[key];
+        return html`<button type="button" class="set-row" data-act="settings-page" data-v="${key}"><span class="mico ${pg.cls}" aria-hidden="true">${ICON[pg.icon]}</span><span class="sr-txt"><b>${pg.title}</b><span>${pg.summary()}</span></span><span class="chev" aria-hidden="true">${ICON.right}</span></button>`;
+      })}</div></section>`)}
+      <p class="about">Mon suivi · ${where}</p>`;
+  }
+
+  /* ---------- Rendu : Calendrier ---------- */
+  function renderCalendar() {
+    const mode = S.ui.calMode;
+    return html`<h1 class="page-title">Calendrier</h1>
+      <div class="seg-nav" role="group" aria-label="Affichage">${[['semaine', 'Semaine'], ['mois', 'Mois'], ['annee', 'Année']].map(([v, l]) => html`<button type="button" data-act="cal-mode" data-v="${v}" aria-pressed="${bool(mode === v)}">${l}</button>`)}</div>
+      ${mode === 'semaine' ? renderWeek() : mode === 'annee' ? renderYear() : renderMonth()}`;
+  }
+  function renderMonth() {
+    const mk = S.ui.monthOf, [y, m] = mk.split('-').map(Number), t = todayKey();
+    const first = `${mk}-01`, nDays = new Date(y, m, 0).getDate(), goal = Math.round(S.settings.goals.water * 1000);
+    let full = 0, tracked = 0, waterOk = 0;
+    const visits = [];
+    const cells = Array.from({ length: weekdayOf(first) }, () => html`<span class="mday out" aria-hidden="true"></span>`);
+    for (let dn = 1; dn <= nDays; dn++) {
+      const k = `${mk}-${pad(dn)}`, d = peekDay(k), st = stats(k), v = hasVisit(k), j = hasJournal(d), wOk = waterOf(d) >= goal;
+      const future = k > t, p = st.total ? st.taken / st.total : 0;
+      if (!future && st.total) { tracked++; if (p >= 1) full++; }
+      if (wOk) waterOk++;
+      if (v) visits.push(k);
+      const label = `${longDate(k)} : ${st.total ? `${st.taken} sur ${st.total} compléments` : 'rien de prévu'}${wOk ? ', objectif d’eau atteint' : ''}${j ? ', journal rempli' : ''}${v ? ', visite médicale' : ''}`;
+      cells.push(html`<button type="button" class="mday${future ? ' future' : ''}${k === t ? ' today' : ''}${v ? ' visit' : ''}" data-act="goto" data-date="${k}" aria-label="${label}"><span class="dn">${dn}</span><span class="bar" aria-hidden="true"><i style="width:${Math.round(p * 100)}%"></i></span><span class="marks" aria-hidden="true">${v ? html`<i class="mk-v"></i>` : ''}${wOk ? html`<i class="mk-w"></i>` : ''}${j ? html`<i class="mk-j"></i>` : ''}</span></button>`);
+    }
+    const summary = [tracked ? `Tout pris ${plural(full, 'jour')} sur ${tracked}` : 'Rien de suivi ce mois-ci pour l’instant', waterOk ? `eau : objectif atteint ${plural(waterOk, 'jour')}` : '', visits.length ? `visite ${visits.map((k) => `le ${dayNumber(fromKey(k).getDate())}`).join(' et ')}` : ''].filter(Boolean).join(' · ');
+    return html`<div class="wk-head"><h2 class="wk-title">${cap1(MONTHS[m - 1])} ${y}</h2><div class="daynav">
+        ${mk !== t.slice(0, 7) ? html`<button type="button" class="ghost" data-act="month-now">Ce mois-ci</button>` : ''}
+        <button type="button" class="icon" data-act="month-prev" aria-label="Mois précédent">${ICON.left}</button>
+        <button type="button" class="icon" data-act="month-next" aria-label="Mois suivant">${ICON.right}</button>
+      </div></div>
+      <p class="msum">${summary}.</p>
+      <div class="card"><div class="mgrid">${WD_SHORT.map((l) => html`<span class="wdh" aria-hidden="true">${l}</span>`)}${cells}</div></div>
+      <div class="legend" aria-hidden="true" style="margin-top:14px"><span><i class="dot" style="background:var(--fill)"></i>Barre : compléments pris</span><span><i class="dot" style="background:var(--soir)"></i>Visite médicale</span><span><i class="dot" style="background:var(--soir-2);border:1.5px solid var(--soir)"></i>Objectif d’eau atteint</span><span><i class="dot" style="background:var(--aprem)"></i>Journal rempli</span></div>`;
+  }
+
+  /* ---------- Rendu : Santé ---------- */
+  const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  const tinyDate = (k) => { const d = fromKey(k); return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`; };
+  /* Courbe du poids aux pesées : une série, ligne 2 px, points 8 px, zone à 10 %, grille fine, ligne d'objectif,
+     dernière valeur écrite au bout ; au survol, repère vertical et bulle. Les valeurs sont aussi dans « Visites ». */
+  function weightChart() {
+    const pts = weighIns(), target = S.settings.health.targetWeight;
+    if (pts.length < 2) {
+      return html`<p class="empty">${pts.length ? `Une pesée pour l’instant : ${fmtDec(pts[0].w)} kg le ${shortDate(pts[0].k)}. ` : ''}Ta courbe apparaîtra dès la deuxième pesée, à la visite médicale.</p>`;
+    }
+    const W = Math.round(Math.max(280, Math.min(880, (view.clientWidth || 360) - (innerWidth >= 900 ? 90 : 40)))), H = 230;
+    const padL = 40, padR = 64, padT = 18, padB = 30;
+    const x0 = dayNum(pts[0].k), x1 = Math.max(x0 + 1, dayNum(pts[pts.length - 1].k));
+    let lo = Math.min(...pts.map((p) => p.w)), hi = Math.max(...pts.map((p) => p.w));
+    if (target) { lo = Math.min(lo, target); hi = Math.max(hi, target); }
+    const range = Math.max(hi - lo, 1), step = range <= 4 ? 1 : range <= 10 ? 2 : range <= 25 ? 5 : 10;
+    lo = Math.floor((lo - step * 0.3) / step) * step; hi = Math.ceil((hi + step * 0.3) / step) * step;
+    const X = (k) => padL + ((dayNum(k) - x0) / (x1 - x0)) * (W - padL - padR);
+    const Y = (w) => padT + ((hi - w) / (hi - lo)) * (H - padT - padB);
+    const ticks = [];
+    for (let v = lo; v <= hi + 1e-9; v += step) ticks.push(v);
+    const line = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.k).toFixed(1)} ${Y(p.w).toFixed(1)}`).join(' ');
+    const area = `${line} L${X(pts[pts.length - 1].k).toFixed(1)} ${H - padB} L${X(pts[0].k).toFixed(1)} ${H - padB} Z`;
+    const labelled = pts.length <= 6 ? pts : [pts[0], pts[Math.floor(pts.length / 2)], pts[pts.length - 1]];
+    const last = pts[pts.length - 1];
+    const data = pts.map((p) => ({ x: +X(p.k).toFixed(1), y: +Y(p.w).toFixed(1), d: shortDate(p.k), v: `${fmtDec(p.w)} kg` }));
+    const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(`Poids aux pesées : ${pts.map((p) => `${shortDate(p.k)} ${fmtDec(p.w)} kg`).join(', ')}`)}">`
+      + ticks.map((v) => `<line x1="${padL}" x2="${W - padR}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--line)" stroke-width="1"/><text x="${padL - 8}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end" font-size="12" fill="var(--muted)" font-weight="600">${esc(fmtDec(v, 0))}</text>`).join('')
+      + (target ? `<line x1="${padL}" x2="${W - padR}" y1="${Y(target).toFixed(1)}" y2="${Y(target).toFixed(1)}" stroke="var(--fill)" stroke-width="1.5"/><text x="${padL + 6}" y="${(Y(target) - 6).toFixed(1)}" font-size="12" font-weight="700" fill="var(--ink)">${esc(`Objectif ${fmtDec(target)} kg`)}</text>` : '')
+      + `<path d="${area}" fill="var(--chart)" fill-opacity=".1" stroke="none"/>`
+      + `<path d="${line}" fill="none" stroke="var(--chart)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`
+      + `<line class="cross" x1="0" x2="0" y1="${padT}" y2="${H - padB}" stroke="var(--muted)" stroke-width="1" style="display:none"/>`
+      + pts.map((p) => `<circle cx="${X(p.k).toFixed(1)}" cy="${Y(p.w).toFixed(1)}" r="4" fill="var(--chart)" stroke="var(--surface)" stroke-width="2"/>`).join('')
+      + labelled.map((p, i) => `<text x="${X(p.k).toFixed(1)}" y="${H - 8}" text-anchor="${pts.length > 1 && p === pts[0] ? 'start' : p === last ? 'end' : 'middle'}" font-size="12" fill="var(--muted)" font-weight="600">${esc(tinyDate(p.k))}</text>`).join('')
+      + `<text x="${(X(last.k) + 10).toFixed(1)}" y="${(Y(last.w) + 4).toFixed(1)}" font-size="13" font-weight="800" fill="var(--ink)">${esc(`${fmtDec(last.w)} kg`)}</text>`
+      + `<rect class="hit" x="${padL}" y="0" width="${W - padL - padR}" height="${H}" fill="transparent"/></svg>`;
+    return html`<div class="chart-wrap" id="wchart" data-w="${W}" data-pts="${JSON.stringify(data)}">${trusted(svg)}<div class="chart-tip" hidden></div></div>`;
+  }
+  function bindChart() {
+    const wrap = document.getElementById('wchart');
+    if (!wrap) return;
+    const svg = wrap.querySelector('svg'), tip = wrap.querySelector('.chart-tip'), cross = svg.querySelector('.cross');
+    const pts = JSON.parse(wrap.dataset.pts), W = Number(wrap.dataset.w);
+    const show = (e) => {
+      const r = svg.getBoundingClientRect(), k = r.width / W, px = (e.clientX - r.left) / k;
+      const p = pts.reduce((a, b) => (Math.abs(b.x - px) < Math.abs(a.x - px) ? b : a));
+      cross.setAttribute('x1', p.x); cross.setAttribute('x2', p.x); cross.style.display = '';
+      tip.replaceChildren(Object.assign(document.createElement('b'), { textContent: p.v }), document.createTextNode(` · ${p.d}`));
+      tip.hidden = false;
+      const half = tip.offsetWidth / 2, maxX = wrap.clientWidth - half; // la bulle reste dans la carte
+      tip.style.left = `${Math.max(half, Math.min(maxX, p.x * k))}px`; tip.style.top = `${p.y * k}px`;
+    };
+    svg.addEventListener('pointermove', show);
+    svg.addEventListener('pointerdown', show);
+    svg.addEventListener('pointerleave', () => { tip.hidden = true; cross.style.display = 'none'; });
+  }
+  function renderHealth() {
+    const h = S.settings.health, t = todayKey();
+    const age = ageOf(h.birth), cw = currentWeight(), wNow = weightNow(), b = bmi();
+    const stat = (label, value, sub) => html`<div class="stat"><span>${label}</span><b>${value}</b>${sub ? html`<small>${sub}</small>` : ''}</div>`;
+    // objectif de poids
+    const pts = weighIns(), start = h.startWeight || (pts[0] && pts[0].w);
+    let goal = '';
+    if (h.targetWeight && wNow) {
+      const left = round1(wNow - h.targetWeight), done = start ? round1(start - wNow) : null;
+      const pct = start && start !== h.targetWeight ? Math.max(0, Math.min(100, Math.round(((start - wNow) / (start - h.targetWeight)) * 100))) : 0;
+      goal = html`<div class="goalbar"><p>Objectif ${fmtDec(h.targetWeight)} kg · ${left > 0 ? `encore ${fmtDec(left)} kg` : 'atteint'}${done ? ` · ${done > 0 ? '−' : '+'}${fmtDec(Math.abs(done))} kg depuis le départ` : ''}</p><div class="track" role="img" aria-label="${pct} % du chemin vers l’objectif"><i style="width:${pct}%"></i></div></div>`;
+    }
+    // 7 derniers jours
+    const days = Array.from({ length: 7 }, (_, i) => addDays(t, i - 6));
+    const avg = (vals) => (vals.length ? vals.reduce((a, c) => a + c, 0) / vals.length : null);
+    const nights = days.map((dk) => nightMinutes((peekDay(addDays(dk, -1)) || {}).bed, (peekDay(dk) || {}).wake)).filter((m) => m != null);
+    const water = days.map((dk) => waterOf(peekDay(dk))).filter((x) => x > 0);
+    let sch = 0, took = 0;
+    days.forEach((dk) => { const st = stats(dk); sch += st.total; took += st.taken; });
+    const eaten = days.map((dk) => sumMacros(dayItems(peekDay(dk)))).filter((x) => x.n);
+    const cis = days.flatMap((dk) => listOf((peekDay(dk) || {}).checkins));
+    const sAvg = (key) => avg(cis.map((c) => scaleValue(c[key])).filter((x) => x != null));
+    const mood = sAvg('mood'), stress = sAvg('stress'), pain = sAvg('pain');
+    const symCount = days.reduce((a, dk) => a + listOf((peekDay(dk) || {}).symptoms).length, 0);
+    // visites et prises de sang
+    const nv = nextVisit(t), n = daysBetween(t, nv), pv = prevVisit(addDays(t, 1));
+    const visitDays = [];
+    const v = S.settings.visit;
+    for (let k = v.start; k <= t; k = addDays(k, v.every)) visitDays.push(k);
+    Object.keys(S.months).forEach((mk) => Object.keys(S.months[mk].days || {}).forEach((dk) => { if (visitOf(peekDay(dk)) && !visitDays.includes(dk)) visitDays.push(dk); }));
+    visitDays.sort().reverse();
+    const withLabs = visitDays.filter((k) => labsFilled(visitOf(peekDay(k)))).slice(0, 4).reverse();
+    const labRows = LABS.filter(([key]) => withLabs.some((k) => str(((visitOf(peekDay(k)) || {}).labs || {})[key]).trim()));
+    return html`<h1 class="page-title">Santé</h1>
+      <div class="hgrid">
+        <section class="card wide" aria-labelledby="h-prof">
+          <div class="card-head"><span class="mico m-midi" aria-hidden="true">${ICON.person}</span><h2 id="h-prof">Mon profil</h2><button type="button" class="link" data-act="goto-settings" data-v="profil">Modifier</button></div>
+          ${!age && !h.height && !wNow ? html`<p class="hint">Renseigne ton âge, ta taille et ton objectif de poids : ils s’affichent ici et partent avec tes envois à Claude.</p>` : ''}
+          <div class="stats">
+            ${stat('Âge', age != null ? `${age} ans` : '—')}
+            ${stat('Taille', h.height ? `${fmtHeight(h.height)}` : '—')}
+            ${stat('Poids', wNow ? `${fmtDec(wNow)} kg` : '—', cw ? `pesée du ${shortDate(cw.k)}` : wNow ? 'poids de départ' : '')}
+            ${stat('IMC', b ? fmtDec(b) : '—', b ? bmiLabel(b) : h.height ? '' : 'avec ta taille')}
+          </div>
+          ${goal}
+        </section>
+        <section class="card wide" aria-labelledby="h-weight">
+          <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.scale}</span><h2 id="h-weight">Poids aux pesées</h2></div>
+          ${weightChart()}
+        </section>
+        <section class="card" aria-labelledby="h-next">
+          <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><h2 id="h-next">Prochaine visite</h2><span class="pill">${cap1(whenLabel(n))}</span></div>
+          <p style="margin:0 0 4px;font-weight:800;font-size:18px">${longDate(nv)}</p>
+          <p class="hint">Prise de sang (souvent à jeun), pesée et médecin, ${cycleLabel()}.</p>
+          <div class="actions"><button type="button" class="ghost" data-act="goto" data-date="${nv}">Voir ce jour</button>${pv && pv <= t ? html`<button type="button" class="ghost" data-act="goto" data-date="${pv}">Bilan du ${shortDate(pv)}</button>` : ''}</div>
+        </section>
+        <section class="card" aria-labelledby="h-week">
+          <div class="card-head"><span class="mico m-midi" aria-hidden="true">${ICON.chart}</span><h2 id="h-week">7 derniers jours</h2></div>
+          <div class="stats">
+            ${stat('Sommeil', nights.length ? fmtDuration(Math.round(avg(nights))) : '—', nights.length ? `moyenne sur ${plural(nights.length, 'nuit')}` : 'pas de nuit notée')}
+            ${stat('Eau', water.length ? `${fmtL(avg(water))} L` : '—', water.length ? `par jour, objectif ${fmtDec(S.settings.goals.water)} L` : 'rien noté')}
+            ${stat('Compléments', sch ? `${Math.round((took / sch) * 100)} %` : '—', sch ? `${took} pris sur ${sch}` : '')}
+            ${stat('Calories', eaten.length ? fmtInt(avg(eaten.map((x) => x.kcal))) : '—', eaten.length ? `par jour, protéines ${fmtG(avg(eaten.map((x) => x.p)))} g` : 'rien noté')}
+            ${stat('Humeur', mood != null ? `${fmtAvg(mood)}/5` : '—', stress != null ? `stress ${fmtAvg(stress)}/5` : '')}
+            ${stat('Douleur', pain != null ? `${fmtAvg(pain)}/5` : '—', symCount ? `${plural(symCount, 'ressenti')} noté${symCount > 1 ? 's' : ''}` : 'aucun ressenti noté')}
+          </div>
+        </section>
+        <section class="card wide" aria-labelledby="h-labs">
+          <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.drop}</span><h2 id="h-labs">Prises de sang</h2></div>
+          ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Valeur</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${ref}</small></td></tr>`)}</tbody></table></div>`
+            : html`<p class="empty">Tes résultats apparaîtront ici, visite après visite, dès que tu les notes le jour de la visite.</p>`}
+        </section>
+        <section class="card wide" aria-labelledby="h-visits">
+          <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><h2 id="h-visits">Visites</h2></div>
+          ${visitDays.length ? html`<ul class="vlist">${visitDays.map((k) => {
+            const vis = visitOf(peekDay(k)) || {}, w = weightOf(peekDay(k)), nl = LABS.filter(([key]) => str((vis.labs || {})[key]).trim()).length;
+            return html`<li><button type="button" data-act="goto" data-date="${k}"><b>${longDate(k)}</b><span>${[w ? `${fmtDec(w)} kg` : 'pas de pesée', nl ? `${plural(nl, 'résultat')}` : 'résultats à noter', vis.doctor ? 'médecin vu' : ''].filter(Boolean).join(' · ')}</span></button></li>`;
+          })}</ul>` : html`<p class="empty">Ta première visite est le ${shortDate(v.start)}.</p>`}
+        </section>
+      </div>`;
   }
   /* ---------- Rendu général ---------- */
   const view = document.getElementById('view');
-  const VIEWS = { jour: renderDay, semaine: renderWeek, annee: renderYear, reglages: renderSettings };
+  const VIEWS = { jour: renderDay, calendrier: renderCalendar, sante: renderHealth, reglages: renderSettings };
   let pendingRender = false;
   /* Le bouton qui a le focus est recréé à chaque rendu : on retrouve le même (mêmes data-*) pour garder la place au clavier. */
   const FOCUS_ATTRS = ['data-act', 'data-sid', 'data-date', 'data-id', 'data-scale', 'data-v', 'data-scope', 'data-key'];
@@ -2013,7 +2483,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return sel ? 'button' + sel : null;
   }
   function render() {
-    document.querySelectorAll('.tabs [data-view]').forEach((b) => {
+    document.querySelectorAll('.nav [data-view]').forEach((b) => {
       if (b.dataset.view === S.ui.view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
     if (!S.ready) { view.innerHTML = '<p class="loading">Chargement de tes données…</p>'; return; }
@@ -2026,6 +2496,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       if (el) { try { el.focus(explicit ? undefined : { preventScroll: true }); if (S.ui.select && el.select) el.select(); } catch (e) { /* rien */ } }
     }
     S.ui.focus = null; S.ui.select = false;
+    if (S.ui.view === 'sante') bindChart();
   }
   function isEditing() {
     const a = document.activeElement;
@@ -2115,7 +2586,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   };
   function buildCSV() {
-    const rows = [['Date', 'Réveil', 'Coucher', 'Poids (kg)', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Ressenti', 'Repas', 'Calories', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Notes']];
+    const rows = [['Date', 'Réveil', 'Coucher', 'Poids (kg)', 'Eau (L)', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Ressenti', 'Repas', 'Calories', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Notes']];
     const dash = (v) => v ?? '-';
     Object.keys(S.months).sort().forEach((mk) => {
       Object.keys(S.months[mk].days || {}).sort().forEach((k) => {
@@ -2126,9 +2597,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
         const ml = listOf(d.meals).sort(byTime).map((x) => `${str(x.time)} ${str(x.kind) || 'Repas'} : ${[str(x.text), mealItems(x).map((it) => `${it.name}${num(it.grams) ? ` ${it.grams} g` : ''}`).join(', ')].filter(Boolean).join(' — ')}`).join(' | ');
         const hasTaken = isObj(d.taken) && Object.values(d.taken).some(Boolean);
         const t = sumMacros(dayItems(d)), w = weightOf(d);
-        if (!str(d.wake) && !str(d.bed) && !w && !ci && !sy && !ml && !str(d.notes) && !hasTaken) return;
+        if (!str(d.wake) && !str(d.bed) && !w && !waterOf(d) && !ci && !sy && !ml && !str(d.notes) && !hasTaken) return;
         const st = stats(k);
-        rows.push([k, str(d.wake), str(d.bed), w ? fmtDec(w) : '', st.taken, st.total, ci, sy, ml, t.n ? Math.round(t.kcal) : '', t.n ? fmtDec(t.p) : '', t.n ? fmtDec(t.g) : '', t.n ? fmtDec(t.l) : '', str(d.notes)]);
+        rows.push([k, str(d.wake), str(d.bed), w ? fmtDec(w) : '', waterOf(d) ? fmtL(waterOf(d)) : '', st.taken, st.total, ci, sy, ml, t.n ? Math.round(t.kcal) : '', t.n ? fmtDec(t.p) : '', t.n ? fmtDec(t.g) : '', t.n ? fmtDec(t.l) : '', str(d.notes)]);
       });
     });
     return '﻿' + rows.map((r) => r.map(csvCell).join(';')).join('\r\n');
@@ -2274,7 +2745,30 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
     ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'),
-    tab: (d) => { S.ui.view = d.view; S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); toTop(); },
+    tab: (d) => {
+      const again = S.ui.view === d.view;
+      if (again && d.view === 'jour') { go(todayKey()); toTop(); return; } // Accueil touché deux fois : retour à aujourd'hui
+      if (d.view === 'reglages' && (again || !S.ui.settingsPage)) S.ui.settingsPage = null;
+      S.ui.view = d.view; S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null;
+      render(); toTop();
+    },
+    jump: (d) => {
+      const el = document.getElementById(d.v);
+      if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    },
+    'water-add': (d) => {
+      const v = Number(d.v), goal = S.settings.goals.water * 1000, before = waterOf(peekDay(d.date));
+      mutateDay(d.date, 'water', (day) => { day.water = Math.max(0, Math.min(10000, waterOf(day) + v)); });
+      if (v > 0 && before < goal && before + v >= goal) toast('Objectif d’eau atteint');
+    },
+    'water-suggest': (d) => { mutateSettings((st) => { st.goals.water = round1(Number(d.v)); }); toast(`Objectif d’eau : ${fmtDec(Number(d.v))} L par jour`); },
+    'settings-page': (d) => { S.ui.settingsPage = d.v || null; S.ui.confirm = null; S.ui.exportText = null; render(); toTop(); },
+    'goto-settings': (d) => { S.ui.view = 'reglages'; S.ui.settingsPage = d.v || null; S.ui.form = null; render(); toTop(); },
+    'cal-mode': (d) => { S.ui.calMode = d.v; render(); },
+    'month-prev': () => { const [y, m] = S.ui.monthOf.split('-').map(Number); S.ui.monthOf = toKey(new Date(y, m - 2, 1)).slice(0, 7); render(); },
+    'month-next': () => { const [y, m] = S.ui.monthOf.split('-').map(Number); S.ui.monthOf = toKey(new Date(y, m, 1)).slice(0, 7); render(); },
+    'month-now': () => { S.ui.monthOf = todayKey().slice(0, 7); render(); },
+    'h-sex': (d) => { mutateSettings((st) => { st.health.sex = st.health.sex === d.v ? '' : d.v; }); },
     'day-prev': () => go(addDays(S.ui.date, -1)),
     'day-next': () => go(addDays(S.ui.date, 1)),
     'day-today': () => go(todayKey()),
@@ -2503,10 +2997,24 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     } else if (ds.ask === 'photo') {
       S.ui.ask.photo = (t.files && t.files[0]) || null;
       render();
+    } else if (ds.goal === 'water') {
+      const n = posNum(t.value);
+      if (!n || n < 0.5 || n > 8) { toast('Entre 0,5 et 8 litres.'); t.value = fmtDec(S.settings.goals.water); return; }
+      mutateSettings((st) => { st.goals.water = round1(n); }, false);
+      t.value = fmtDec(round1(n));
+    } else if (ds.goal === 'glass') {
+      mutateSettings((st) => { st.goals.glass = Number(t.value) || 250; }, false);
     } else if (ds.goal) {
       const n = posNum(t.value);
       mutateSettings((st) => { st.goals[ds.goal] = n ? round1(n) : null; }, false);
       t.value = n ? fmtDec(round1(n)) : '';
+    } else if (ds.hset && !['treatments', 'conditions', 'allergies'].includes(ds.hset)) {
+      const key = ds.hset, v = t.value.trim();
+      mutateSettings((st) => { st.health = normalizeHealth({ ...st.health, [key]: key === 'birth' || key === 'activity' ? v : num(v) }); }, false);
+      const n = S.settings.health[key];
+      if (v && (n == null || n === '')) toast(key === 'height' ? 'Taille en centimètres, par exemple 180.' : key === 'birth' ? 'Choisis ta date de naissance.' : 'Poids en kilos, par exemple 82,5.');
+      if (key !== 'birth' && key !== 'activity') t.value = n ? fmtDec(n) : '';
+      if (key === 'birth') render();
     } else if (ds.setting === 'claudeUrl') {
       const v = t.value.trim();
       if (v && !isClaudeUrl(v)) { toast('Colle un lien qui commence par https://claude.ai/'); return; }
@@ -2549,6 +3057,8 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
       S.ui.foodDraft[ds.fd] = t.value;
     } else if (ds.restore) {
       S.ui.restoreText = t.value;
+    } else if (['treatments', 'conditions', 'allergies'].includes(ds.hset)) {
+      mutateSettings((st) => { st.health[ds.hset] = t.value.slice(0, 2000); }, false);
     } else if (ds.setting === 'profile') {
       mutateSettings((st) => { st.profile = t.value.slice(0, 4000); }, false);
     } else if (['name', 'dose', 'note'].includes(ds.sset)) {
@@ -2580,6 +3090,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
     if (t === lastToday) return;
     if (S.ui.date === lastToday) S.ui.date = t;
     if (S.ui.weekOf === startOfWeek(lastToday)) S.ui.weekOf = startOfWeek(t);
+    if (S.ui.monthOf === lastToday.slice(0, 7)) S.ui.monthOf = t.slice(0, 7);
     lastToday = t;
     if (S.ready) safeRender();
   }
@@ -2595,6 +3106,9 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   window.addEventListener('online', resume);
   window.addEventListener('pagehide', flushAll);
   setInterval(checkRollover, 60000);
+  // la courbe du poids se recalcule à la largeur de l'écran
+  let resizeTimer = null;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (S.ready && S.ui.view === 'sante') safeRender(); }, 200); });
 
   /* App Android : rappels de la visite médicale (la veille à 19:00, le matin à 7:30), pour les 6 prochaines.
      Identifiants 7000 à 7099 réservés à ces rappels : on les annule tous puis on les recrée. */
@@ -2630,6 +3144,7 @@ main{ max-width:1120px; margin:0 auto; padding:22px 16px 64px; }
   if (capApp && typeof capApp.addListener === 'function') {
     capApp.addListener('backButton', () => {
       if (S.ui.form || S.ui.confirm || S.ui.exportText != null) { S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); }
+      else if (S.ui.view === 'reglages' && S.ui.settingsPage) { S.ui.settingsPage = null; render(); toTop(); }
       else if (S.ui.view !== 'jour') { S.ui.view = 'jour'; render(); toTop(); }
       else if (typeof capApp.minimizeApp === 'function') capApp.minimizeApp();
     });

@@ -1,8 +1,13 @@
 # Mon suivi
 
-Journal santé quotidien : compléments (matin, midi, 16h, soir), sommeil, check-ins (humeur, énergie,
-concentration, stress, douleur, faim), ce que je ressens (douleurs, sensations, effets secondaires), repas avec
-aliments et macros (protéines, glucides, lipides, calories) et notes. Vues Jour, Semaine, Année et Réglages.
+Journal santé quotidien : compléments (matin, midi, 16h, soir), eau (verres, objectif en litres), sommeil,
+check-ins (humeur, énergie, concentration, stress, douleur, faim), ce que je ressens (douleurs, sensations, effets
+secondaires), repas avec aliments et macros (protéines, glucides, lipides, calories) et notes.
+
+Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, avec quatre anneaux de résumé),
+**Calendrier** (semaine, mois, année), **Santé** (profil, IMC, courbe du poids, prochaine visite, 7 derniers jours,
+prises de sang visite par visite) et **Réglages** (profil santé, objectifs du jour, visite médicale, compléments,
+mes aliments, Claude, sauvegarde et données).
 
 **Visite médicale toutes les 4 semaines** (première le lundi 28 septembre 2026, réglable) : pesée, prise de sang
 (valeurs avec repères habituels), avis du médecin, et bilan des 28 jours d'avant à envoyer à Claude. Rappel sur la page
@@ -43,8 +48,8 @@ modification de `diet/` (workflow « Mon suivi ») :
 
 ## Données
 
-- **Compte Claude** : `data/users/<id>/settings` (liste, objectifs, mes aliments, profil) et un document par mois,
-  `data/users/<id>/mAAAA-MM` (`{ days: { "AAAA-MM-JJ": { taken, wake, bed, checkins, symptoms, meals, notes, visit, claude } } }`).
+- **Compte Claude** : `data/users/<id>/settings` (liste, objectifs, profil santé, visite, mes aliments) et un document
+  par mois, `data/users/<id>/mAAAA-MM` (`{ days: { "AAAA-MM-JJ": { taken, water, wake, bed, checkins, symptoms, meals, notes, visit, claude } } }`).
   Seuls les champs modifiés sont envoyés, pour ne pas écraser ce qu'un autre appareil écrit en même temps.
 - **Copie sur l'appareil** (`localStorage`, clé `mon-suivi-cloud-v1`) : affichage immédiat au chargement et
   modifications pas encore confirmées par le compte, renvoyées au prochain chargement ou au retour du réseau.
