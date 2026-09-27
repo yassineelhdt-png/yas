@@ -116,7 +116,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .daynav{ display:flex; align-items:center; gap:8px; margin-left:auto; }
 
 /* Jour */
-.datebar{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
 .date{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px, 4.4vw, 40px); line-height:1.08; letter-spacing:-.025em; }
 .strip{ display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:6px; margin:18px 0 26px; }
 .lid{ position:relative; border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:7px 2px 9px; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:0; }
@@ -301,7 +300,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .legend .bub{ display:inline-block; width:16px; height:16px; min-height:0; }
 
 /* Réglages */
-.set-title{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px, 4.4vw, 40px); letter-spacing:-.025em; margin-bottom:22px; }
 .set-sec{ max-width:820px; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:18px; box-shadow:var(--shadow); }
 @media (min-width:720px){ .set-sec{ padding:22px 24px; } }
 .set-sec + .set-sec{ margin-top:18px; }
@@ -357,7 +355,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .mbar .track{ height:8px; border-radius:4px; background:var(--bub); overflow:hidden; }
 .mbar .track i{ display:block; height:100%; border-radius:4px; background:var(--c); width:var(--w); }
 .mbar b{ font-variant-numeric:tabular-nums; min-width:92px; text-align:right; }
-.c-kcal{ --c:var(--fill); } .c-p{ --c:var(--soir); } .c-g{ --c:var(--matin); } .c-l{ --c:var(--aprem); }
 .items{ list-style:none; margin:6px 0 0; padding:0; display:grid; gap:2px; font-size:14px; }
 .items li{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:0 10px; }
 .items li span{ color:var(--muted); font-variant-numeric:tabular-nums; }
@@ -413,7 +410,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .vr-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
 .vr-txt small{ font-size:12.5px; font-weight:600; color:var(--muted); line-height:1.35; }
 .vbadge{ align-self:flex-start; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:800; color:var(--ink); background:color-mix(in srgb, var(--lv) 18%, transparent); border:1px solid color-mix(in srgb, var(--lv) 45%, transparent); }
-.vcell.watch{ color:var(--c-kcal); font-weight:800; } .vcell.alert{ color:var(--accent); font-weight:800; }
+.vcell.watch, .vcell.alert{ display:inline-block; padding:1px 7px; border-radius:7px; font-weight:800; color:var(--ink); }
+.vcell.watch{ background:color-mix(in srgb, var(--c-kcal) 22%, transparent); } .vcell.alert{ background:var(--accent-tint); color:var(--accent-2); }
 .lab-note{ font-size:12px; font-weight:600; color:var(--muted); line-height:1.3; }
 
 /* Claude */
@@ -435,7 +433,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .report-box{ margin-top:14px; }
 .report-box summary{ cursor:pointer; font-weight:700; color:var(--muted); font-size:14px; padding:6px 0; }
 .report-box .export{ margin-top:8px; font-family:ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size:12.5px; line-height:1.45; }
-.set-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; margin-bottom:10px; }
 .restore{ margin-top:14px; }
 
 /* Accueil */
@@ -462,8 +459,87 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .tile-txt{ min-width:0; display:flex; flex-direction:column; line-height:1.25; }
 .tile-txt b{ font-size:16px; font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .tile-txt span{ font-size:13px; font-weight:700; color:var(--muted); }
+.tile-txt .t-short{ display:none; }
 .tile .face{ font-size:24px; }
+.c-kcal{ --c:var(--fill); } .c-p{ --c:var(--soir); } .c-g{ --c:var(--matin); } .c-l{ --c:var(--aprem); }
 .c-sport{ --c:var(--sport); } .c-water{ --c:var(--soir); } .c-supps{ --c:var(--fill); } .c-kcal2{ --c:var(--matin); } .c-mood{ --c:var(--aprem); }
+
+/* Accueil en onglets */
+.daytabs{ position:sticky; top:calc(env(safe-area-inset-top, 0px) + 55px); z-index:8; margin:0 0 18px; padding:8px 0; background:color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+.daytabs-in{ display:flex; gap:4px; padding:4px; overflow-x:auto; scrollbar-width:none; background:var(--surface); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); }
+.daytabs-in::-webkit-scrollbar{ display:none; }
+.dtab{ position:relative; flex:1 0 auto; display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:8px 14px; border:0; border-radius:14px; background:transparent; color:var(--muted); font-weight:800; font-size:14px; white-space:nowrap; }
+.dtab .dt-ico{ display:grid; place-items:center; }
+.dtab .dt-ico svg{ width:20px; height:20px; }
+.dtab:hover{ color:var(--ink); }
+.dtab[aria-pressed="true"]{ background:var(--ink); color:var(--bg); }
+.dt-badge{ padding:1px 7px; border-radius:999px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink); font-size:11.5px; font-weight:800; font-variant-numeric:tabular-nums; }
+.dtab[aria-pressed="true"] .dt-badge{ background:color-mix(in srgb, var(--bg) 18%, transparent); border-color:transparent; color:var(--bg); }
+.dt-visit:not([aria-pressed="true"]){ color:var(--soir); }
+@media (max-width:640px){
+  .dtab{ flex:1 1 auto; flex-direction:column; gap:2px; min-height:52px; padding:6px 6px 5px; font-size:11.5px; border-radius:13px; }
+  .dt-badge{ position:absolute; top:3px; left:calc(50% + 7px); padding:0 5px; font-size:10px; line-height:15px; }
+}
+.daypanel > * + *{ margin-top:18px; }
+.todo .card-head{ margin-bottom:4px; }
+.todo-list{ display:flex; flex-direction:column; }
+.todo .banner{ margin:0; padding:12px 0; border:0; border-top:1px solid var(--line); border-radius:0; background:transparent; gap:8px 12px; }
+.todo .banner:first-child{ border-top:0; padding-top:6px; }
+.todo .banner:last-child{ padding-bottom:0; }
+.todo .banner .mico{ width:32px; height:32px; border-radius:10px; }
+.todo .banner .mico svg{ width:18px; height:18px; }
+.todo .banner .btxt b{ font-size:15px; }
+.todo .banner .btxt span{ font-size:13px; line-height:1.35; }
+.todo .banner .actions{ margin:0; }
+.todo .banner .actions .primary, .todo .banner .actions .ghost, .todo .banner > .ghost{ min-height:38px; padding:7px 14px; font-size:14px; }
+.todo .banner > p:first-child{ flex:1 1 200px; }
+.dt-lbl.short{ display:none; }
+@media (max-width:640px){ .dt-lbl.long{ display:none; } .dt-lbl.short{ display:inline; } }
+.overview{ display:grid; gap:18px; align-items:start; }
+@media (min-width:900px){ .overview{ grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); } }
+.now .card-head .pill{ margin-left:auto; }
+.pill.ok{ background:color-mix(in srgb, var(--fill) 14%, var(--surface)); border-color:color-mix(in srgb, var(--fill) 40%, var(--line)); color:var(--ink); }
+.now .moment{ margin-bottom:10px; }
+.now-done{ display:flex; align-items:center; gap:10px; margin:0 0 12px; padding:12px 14px; border-radius:14px; background:color-mix(in srgb, var(--fill) 10%, var(--surface)); font-weight:700; }
+.now-done svg{ flex:none; width:22px; height:22px; color:var(--fill); }
+.see-all{ display:block; margin:-2px 0 12px; }
+.quick{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+@media (min-width:640px) and (max-width:899px){ .quick{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
+.qa{ display:flex; align-items:center; gap:10px; min-height:56px; padding:9px 10px; border:1px solid var(--line); border-radius:15px; background:var(--surface-2); color:var(--ink); text-align:left; min-width:0; }
+.qa:hover{ border-color:color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.qa-ico{ flex:none; width:36px; height:36px; border-radius:11px; display:grid; place-items:center; background:var(--accent-tint); color:var(--accent-2); }
+.qa-ico svg{ width:20px; height:20px; }
+.qa[data-act="water-add"] .qa-ico{ background:var(--soir-tint); color:var(--soir); }
+.qa-txt{ display:flex; flex-direction:column; min-width:0; line-height:1.2; }
+.qa-txt b{ font-size:15px; font-weight:800; }
+.qa-txt small{ font-size:12.5px; font-weight:700; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.visit-teaser{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border:1px solid var(--soir-line); border-radius:18px; background:var(--soir-tint); color:var(--ink); text-align:left; }
+.visit-teaser .vt-txt{ flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
+.visit-teaser b{ font-size:16px; font-weight:800; }
+.visit-teaser small{ font-size:13px; font-weight:700; color:var(--muted); }
+.visit-teaser .chev{ color:var(--soir); }
+/* Aperçu : les six anneaux sur une seule rangée, dans une carte. */
+.daypanel .tiles{ grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin:0; padding:16px 10px 14px; background:var(--surface); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow); }
+.daypanel .tile{ flex-direction:column; align-items:center; gap:8px; padding:4px 2px; border:0; border-radius:14px; background:transparent; box-shadow:none; text-align:center; }
+.daypanel .tile:hover{ background:var(--surface-2); }
+.daypanel .tile .ring{ width:56px; height:56px; }
+.daypanel .tile .ring span{ width:44px; height:44px; }
+.daypanel .tile .ring span svg{ width:20px; height:20px; }
+.daypanel .tile-txt{ align-items:center; max-width:100%; }
+.daypanel .tile-txt b{ font-size:17px; max-width:100%; }
+.daypanel .tile-txt .t-long{ font-size:12.5px; line-height:1.3; }
+@media (max-width:620px){
+  .daypanel .tiles{ gap:2px; padding:12px 6px 10px; }
+  .daypanel .tile{ gap:6px; padding:2px 0; border-radius:12px; }
+  .daypanel .tile .ring{ width:44px; height:44px; }
+  .daypanel .tile .ring span{ width:34px; height:34px; }
+  .daypanel .tile .ring span svg{ width:17px; height:17px; }
+  .daypanel .tile-txt{ align-items:center; line-height:1.15; max-width:100%; }
+  .daypanel .tile-txt b{ font-size:13.5px; max-width:100%; }
+  .daypanel .tile-txt .t-long{ display:none; }
+  .daypanel .tile-txt .t-short{ display:block; font-size:11px; }
+  .daypanel .tile .face{ font-size:20px; }
+}
 
 /* Eau */
 .glasses{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 12px; }
@@ -633,7 +709,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .rest-idle .chips{ display:grid; grid-template-columns:repeat(auto-fit, minmax(76px, 1fr)); }
 .rest-ring.idle{ background:var(--bub); }
 .rest-ring.idle b{ color:var(--muted); }
-.rest-lbl{ font-weight:800; }
 .rest .chips button{ min-height:44px; padding:6px 8px; font-size:15px; }
 .rest.on{ background:var(--accent-tint); border-color:var(--accent-line); }
 .rest-ring{ --p:1; flex:none; width:124px; height:124px; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--p) * 1turn), var(--bub) 0); display:grid; place-items:center; }
@@ -1045,6 +1120,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     ...Object.fromEntries(Object.entries({
       visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
+      grid: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
+      bowl: '<path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 7.5c0-1.2 1-1.6 1-2.8M12 7.5c0-1.2 1-1.6 1-2.8M16 7.5c0-1.2 1-1.6 1-2.8"/>',
       calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
       drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>',
       person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
@@ -1269,7 +1346,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null, appt: null, apptPast: false,
       restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
-      calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', profileAdd: false, switching: false,
+      dayTab: 'apercu', calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', profileAdd: false, switching: false,
       bilan: { kind: 'semaine', anchor: todayKey() }, dossier: { range: 'all', from: '', to: '' },
       foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
@@ -1973,6 +2050,121 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     connect();
   }
 
+  /* ---------- Accueil en onglets ----------
+     L'accueil tient sur un écran : l'aperçu montre l'essentiel et ce qu'il y a à faire maintenant,
+     chaque partie de la journée a son onglet. Réglages → Affichage : « Tout sur une page » pour tout faire défiler. */
+  const UI_KEY = 'mon-suivi-ui-v1';
+  const uiPrefs = (() => { const v = lsGet(UI_KEY); return isObj(v) ? v : {}; })();
+  const homeTabs = () => uiPrefs.home !== 'page';
+  // clé, libellé, icône, libellé court (téléphone)
+  const DAY_TABS = [['apercu', 'Aperçu', 'grid'], ['visite', 'Visite', 'visit'], ['supps', 'Compléments', 'pill'], ['repas', 'Eau et repas', 'bowl', 'Repas'], ['journal', 'Journal', 'smile'], ['claude', 'Claude', 'spark']];
+  // L'onglet où vit chaque section (pour les anneaux, les rappels et les formulaires).
+  const SECTION_TAB = { 'sec-supps': 'supps', 'sec-water': 'repas', 'sec-meals': 'repas', 'sec-sleep': 'journal', 'sec-checkins': 'journal', 'sec-symptoms': 'journal', 'sec-notes': 'journal', claude: 'claude', visit: 'visite' };
+  const FORM_TAB = { checkin: 'journal', symptom: 'journal', meal: 'repas' };
+  const dayTabOf = (k) => { const v = S.ui.dayTab; return v === 'visite' && !hasVisit(k) ? 'apercu' : DAY_TABS.some((x) => x[0] === v) ? v : 'apercu'; };
+  /* Ouvre l'onglet qui contient une section, puis l'amène sous la barre d'onglets. */
+  function showSection(id, { focus } = {}) {
+    const tab = SECTION_TAB[id];
+    if (homeTabs() && tab && S.ui.view === 'jour' && dayTabOf(S.ui.date) !== tab) { S.ui.dayTab = tab; if (focus) S.ui.focus = focus; render(); }
+    else if (focus) { S.ui.focus = focus; render(); }
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
+  function setDayTab(tab) {
+    S.ui.dayTab = tab; S.ui.form = null; S.ui.confirm = null;
+    render();
+    // la barre d'onglets reste en haut : on ne remonte que si on l'a dépassée
+    const bar = document.querySelector('.daytabs');
+    if (bar) { const top = bar.getBoundingClientRect().top + window.scrollY - (document.querySelector('.top') || { offsetHeight: 60 }).offsetHeight; if (window.scrollY > top) window.scrollTo(0, top); }
+  }
+  function dayTabBar(k, d, cur) {
+    const st = stats(k), ml = waterOf(d), cis = listOf(d.checkins).length, visit = hasVisit(k);
+    const badge = { supps: st.total ? `${st.taken}/${st.total}` : '', repas: ml ? `${fmtL(ml)} L` : '', journal: cis ? String(cis) : '', visite: '', claude: (peekDay(k) || {}).sent ? '✓' : '' };
+    return html`<nav class="daytabs" aria-label="Parties de la journée"><div class="daytabs-in">${DAY_TABS.filter(([id]) => id !== 'visite' || visit).map(([id, label, icon, short]) => html`<button type="button" class="dtab${id === 'visite' ? ' dt-visit' : ''}" data-act="day-tab" data-v="${id}" aria-pressed="${bool(cur === id)}"${short ? html` aria-label="${label}"` : ''}><span class="dt-ico" aria-hidden="true">${ICON[icon]}</span><span class="dt-lbl${short ? ' long' : ''}">${label}</span>${short ? html`<span class="dt-lbl short" aria-hidden="true">${short}</span>` : ''}${badge[id] ? html`<small class="dt-badge">${badge[id]}</small>` : ''}</button>`)}</div></nav>`;
+  }
+  /* Le moment de la journée à mettre en avant : aujourd'hui, celui en cours s'il reste quelque chose, sinon le prochain
+     qui reste ; un autre jour, le premier moment incomplet. */
+  function focusMoment(k) {
+    const sch = scheduledFor(k), left = (key) => sch.some((s) => s.moment === key && !isTaken(s.id, k));
+    const order = MOMENTS.map((m) => m.key);
+    if (k === todayKey()) {
+      const i = order.indexOf(momentNow());
+      const pick = [...order.slice(i), ...order.slice(0, i).reverse()].find(left);
+      return pick || null;
+    }
+    return order.find(left) || null;
+  }
+  function nowCard(k, d, isToday) {
+    const st = stats(k), m = focusMoment(k), ml = waterOf(d), goal = Math.round(S.settings.goals.water * 1000), glass = S.settings.goals.glass;
+    const cis = listOf(d.checkins).sort(byTime), last = cis[cis.length - 1];
+    const mm = m && MOMENTS.find((x) => x.key === m);
+    const quick = (act, icon, label, sub, extra = {}) => html`<button type="button" class="qa" data-act="${act}" data-date="${k}"${extra.v != null ? html` data-v="${extra.v}"` : ''}><span class="qa-ico" aria-hidden="true">${ICON[icon]}</span><span class="qa-txt"><b>${label}</b><small>${sub}</small></span></button>`;
+    return html`<section class="card now" id="sec-now" aria-labelledby="now-title">
+      <div class="card-head"><h2 id="now-title">${isToday ? 'Maintenant' : 'Ce jour-là'}</h2>${st.total ? html`<span class="pill${st.taken === st.total ? ' ok' : ''}">${st.taken === st.total ? 'Compléments : tout est pris' : `${st.taken} sur ${st.total} pris`}</span>` : ''}</div>
+      ${mm ? momentGroup(mm, k, itemsForDay(k).filter((s) => s.moment === mm.key))
+        : st.total ? html`<p class="now-done">${ICON.check}<span>Tous les compléments ${isToday ? 'du jour' : 'de ce jour'} sont cochés.</span></p>`
+        : html`<p class="hint" style="margin:0 0 4px">${S.settings.supplements.length ? 'Pas de complément prévu ce jour-là.' : 'Ajoute tes compléments dans Réglages : ils s’affichent ici au bon moment.'}</p>`}
+      ${mm && st.total > st.taken ? html`<button type="button" class="link see-all" data-act="day-tab" data-v="supps">Voir tous les compléments</button>` : ''}
+      <div class="quick">
+        ${quick('water-add', 'drop', `+ 1 verre`, `${fmtL(ml)} / ${fmtL(goal)} L`, { v: glass })}
+        ${quick('ci-new', 'smile', 'Check-in', last ? `dernier à ${str(last.time)}` : 'humeur, énergie…')}
+        ${quick('meal-new', 'bowl', 'Repas', listOf(d.meals).length ? plural(listOf(d.meals).length, 'repas noté') : 'rien de noté')}
+        ${quick('sym-new', 'heart', 'Ressenti', listOf(d.symptoms).length ? plural(listOf(d.symptoms).length, 'noté') : 'douleur, sensation')}
+      </div>
+    </section>`;
+  }
+  /* Le jour de la visite, l'aperçu l'annonce et ouvre son onglet. */
+  function visitTeaser(k, d) {
+    const vis = visitOf(d) || {}, w = weightOf(d), bp = vitalOf(vis, 'sys') && vitalOf(vis, 'dia');
+    const done = [vis.blood ? 'prise de sang' : '', w ? 'pesée' : '', bp ? 'tension' : '', vis.doctor ? 'médecin' : ''].filter(Boolean);
+    return html`<button type="button" class="visit-teaser" data-act="day-tab" data-v="visite"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><span class="vt-txt"><b>${k === todayKey() ? 'Visite médicale aujourd’hui' : 'Visite médicale ce jour-là'}</b><small>${done.length ? `Noté : ${done.join(', ')}` : 'Prise de sang, pesée, tension et médecin : tout se note ici.'}</small></span><span class="chev" aria-hidden="true">${ICON.right}</span></button>`;
+  }
+  function dayPanel(tab, k, d, isToday, visit) {
+    switch (tab) {
+      case 'visite': return visitCard(k, d);
+      case 'supps': return supplementBlock(k);
+      case 'repas': return html`<div class="daygrid"><div class="col">${waterBlock(k, d)}</div><div class="col">${mealBlock(k, d)}</div></div>`;
+      case 'journal': return html`<div class="daygrid"><div class="col">${checkinBlock(k, d, isToday)}${symptomBlock(k, d)}</div><div class="col">${sleepBlock(k, d, isToday)}${notesBlock(k, d)}</div></div>`;
+      case 'claude': return claudeBlock(visit ? 'visit' : 'day', k);
+      default: return html`
+        ${visit ? visitTeaser(k, d) : ''}
+        ${summaryTiles(k, d)}
+        <div class="overview"><div class="col">${nowCard(k, d, isToday)}</div><div class="col">${todoCard(k, isToday)}${apptDayCard(k, isToday)}</div></div>`;
+    }
+  }
+  /* Les rappels du jour dans une seule carte compacte, en tête de l'aperçu. */
+  function todoCard(k, isToday) {
+    const items = [...weeklyBanner(), ...(isToday ? [...visitBanners(k), ...cureBanners(k), sendBanner(), backupBanner(), firstStepsRow()] : [])].filter((x) => String(x).trim());
+    if (!items.length) return '';
+    return html`<section class="card todo" id="sec-todo" aria-labelledby="todo-title">
+      <div class="card-head"><h2 id="todo-title">À faire</h2><span class="pill">${items.length}</span></div>
+      <div class="todo-list">${items}</div>
+    </section>`;
+  }
+  /* « Premiers pas » en une ligne : la prochaine étape et la progression. */
+  function firstStepsRow() {
+    const st = S.settings;
+    if (st.onboardDone || (st.supplements.length && hasProfile())) return '';
+    const steps = [['profil', 'ton profil santé', hasProfile()], ['complements', 'tes compléments', st.supplements.length > 0], ['visite', 'ta visite médicale', !!st.onboard.visite], ['objectifs', 'tes objectifs du jour', !!st.onboard.objectifs]];
+    const done = steps.filter((x) => x[2]).length, next = steps.find((x) => !x[2]);
+    return html`<div class="banner first" role="note"><span class="mico" aria-hidden="true">${ICON.spark}</span><p class="btxt"><b>Premiers pas : ${done} sur ${steps.length}</b><span>${next ? `Prochaine étape : ${next[1]}.` : 'Tout est prêt.'}</span></p><div class="actions">${next ? html`<button type="button" class="primary" data-act="onboard-go" data-v="${next[0]}">Continuer</button>` : ''}<button type="button" class="link" data-act="onboard-hide">Masquer</button></div></div>`;
+  }
+  const HOME_ACTIONS = {
+    'day-tab': (d) => setDayTab(d.v),
+    'home-layout': (d) => {
+      uiPrefs.home = d.v === 'page' ? 'page' : 'tabs';
+      lsSet(UI_KEY, uiPrefs);
+      render(); toast(uiPrefs.home === 'page' ? 'Accueil : tout sur une page' : 'Accueil : en onglets');
+    }
+  };
+  function displaySettings() {
+    const tabs = homeTabs();
+    return html`<section class="set-sec">
+      <div class="field"><span id="home-l">Accueil</span><div class="seg" role="group" aria-labelledby="home-l"><button type="button" data-act="home-layout" data-v="tabs" aria-pressed="${bool(tabs)}">En onglets</button><button type="button" data-act="home-layout" data-v="page" aria-pressed="${bool(!tabs)}">Tout sur une page</button></div></div>
+      <p class="hint">${tabs ? 'L’aperçu montre l’essentiel et ce qu’il y a à faire maintenant ; compléments, eau et repas, journal et Claude ont chacun leur onglet.' : 'Toute la journée sur une seule page, à faire défiler.'} Ce choix reste sur cet appareil.</p>
+    </section>`;
+  }
+
   /* ---------- Rendu : Jour ---------- */
   function renderDay() {
     const k = S.ui.date, t = todayKey(), isToday = k === t;
@@ -1980,13 +2172,18 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const visit = hasVisit(k), gap = daysBetween(t, k);
     const rel = isToday ? 'Aujourd’hui' : gap === -1 ? 'Hier' : gap === 1 ? 'Demain' : gap < 0 ? `Il y a ${-gap} jours` : `Dans ${gap} jours`;
     const greet = { matin: 'Bonjour', midi: 'Bon appétit', aprem: 'Bon après-midi', soir: 'Bonsoir' }[momentNow()];
-    return html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? `${rel} · ${greet}${PROFILES.list.length > 1 || activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
+    const hero = html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? `${rel} · ${greet}${PROFILES.list.length > 1 || activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
         <div class="daynav">
           ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
           <button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">${ICON.left}</button>
           <button type="button" class="icon" data-act="day-next" aria-label="Jour suivant">${ICON.right}</button>
         </div>
-      </div>${weekStrip(k)}</section>
+      </div>${weekStrip(k)}</section>`;
+    if (homeTabs()) {
+      const tab = dayTabOf(k);
+      return html`${hero}${dayTabBar(k, d, tab)}<div class="daypanel" id="daypanel" data-tab="${tab}">${dayPanel(tab, k, d, isToday, visit)}</div>`;
+    }
+    return html`${hero}
       ${weeklyBanner()}
       ${isToday ? visitBanners(k) : ''}
       ${isToday ? cureBanners(k) : ''}
@@ -2008,14 +2205,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const cis = listOf(d.checkins).sort(byTime), last = cis[cis.length - 1], mood = last ? scaleValue(last.mood) : null;
     const clamp = (x) => Math.max(0, Math.min(1, x)).toFixed(3);
     const wk = sportWeek(k), sp = S.settings.sport, steps = stepsOf(d);
-    const tile = (cls, target, p, inner, big, small, label) => html`<button type="button" class="tile ${cls}" ${target.startsWith('tab:') ? html`data-act="tab" data-view="${target.slice(4)}"` : html`data-act="jump" data-v="${target}"`} aria-label="${label}"><span class="ring" style="--p:${clamp(p)}"><span>${inner}</span></span><span class="tile-txt"><b>${big}</b><span>${small}</span></span></button>`;
+    const tile = (cls, target, p, inner, big, small, label, short) => html`<button type="button" class="tile ${cls}" ${target.startsWith('tab:') ? html`data-act="tab" data-view="${target.slice(4)}"` : html`data-act="jump" data-v="${target}"`} aria-label="${label}"><span class="ring" style="--p:${clamp(p)}"><span>${inner}</span></span><span class="tile-txt"><b>${big}</b><span class="t-long">${small}</span><span class="t-short" aria-hidden="true">${short}</span></span></button>`;
     return html`<div class="tiles">
-      ${tile('c-supps', 'sec-supps', st.total ? st.taken / st.total : 0, ICON.pill, st.total ? `${st.taken}/${st.total}` : '—', 'compléments', `Compléments : ${st.taken} sur ${st.total}`)}
-      ${tile('c-water', 'sec-water', goal ? ml / goal : 0, ICON.drop, `${fmtL(ml)} L`, `sur ${fmtL(goal)} L d’eau`, `Eau : ${fmtL(ml)} litre sur ${fmtL(goal)}`)}
-      ${tile('c-kcal2', 'sec-meals', kcalGoal ? tot.kcal / kcalGoal : 0, ICON.flame, tot.n ? fmtInt(tot.kcal) : '—', kcalGoal ? `sur ${fmtInt(kcalGoal)} kcal` : 'kcal', `Calories : ${fmtInt(tot.kcal)}${kcalGoal ? ` sur ${fmtInt(kcalGoal)}` : ''}`)}
-      ${tile('c-sport', 'tab:sport', wk.count / sp.perWeek, ICON.dumbbell, `${wk.count}/${sp.perWeek}`, 'séances cette semaine', `Sport : ${wk.count} séances sur ${sp.perWeek} cette semaine`)}
-      ${tile('c-sport', 'tab:sport', steps / sp.steps, ICON.steps, steps ? fmtInt(steps) : '—', `sur ${fmtInt(sp.steps)} pas`, `Pas : ${fmtInt(steps)} sur ${fmtInt(sp.steps)}`)}
-      ${tile('c-mood', 'sec-checkins', mood ? mood / 5 : 0, mood ? html`<span class="face">${FACES[mood - 1]}</span>` : ICON.smile, mood ? `${mood}/5` : '—', last ? `humeur à ${str(last.time)}` : 'pas de check-in', mood ? `Humeur ${mood} sur 5` : 'Pas encore de check-in')}
+      ${tile('c-supps', 'sec-supps', st.total ? st.taken / st.total : 0, ICON.pill, st.total ? `${st.taken}/${st.total}` : '—', 'compléments', `Compléments : ${st.taken} sur ${st.total}`, 'compl.')}
+      ${tile('c-water', 'sec-water', goal ? ml / goal : 0, ICON.drop, `${fmtL(ml)} L`, `sur ${fmtL(goal)} L d’eau`, `Eau : ${fmtL(ml)} litre sur ${fmtL(goal)}`, 'eau')}
+      ${tile('c-kcal2', 'sec-meals', kcalGoal ? tot.kcal / kcalGoal : 0, ICON.flame, tot.n ? fmtInt(tot.kcal) : '—', kcalGoal ? `sur ${fmtInt(kcalGoal)} kcal` : 'kcal', `Calories : ${fmtInt(tot.kcal)}${kcalGoal ? ` sur ${fmtInt(kcalGoal)}` : ''}`, 'kcal')}
+      ${tile('c-sport', 'tab:sport', wk.count / sp.perWeek, ICON.dumbbell, `${wk.count}/${sp.perWeek}`, 'séances cette semaine', `Sport : ${wk.count} séances sur ${sp.perWeek} cette semaine`, 'sport')}
+      ${tile('c-sport', 'tab:sport', steps / sp.steps, ICON.steps, steps ? fmtInt(steps) : '—', `sur ${fmtInt(sp.steps)} pas`, `Pas : ${fmtInt(steps)} sur ${fmtInt(sp.steps)}`, 'pas')}
+      ${tile('c-mood', 'sec-checkins', mood ? mood / 5 : 0, mood ? html`<span class="face">${FACES[mood - 1]}</span>` : ICON.smile, mood ? `${mood}/5` : '—', last ? `humeur à ${str(last.time)}` : 'pas de check-in', mood ? `Humeur ${mood} sur 5` : 'Pas encore de check-in', 'humeur')}
     </div>`;
   }
   function waterBlock(k, d) {
@@ -2042,7 +2239,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (n >= 1 && n <= 7) {
       out.push(banner(ICON.visit, `Visite médicale ${whenLabel(n)} : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}`,
         'Prise de sang (souvent à jeun, vérifie avec le labo), pesée et médecin. Note tes questions pour le médecin.',
-        html`<button type="button" class="ghost" data-act="goto" data-date="${nv}">Voir ce jour</button>`));
+        html`<button type="button" class="ghost" data-act="goto" data-date="${nv}" data-tab="visite">Voir ce jour</button>`));
     }
     const pv = prevVisit(k);
     if (pv && daysBetween(pv, k) <= 10 && !labsFilled(visitOf(peekDay(pv)))) {
@@ -2128,7 +2325,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   function sleepBlock(k, d, isToday) {
     const prev = peekDay(addDays(k, -1));
     const wake = str(d.wake), night = nightLength(prev && prev.bed, wake);
-    return html`<section class="card" aria-labelledby="sleep-title">
+    return html`<section class="card" id="sec-sleep" aria-labelledby="sleep-title">
       <div class="card-head"><span class="scene" aria-hidden="true">${SCENE.soir}</span><h2 id="sleep-title">Sommeil</h2>${night ? html`<span class="pill">Nuit de ${night}</span>` : ''}</div>
       <div class="sleep">
         <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
@@ -2161,16 +2358,18 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (!items.length) return html`<section class="card supps" id="sec-supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}${cureNotes(k)}</section>`;
     return html`<section class="card supps" id="sec-supps">${head}<div class="moments">${MOMENTS.map((m) => {
       const list = items.filter((s) => s.moment === m.key);
-      if (!list.length) return '';
-      const sch = list.filter((s) => isScheduled(s, k)), done = sch.filter((s) => isTaken(s.id, k)).length;
-      const status = !sch.length ? ''
-        : done === sch.length ? html`<span class="mdone">${ICON.check}Fait</span>`
-        : html`<span class="mcount" aria-label="${done} sur ${sch.length} pris">${done}/${sch.length}</span><button type="button" class="mall" data-act="moment-all" data-v="${m.key}" data-date="${k}" aria-label="Tout cocher : ${m.label}">Tout cocher</button>`;
-      return html`<div class="moment m-${m.key}" role="group" aria-labelledby="mt-${m.key}">
-        <div class="moment-head"><span class="scene" aria-hidden="true">${SCENE[m.key]}</span><div class="mtitle"><h3 id="mt-${m.key}">${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${status}</div>
-        <div class="mitems">${list.map((s) => supplementItem(s, k))}</div>
-      </div>`;
+      return list.length ? momentGroup(m, k, list) : '';
     })}</div>${cureNotes(k)}</section>`;
+  }
+  function momentGroup(m, k, list) {
+    const sch = list.filter((s) => isScheduled(s, k)), done = sch.filter((s) => isTaken(s.id, k)).length;
+    const status = !sch.length ? ''
+      : done === sch.length ? html`<span class="mdone">${ICON.check}Fait</span>`
+      : html`<span class="mcount" aria-label="${done} sur ${sch.length} pris">${done}/${sch.length}</span><button type="button" class="mall" data-act="moment-all" data-v="${m.key}" data-date="${k}" aria-label="Tout cocher : ${m.label}">Tout cocher</button>`;
+    return html`<div class="moment m-${m.key}" role="group" aria-labelledby="mt-${m.key}">
+      <div class="moment-head"><span class="scene" aria-hidden="true">${SCENE[m.key]}</span><div class="mtitle"><h3 id="mt-${m.key}">${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${status}</div>
+      <div class="mitems">${list.map((s) => supplementItem(s, k))}</div>
+    </div>`;
   }
   const FORM_KINDS = { checkin: { act: 'ci', field: 'checkins' }, meal: { act: 'meal', field: 'meals' }, symptom: { act: 'sym', field: 'symptoms' }, sport: { act: 'spt', field: 'sport' } };
   function rowActions(kind, k, id, what) {
@@ -2235,7 +2434,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const lv = scaleValue(s.intensity);
       return html`<li class="entry"><span class="t">${str(s.time)}</span><div class="e-body">${lv ? html`<span class="kind">Intensité ${lv}/5</span>` : ''}<p class="note">${s.text}</p></div>${rowActions('sym', k, s.id, `« ${str(s.text).slice(0, 40)} »`)}</li>`;
     };
-    return html`<section class="jsec"><div class="sec-head"><h2>Ce que je ressens</h2>${f ? '' : html`<button type="button" class="primary" data-act="sym-new" data-date="${k}">Noter</button>`}</div>
+    return html`<section class="jsec" id="sec-symptoms"><div class="sec-head"><h2>Ce que je ressens</h2>${f ? '' : html`<button type="button" class="primary" data-act="sym-new" data-date="${k}">Noter</button>`}</div>
       ${f && !f.id ? symptomForm(f) : ''}
       ${list.length ? html`<ul class="list">${list.map((s) => (f && f.id === s.id ? html`<li class="editing">${symptomForm(f)}</li>` : entry(s)))}</ul>`
         : f ? '' : html`<p class="empty">Une douleur, une sensation, un effet secondaire ? Note-le ici, avec l’heure.</p>`}
@@ -2379,7 +2578,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   }
 
   function notesBlock(k, d) {
-    return html`<section class="jsec"><div class="sec-head"><h2><label for="notes-${k}">Notes du jour</label></h2></div><textarea id="notes-${k}" class="notes" data-bind="notes" data-date="${k}" rows="4" placeholder="Cours, révisions, ce qui s’est passé…">${str(d.notes)}</textarea></section>`;
+    return html`<section class="jsec" id="sec-notes"><div class="sec-head"><h2><label for="notes-${k}">Notes du jour</label></h2></div><textarea id="notes-${k}" class="notes" data-bind="notes" data-date="${k}" rows="4" placeholder="Cours, révisions, ce qui s’est passé…">${str(d.notes)}</textarea></section>`;
   }
 
   /* ---------- Claude ---------- */
@@ -2791,10 +2990,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const label = canShare() ? 'Envoyer à Claude' : store.sample && scope !== 'days' ? 'Demander à Claude' : 'Copier pour Claude';
     return html`<div class="banner send" role="note"><span class="mico" aria-hidden="true">${ICON.send}</span><p class="btxt"><b>${title}</b><span>${text}</span></p><div class="actions"><button type="button" class="primary" data-act="send-pending" data-scope="${scope}" data-key="${key}">${label}</button><button type="button" class="link" data-act="send-done" data-key="${key}">Déjà fait</button></div></div>`;
   }
-  function scrollToClaude() {
-    const el = document.getElementById('claude');
-    if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
-  }
+  function scrollToClaude() { showSection('claude'); }
   /* Le bouton « … Claude » du check-in : la meilleure action possible ici. */
   function claudeGo(k) {
     const scope = hasVisit(k) ? 'visit' : 'day';
@@ -3088,12 +3284,16 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       title: 'Claude', icon: 'spark', cls: 'm-aprem', render: claudeSettings,
       summary: () => (S.settings.claudeUrl ? 'Projet Claude lié' : 'Aucun projet lié')
     },
+    affichage: {
+      title: 'Affichage', icon: 'grid', cls: 'm-aprem', render: displaySettings,
+      summary: () => (homeTabs() ? 'Accueil en onglets' : 'Accueil : tout sur une page')
+    },
     donnees: {
       title: 'Sauvegarde et données', icon: 'save', cls: 'm-soir', render: dataSettings,
       summary: () => (store.mode === 'cloud' ? 'Synchronisées avec ton compte Claude' : 'Sur cet appareil · sauvegarder, restaurer')
     }
   };
-  const SETTINGS_GROUPS = [['Moi', ['profils', 'profil', 'objectifs']], ['Suivi', ['visite', 'sport', 'complements', 'aliments']], ['Claude et données', ['claude', 'donnees']]];
+  const SETTINGS_GROUPS = [['Moi', ['profils', 'profil', 'objectifs']], ['Suivi', ['visite', 'sport', 'complements', 'aliments']], ['Claude et données', ['claude', 'donnees', 'affichage']]];
   function renderSettings() {
     const page = SETTINGS_PAGES[S.ui.settingsPage];
     if (page) {
@@ -4161,7 +4361,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     stopChrono(); S.chrono = null;
     S.settings = null; S.months = {}; S.ready = false;
     const t = todayKey();
-    Object.assign(S.ui, { view: 'jour', date: t, weekOf: startOfWeek(t), monthOf: t.slice(0, 7), year: new Date().getFullYear(),
+    Object.assign(S.ui, { view: 'jour', dayTab: 'apercu', date: t, weekOf: startOfWeek(t), monthOf: t.slice(0, 7), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, openSup: null, appt: null, apptPast: false, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
       settingsPage: null, tplEdit: null, profileEdit: null, profileAdd: false, foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       bilan: { kind: 'semaine', anchor: t }, dossier: { range: 'all', from: '', to: '' },
@@ -4403,9 +4603,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         return { label, tip: cap1(longDate(k)), m: k <= t ? dayMetrics(k) : null, now: k === t };
       });
     }
+    const empty = []; // graphiques sans aucune valeur sur la période : une ligne au lieu d'un cadre vide
     const charts = BILAN_CHARTS.map((c) => {
       const vals = points.map((pt) => (p.kind === 'annee' ? (pt.s ? (c.yearVal ? c.yearVal(pt.s) : c.val(pt.s)) : null) : pt.m ? c.val(pt.m) : null));
       const got = vals.map((v, i) => [v, i]).filter(([v]) => v != null);
+      if (!got.length) { empty.push(c.title.toLowerCase()); return ''; }
       const maxI = got.length ? got.reduce((a, b) => (b[0] > a[0] ? b : a))[1] : -1;
       const goal = c.goal ? c.goal() : null;
       const spec = { color: c.color, top: c.top || null, goal: goal || null, goalLabel: goal ? `Objectif ${c.goalFmt(goal)}` : '', vals: vals.map((v) => (v == null ? null : Math.round(v * 100) / 100)),
@@ -4430,7 +4632,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       </div>
       <p class="hint">${s.filled ? `${plural(s.filled, 'jour')} rempli${s.filled > 1 ? 's' : ''} sur ${past.length}${isCurrent ? ' jusqu’à aujourd’hui' : ''}. Les jours sans rien de coché ni noté ne comptent pas dans les moyennes.${cmp ? ` Les flèches comparent ${vsLabel}.` : ''}` : 'Rien de noté sur cette période.'}</p>
       ${tiles}
-      <div class="bcharts">${charts}</div>
+      ${empty.length < BILAN_CHARTS.length ? html`<div class="bcharts">${charts}</div>` : ''}
+      ${empty.length ? html`<p class="hint bempty">${empty.length === BILAN_CHARTS.length ? 'Les graphiques apparaîtront dès le premier jour noté' : `Pas encore de graphique pour ${empty.length > 1 ? `${empty.slice(0, -1).join(', ')} et ${empty[empty.length - 1]}` : empty[0]}`} : chaque jour, une colonne.</p>` : ''}
       ${adh.length ? html`<h3 class="sub-title" style="margin-top:22px">Chaque complément</h3>
         <ul class="adh">${adh.map(({ sp, sch, took }) => html`<li class="m-${sp.moment}"><span class="adh-name">${sp.name}${sp.dose ? html` <small>${sp.dose}</small>` : ''}</span><span class="adh-bar" role="img" aria-label="${Math.round((took / sch) * 100)} %"><i style="width:${Math.round((took / sch) * 100)}%"></i></span><span class="adh-val">${Math.round((took / sch) * 100)} % <small>${took}/${sch}</small></span></li>`)}</ul>` : ''}
       <div class="actions" style="margin-top:16px"><button type="button" class="ghost" data-act="dossier-period" data-from="${p.start}" data-to="${p.end < t ? p.end : t}">Dossier de cette période (Claude, médecin)</button></div>
@@ -4865,6 +5068,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     }
     S.ui.confirm = null;
     S.ui.form = { type, date: k, id: id || null, draft };
+    if (FORM_TAB[type] && S.ui.view === 'jour') S.ui.dayTab = FORM_TAB[type];
     if (type === 'symptom') S.ui.focus = '#sym-text';
     else if (type === 'meal' && finePointer()) S.ui.focus = '#fi-name';
     render();
@@ -5120,7 +5324,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   };
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
-    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...APPT_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...APPT_ACTIONS, ...HOME_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
     'sport-day': (d) => { S.ui.date = d.date; S.ui.form = null; render(); },
     'spt-kind': (d) => {
       const dr = S.ui.form && S.ui.form.draft;
@@ -5186,15 +5390,12 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     },
     tab: (d) => {
       const again = S.ui.view === d.view;
-      if (again && d.view === 'jour') { go(todayKey()); toTop(); return; } // Accueil touché deux fois : retour à aujourd'hui
+      if (again && d.view === 'jour') { S.ui.dayTab = 'apercu'; go(todayKey()); toTop(); return; } // Accueil touché deux fois : aperçu d'aujourd'hui
       if (d.view === 'reglages' && (again || !S.ui.settingsPage)) S.ui.settingsPage = null;
       S.ui.view = d.view; S.ui.form = null; S.ui.appt = null; S.ui.confirm = null; S.ui.exportText = null;
       render(); toTop();
     },
-    jump: (d) => {
-      const el = document.getElementById(d.v);
-      if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
-    },
+    jump: (d) => showSection(d.v),
     'water-add': (d) => {
       const v = Number(d.v), goal = S.settings.goals.water * 1000, before = waterOf(peekDay(d.date));
       mutateDay(d.date, 'water', (day) => { day.water = Math.max(0, Math.min(10000, waterOf(day) + v)); });
@@ -5211,7 +5412,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     'day-prev': () => go(addDays(S.ui.date, -1)),
     'day-next': () => go(addDays(S.ui.date, 1)),
     'day-today': () => go(todayKey()),
-    goto: (d) => { const fromOther = S.ui.view !== 'jour'; S.ui.view = 'jour'; go(d.date); if (fromOther) toTop(); },
+    goto: (d) => { const fromOther = S.ui.view !== 'jour'; S.ui.view = 'jour'; if (d.tab) S.ui.dayTab = d.tab; go(d.date); if (fromOther) toTop(); },
     toggle: (d) => {
       S.ui.just = `${d.sid}|${d.date}`;
       mutateDay(d.date, 'taken:' + d.sid, (day) => { day.taken[d.sid] = !day.taken[d.sid]; });
@@ -5227,7 +5428,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       mutateDay(d.date, 'visit', (day) => { const vis = ensureVisit(day); vis[d.v] = !vis[d.v]; });
     },
     'goto-labs': (d) => {
-      S.ui.view = 'jour'; S.ui.labsOpen = true;
+      S.ui.view = 'jour'; S.ui.labsOpen = true; S.ui.dayTab = 'visite';
       S.ui.focus = `#lab-vitD-${d.date}`;
       go(d.date);
       const el = document.getElementById('visit');

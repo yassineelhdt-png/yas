@@ -4,6 +4,14 @@ Journal santé quotidien : compléments (matin, midi, 16h, soir), eau (verres, o
 check-ins (humeur, énergie, concentration, stress, douleur, faim), ce que je ressens (douleurs, sensations, effets
 secondaires), repas avec aliments et macros (protéines, glucides, lipides, calories) et notes.
 
+**Accueil en onglets** : la journée tient sur un écran. *Aperçu* : les six anneaux sur une rangée, « Maintenant »
+(les compléments du moment à cocher, et en un appui : un verre d'eau, un check-in, un repas, un ressenti), « À faire »
+(les rappels du jour regroupés : visite, cures, envoi à Claude, sauvegarde, premiers pas) et les rendez-vous ; puis un
+onglet par partie : *Compléments*, *Eau et repas*, *Journal* (check-ins, ressentis, sommeil, notes), *Claude*, et
+*Visite* le jour de la visite. La barre d'onglets reste en haut ; les anneaux et les rappels ouvrent le bon onglet.
+Réglages → *Affichage* : « Tout sur une page » pour retrouver l'accueil d'avant, à faire défiler (choix gardé sur
+l'appareil).
+
 Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, avec six anneaux de résumé, « Bonjour » ou
 « Bonsoir » et une petite scène du moment : lever du soleil, plein midi, fin d'après-midi, nuit étoilée, reprises en tête
 de chaque moment des compléments), **Calendrier** (semaine, mois, année, et l'agenda), **Sport**, **Santé** (profil,

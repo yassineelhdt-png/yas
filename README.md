@@ -109,3 +109,17 @@ L'APK est signé avec `android/app/horaire9h.keystore` pour que chaque nouvelle 
 la précédente. Cette clé est publique dans le dépôt : elle convient à une installation personnelle, pas à une
 publication sur le Play Store. Pour une clé privée, définir `ANDROID_KEYSTORE_FILE`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS` et `ANDROID_KEY_PASSWORD` au moment du build.
+
+## Agents Claude Code : annales et analyse au peigne fin
+
+Le dossier `.claude/` contient deux skills et quatre agents, disponibles dans toute session Claude Code ouverte dans ce
+dépôt (détails dans [`.claude/README-annales.md`](.claude/README-annales.md)) :
+
+- `/annale` : génère un examen blanc et son corrigé, le fait résoudre à l'aveugle, compare, corrige (2 tours au plus),
+  puis relit tout au peigne fin. Agents : `generateur-annale`, `solveur-aveugle`, `verificateur-annale`,
+  `analyste-exhaustif`. Mets tes cours dans `cours/` et d'anciens examens dans `annales-sources/` ; résultats dans
+  `sortie/<matiere>-<chapitre>-<date>/`.
+- `/analyse <fichier>` : vérifie un texte, un corrigé ou du code élément par élément (inventaire numéroté par
+  `.claude/skills/analyse/scripts/decouper.py`, recalcul Python, exécution du code) et rend un rapport ❌ / ⚠️ / 🔍.
+
+Calculs : `pip install sympy numpy`.
