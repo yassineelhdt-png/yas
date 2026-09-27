@@ -397,6 +397,23 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .labs .count{ font-size:13px; }
 .vgrid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:10px; margin-bottom:10px; }
 .vgrid .field span{ font-size:13px; }
+.vitals{ margin:14px 0 6px; padding:14px; border-radius:16px; background:var(--surface-2); border:1px solid var(--line); }
+.vsub{ display:flex; align-items:center; gap:4px; margin:0 0 10px; font-size:16px; font-weight:800; }
+.bp-in{ display:flex; align-items:center; gap:6px; }
+.vitals .vgrid{ grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+.vitals .vgrid > .field:first-child{ grid-column:1 / -1; max-width:340px; }
+@media (max-width:520px){ .vitals .vgrid{ grid-template-columns:repeat(2, minmax(0,1fr)); } .vitals{ padding:12px; } }
+.bp-in input{ width:0; flex:1 1 0; min-width:0; text-align:center; }
+.bp-in span{ font-size:20px; font-weight:800; color:var(--muted); }
+.vreads{ list-style:none; margin:4px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:8px; }
+.vread{ --lv:var(--c-supp); display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:14px; background:var(--surface); border:1px solid var(--line); }
+.vread.watch{ --lv:var(--c-kcal); } .vread.alert{ --lv:var(--accent); }
+.vread.alert{ border-color:var(--accent-line); background:var(--accent-tint); }
+.vdot{ flex:none; width:10px; height:10px; margin-top:6px; border-radius:50%; background:var(--lv); }
+.vr-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.vr-txt small{ font-size:12.5px; font-weight:600; color:var(--muted); line-height:1.35; }
+.vbadge{ align-self:flex-start; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:800; color:var(--ink); background:color-mix(in srgb, var(--lv) 18%, transparent); border:1px solid color-mix(in srgb, var(--lv) 45%, transparent); }
+.vcell.watch{ color:var(--c-kcal); font-weight:800; } .vcell.alert{ color:var(--accent); font-weight:800; }
 .lab-note{ font-size:12px; font-weight:600; color:var(--muted); line-height:1.3; }
 
 /* Claude */
@@ -423,7 +440,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 
 /* Accueil */
 .hero{ margin-bottom:18px; }
-.hero-top{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+.hero-top{ display:flex; flex-wrap:wrap; align-items:center; gap:12px 14px; }
+.hero-txt{ flex:1 1 160px; min-width:0; }
+.hero-txt .date{ overflow-wrap:anywhere; }
+.hero-top .daynav{ margin-left:auto; }
+.scene{ flex:none; display:block; width:40px; height:40px; border-radius:12px; overflow:hidden; box-shadow:0 1px 2px rgb(0 0 0 / .08); }
+.scene svg{ display:block; width:100%; height:100%; }
+.hero-scene{ width:56px; height:56px; border-radius:17px; }
+@media (max-width:480px){ .hero-scene{ width:46px; height:46px; border-radius:14px; } .hero-top{ gap:10px; } }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .scene{ filter:brightness(.9) saturate(.92); } }
+:root[data-theme="dark"] .scene{ filter:brightness(.9) saturate(.92); }
 .eyebrow{ margin:0 0 2px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-2); }
 .hero .strip{ margin:16px 0 0; }
 .tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-bottom:18px; }
@@ -461,6 +487,50 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .mday .marks i{ width:7px; height:7px; border-radius:50%; }
 .mday .mk-s{ background:var(--sport); } .mday .mk-v{ background:var(--soir); } .mday .mk-j{ background:var(--aprem); } .mday .mk-w{ background:var(--soir-2); border:1.5px solid var(--soir); }
 .mday.future{ opacity:.5; }
+.mday .mk-r{ background:var(--ink); }
+.mday.has-appt{ border-color:color-mix(in srgb, var(--ink) 35%, var(--line)); }
+.mday.has-appt.future{ opacity:.85; }
+.mtag{ display:none; max-width:92%; padding:1px 6px; border-radius:6px; background:var(--ink); color:var(--bg); font-size:11px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+@media (min-width:760px){ .mday .mtag{ display:block; } .mday.has-appt .mk-r{ display:none; } }
+.lid.has-appt::after{ content:""; position:absolute; top:6px; left:6px; width:7px; height:7px; border-radius:50%; background:var(--ink); }
+.lid[aria-current="date"].has-appt::after{ background:var(--on-accent); }
+.week thead .rtag{ color:var(--ink); max-width:74px; margin:2px auto 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-transform:none; letter-spacing:0; }
+.title-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.title-row .page-title{ margin-right:auto; }
+@media (min-width:1100px){ .title-row [data-act="appt-new"]{ display:none; } }
+.appt-form > .seg{ display:flex; width:100%; }
+.appt-form > .seg button{ flex:1 1 0; min-width:0; white-space:nowrap; }
+.cal-layout{ display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
+.cal-main{ min-width:0; }
+@media (min-width:1100px){ .cal-layout{ grid-template-columns:minmax(0,1fr) 380px; align-items:start; } .cal-side{ position:sticky; top:80px; } }
+.appts .card-head .pill{ margin-left:auto; }
+.appt-add{ width:100%; margin:2px 0 14px; }
+.appt-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.appt{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; align-items:start; padding:10px; border:1px solid var(--line); border-radius:16px; background:var(--surface-2); }
+.appt .row-actions{ grid-column:2; justify-self:start; margin-top:2px; }
+.appt.today{ border-color:var(--accent-line); background:var(--accent-tint); }
+.appt.past{ opacity:.72; }
+.appt.fresh{ animation:fresh 2.4s ease-out; }
+.appt-cal{ width:52px; padding:5px 0 6px; border-radius:12px; background:var(--surface); border:1px solid var(--line); display:flex; flex-direction:column; align-items:center; line-height:1.1; }
+.appt-cal small{ font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.appt-cal b{ font-size:21px; font-weight:800; font-variant-numeric:tabular-nums; }
+.appt.today .appt-cal{ background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.appt.today .appt-cal small{ color:inherit; opacity:.85; }
+.appt.is-date .appt-cal{ border-style:dashed; }
+.appt-body{ min-width:0; }
+.appt-title{ margin:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; font-size:16px; }
+.appt-title b{ overflow-wrap:anywhere; }
+.appt-time{ font-weight:800; font-variant-numeric:tabular-nums; color:var(--accent-2); }
+.appt-time.soft{ font-size:13px; color:var(--muted); font-weight:700; }
+.appt-meta{ margin:2px 0 0; font-size:13px; font-weight:700; color:var(--muted); overflow-wrap:anywhere; }
+.appt-note{ margin:6px 0 0; font-size:14px; white-space:pre-line; overflow-wrap:anywhere; }
+.appt-sub{ margin:14px 0 8px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.appt-past{ margin-top:14px; }
+.appt-past summary{ cursor:pointer; font-weight:800; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.appt-form{ margin-bottom:14px; }
+.appt-when{ margin:-4px 0 0; font-weight:700; color:var(--ink); }
+.day-chips button{ min-width:64px; }
+#sec-appts{ scroll-margin-top:calc(env(safe-area-inset-top, 0px) + 72px); }
 .mday.today{ border-color:var(--ink); border-width:2px; }
 .mday.visit{ background:var(--soir-tint); border-color:var(--soir-line); }
 .mday.out{ visibility:hidden; }
@@ -618,21 +688,46 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .who{ display:inline-flex; align-items:center; gap:8px; min-width:0; max-width:42vw; min-height:40px; padding:4px 13px 4px 4px; border:1px solid var(--line); border-radius:999px; background:var(--surface); color:var(--ink); font-weight:800; font-size:14px; }
 .who-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 @media (max-width:370px){ .who-name{ display:none; } .who{ padding-right:4px; } }
-.profile-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
-.profile{ display:flex; flex-direction:column; gap:12px; padding:12px 14px; border-radius:18px; background:var(--surface-2); border:1px solid var(--line); }
+.avatar{ display:inline-flex; align-items:center; justify-content:center; aspect-ratio:1 / 1; align-self:center; overflow:hidden; position:relative; text-align:center; }
+.avatar img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+.avatar.ph{ background:var(--surface-2); box-shadow:0 0 0 2px var(--pc); }
+.avatar.em, .emo{ font-family:"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-weight:400; line-height:1; }
+.avatar.em{ background:color-mix(in srgb, var(--pc) 22%, var(--surface)); box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--pc) 55%, transparent); font-size:18px; }
+.avatar.big{ width:56px; height:56px; font-size:23px; }
+.avatar.big.em{ font-size:30px; }
+.avatar.xl{ width:92px; height:92px; font-size:38px; }
+.avatar.xl.em{ font-size:50px; }
+.avatar.xl.ph{ box-shadow:0 0 0 3px var(--surface), 0 0 0 6px var(--pc); }
+.avatar.plus{ --pc:var(--surface-2); --pco:var(--muted); border:2px dashed var(--line); font-size:28px; font-weight:600; }
+.pf-hero{ display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px; padding:18px; border-radius:22px; background:color-mix(in srgb, var(--pc) 12%, var(--surface)); border:1px solid color-mix(in srgb, var(--pc) 30%, var(--line)); }
+.pf-hero.c0{ --pc:var(--accent); }
+.pf-hero-txt{ flex:1 1 180px; min-width:0; }
+.pf-hero-txt .eyebrow{ color:var(--muted); }
+.pf-hero-txt h2{ margin:0; font-family:var(--font-display); font-size:28px; font-weight:600; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.pf-hero-txt p:last-child{ margin:4px 0 0; font-size:14px; font-weight:600; color:var(--muted); }
+.pf-sub{ margin:24px 0 10px; }
+.pf-grid{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:10px; }
+.profile{ display:flex; flex-direction:column; gap:6px; padding:6px; border-radius:20px; background:var(--surface-2); border:1px solid var(--line); min-width:0; }
 .profile.on{ border-color:var(--accent-line); background:var(--accent-tint); }
-.pf-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; }
-.pf-txt{ flex:1 1 140px; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
-.pf-txt b{ font-size:17px; font-weight:800; }
-.pf-txt span{ font-size:13.5px; font-weight:600; color:var(--muted); }
-.pf-actions{ display:flex; align-items:center; gap:6px; }
+.profile.add{ background:transparent; border-style:dashed; }
+.pf-tile{ display:flex; align-items:center; gap:12px; width:100%; min-height:72px; padding:8px 10px; border:0; border-radius:15px; background:transparent; color:var(--ink); text-align:left; font:inherit; }
+button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent); }
+.pf-txt{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
+.pf-txt b{ font-size:17px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pf-txt span{ font-size:13px; font-weight:600; color:var(--muted); }
+.pf-mod{ align-self:flex-start; margin:-4px 0 4px 78px; min-height:32px; }
 .pill.on{ background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
-.pf-edit{ margin:0; }
+.pf-new{ display:flex; flex-direction:column; gap:10px; padding:10px; }
+.pf-edit{ display:flex; flex-direction:column; gap:14px; margin:12px 0 0; padding:16px; border-radius:18px; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
+.profile .pf-edit{ margin:0 0 4px; }
+.pf-edit-top{ display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px; }
+.pf-photo-btns{ flex:1 1 180px; display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+.emoji-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(46px, 1fr)); gap:6px; }
+.emo{ height:46px; border:1px solid var(--line); border-radius:14px; background:var(--surface-2); font-size:24px; line-height:1; padding:0; }
+.emo[aria-pressed="true"]{ background:var(--accent-tint); border-color:var(--accent); box-shadow:inset 0 0 0 2px var(--accent); }
 .pf-colors .swatch{ width:40px; height:40px; min-height:40px; padding:0; border-radius:50%; background:var(--pc); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--line); }
 .pf-colors .swatch.c0{ --pc:var(--accent); }
-.pf-colors .swatch[aria-pressed="true"]{ box-shadow:0 0 0 3px var(--ink); }
-.pf-add{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px; }
-.pf-add .primary{ min-height:46px; }
+.chips.pf-colors .swatch[aria-pressed="true"]{ background:var(--pc); border-color:var(--surface); box-shadow:0 0 0 3px var(--ink); }
 
 /* Chrono */
 .chrono-card .card-head{ flex-wrap:wrap; }
@@ -647,6 +742,14 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .laps li b{ font-size:18px; font-weight:800; }
 .laps li small{ color:var(--muted); font-weight:600; min-width:64px; text-align:right; }
 .laps li.best{ border-color:var(--accent-line); background:var(--accent-tint); }
+.bpm-row{ display:grid; grid-template-columns:auto minmax(0,1fr) minmax(0,1fr); gap:6px 10px; align-items:end; }
+.bpm-row .field input{ width:100%; }
+.bpm-ico{ width:40px; height:44px; display:grid; place-items:center; color:var(--accent); }
+.bpm-ico svg{ width:26px; height:26px; }
+.bpm-ico.sm{ display:inline-grid; width:18px; height:18px; vertical-align:-3px; margin-right:4px; }
+.bpm-ico.sm svg{ width:16px; height:16px; }
+.bpm-hint{ grid-column:1 / -1; margin:0; }
+.bpm-note{ color:var(--accent-2); font-weight:700; }
 .add-sheet{ display:flex; flex-direction:column; gap:12px; margin-top:14px; padding:14px; border-radius:16px; background:var(--accent-tint); border:1px solid var(--accent-line); }
 .add-sheet h3{ font-size:17px; font-weight:800; }
 .add-sheet .actions .big{ flex:1 1 220px; }
@@ -790,10 +893,15 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const PROFILES_KEY = 'mon-suivi-profiles-v1';
   const MAIN = 'main';
   const PROFILE_COLORS = ['accent', 'soir', 'midi', 'aprem', 'matin'];
+  // Images au choix à la place de l'initiale (ou une photo, réduite à 160 × 160 et gardée dans la liste des profils).
+  const AVATAR_EMOJIS = ['🙂', '😎', '🥰', '🤓', '🧔', '👩', '👵', '👴', '🧒', '👶', '🐱', '🐶', '🦊', '🐼', '🦁', '🌸', '🌻', '⚽', '💪', '🎧'];
+  const isPhoto = (v) => typeof v === 'string' && v.length <= 60000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v);
   const normalizeProfile = (p, i) => ({
     id: p.id === MAIN || /^p[a-z0-9]{3,20}$/.test(String(p.id)) ? String(p.id) : MAIN,
     name: String(p.name || '').trim().slice(0, 30) || (p.id === MAIN ? 'Moi' : 'Profil'),
-    color: Number.isInteger(p.color) && p.color >= 0 && p.color < PROFILE_COLORS.length ? p.color : i % PROFILE_COLORS.length
+    color: Number.isInteger(p.color) && p.color >= 0 && p.color < PROFILE_COLORS.length ? p.color : i % PROFILE_COLORS.length,
+    photo: isPhoto(p.photo) ? p.photo : '',
+    emoji: AVATAR_EMOJIS.includes(p.emoji) ? p.emoji : ''
   });
   function normalizeProfileList(list) {
     const seen = new Set(), out = [];
@@ -936,11 +1044,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     right: trusted('<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     ...Object.fromEntries(Object.entries({
-      sunrise: '<path d="M3 19h18M7 19a5 5 0 0 1 10 0M12 11V3M9.5 5.5 12 3l2.5 2.5M4.6 12.6l1.4 1.4M19.4 12.6 18 14"/>',
-      sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
-      sunset: '<path d="M3 19h18M7 19a5 5 0 0 1 10 0M12 3v8M9.5 8.5 12 11l2.5-2.5M4.6 12.6l1.4 1.4M19.4 12.6 18 14"/>',
-      moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
       visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
+      calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
       drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>',
       person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
       people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M15.8 14.3A5.5 5.5 0 0 1 21.5 20"/>',
@@ -957,12 +1062,49 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       scale: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 9.5a5.6 5.6 0 0 1 8 0L13 12.5"/>',
       chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
       smile: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 14.2a4.5 4.5 0 0 0 7 0M9 9.8h.01M15 9.8h.01"/>',
+      heart: '<path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/><path d="M3.5 13h4l1.5-2.5 2.5 5 1.8-3.5h7.2"/>',
       glassEmpty: '<path d="M5.5 3.5h13l-1.7 16.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3z"/>',
       glassHalf: '<path d="M5.5 3.5h13l-1.7 16.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M7.4 13.5h9.2l-.7 6.2H8.1z" fill="currentColor" stroke="none"/>',
       glassFull: '<path d="M5.5 3.5h13l-1.7 16.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M6.6 7.5h10.8l-1.5 12.2H8.1z" fill="currentColor" stroke="none"/>'
     }).map(([k, d]) => [k, trusted(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`)]))
   };
-  const MOMENT_ICON = { matin: ICON.sunrise, midi: ICON.sun, aprem: ICON.sunset, soir: ICON.moon };
+  /* Petites scènes illustrées des moments de la journée : lever du soleil, plein midi, fin d'après-midi, nuit étoilée.
+     Formes pleines sans dégradé ni identifiant : elles s'affichent pareil partout, même répétées sur la page. */
+  const SCENE = Object.fromEntries(Object.entries({
+    matin: [
+    '<rect width="40" height="40" fill="#FFE7C2"/>',
+    '<circle cx="20" cy="27" r="13" fill="#FFD28F"/>',
+    '<circle cx="20" cy="27" r="7.5" fill="#FF9F2E"/>',
+    '<path d="M20 15.5v-3.5M12.4 19.4l-2.4-2.4M27.6 19.4l2.4-2.4M8.5 26H5M35 26h-3.5" stroke="#FF9F2E" stroke-width="2.2" stroke-linecap="round"/>',
+    '<path d="M0 29c6-3.5 12-3.8 19-1.2 7 2.5 13 2.4 21-.8V40H0z" fill="#F7A96A"/>',
+    '<path d="M0 34c8-3 16-3 24-.4 6 1.9 11 1.7 16 .2V40H0z" fill="#E98250"/>'
+    ],
+    midi: [
+    '<rect width="40" height="40" fill="#CDE8FF"/>',
+    '<circle cx="18" cy="17" r="11" fill="#E3F2FF"/>',
+    '<circle cx="18" cy="17" r="6.5" fill="#FFC52E"/>',
+    '<path d="M18 5.5v2.5M18 26v2.5M6.5 17H9M27 17h2.5M9.9 8.9l1.8 1.8M24.3 23.3l1.8 1.8M9.9 25.1l1.8-1.8M24.3 10.7l1.8-1.8" stroke="#FFC52E" stroke-width="2.2" stroke-linecap="round"/>',
+    '<path d="M21 33.5a4.5 4.5 0 0 1 4.3-4.5 6 6 0 0 1 11.2 1.6 3.5 3.5 0 0 1-.5 7H25.5a4.5 4.5 0 0 1-4.5-4.1z" fill="#FFFFFF"/>'
+    ],
+    aprem: [
+    '<rect width="40" height="40" fill="#FFD5C4"/>',
+    '<circle cx="24" cy="22" r="12" fill="#FFBFA6"/>',
+    '<circle cx="24" cy="22" r="7" fill="#FF7648"/>',
+    '<path d="M3 16.5a3.8 3.8 0 0 1 3.7-3.8 5 5 0 0 1 9.4 1.3 3 3 0 0 1-.4 6H6.8A3.8 3.8 0 0 1 3 16.5z" fill="#FFF3EC"/>',
+    '<path d="M0 31c7-3 14-3.2 21-.6 7 2.6 13 2.4 19-.4V40H0z" fill="#E98B78"/>',
+    '<path d="M0 35.5c9-2.6 18-2.4 27 .2 5 1.4 9 1.2 13 0V40H0z" fill="#C9675A"/>'
+    ],
+    soir: [
+    '<rect width="40" height="40" fill="#26316F"/>',
+    '<circle cx="18" cy="18" r="12" fill="#323F85"/>',
+    '<circle cx="18" cy="18" r="8" fill="#FFE39A"/>',
+    '<circle cx="22.5" cy="14.5" r="7.2" fill="#323F85"/>',
+    '<path d="M31 8.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="#FFFFFF"/>',
+    '<circle cx="33" cy="21" r="1" fill="#FFFFFF"/><circle cx="8" cy="31" r="1.1" fill="#FFFFFF" opacity=".8"/><circle cx="27" cy="29" r=".9" fill="#FFFFFF" opacity=".7"/><circle cx="7" cy="9" r=".8" fill="#FFFFFF" opacity=".7"/>',
+    '<path d="M0 34c8-2.6 16-2.8 24-.6 6 1.6 11 1.4 16 .2V40H0z" fill="#1B2354"/>'
+    ]
+  }).map(([k, parts]) => [k, trusted(`<svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">${parts.join('')}</svg>`)]));
+  const momentNow = (min = toMin(nowTime())) => (min < 11 * 60 ? 'matin' : min < 14 * 60 ? 'midi' : min < 18 * 60 + 30 ? 'aprem' : 'soir');
   /* Une note de 1 à 5, sinon null (protège l'affichage contre une donnée abîmée). */
   const scaleValue = (v) => (Number.isInteger(v) && v >= 1 && v <= 5 ? v : null);
 
@@ -1054,6 +1196,21 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const every = Math.round(num(v && v.every) || 28);
     return { start: v && isKey(v.start) ? v.start : VISIT_START, every: every >= 7 && every <= 120 ? every : 28, notify: !(v && v.notify === false) };
   }
+  /* Rendez-vous (avec heure et lieu) et dates à retenir (toute la journée). */
+  const APPT_CATS = {
+    rdv: [['medecin', 'Médecin'], ['dentiste', 'Dentiste'], ['analyse', 'Prise de sang'], ['kine', 'Kiné'], ['specialiste', 'Spécialiste'], ['autre', 'Autre']],
+    date: [['anniv', 'Anniversaire'], ['examen', 'Examen'], ['event', 'Événement'], ['autre', 'Autre']]
+  };
+  function normalizeAppt(a) {
+    if (!isObj(a) || !isKey(a.date)) return null;
+    const kind = a.kind === 'date' ? 'date' : 'rdv';
+    return {
+      id: /^[a-z0-9]{4,24}$/i.test(String(a.id)) ? String(a.id) : newId(), kind, cat: (APPT_CATS[kind].find((c) => c[0] === a.cat) || [''])[0],
+      date: a.date, time: kind === 'rdv' && toMin(a.time) != null ? String(a.time) : '',
+      title: String(a.title || '').trim().slice(0, 60) || (kind === 'date' ? 'Date à retenir' : 'Rendez-vous'),
+      place: kind === 'rdv' ? String(a.place || '').trim().slice(0, 80) : '', note: String(a.note || '').trim().slice(0, 1000), remind: a.remind !== false
+    };
+  }
   const isClaudeUrl = (u) => /^https:\/\/claude\.ai\/[^\s"'<>]*$/.test(String(u || ''));
   function normalizeSettings(raw) {
     const created = raw && isKey(raw.created) ? raw.created : todayKey();
@@ -1068,6 +1225,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       profile: String((raw && raw.profile) || '').slice(0, 4000),
       claudeUrl: raw && isClaudeUrl(raw.claudeUrl) ? raw.claudeUrl : '',
       visit: normalizeVisit(raw && raw.visit),
+      appts: (raw && Array.isArray(raw.appts) ? raw.appts : []).map(normalizeAppt).filter(Boolean)
+        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(-400),
       supplements: sups.filter(isObj).map((s) => ({
         id: String(s.id || newId()),
         name: String(s.name || 'Sans nom'),
@@ -1108,9 +1267,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     settings: null, months: {}, ready: false, live: null, chrono: null,
     ui: {
       view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
-      form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null,
+      form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null, appt: null, apptPast: false,
       restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
-      calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', switching: false,
+      calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', profileAdd: false, switching: false,
       bilan: { kind: 'semaine', anchor: todayKey() }, dossier: { range: 'all', from: '', to: '' },
       foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
@@ -1219,6 +1378,46 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     ['alt', 'ALAT (foie)', '< 45 U/L']
   ];
   const visitOf = (d) => (d && isObj(d.visit) ? d.visit : null);
+  /* Mesures de la visite : tension, pouls, saturation, température, tour de taille.
+     Repères d'adulte au repos (tension : classes ESH 2023). Une aide pour lire ses chiffres, pas un diagnostic. */
+  const VITALS = [
+    ['sys', 'Tension haute (systolique)', 'mmHg', 60, 260], ['dia', 'Tension basse (diastolique)', 'mmHg', 30, 160],
+    ['pulse', 'Pouls au repos', 'bpm', 25, 220], ['spo2', 'Saturation (SpO₂)', '%', 50, 100],
+    ['temp', 'Température', '°C', 33, 43], ['waist', 'Tour de taille', 'cm', 40, 200]
+  ];
+  const vitalOf = (vis, key) => { const v = VITALS.find((x) => x[0] === key), n = num(vis && vis[key]); return v && n != null && n >= v[3] && n <= v[4] ? n : null; };
+  const hasVitals = (vis) => !!vis && VITALS.some(([key]) => vitalOf(vis, key) != null);
+  function bpClass(sys, dia) {
+    if (sys == null || dia == null) return null;
+    if (sys >= 180 || dia >= 110) return { level: 'alert', label: 'Hypertension de grade 3', tip: 'Très élevée : refais la mesure au calme et appelle ton médecin sans attendre.' };
+    if (sys >= 160 || dia >= 100) return { level: 'alert', label: 'Hypertension de grade 2', tip: 'À montrer rapidement à ton médecin.' };
+    if (sys >= 140 || dia >= 90) return { level: 'alert', label: 'Hypertension de grade 1', tip: 'À recontrôler (plusieurs mesures au calme, sur plusieurs jours) et à montrer à ton médecin.' };
+    if (sys >= 130 || dia >= 85) return { level: 'watch', label: 'Normale haute', tip: 'À surveiller : sel, sport, sommeil et poids jouent beaucoup.' };
+    if (sys < 90 || dia < 60) return { level: 'watch', label: 'Basse', tip: 'Signale-la à ton médecin si tu as des vertiges ou des malaises en te levant.' };
+    if (sys >= 120 || dia >= 80) return { level: 'ok', label: 'Normale', tip: '' };
+    return { level: 'ok', label: 'Optimale', tip: '' };
+  }
+  /* Lecture de chaque mesure notée : niveau (ok, à surveiller, à signaler), étiquette et conseil. */
+  function vitalsRead(vis) {
+    const out = [], v = (key) => vitalOf(vis, key), female = S.settings.health.sex === 'femme';
+    const sys = v('sys'), dia = v('dia'), bp = bpClass(sys, dia);
+    if (bp) out.push({ key: 'bp', what: 'Tension', value: `${sys}/${dia} mmHg`, ...bp });
+    const p = v('pulse');
+    if (p != null) out.push({ key: 'pulse', what: 'Pouls au repos', value: `${p} bpm`, ...(p < 50 ? { level: 'watch', label: 'Lent', tip: 'Fréquent chez les sportifs ; sinon, à signaler, surtout avec fatigue ou vertiges.' }
+      : p > 100 ? { level: 'alert', label: 'Rapide au repos', tip: 'Plus de 100 au repos : à signaler à ton médecin.' } : { level: 'ok', label: 'Normal', tip: '' }) });
+    const o = v('spo2');
+    if (o != null) out.push({ key: 'spo2', what: 'Saturation', value: `${o} %`, ...(o < 92 ? { level: 'alert', label: 'Basse', tip: 'Sous 92 % : à signaler rapidement.' }
+      : o < 95 ? { level: 'watch', label: 'Un peu basse', tip: 'Refais la mesure doigt au chaud, sans vernis.' } : { level: 'ok', label: 'Normale', tip: '' }) });
+    const tp = v('temp');
+    if (tp != null) out.push({ key: 'temp', what: 'Température', value: `${fmtDec(tp)} °C`, ...(tp >= 38 ? { level: 'alert', label: 'Fièvre', tip: '' }
+      : tp > 37.5 ? { level: 'watch', label: 'Légère fièvre', tip: '' } : tp < 35.5 ? { level: 'watch', label: 'Basse', tip: '' } : { level: 'ok', label: 'Normale', tip: '' }) });
+    const w = v('waist'), [lo, hi] = female ? [80, 88] : [94, 102];
+    if (w != null) out.push({ key: 'waist', what: 'Tour de taille', value: `${fmtDec(w)} cm`, ...(w >= hi ? { level: 'alert', label: 'Risque élevé', tip: `Au-delà de ${hi} cm, le risque cardiovasculaire augmente : à discuter avec ton médecin.` }
+      : w >= lo ? { level: 'watch', label: 'À surveiller', tip: `Repère : moins de ${lo} cm.` } : { level: 'ok', label: 'Bon', tip: '' }) });
+    return out;
+  }
+  const LEVEL_TXT = { ok: 'normal', watch: 'à surveiller', alert: 'à signaler' };
+  const vitalsLine = (vis) => vitalsRead(vis).map((r) => `${r.what.toLowerCase()} ${r.value} (${r.label.toLowerCase()})`).join(' ; ');
   function ensureVisit(d) {
     if (!isObj(d.visit)) d.visit = { weight: null, blood: false, doctor: false, labs: {}, labsText: '', notes: '' };
     if (!isObj(d.visit.labs)) d.visit.labs = {};
@@ -1269,6 +1468,26 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const sessionsOf = (d) => sportOf(d).filter((a) => a.kind === 'seance');
   const minutesOf = (list) => list.reduce((acc, a) => acc + (posNum(a.minutes) || 0), 0);
   const entryName = (a) => str(a.name) || (sportType(a.type) || [0, 'Activité'])[1];
+  /* Fréquence cardiaque d'une séance (lue sur la machine, la montre ou la ceinture) : 30 à 240 bpm, sinon rien. */
+  const bpmOf = (v) => { const n = num(v); return n != null && n >= 30 && n <= 240 ? Math.round(n) : null; };
+  const hrMax = () => { const age = ageOf(S.settings.health.birth); return age != null && age >= 10 && age <= 100 ? Math.round(208 - 0.7 * age) : null; };
+  const pctMax = (b) => { const m = hrMax(); return b && m ? Math.round((b / m) * 100) : null; };
+  /* « 165 bpm max (86 %), 142 de moyenne » */
+  function bpmText(a, short) {
+    const mx = bpmOf(a.bpmMax), av = bpmOf(a.bpmAvg), pc = pctMax(mx);
+    if (!mx && !av) return '';
+    return [mx ? `${mx} bpm max${pc ? ` (${pc} %${short ? '' : ' de la FC max théorique'})` : ''}` : '', av ? `${av}${mx ? '' : ' bpm'} de moyenne` : ''].filter(Boolean).join(', ');
+  }
+  /* Deux champs BPM (max, moyen) et le repère de FC max ; « prefix » donne les data-* et id de chaque écran. */
+  function bpmFields(maxVal, avgVal, attrs) {
+    const m = hrMax();
+    return html`<div class="bpm-row">
+      <span class="bpm-ico" aria-hidden="true">${ICON.heart}</span>
+      <label class="field"><span>BPM max</span><input type="text" inputmode="numeric" id="${attrs.id}-max" ${trusted(attrs.data)}="${attrs.max}" value="${maxVal == null ? '' : String(maxVal)}" placeholder="—" autocomplete="off"></label>
+      <label class="field"><span>BPM moyen</span><input type="text" inputmode="numeric" id="${attrs.id}-avg" ${trusted(attrs.data)}="${attrs.avg}" value="${avgVal == null ? '' : String(avgVal)}" placeholder="—" autocomplete="off"></label>
+      <p class="hint bpm-hint">${m ? `Ta FC max théorique : ≈ ${m} bpm (208 − 0,7 × âge).` : 'Facultatif : le pouls lu sur la machine, la montre ou la ceinture cardio.'}${maxVal && pctMax(bpmOf(maxVal)) ? ` Ici ${pctMax(bpmOf(maxVal))} %.` : ''}</p>
+    </div>`;
+  }
   /* Dépense estimée : MET × poids (kg) × durée (h). Seulement si le poids est connu. */
   function kcalBurned(a) {
     const tp = sportType(a.type), w = weightNow(), min = posNum(a.minutes);
@@ -1760,7 +1979,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const d = peekDay(k) || {};
     const visit = hasVisit(k), gap = daysBetween(t, k);
     const rel = isToday ? 'Aujourd’hui' : gap === -1 ? 'Hier' : gap === 1 ? 'Demain' : gap < 0 ? `Il y a ${-gap} jours` : `Dans ${gap} jours`;
-    return html`<section class="hero"><div class="hero-top"><div><p class="eyebrow">${rel}</p><h1 class="date">${longDate(k)}</h1></div>
+    const greet = { matin: 'Bonjour', midi: 'Bon appétit', aprem: 'Bon après-midi', soir: 'Bonsoir' }[momentNow()];
+    return html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? `${rel} · ${greet}${PROFILES.list.length > 1 || activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
         <div class="daynav">
           ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
           <button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">${ICON.left}</button>
@@ -1774,6 +1994,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       ${isToday ? backupBanner() : ''}
       ${isToday ? firstSteps() : ''}
       ${summaryTiles(k, d)}
+      ${apptDayCard(k, isToday)}
       ${visit ? visitCard(k, d) : ''}
       <div class="daygrid">
         <div class="col">${sleepBlock(k, d, isToday)}${supplementBlock(k)}${waterBlock(k, d)}</div>
@@ -1851,7 +2072,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const filled = LABS.filter(([key]) => str(labs[key]).trim()).length;
     const check = (key, label) => html`<button type="button" class="vcheck" data-act="visit-check" data-v="${key}" data-date="${k}" aria-pressed="${bool(!!vis[key])}"><span class="vbox" aria-hidden="true">${vis[key] ? ICON.check : ''}</span>${label}</button>`;
     return html`<section class="card visit" id="visit" aria-labelledby="visit-title">
-      <div class="visit-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><div><h2 id="visit-title">Visite médicale</h2><p>${k === todayKey() ? 'Aujourd’hui · ' : ''}prise de sang, pesée et médecin, ${cycleLabel()}</p></div></div>
+      <div class="visit-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><div><h2 id="visit-title">Visite médicale</h2><p>${k === todayKey() ? 'Aujourd’hui · ' : ''}prise de sang, pesée, tension et médecin, ${cycleLabel()}</p></div></div>
       <div class="vchecks">${check('blood', 'Prise de sang faite')}${check('doctor', 'Vu le médecin')}</div>
       <div class="vweight">
         <label class="field"><span>Poids (kg)</span><input type="text" inputmode="decimal" id="vw-${k}" data-visit="weight" data-date="${k}" value="${w ? fmtDec(w) : ''}" placeholder="—" autocomplete="off"></label>
@@ -1859,6 +2080,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
           : !before.length ? html`<p class="delta muted">Première pesée : ton point de départ.</p>` : ''}
       </div>
       ${before.length ? html`<p class="vhist">Pesées d’avant : ${before.slice(-4).map((x) => `${shortDate(x.k)} · ${fmtDec(x.w)} kg`).join('  —  ')}</p>` : ''}
+      ${vitalsBlock(k, vis)}
       <details class="labs" data-toggle="labs"${S.ui.labsOpen || filled ? html` open` : ''}>
         <summary>Résultats de la prise de sang${filled ? html`<span class="pill">${filled} noté${filled > 1 ? 's' : ''}</span>` : ''}</summary>
         <p class="hint">Recopie chaque valeur avec son unité. En gris, le repère habituel ; ton labo indique ses propres normes.</p>
@@ -1869,13 +2091,32 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       <p class="hint" style="margin:12px 0 0">Les résultats arrivent souvent un ou deux jours après : reviens les noter ici. Ton bilan du mois pour Claude est en bas de la page.</p>
     </section>`;
   }
+  function vitalsBlock(k, vis) {
+    const reads = vitalsRead(vis), female = S.settings.health.sex === 'femme';
+    const val = (key) => { const x = vis[key]; return x == null ? '' : typeof x === 'number' ? fmtDec(x) : str(x); };
+    const inp = (key, label, ph, mode = 'numeric') => html`<label class="field"><span>${label}</span><input type="text" inputmode="${mode}" id="vm-${key}-${k}" data-vm="${key}" data-date="${k}" value="${val(key)}" placeholder="${ph}" autocomplete="off"></label>`;
+    const prev = [...Object.keys(S.months)].sort().flatMap((mk) => Object.keys(S.months[mk].days || {}).sort()).filter((dk) => dk < k && hasVitals(visitOf(peekDay(dk)))).slice(-3);
+    return html`<div class="vitals" role="group" aria-labelledby="vit-${k}">
+      <h3 class="vsub" id="vit-${k}"><span class="bpm-ico sm" aria-hidden="true">${ICON.heart}</span>Tension, pouls et mesures</h3>
+      <div class="vgrid">
+        <div class="field"><span id="bp-l-${k}">Tension (mmHg)</span><div class="bp-in" role="group" aria-labelledby="bp-l-${k}"><input type="text" inputmode="numeric" id="vm-sys-${k}" data-vm="sys" data-date="${k}" value="${val('sys')}" placeholder="120" aria-label="Tension haute (systolique)" autocomplete="off"><span aria-hidden="true">/</span><input type="text" inputmode="numeric" id="vm-dia-${k}" data-vm="dia" data-date="${k}" value="${val('dia')}" placeholder="80" aria-label="Tension basse (diastolique)" autocomplete="off"></div></div>
+        ${inp('pulse', 'Pouls au repos (bpm)', '60 à 100')}
+        ${inp('spo2', 'Saturation SpO₂ (%)', '95 à 100')}
+        ${inp('temp', 'Température (°C)', '36,1 à 37,5', 'decimal')}
+        ${inp('waist', 'Tour de taille (cm)', female ? 'moins de 80' : 'moins de 94', 'decimal')}
+      </div>
+      ${reads.length ? html`<ul class="vreads">${reads.map((r) => html`<li class="vread ${r.level}"><span class="vdot" aria-hidden="true"></span><span class="vr-txt"><b>${r.what} : ${r.value}</b><span class="vbadge">${r.label}<span class="sr-only"> (${LEVEL_TXT[r.level]})</span></span>${r.tip ? html`<small>${r.tip}</small>` : ''}</span></li>`)}</ul>` : ''}
+      ${prev.length ? html`<p class="vhist">Avant : ${prev.map((dk) => `${shortDate(dk)} · ${vitalsRead(visitOf(peekDay(dk))).filter((r) => r.key === 'bp' || r.key === 'pulse').map((r) => r.value).join(', ') || 'mesures notées'}`).join('  —  ')}</p>` : ''}
+      <p class="hint" style="margin:6px 0 0">Tension : assis, au calme depuis 5 minutes, bras posé à hauteur du cœur ; fais 2 mesures à 1 minute d’écart et note la seconde. Repères d’adulte au repos : ton médecin juge selon ton cas.</p>
+    </div>`;
+  }
   function weekStrip(k) {
     const start = startOfWeek(k), t = todayKey();
     const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
     return html`<div class="strip" role="group" aria-label="Jours de la semaine">${days.map((dk, i) => {
-      const st = stats(dk), pct = st.total ? Math.round((st.taken / st.total) * 100) : 0, v = hasVisit(dk);
-      const label = longDate(dk) + (st.total ? `, ${st.taken} sur ${st.total} compléments` : '') + (v ? ', visite médicale' : '');
-      return html`<button type="button" class="lid${dk === t ? ' today' : ''}${v ? ' visit' : ''}" data-act="goto" data-date="${dk}"${dk === k ? html` aria-current="date"` : ''} aria-label="${label}"><span class="wd">${WD_SHORT[i]}</span><span class="dn">${fromKey(dk).getDate()}</span><span class="bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
+      const st = stats(dk), pct = st.total ? Math.round((st.taken / st.total) * 100) : 0, v = hasVisit(dk), ap = apptsOn(dk);
+      const label = longDate(dk) + (st.total ? `, ${st.taken} sur ${st.total} compléments` : '') + (v ? ', visite médicale' : '') + ap.map((a) => `, ${a.title}${a.time ? ` à ${a.time}` : ''}`).join('');
+      return html`<button type="button" class="lid${dk === t ? ' today' : ''}${v ? ' visit' : ''}${ap.length ? ' has-appt' : ''}" data-act="goto" data-date="${dk}"${dk === k ? html` aria-current="date"` : ''} aria-label="${label}"><span class="wd">${WD_SHORT[i]}</span><span class="dn">${fromKey(dk).getDate()}</span><span class="bar" aria-hidden="true"><i style="width:${pct}%"></i></span></button>`;
     })}</div>`;
   }
   function weeklyBanner() {
@@ -1888,7 +2129,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const prev = peekDay(addDays(k, -1));
     const wake = str(d.wake), night = nightLength(prev && prev.bed, wake);
     return html`<section class="card" aria-labelledby="sleep-title">
-      <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.moon}</span><h2 id="sleep-title">Sommeil</h2>${night ? html`<span class="pill">Nuit de ${night}</span>` : ''}</div>
+      <div class="card-head"><span class="scene" aria-hidden="true">${SCENE.soir}</span><h2 id="sleep-title">Sommeil</h2>${night ? html`<span class="pill">Nuit de ${night}</span>` : ''}</div>
       <div class="sleep">
         <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
         <label class="field"><span>Coucher</span><input type="time" id="bed-${k}" data-bind="bed" data-date="${k}" value="${str(d.bed)}"></label>
@@ -1926,7 +2167,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         : done === sch.length ? html`<span class="mdone">${ICON.check}Fait</span>`
         : html`<span class="mcount" aria-label="${done} sur ${sch.length} pris">${done}/${sch.length}</span><button type="button" class="mall" data-act="moment-all" data-v="${m.key}" data-date="${k}" aria-label="Tout cocher : ${m.label}">Tout cocher</button>`;
       return html`<div class="moment m-${m.key}" role="group" aria-labelledby="mt-${m.key}">
-        <div class="moment-head"><span class="mico" aria-hidden="true">${MOMENT_ICON[m.key]}</span><div class="mtitle"><h3 id="mt-${m.key}">${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${status}</div>
+        <div class="moment-head"><span class="scene" aria-hidden="true">${SCENE[m.key]}</span><div class="mtitle"><h3 id="mt-${m.key}">${m.label}</h3>${m.hint ? html`<span>${m.hint}</span>` : ''}</div>${status}</div>
         <div class="mitems">${list.map((s) => supplementItem(s, k))}</div>
       </div>`;
     })}</div>${cureNotes(k)}</section>`;
@@ -2243,6 +2484,14 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const w = weightOf(d), hist = weighIns().filter((x) => x.k <= k).slice(-6);
     if (w) L.push(`- Poids : ${fmtDec(w)} kg${hist.length > 1 ? ` (pesées : ${hist.map((x) => `${shortDate(x.k)} ${fmtDec(x.w)} kg`).join(' → ')})` : ''}`);
     else L.push('- Poids : pas encore noté');
+    const reads = vitalsRead(vis);
+    if (reads.length) {
+      L.push('- Mesures (lecture de l’app, repères d’adulte au repos) :');
+      reads.forEach((r) => L.push(`  - ${r.what} : ${r.value} — ${r.label.toLowerCase()} (${LEVEL_TXT[r.level]})`));
+      const bpHist = [...Object.keys(S.months)].sort().flatMap((mk) => Object.keys(S.months[mk].days || {}).sort())
+        .filter((dk) => dk < k && bpClass(vitalOf(visitOf(peekDay(dk)), 'sys'), vitalOf(visitOf(peekDay(dk)), 'dia'))).slice(-5);
+      if (bpHist.length) L.push(`  - Tensions d’avant : ${bpHist.map((dk) => { const v2 = visitOf(peekDay(dk)); return `${shortDate(dk)} ${vitalOf(v2, 'sys')}/${vitalOf(v2, 'dia')}`; }).join(' → ')}`);
+    } else L.push('- Tension et pouls : pas encore notés');
     const got = LABS.filter(([key]) => str(labs[key]).trim());
     if (got.length) {
       L.push('- Prise de sang (valeur notée ; entre parenthèses, repère habituel) :');
@@ -2274,9 +2523,14 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (tot.n) parts.push(`${fmtInt(tot.kcal)} kcal (${macroLine(tot)})`);
       if (syms.length) parts.push('ressenti : ' + syms.map((s) => `${str(s.text)}${scaleValue(s.intensity) ? ` ${s.intensity}/5` : ''}`).join(' ; '));
       if (str(d.notes).trim()) parts.push(`notes : ${str(d.notes).trim().replace(/\s+/g, ' ').slice(0, 200)}`);
+      if (apptsOn(k).length) parts.push(`rendez-vous : ${apptsOn(k).map((a) => `${a.title}${a.time ? ` ${a.time}` : ''}`).join(', ')}`);
       return `- ${longDate(k)} : ${parts.length ? parts.join(' · ') : 'rien de noté'}`;
     }
     L.push(`## ${longDate(k)} ${fromKey(k).getFullYear()}`.replace(/(\d{4}) \1$/, '$1'));
+    const ap = apptsOn(k);
+    if (ap.length) L.push(`Rendez-vous et dates : ${ap.map(apptText).join(' ; ')}`);
+    const next = k === todayKey() ? apptsBetween(addDays(k, 1), addDays(k, 14)) : [];
+    if (next.length) L.push(`À venir : ${next.map((a) => `${shortDate(a.date)}, ${apptText(a)}`).join(' ; ')}`);
     if (!skipVisit && (visitOf(d) || isVisitDay(k))) L.push(...visitLines(k));
     L.push(`Sommeil : coucher la veille ${str(prev.bed) || 'non noté'}, réveil ${str(d.wake) || 'non noté'}${night ? ` (nuit de ${night})` : ''}`);
     L.push(`Eau : ${waterOf(d) ? `${fmtL(waterOf(d))} L` : 'rien noté'} (objectif ${fmtDec(S.settings.goals.water)} L)`);
@@ -2285,7 +2539,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     L.push(acts.length ? 'Activité physique :' : `Activité physique : rien de noté${pl ? ` (séance prévue : ${pl.name}, ${pl.minutes} min)` : ''}`);
     acts.forEach((a) => {
       const kc = kcalBurned(a), exos = listOf(a.exos).filter((e) => isObj(e) && listOf(e.sets).length);
-      L.push(`- ${str(a.time)} ${KIND_LABEL[a.kind] ? KIND_LABEL[a.kind].toLowerCase() : 'activité'} : ${entryName(a)}${a.minutes ? `, ${a.minutes} min` : ''}, ${intensityLabel(a.intensity).toLowerCase()}${a.details && !exos.length ? ` — ${a.details}` : ''}${kc ? ` (≈ ${kc} kcal)` : ''}`);
+      L.push(`- ${str(a.time)} ${KIND_LABEL[a.kind] ? KIND_LABEL[a.kind].toLowerCase() : 'activité'} : ${entryName(a)}${a.minutes ? `, ${a.minutes} min` : ''}, ${intensityLabel(a.intensity).toLowerCase()}${bpmText(a) ? `, cœur : ${bpmText(a)}` : ''}${a.details && !exos.length ? ` — ${a.details}` : ''}${kc ? ` (≈ ${kc} kcal)` : ''}`);
       exos.forEach((e) => L.push(`  - ${str(e.name)} : ${listOf(e.sets).map((x) => (e.mode === 'time' ? fmtSec(x.sec || 0) : `${x.reps} rép.${x.kg ? ` à ${fmtKg(x.kg)} kg` : ''}${x.rir != null ? ` (${rirLabel(x.rir)} en réserve)` : ''}`)).join(', ')}`));
       if (str(a.note).trim()) L.push(`  Notes de séance : ${str(a.note).trim()}`);
     });
@@ -2386,7 +2640,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const ask = q || {
       week: 'Fais le point sur ma semaine à partir de ce suivi : comment je vais, les tendances, les liens possibles, et ce que je peux améliorer.',
       days: 'Voici mes dernières journées, que je ne t’avais pas encore envoyées. Fais le point : comment je vais, ce qui a changé d’un jour à l’autre, les liens possibles, et ce que je peux faire demain.',
-      visit: 'Voici ma visite médicale et mes 4 dernières semaines. Analyse ma prise de sang (carences ?) en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon alimentation et mon état, et dis-moi quelles questions poser à mon médecin.',
+      visit: 'Voici ma visite médicale et mes 4 dernières semaines. Analyse ma prise de sang (carences ?), ma tension, mon pouls et mes autres mesures en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon sport, mon alimentation et mon état ; dis-moi ce qui mérite d’être surveillé et quelles questions poser à mon médecin.',
       day: 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.'
     }[scope];
     if (scope === 'dossier') { const [from, to] = key.split('_'); return dossierText(from, to); }
@@ -2585,7 +2839,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         <button type="button" class="icon" data-act="week-next" aria-label="Semaine suivante">${ICON.right}</button>
       </div></div>
       <p class="hint">Touche une gélule pour la cocher, ou un jour pour ouvrir son journal.</p>
-      <div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>${days.map((dk, i) => html`<th scope="col"${dk === t ? html` class="today"` : ''}><button type="button" data-act="goto" data-date="${dk}" aria-label="${longDate(dk)}${hasVisit(dk) ? ', visite médicale' : ''}"><span>${WD_SHORT[i]}</span><b>${fromKey(dk).getDate()}</b>${hasVisit(dk) ? html`<small class="vtag" aria-hidden="true">Visite</small>` : ''}</button></th>`)}</tr></thead>
+      <div class="scroller"><table class="week"><thead><tr><th scope="col"><span class="sr-only">Complément</span></th>${days.map((dk, i) => html`<th scope="col"${dk === t ? html` class="today"` : ''}><button type="button" data-act="goto" data-date="${dk}" aria-label="${longDate(dk)}${hasVisit(dk) ? ', visite médicale' : ''}${apptsOn(dk).map((a) => `, ${a.title}${a.time ? ` à ${a.time}` : ''}`).join('')}"><span>${WD_SHORT[i]}</span><b>${fromKey(dk).getDate()}</b>${hasVisit(dk) ? html`<small class="vtag" aria-hidden="true">Visite</small>` : ''}${apptsOn(dk).slice(0, 2).map((a) => html`<small class="vtag rtag" aria-hidden="true">${a.title}</small>`)}</button></th>`)}</tr></thead>
       <tbody>${rows}</tbody><tbody class="sum">${summary}</tbody></table></div>
       ${S.settings.supplements.length ? '' : html`<p class="empty">Ta liste est vide. Ajoute tes compléments dans Réglages.</p>`}
       <div class="week-claude">${start <= t ? claudeBlock('week', start) : ''}</div>`;
@@ -2709,7 +2963,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const nv = nextVisit(t), n = daysBetween(t, nv);
     const after = [1, 2, 3].map((i) => shortDate(addDays(nv, i * v.every)));
     return html`<section class="set-sec">
-      <p class="next-visit m-soir"><span class="mico" aria-hidden="true">${ICON.visit}</span><span><b>Prochaine visite : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}</b><span>${cap1(whenLabel(n))} · prise de sang, pesée et médecin</span></span></p>
+      <p class="next-visit m-soir"><span class="mico" aria-hidden="true">${ICON.visit}</span><span><b>Prochaine visite : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}</b><span>${cap1(whenLabel(n))} · prise de sang, pesée, tension et médecin</span></span></p>
       <div class="form-grid">
         <label class="field"><span>Première visite</span><input type="date" id="visit-start" data-vset="start" value="${v.start}"></label>
         <label class="field"><span>Tous les (jours)</span><input type="number" inputmode="numeric" min="7" max="120" id="visit-every" data-vset="every" value="${v.every}"></label>
@@ -2858,9 +3112,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   /* ---------- Rendu : Calendrier ---------- */
   function renderCalendar() {
     const mode = S.ui.calMode;
-    return html`<h1 class="page-title">Calendrier</h1>
+    return html`<div class="title-row"><h1 class="page-title">Calendrier</h1>${S.ui.appt ? '' : html`<button type="button" class="primary" data-act="appt-new" data-where="cal">+ Rendez-vous</button>`}</div>
       <div class="seg-nav" role="group" aria-label="Affichage">${[['semaine', 'Semaine'], ['mois', 'Mois'], ['annee', 'Année']].map(([v, l]) => html`<button type="button" data-act="cal-mode" data-v="${v}" aria-pressed="${bool(mode === v)}">${l}</button>`)}</div>
-      ${mode === 'semaine' ? renderWeek() : mode === 'annee' ? renderYear() : renderMonth()}`;
+      <div class="cal-layout"><div class="cal-main">${mode === 'semaine' ? renderWeek() : mode === 'annee' ? renderYear() : renderMonth()}</div><div class="cal-side">${apptCard()}</div></div>`;
   }
   function renderMonth() {
     const mk = S.ui.monthOf, [y, m] = mk.split('-').map(Number), t = todayKey();
@@ -2869,13 +3123,13 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const visits = [];
     const cells = Array.from({ length: weekdayOf(first) }, () => html`<span class="mday out" aria-hidden="true"></span>`);
     for (let dn = 1; dn <= nDays; dn++) {
-      const k = `${mk}-${pad(dn)}`, d = peekDay(k), st = stats(k), v = hasVisit(k), j = hasJournal(d), wOk = waterOf(d) >= goal, ns = sessionsOf(d).length;
+      const k = `${mk}-${pad(dn)}`, d = peekDay(k), st = stats(k), v = hasVisit(k), j = hasJournal(d), wOk = waterOf(d) >= goal, ns = sessionsOf(d).length, ap = apptsOn(k);
       const future = k > t, p = st.total ? st.taken / st.total : 0;
       if (!future && st.total) { tracked++; if (p >= 1) full++; }
       if (wOk) waterOk++;
       if (v) visits.push(k);
-      const label = `${longDate(k)} : ${st.total ? `${st.taken} sur ${st.total} compléments` : 'rien de prévu'}${ns ? `, ${plural(ns, 'séance')} de sport` : ''}${wOk ? ', objectif d’eau atteint' : ''}${j ? ', journal rempli' : ''}${v ? ', visite médicale' : ''}`;
-      cells.push(html`<button type="button" class="mday${future ? ' future' : ''}${k === t ? ' today' : ''}${v ? ' visit' : ''}" data-act="goto" data-date="${k}" aria-label="${label}"><span class="dn">${dn}</span><span class="bar" aria-hidden="true"><i style="width:${Math.round(p * 100)}%"></i></span><span class="marks" aria-hidden="true">${v ? html`<i class="mk-v"></i>` : ''}${ns ? html`<i class="mk-s"></i>` : ''}${wOk ? html`<i class="mk-w"></i>` : ''}${j ? html`<i class="mk-j"></i>` : ''}</span></button>`);
+      const label = `${longDate(k)} : ${st.total ? `${st.taken} sur ${st.total} compléments` : 'rien de prévu'}${ns ? `, ${plural(ns, 'séance')} de sport` : ''}${wOk ? ', objectif d’eau atteint' : ''}${j ? ', journal rempli' : ''}${v ? ', visite médicale' : ''}${ap.length ? `, ${ap.map((a) => `${a.title}${a.time ? ` à ${a.time}` : ''}`).join(', ')}` : ''}`;
+      cells.push(html`<button type="button" class="mday${future ? ' future' : ''}${k === t ? ' today' : ''}${v ? ' visit' : ''}${ap.length ? ' has-appt' : ''}" data-act="goto" data-date="${k}" aria-label="${label}"><span class="dn">${dn}</span><span class="bar" aria-hidden="true"><i style="width:${Math.round(p * 100)}%"></i></span>${ap.length ? html`<span class="mtag" aria-hidden="true">${ap[0].title}${ap.length > 1 ? ` +${ap.length - 1}` : ''}</span>` : ''}<span class="marks" aria-hidden="true">${ap.length ? html`<i class="mk-r"></i>` : ''}${v ? html`<i class="mk-v"></i>` : ''}${ns ? html`<i class="mk-s"></i>` : ''}${wOk ? html`<i class="mk-w"></i>` : ''}${j ? html`<i class="mk-j"></i>` : ''}</span></button>`);
     }
     const summary = [tracked ? `Tout pris ${plural(full, 'jour')} sur ${tracked}` : 'Rien de suivi ce mois-ci pour l’instant', waterOk ? `eau : objectif atteint ${plural(waterOk, 'jour')}` : '', visits.length ? `visite ${visits.map((k) => `le ${dayNumber(fromKey(k).getDate())}`).join(' et ')}` : ''].filter(Boolean).join(' · ');
     return html`<div class="wk-head"><h2 class="wk-title">${cap1(MONTHS[m - 1])} ${y}</h2><div class="daynav">
@@ -2885,7 +3139,141 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       </div></div>
       <p class="msum">${summary}.</p>
       <div class="card"><div class="mgrid">${WD_SHORT.map((l) => html`<span class="wdh" aria-hidden="true">${l}</span>`)}${cells}</div></div>
-      <div class="legend" aria-hidden="true" style="margin-top:14px"><span><i class="dot" style="background:var(--fill)"></i>Barre : compléments pris</span><span><i class="dot" style="background:var(--soir)"></i>Visite médicale</span><span><i class="dot" style="background:var(--sport)"></i>Séance de sport</span><span><i class="dot" style="background:var(--soir-2);border:1.5px solid var(--soir)"></i>Objectif d’eau atteint</span><span><i class="dot" style="background:var(--aprem)"></i>Journal rempli</span></div>`;
+      <div class="legend" aria-hidden="true" style="margin-top:14px"><span><i class="dot" style="background:var(--ink)"></i>Rendez-vous</span><span><i class="dot" style="background:var(--fill)"></i>Barre : compléments pris</span><span><i class="dot" style="background:var(--soir)"></i>Visite médicale</span><span><i class="dot" style="background:var(--sport)"></i>Séance de sport</span><span><i class="dot" style="background:var(--soir-2);border:1.5px solid var(--soir)"></i>Objectif d’eau atteint</span><span><i class="dot" style="background:var(--aprem)"></i>Journal rempli</span></div>`;
+  }
+
+  /* ---------- Rendez-vous et dates à retenir ----------
+     Rangés avec les réglages du profil (settings.appts) : ils suivent le compte Claude et les sauvegardes. */
+  const byWhen = (a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || ''));
+  const apptsOn = (k) => S.settings.appts.filter((a) => a.date === k).sort(byWhen);
+  const apptsBetween = (a, b) => S.settings.appts.filter((x) => x.date >= a && x.date <= b).sort(byWhen);
+  const apptCat = (a) => APPT_CATS[a.kind].find((c) => c[0] === a.cat) || null;
+  function relDay(k) {
+    const n = daysBetween(todayKey(), k);
+    return n === 0 ? 'aujourd’hui' : n === 1 ? 'demain' : n === -1 ? 'hier' : n > 1 ? `dans ${n} jours` : `il y a ${-n} jours`;
+  }
+  /* « Dentiste à 14:30 (Cabinet du Dr Martin) » : pour Claude, le dossier et les rappels. */
+  const apptText = (a) => `${a.title}${a.time ? ` à ${a.time}` : ''}${a.place ? ` (${a.place})` : ''}${a.note ? ` — ${a.note.replace(/\s+/g, ' ')}` : ''}`;
+  function apptRow(a) {
+    const t = todayKey(), d = fromKey(a.date), cat = apptCat(a);
+    const meta = [cap1(relDay(a.date)), cat && norm(cat[1]) !== norm(a.title) ? cat[1] : '', a.place].filter(Boolean).join(' · ');
+    return html`<li class="appt${a.kind === 'date' ? ' is-date' : ''}${a.date < t ? ' past' : ''}${a.date === t ? ' today' : ''}${S.ui.just === a.id ? ' fresh' : ''}">
+      <span class="appt-cal" aria-hidden="true"><small>${WD_SHORT[weekdayOf(a.date)]}</small><b>${d.getDate()}</b><small>${MONTHS_SHORT[d.getMonth()]}</small></span>
+      <div class="appt-body">
+        <p class="appt-title"><b>${a.title}</b>${a.time ? html`<span class="appt-time">${a.time}</span>` : a.kind === 'date' ? html`<span class="appt-time soft">toute la journée</span>` : ''}</p>
+        <p class="appt-meta">${meta}</p>
+        ${a.note ? html`<p class="appt-note">${a.note}</p>` : ''}
+      </div>
+      ${rowActions('appt', a.date, a.id, `${a.title} du ${shortDate(a.date)}`)}
+    </li>`;
+  }
+  function apptForm() {
+    const f = S.ui.appt, dr = f.draft, t = todayKey(), rdv = dr.kind === 'rdv';
+    const next = Array.from({ length: 8 }, (_, i) => addDays(t, i));
+    const dayLbl = (k, i) => (i === 0 ? 'Aujourd’hui' : i === 1 ? 'Demain' : `${WD_SHORT[weekdayOf(k)]} ${fromKey(k).getDate()}`);
+    return html`<div class="form appt-form" id="appt-form" role="group" aria-label="${f.id ? 'Modifier' : 'Ajouter'} ${rdv ? 'un rendez-vous' : 'une date à retenir'}">
+      <div class="seg" role="group" aria-label="Type"><button type="button" data-act="appt-kind" data-v="rdv" aria-pressed="${bool(rdv)}">Rendez-vous</button><button type="button" data-act="appt-kind" data-v="date" aria-pressed="${bool(!rdv)}">Date à retenir</button></div>
+      <div class="chips" role="group" aria-label="Catégorie">${APPT_CATS[dr.kind].map(([v, l]) => html`<button type="button" data-act="appt-cat" data-v="${v}" aria-pressed="${bool(dr.cat === v)}">${l}</button>`)}</div>
+      <label class="field"><span>${rdv ? 'Rendez-vous' : 'Quoi'}</span><input type="text" id="appt-title" data-appt="title" value="${dr.title}" placeholder="${rdv ? 'Dentiste' : 'Anniversaire de maman'}" maxlength="60" autocomplete="off"></label>
+      <div class="field"><span id="appt-day-l">Quel jour ?</span>
+        <div class="chips day-chips" role="group" aria-labelledby="appt-day-l">${next.map((k, i) => html`<button type="button" data-act="appt-day" data-v="${k}" aria-pressed="${bool(dr.date === k)}">${dayLbl(k, i)}</button>`)}</div>
+      </div>
+      <div class="form-row">
+        <label class="field"><span>Date</span><input type="date" id="appt-date" data-appt="date" value="${dr.date}"></label>
+        ${rdv ? html`<label class="field field-time"><span>Heure</span><input type="time" id="appt-time" data-appt="time" value="${dr.time}"></label>` : ''}
+      </div>
+      <p class="hint appt-when">${isKey(dr.date) ? `${cap1(longDate(dr.date))}${rdv && dr.time ? ` à ${dr.time}` : ''} · ${relDay(dr.date)}` : 'Choisis le jour.'}</p>
+      ${rdv ? html`<label class="field"><span>Où (facultatif)</span><input type="text" id="appt-place" data-appt="place" value="${dr.place}" placeholder="Cabinet du Dr Martin, 12 rue des Lilas" maxlength="80" autocomplete="off"></label>` : ''}
+      <label class="field"><span>Note (facultatif)</span><textarea id="appt-note" data-appt="note" rows="2" placeholder="${rdv ? 'Venir à jeun, apporter l’ordonnance, questions à poser…' : 'Idée de cadeau, heure de la fête…'}">${dr.note}</textarea></label>
+      ${PLATFORM.native ? html`<label class="switch"><input type="checkbox" id="appt-remind" data-appt="remind"${dr.remind ? html` checked` : ''}> Rappel la veille à 19:00${rdv ? (dr.time ? ' et 1 h avant' : ' et le matin à 8:00') : ''}</label>` : ''}
+      <div class="actions"><button type="button" class="primary" data-act="appt-save">${f.id ? 'Enregistrer' : 'Ajouter'}</button><button type="button" class="ghost" data-act="appt-cancel">Annuler</button></div>
+    </div>`;
+  }
+  /* Calendrier : le formulaire, les rendez-vous à venir, puis les passés (repliés). */
+  function apptCard() {
+    const t = todayKey(), f = S.ui.appt && S.ui.appt.where === 'cal' ? S.ui.appt : null, all = S.settings.appts;
+    const up = all.filter((a) => a.date >= t).sort(byWhen), past = all.filter((a) => a.date < t).sort(byWhen).reverse();
+    return html`<section class="card appts" id="sec-appts" aria-labelledby="appts-title">
+      <div class="card-head"><span class="mico" aria-hidden="true">${ICON.calendar}</span><h2 id="appts-title">Agenda</h2>${up.length ? html`<span class="pill">${up.length} à venir</span>` : ''}</div>
+      ${f ? apptForm() : html`<button type="button" class="primary big appt-add" data-act="appt-new" data-where="cal">+ Ajouter un rendez-vous ou une date</button>`}
+      ${up.length ? html`<ul class="appt-list">${up.map(apptRow)}</ul>`
+        : f ? '' : html`<p class="empty">Rien de prévu. Dentiste jeudi, médecin, prise de sang, anniversaire : ajoute-les ici, ils s’affichent aussi sur l’accueil${PLATFORM.native ? ' et te sont rappelés la veille' : ''}.</p>`}
+      ${past.length ? html`<details class="appt-past" data-toggle="apptPast"${S.ui.apptPast ? html` open` : ''}><summary>Passés<span class="pill">${past.length}</span></summary><ul class="appt-list">${past.slice(0, 40).map(apptRow)}</ul></details>` : ''}
+    </section>`;
+  }
+  /* Accueil : les rendez-vous du jour affiché et, aujourd'hui, ceux des deux semaines à venir. */
+  function apptDayCard(k, isToday) {
+    const f = S.ui.appt && S.ui.appt.where === 'day' ? S.ui.appt : null;
+    const on = apptsOn(k), soon = isToday ? apptsBetween(addDays(k, 1), addDays(k, 14)) : [];
+    if (!on.length && !soon.length && !f) return '';
+    return html`<section class="card appts" id="sec-appts" aria-labelledby="appts-title">
+      <div class="card-head"><span class="mico" aria-hidden="true">${ICON.calendar}</span><h2 id="appts-title">${isToday ? 'Rendez-vous' : 'Ce jour-là'}</h2>${f ? '' : html`<button type="button" class="ghost" data-act="appt-new" data-where="day" data-date="${k}">Ajouter</button>`}</div>
+      ${f ? apptForm() : ''}
+      ${on.length ? html`<ul class="appt-list">${on.map(apptRow)}</ul>` : isToday && !f ? html`<p class="hint" style="margin:0 0 4px">Rien aujourd’hui.</p>` : ''}
+      ${soon.length ? html`<h3 class="appt-sub">Dans les 2 semaines</h3><ul class="appt-list">${soon.map(apptRow)}</ul>` : ''}
+    </section>`;
+  }
+  function startAppt(where, date, id) {
+    const a = id ? S.settings.appts.find((x) => x.id === id) : null;
+    if (id && !a) return;
+    const k = isKey(date) && date >= todayKey() ? date : todayKey();
+    const draft = a ? { ...a } : { kind: 'rdv', cat: '', title: '', date: k, time: '', place: '', note: '', remind: true, touched: false };
+    draft.touched = !!a;
+    S.ui.appt = { where, id: a ? a.id : null, draft };
+    S.ui.confirm = null;
+    S.ui.focus = '#appt-title'; S.ui.reveal = '#sec-appts';
+    render();
+  }
+  function saveAppt() {
+    const f = S.ui.appt;
+    if (!f) return;
+    const dr = f.draft;
+    if (!isKey(dr.date)) { toast('Choisis le jour.'); S.ui.focus = '#appt-date'; render(); return; }
+    if (dr.time && toMin(dr.time) == null) { toast('L’heure n’est pas valable.'); return; }
+    const cat = APPT_CATS[dr.kind].find((c) => c[0] === dr.cat);
+    const title = String(dr.title || '').trim() || (cat && cat[0] !== 'autre' ? cat[1] : '');
+    if (!title) { toast(dr.kind === 'rdv' ? 'Écris le rendez-vous, par exemple « Dentiste ».' : 'Écris ce qu’il faut retenir.'); S.ui.focus = '#appt-title'; render(); return; }
+    const entry = normalizeAppt({ ...dr, id: f.id || newId(), title, time: dr.kind === 'rdv' ? dr.time : '', place: dr.kind === 'rdv' ? dr.place : '' });
+    mutateSettings((st) => {
+      const i = st.appts.findIndex((x) => x.id === entry.id);
+      if (i >= 0) st.appts[i] = entry; else st.appts.push(entry);
+      st.appts.sort(byWhen);
+    }, false);
+    S.ui.appt = null; S.ui.just = entry.id; S.ui.reveal = '#sec-appts';
+    render(); scheduleReminders();
+    toast(`${f.id ? 'Modifié' : 'Ajouté'} : ${entry.title}, ${relDay(entry.date)}${entry.time ? ` à ${entry.time}` : ''}`);
+  }
+  const APPT_ACTIONS = {
+    'appt-new': (d) => startAppt(d.where || (S.ui.view === 'calendrier' ? 'cal' : 'day'), d.date),
+    'appt-edit': (d) => startAppt(S.ui.view === 'calendrier' ? 'cal' : 'day', null, d.id),
+    'appt-ask': (d) => askDelete('appt', d.id, `[data-act="appt-del"]${attr('data-id', d.id)}`),
+    'appt-del': (d) => {
+      S.ui.confirm = null;
+      const back = S.settings.appts.find((x) => x.id === d.id);
+      if (!back) return;
+      mutateSettings((st) => { st.appts = st.appts.filter((x) => x.id !== d.id); });
+      scheduleReminders();
+      toast('Rendez-vous supprimé', () => { mutateSettings((st) => { if (!st.appts.some((x) => x.id === back.id)) { st.appts.push(back); st.appts.sort(byWhen); } }); scheduleReminders(); toast('Remis'); });
+    },
+    'appt-kind': (d) => { const dr = S.ui.appt && S.ui.appt.draft; if (dr && dr.kind !== d.v) { dr.kind = d.v === 'date' ? 'date' : 'rdv'; if (!APPT_CATS[dr.kind].some((c) => c[0] === dr.cat)) { if (!dr.touched && APPT_CATS[dr.kind === 'rdv' ? 'date' : 'rdv'].some((c) => c[1] === dr.title)) dr.title = ''; dr.cat = ''; } render(); } },
+    'appt-cat': (d) => {
+      const dr = S.ui.appt && S.ui.appt.draft, c = dr && APPT_CATS[dr.kind].find((x) => x[0] === d.v);
+      if (!c) return;
+      dr.cat = dr.cat === c[0] ? '' : c[0];
+      if (!dr.touched || !String(dr.title).trim()) { dr.title = dr.cat && c[0] !== 'autre' ? c[1] : ''; dr.touched = false; }
+      render();
+    },
+    'appt-day': (d) => { const dr = S.ui.appt && S.ui.appt.draft; if (dr && isKey(d.v)) { dr.date = d.v; render(); } },
+    'appt-save': () => saveAppt(),
+    'appt-cancel': () => { S.ui.appt = null; render(); }
+  };
+  function onApptInput(f, t, change) {
+    const dr = S.ui.appt && S.ui.appt.draft;
+    if (!dr) return;
+    if (f === 'remind') { dr.remind = t.checked; return; }
+    dr[f] = t.value;
+    if (f === 'title') dr.touched = !!t.value.trim();
+    if (change && (f === 'date' || f === 'time')) safeRender(); // la phrase « jeudi 1er octobre · dans 2 jours » suit
   }
 
   /* ---------- Rendu : Sport ---------- */
@@ -2901,7 +3289,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const planDone = plan && sessionsOf(d).some((a) => a.tpl === plan.id);
     const entry = (a) => {
       const kc = kcalBurned(a);
-      return html`<li class="entry${S.ui.just === a.id ? ' fresh' : ''}"><span class="t">${str(a.time)}</span><div class="e-body"><span class="kind">${KIND_LABEL[a.kind] || 'Activité'} · ${intensityLabel(a.intensity).toLowerCase()}</span><p class="note"><b>${entryName(a)}</b>${a.minutes ? ` · ${a.minutes} min` : ''}${kc ? ` · ≈ ${kc} kcal` : ''}</p>${a.details ? html`<p class="note muted">${a.details}</p>` : ''}${a.note ? html`<p class="note muted">${a.note}</p>` : ''}</div>${rowActions('spt', k, a.id, `${entryName(a)} de ${str(a.time)}`)}</li>`;
+      return html`<li class="entry${S.ui.just === a.id ? ' fresh' : ''}"><span class="t">${str(a.time)}</span><div class="e-body"><span class="kind">${KIND_LABEL[a.kind] || 'Activité'} · ${intensityLabel(a.intensity).toLowerCase()}</span><p class="note"><b>${entryName(a)}</b>${a.minutes ? ` · ${a.minutes} min` : ''}${kc ? ` · ≈ ${kc} kcal` : ''}</p>${bpmText(a, true) ? html`<p class="note bpm-note"><span class="bpm-ico sm" aria-hidden="true">${ICON.heart}</span>${bpmText(a, true)}</p>` : ''}${a.details ? html`<p class="note muted">${a.details}</p>` : ''}${a.note ? html`<p class="note muted">${a.note}</p>` : ''}</div>${rowActions('spt', k, a.id, `${entryName(a)} de ${str(a.time)}`)}</li>`;
     };
     return html`<h1 class="page-title">Sport</h1>
       ${S.live ? livePanel() : isToday ? liveLauncher(plan, planDone) : ''}
@@ -2972,6 +3360,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       </div>
       <div class="chips" role="group" aria-label="Durée">${[15, 30, 45, 60, 90].map((m) => html`<button type="button" data-act="spt-min" data-v="${m}" aria-pressed="${bool(Number(dr.minutes) === m)}">${m} min</button>`)}</div>
       <div class="field"><span id="int-lbl">Intensité</span><div class="seg" role="group" aria-labelledby="int-lbl">${INTENSITIES.map(([v, l]) => html`<button type="button" data-act="spt-int" data-v="${v}" aria-pressed="${bool(Number(dr.intensity) === v)}">${l}</button>`)}</div></div>
+      ${bpmFields(dr.bpmMax, dr.bpmAvg, { id: 'draft-bpm', data: 'data-draft', max: 'bpmMax', avg: 'bpmAvg' })}
       <label class="field"><span>Détails</span><textarea id="draft-details" data-draft="details" rows="2" placeholder="${dr.kind === 'seance' ? '50 squats, 3 × 10 pompes, 10 min de corde à sauter…' : 'Déménagement, 3 étages sans ascenseur…'}">${str(dr.details)}</textarea></label>
       ${formActions()}
     </div>`;
@@ -3273,6 +3662,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         </div>
         <div class="chips" role="group" aria-label="Activité">${SPORT_TYPES.seance.map(([key, name]) => html`<button type="button" data-act="live-fin-type" data-v="${key}" aria-pressed="${bool(fin.type === key)}">${name}</button>`)}</div>
         <div class="field"><span id="fin-int">Intensité</span><div class="seg" role="group" aria-labelledby="fin-int">${INTENSITIES.map(([v, t]) => html`<button type="button" data-act="live-fin-int" data-v="${v}" aria-pressed="${bool(fin.intensity === v)}">${t}</button>`)}</div></div>
+        ${bpmFields(fin.bpmMax, fin.bpmAvg, { id: 'live-fin-bpm', data: 'data-live', max: 'finBpmMax', avg: 'finBpmAvg' })}
         <div class="actions"><button type="button" class="primary big" data-act="live-save">Ajouter à mon activité du jour</button><button type="button" class="ghost big" data-act="live-finish-cancel">Continuer la séance</button></div>
       </div>` : '';
     return html`<section class="live" id="live" aria-labelledby="live-title">
@@ -3407,9 +3797,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const l = S.live, fin = l.finishing;
       const minutes = Math.round(num(fin.minutes) || 0);
       if (!(minutes > 0) || minutes > 600) { toast('Indique la durée de la séance en minutes.'); return; }
+      for (const f of ['bpmMax', 'bpmAvg']) if (String(fin[f] ?? '').trim() && bpmOf(fin[f]) == null) { toast('Les BPM : un nombre entre 30 et 240.'); S.ui.focus = `#live-fin-bpm-${f === 'bpmMax' ? 'max' : 'avg'}`; render(); return; }
       const exos = l.exos.filter((e) => e.sets.length).map((e) => ({ name: e.name, mode: e.mode, sets: e.sets.map((x) => (e.mode === 'time' ? { sec: x.sec } : { reps: x.reps, kg: x.kg || null, rir: x.rir == null ? null : x.rir })) }));
       const entry = { id: newId(), time: timeOf(l.start), kind: 'seance', type: sportType(fin.type) ? fin.type : 'renfo', name: String(fin.name || '').trim().slice(0, 60) || 'Séance',
-        minutes, intensity: intIn(fin.intensity, 1, 3, 1), details: liveSummary(l).slice(0, 500), note: String(l.note || '').trim().slice(0, 1000), tpl: l.tpl || null, exos, live: true };
+        minutes, intensity: intIn(fin.intensity, 1, 3, 1), bpmMax: bpmOf(fin.bpmMax), bpmAvg: bpmOf(fin.bpmAvg), details: liveSummary(l).slice(0, 500), note: String(l.note || '').trim().slice(0, 1000), tpl: l.tpl || null, exos, live: true };
       mutateDay(l.date, 'sport', (day) => { day.sport.push(entry); }, false);
       const date = l.date;
       S.live = null; saveLive(); stopLiveTicker(); keepAwake(false); restNotify();
@@ -3430,7 +3821,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   function onSheetInput(f, t) {
     const sh = S.chrono && S.chrono.sheet;
     if (!sh) return;
-    if (f === 'name') { sh.name = t.value.slice(0, 60); sh.nameTouched = true; } else if (f === 'minutes') sh.minutes = t.value;
+    if (f === 'name') { sh.name = t.value.slice(0, 60); sh.nameTouched = true; } else if (f === 'minutes' || f === 'bpmMax' || f === 'bpmAvg') sh[f] = t.value;
     saveChrono();
   }
   function onLiveInput(f, t) {
@@ -3443,6 +3834,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     else if (f === 'exo') l.draft.exo = t.value;
     else if (f === 'finMinutes') { if (l.finishing) l.finishing.minutes = t.value; }
     else if (f === 'finName') { if (l.finishing) l.finishing.name = t.value; }
+    else if (f === 'finBpmMax' || f === 'finBpmAvg') { if (l.finishing) l.finishing[f === 'finBpmMax' ? 'bpmMax' : 'bpmAvg'] = t.value; }
     else if (['reps', 'kg', 'sec'].includes(f)) l.draft[f] = t.value;
     saveLive();
   }
@@ -3562,6 +3954,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       </div>
       <div class="chips" role="group" aria-label="Activité">${CHRONO_ACTS.map(([key, name]) => html`<button type="button" data-act="as-act" data-v="${key}" aria-pressed="${bool(sh.act === key)}">${name}</button>`)}</div>
       <div class="field"><span id="as-int">Intensité</span><div class="seg" role="group" aria-labelledby="as-int">${INTENSITIES.map(([v, t]) => html`<button type="button" data-act="as-int" data-v="${v}" aria-pressed="${bool(sh.intensity === v)}">${t}</button>`)}</div></div>
+      ${bpmFields(sh.bpmMax, sh.bpmAvg, { id: 'as-bpm', data: 'data-as', max: 'bpmMax', avg: 'bpmAvg' })}
       <div class="actions"><button type="button" class="primary big" data-act="as-save" data-mode="${mode}">Ajouter à mon activité du jour</button>${S.live ? html`<button type="button" class="ghost" data-act="as-live" data-mode="${mode}">Ajouter à la séance en cours</button>` : ''}</div>
     </div>`;
   }
@@ -3581,8 +3974,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     } else {
       const minutes = Math.round(num(sh.minutes) || 0);
       if (!(minutes >= 1 && minutes <= 600)) { toast('Indique la durée en minutes.'); S.ui.focus = '#as-min'; render(); return; }
+      for (const f of ['bpmMax', 'bpmAvg']) if (String(sh[f] ?? '').trim() && bpmOf(sh[f]) == null) { toast('Les BPM : un nombre entre 30 et 240.'); S.ui.focus = `#as-bpm-${f === 'bpmMax' ? 'max' : 'avg'}`; render(); return; }
       const t = todayKey();
-      const entry = { id: newId(), time: timeOf(Date.now() - r.total), kind: 'seance', type: a[2], name, minutes, intensity: intIn(sh.intensity, 1, 3, a[3]), details: r.details.slice(0, 500), tpl: null };
+      const entry = { id: newId(), time: timeOf(Date.now() - r.total), kind: 'seance', type: a[2], name, minutes, intensity: intIn(sh.intensity, 1, 3, a[3]), bpmMax: bpmOf(sh.bpmMax), bpmAvg: bpmOf(sh.bpmAvg), details: r.details.slice(0, 500), tpl: null };
       mutateDay(t, 'sport', (d) => { d.sport.push(entry); }, false);
       S.ui.date = t; S.ui.just = entry.id;
       toast(`Ajouté à ton activité du jour : ${name}, ${minutes} min`);
@@ -3679,7 +4073,36 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   };
   /* ---------- Profils : changer, créer, modifier, supprimer ---------- */
   const initial = (name) => (String(name || '').trim().charAt(0) || '?').toUpperCase();
-  const avatar = (p, big) => html`<span class="avatar c${p.color}${big ? ' big' : ''}" aria-hidden="true">${initial(p.name)}</span>`;
+  const avatar = (p, size) => html`<span class="avatar c${p.color}${size ? ` ${size === true ? 'big' : size}` : ''}${p.photo ? ' ph' : p.emoji ? ' em' : ''}" aria-hidden="true">${p.photo ? html`<img src="${p.photo}" alt="">` : p.emoji || initial(p.name)}</span>`;
+  /* Photo choisie → carré de 160 px recadré au centre, en JPEG d'au plus ~22 ko (lu en data: URL, sans blob). */
+  function photoToAvatar(file) {
+    return new Promise((resolve, reject) => {
+      if (!file || !/^image\//.test(file.type || '')) { reject(new Error('type')); return; }
+      if (file.size > 25e6) { reject(new Error('size')); return; }
+      const fr = new FileReader();
+      fr.onerror = () => reject(new Error('read'));
+      fr.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('decode'));
+        img.onload = () => {
+          try {
+            const n = 160, c = document.createElement('canvas'), g = c.getContext('2d');
+            const side = Math.min(img.naturalWidth, img.naturalHeight);
+            c.width = n; c.height = n;
+            g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, n, n);
+            g.imageSmoothingQuality = 'high';
+            g.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, n, n);
+            let q = 0.84, out = c.toDataURL('image/jpeg', q);
+            while (out.length > 30000 && q > 0.45) { q -= 0.12; out = c.toDataURL('image/jpeg', q); }
+            if (!isPhoto(out)) throw new Error('encode');
+            resolve(out);
+          } catch (e) { reject(e); }
+        };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
   function refreshWho() {
     const el = document.getElementById('who');
     if (!el) return;
@@ -3739,8 +4162,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     S.settings = null; S.months = {}; S.ready = false;
     const t = todayKey();
     Object.assign(S.ui, { view: 'jour', date: t, weekOf: startOfWeek(t), monthOf: t.slice(0, 7), year: new Date().getFullYear(),
-      form: null, confirm: null, exportText: null, openSup: null, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
-      settingsPage: null, tplEdit: null, profileEdit: null, foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
+      form: null, confirm: null, exportText: null, openSup: null, appt: null, apptPast: false, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
+      settingsPage: null, tplEdit: null, profileEdit: null, profileAdd: false, foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       bilan: { kind: 'semaine', anchor: t }, dossier: { range: 'all', from: '', to: '' },
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null } });
   }
@@ -3773,29 +4196,49 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     } catch (e) { return false; }
   }
   function profilesSettings() {
-    const act = activeProfile(), pe = S.ui.profileEdit;
-    const editForm = (p) => html`<div class="form pf-edit" role="group" aria-label="Modifier ${p.name}">
+    const act = activeProfile(), pe = S.ui.profileEdit, full = PROFILES.list.length >= 8;
+    const editing = pe && PROFILES.list.find((p) => p.id === pe.id);
+    const sub = (p) => (p.id === act.id ? 'Affiché en ce moment' : p.id === MAIN ? 'Profil principal' : 'Touche pour passer dessus');
+    const editPanel = (p) => html`<div class="pf-edit" role="group" aria-labelledby="pf-edit-title">
+        <h3 id="pf-edit-title" class="sr-only">Modifier ${p.name}</h3>
+        <div class="pf-edit-top">
+          ${avatar({ ...p, ...pe }, 'xl')}
+          <div class="pf-photo-btns">
+            <label class="ghost filebtn">${pe.photo ? 'Changer la photo' : 'Choisir une photo'}<input type="file" id="pf-photo" data-pf="photo" accept="image/*" class="sr-only"></label>
+            ${pe.photo || pe.emoji ? html`<button type="button" class="link" data-act="profile-pic-clear">Remettre l’initiale</button>` : ''}
+            <p class="hint" style="margin:0">Une photo de la galerie ou de l’appareil photo, recadrée en rond.</p>
+          </div>
+        </div>
         <label class="field"><span>Prénom</span><input type="text" id="pf-name" data-pf="name" value="${pe.name}" maxlength="30" autocomplete="off"></label>
+        <div class="field"><span id="pf-emo">Ou une image</span><div class="emoji-grid" role="group" aria-labelledby="pf-emo">${AVATAR_EMOJIS.map((e) => html`<button type="button" class="emo" data-act="profile-emoji" data-v="${e}" aria-pressed="${bool(!pe.photo && pe.emoji === e)}" aria-label="Image ${e}">${e}</button>`)}</div></div>
         <div class="field"><span id="pf-col">Couleur</span><div class="chips pf-colors" role="group" aria-labelledby="pf-col">${PROFILE_COLORS.map((c, i) => html`<button type="button" class="swatch c${i}" data-act="profile-color" data-v="${i}" aria-pressed="${bool(pe.color === i)}" aria-label="Couleur ${i + 1}"></button>`)}</div></div>
         <div class="actions"><button type="button" class="primary" data-act="profile-save">Enregistrer</button><button type="button" class="ghost" data-act="profile-cancel">Annuler</button>
           ${p.id === MAIN ? '' : p.id === act.id ? html`<span class="hint" style="margin:0">Pour le supprimer, passe d’abord sur un autre profil.</span>`
             : S.ui.confirm === `profile:${p.id}` ? html`<span class="row-actions"><button type="button" class="link danger" data-act="profile-del" data-id="${p.id}">Oui, supprimer ${p.name} et son journal</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>`
             : html`<button type="button" class="link danger" data-act="profile-del-ask" data-id="${p.id}">Supprimer ce profil</button>`}</div>
       </div>`;
-    return html`<section class="set-sec">
-      <p class="hint">Chaque profil a son propre journal : compléments, repas, sport, visites et réglages. Passe de ton suivi à celui de ta mère en un appui.</p>
-      <ul class="profile-list">${PROFILES.list.map((p) => html`<li class="profile${p.id === act.id ? ' on' : ''}">
-          <div class="pf-row">${avatar(p, true)}
-            <span class="pf-txt"><b>${p.name}</b><span>${p.id === act.id ? 'Affiché en ce moment' : p.id === MAIN ? 'Profil principal' : 'Autre profil'}</span></span>
-            <span class="pf-actions">${p.id === act.id ? html`<span class="pill on">Actif</span>` : html`<button type="button" class="primary" data-act="profile-use" data-id="${p.id}">Utiliser</button>`}
-              ${pe && pe.id === p.id ? '' : html`<button type="button" class="link" data-act="profile-edit" data-id="${p.id}" aria-label="Modifier ${p.name}">Modifier</button>`}</span>
-          </div>
-          ${pe && pe.id === p.id ? editForm(p) : ''}
-        </li>`)}</ul>
-      ${PROFILES.list.length < 8 ? html`<h2 class="sub-title" style="margin-top:22px">Nouveau profil</h2>
-        <div class="pf-add"><label class="field grow"><span>Prénom</span><input type="text" id="pf-new" data-pf="new" value="${S.ui.profileNew}" placeholder="Maman" maxlength="30" autocomplete="off" enterkeyhint="done"></label><button type="button" class="primary" data-act="profile-add">Créer et utiliser</button></div>
-        <p class="hint" style="margin-top:8px">Le nouveau profil démarre vide : ajoute ses compléments, sa visite et ses objectifs dans ses réglages.</p>` : ''}
-      <p class="hint" style="margin-top:14px">${store.mode === 'cloud' ? 'Les profils suivent ton compte Claude : tu les retrouves sur tes autres appareils.' : 'Les profils restent sur cet appareil. Pour en passer un sur un autre appareil : fais une sauvegarde dans ce profil, puis restaure-la dans le même profil là-bas.'}${PLATFORM.native ? ' Les rappels (visite, cures) suivent le profil affiché.' : ''}</p>
+    return html`<section class="set-sec pf-page">
+      <div class="pf-hero c${act.color}">
+        ${avatar(act, 'xl')}
+        <div class="pf-hero-txt"><p class="eyebrow">Profil affiché</p><h2>${act.name}</h2><p>Son journal, ses compléments, son sport, ses visites et ses rendez-vous.</p></div>
+        ${editing && editing.id === act.id ? '' : html`<button type="button" class="ghost" data-act="profile-edit" data-id="${act.id}" aria-label="Modifier ${act.name}">Modifier</button>`}
+      </div>
+      ${editing && editing.id === act.id ? editPanel(editing) : ''}
+      <h2 class="sub-title pf-sub">Changer de profil</h2>
+      <ul class="pf-grid">${PROFILES.list.map((p) => html`<li class="profile${p.id === act.id ? ' on' : ''}">
+          ${p.id === act.id
+            ? html`<div class="pf-tile" aria-current="true">${avatar(p, 'big')}<span class="pf-txt"><b>${p.name}</b><span>${sub(p)}</span></span><span class="pill on">Actif</span></div>`
+            : html`<button type="button" class="pf-tile" data-act="profile-use" data-id="${p.id}" aria-label="Passer sur le profil ${p.name}">${avatar(p, 'big')}<span class="pf-txt"><b>${p.name}</b><span>${sub(p)}</span></span></button>`}
+          ${p.id !== act.id && !(editing && editing.id === p.id) ? html`<button type="button" class="link pf-mod" data-act="profile-edit" data-id="${p.id}" aria-label="Modifier ${p.name}">Modifier</button>` : ''}
+          ${editing && editing.id === p.id && p.id !== act.id ? editPanel(p) : ''}
+        </li>`)}
+        ${full ? '' : html`<li class="profile add">${S.ui.profileAdd
+          ? html`<div class="pf-new"><label class="field"><span>Prénom du nouveau profil</span><input type="text" id="pf-new" data-pf="new" value="${S.ui.profileNew}" placeholder="Maman" maxlength="30" autocomplete="off" enterkeyhint="done"></label>
+              <div class="actions"><button type="button" class="primary" data-act="profile-add">Créer et utiliser</button><button type="button" class="ghost" data-act="profile-add-cancel">Annuler</button></div>
+              <p class="hint" style="margin:0">Il démarre vide : ajoute ensuite ses compléments, sa visite et ses objectifs dans ses réglages.</p></div>`
+          : html`<button type="button" class="pf-tile pf-plus" data-act="profile-add-open"><span class="avatar big plus" aria-hidden="true">+</span><span class="pf-txt"><b>Ajouter un profil</b><span>Ta mère, ton père, un enfant…</span></span></button>`}</li>`}
+      </ul>
+      <p class="hint" style="margin-top:16px">${store.mode === 'cloud' ? 'Les profils et leurs photos suivent ton compte Claude : tu les retrouves sur tes autres appareils.' : 'Les profils restent sur cet appareil. Pour en passer un sur un autre appareil : fais une sauvegarde dans ce profil, puis restaure-la dans le même profil là-bas.'}${PLATFORM.native ? ' Les rappels (visite, cures, rendez-vous) suivent le profil affiché.' : ''}</p>
     </section>`;
   }
   async function addProfile() {
@@ -3804,16 +4247,20 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     if (PROFILES.list.length >= 8) return;
     const used = new Set(PROFILES.list.map((p) => p.color));
     const color = [...PROFILE_COLORS.keys()].find((i) => !used.has(i)) ?? PROFILES.list.length % PROFILE_COLORS.length;
-    const p = { id: newProfileId(), name, color };
+    const p = { id: newProfileId(), name, color, photo: '', emoji: '' };
     PROFILES.list.push(p); saveProfiles(); pushProfiles();
-    S.ui.profileNew = '';
+    S.ui.profileNew = ''; S.ui.profileAdd = false;
     if (await switchProfile(p.id)) toast(`Profil ${name} créé : tu es sur son journal`);
     else { safeRender(); toast(`Profil ${name} créé`); }
   }
   const PROFILE_ACTIONS = {
     'profile-use': async (d) => { const p = PROFILES.list.find((x) => x.id === d.id); if (p && await switchProfile(p.id)) toast(`Profil : ${p.name}`); },
     'profile-add': () => addProfile(),
-    'profile-edit': (d) => { const p = PROFILES.list.find((x) => x.id === d.id); if (p) { S.ui.profileEdit = { id: p.id, name: p.name, color: p.color }; S.ui.confirm = null; S.ui.focus = '#pf-name'; render(); } },
+    'profile-add-open': () => { S.ui.profileAdd = true; S.ui.profileEdit = null; S.ui.focus = '#pf-new'; render(); },
+    'profile-add-cancel': () => { S.ui.profileAdd = false; S.ui.profileNew = ''; render(); },
+    'profile-edit': (d) => { const p = PROFILES.list.find((x) => x.id === d.id); if (p) { S.ui.profileEdit = { id: p.id, name: p.name, color: p.color, photo: p.photo, emoji: p.emoji }; S.ui.profileAdd = false; S.ui.confirm = null; S.ui.focus = '#pf-name'; render(); } },
+    'profile-emoji': (d) => { const pe = S.ui.profileEdit; if (pe && AVATAR_EMOJIS.includes(d.v)) { pe.emoji = pe.emoji === d.v && !pe.photo ? '' : d.v; pe.photo = ''; render(); } },
+    'profile-pic-clear': () => { const pe = S.ui.profileEdit; if (pe) { pe.photo = ''; pe.emoji = ''; render(); } },
     'profile-color': (d) => { if (S.ui.profileEdit) { S.ui.profileEdit.color = Number(d.v); render(); } },
     'profile-cancel': () => { S.ui.profileEdit = null; S.ui.confirm = null; render(); },
     'profile-save': () => {
@@ -3821,8 +4268,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (!p) return;
       const name = String(pe.name || '').trim().slice(0, 30);
       if (!name) { toast('Écris un prénom.'); return; }
-      p.name = name; p.color = pe.color;
-      saveProfiles(); pushProfiles();
+      const before = { ...p };
+      p.name = name; p.color = pe.color; p.photo = isPhoto(pe.photo) ? pe.photo : ''; p.emoji = p.photo ? '' : AVATAR_EMOJIS.includes(pe.emoji) ? pe.emoji : '';
+      if (!saveProfiles()) { Object.assign(p, before); toast('Pas assez de place sur l’appareil pour cette photo.'); return; }
+      pushProfiles();
       S.ui.profileEdit = null;
       refreshWho(); render(); toast('Profil enregistré');
     },
@@ -4123,10 +4572,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     L.push('## 5. Moyennes semaine par semaine', '', ...mdTable(AVG_HEAD, weekRows), '');
 
     // 6. Visites, poids, prises de sang
-    L.push('## 6. Visites médicales, poids et prises de sang', '');
+    L.push('## 6. Visites médicales, rendez-vous, poids, tension et prises de sang', '');
     const visits = days.filter((k) => visitOf(peekDay(k)));
     const wins = weighIns().filter((x) => x.k >= from && x.k <= to);
     L.push(wins.length ? `Pesées : ${wins.map((x) => `${shortDate(x.k)} ${fmtDec(x.w)} kg`).join(' ; ')}` : 'Pas de pesée sur la période.');
+    const withVit = visits.filter((k) => hasVitals(visitOf(peekDay(k))));
+    if (withVit.length) {
+      const rows = withVit.map((k) => { const vis = visitOf(peekDay(k)), rd = vitalsRead(vis), cell = (key) => { const r = rd.find((x) => x.key === key); return r ? `${r.value} (${r.label.toLowerCase()})` : ''; };
+        return [shortDate(k), cell('bp'), cell('pulse'), cell('spo2'), cell('temp'), cell('waist')]; });
+      L.push('', 'Tension, pouls et mesures aux visites (lecture de l’app, repères d’adulte au repos) :', '', ...mdTable(['Date', 'Tension', 'Pouls au repos', 'Saturation', 'Température', 'Tour de taille'], rows));
+    }
     const withLabs = visits.filter((k) => labsFilled(visitOf(peekDay(k))));
     if (withLabs.length) {
       const rows = LABS.filter(([key]) => withLabs.some((k) => str((visitOf(peekDay(k)).labs || {})[key]).trim()))
@@ -4135,6 +4590,11 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       withLabs.forEach((k) => { const tx = str(visitOf(peekDay(k)).labsText).trim(); if (tx) L.push('', `Autres résultats du ${shortDate(k)} : ${tx}`); });
     }
     visits.forEach((k) => { const n = str(visitOf(peekDay(k)).notes).trim(); if (n) L.push(`Médecin, ${shortDate(k)} : ${n}`); });
+    const apPast = apptsBetween(from, to), apNext = apptsBetween(addDays(t, 1), addDays(t, 365));
+    if (apPast.length || apNext.length) {
+      const row = (a) => [shortDate(a.date), a.time || '', a.title, a.place, a.note.replace(/\s+/g, ' ')];
+      L.push('', 'Rendez-vous et dates notés :', '', ...mdTable(['Date', 'Heure', 'Quoi', 'Où', 'Note'], [...apPast, ...apNext.filter((a) => a.date > to)].map(row)));
+    }
     L.push('');
 
     // 7. Ressentis
@@ -4143,7 +4603,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 
     // 8. Sport
     const acts = days.flatMap((k) => sportOf(peekDay(k)).sort(byTime).map((a) => [shortDate(k), str(a.time), `${KIND_LABEL[a.kind] ? KIND_LABEL[a.kind].toLowerCase() : 'activité'} : ${entryName(a)}`, a.minutes ? `${a.minutes} min` : '', intensityLabel(a.intensity).toLowerCase(),
-      [listOf(a.exos).length ? listOf(a.exos).map((e) => `${str(e.name)} : ${listOf(e.sets).map((x) => (e.mode === 'time' ? fmtSec(x.sec || 0) : `${x.reps}${x.kg ? `×${fmtKg(x.kg)} kg` : ''}${x.rir != null ? ` (${rirLabel(x.rir)} en réserve)` : ''}`)).join(', ')}`).join(' ; ') : str(a.details), str(a.note)].filter(Boolean).join(' — ')]));
+      [bpmText(a) ? `cœur : ${bpmText(a)}` : '', listOf(a.exos).length ? listOf(a.exos).map((e) => `${str(e.name)} : ${listOf(e.sets).map((x) => (e.mode === 'time' ? fmtSec(x.sec || 0) : `${x.reps}${x.kg ? `×${fmtKg(x.kg)} kg` : ''}${x.rir != null ? ` (${rirLabel(x.rir)} en réserve)` : ''}`)).join(', ')}`).join(' ; ') : str(a.details), str(a.note)].filter(Boolean).join(' — ')]));
     const tot = summarize(days);
     L.push('## 8. Sport et activités', '', `Total : ${plural(tot.sessions, 'séance')}, ${fmtInt(tot.sportMin)} min d’activité${tot.steps != null ? `, ${fmtInt(tot.steps)} pas par jour en moyenne` : ''}.`, '');
     L.push(...(acts.length ? mdTable(['Date', 'Heure', 'Activité', 'Durée', 'Intensité', 'Détail'], acts) : ['Rien de noté.']), '');
@@ -4290,22 +4750,36 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         <section class="card" aria-labelledby="h-next">
           <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><h2 id="h-next">Prochaine visite</h2><span class="pill">${cap1(whenLabel(n))}</span></div>
           <p style="margin:0 0 4px;font-weight:800;font-size:18px">${longDate(nv)}</p>
-          <p class="hint">Prise de sang (souvent à jeun), pesée et médecin, ${cycleLabel()}.</p>
+          <p class="hint">Prise de sang (souvent à jeun), pesée, tension et médecin, ${cycleLabel()}.</p>
           <div class="actions"><button type="button" class="ghost" data-act="goto" data-date="${nv}">Voir ce jour</button>${pv && pv <= t ? html`<button type="button" class="ghost" data-act="goto" data-date="${pv}">Bilan du ${shortDate(pv)}</button>` : ''}</div>
         </section>
         <section class="card" aria-labelledby="h-visits">
           <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><h2 id="h-visits">Visites</h2></div>
           ${visitDays.length ? html`<ul class="vlist">${visitDays.map((k) => {
             const vis = visitOf(peekDay(k)) || {}, w = weightOf(peekDay(k)), nl = LABS.filter(([key]) => str((vis.labs || {})[key]).trim()).length;
-            return html`<li><button type="button" data-act="goto" data-date="${k}"><b>${longDate(k)}</b><span>${[w ? `${fmtDec(w)} kg` : 'pas de pesée', nl ? `${plural(nl, 'résultat')}` : 'résultats à noter', vis.doctor ? 'médecin vu' : ''].filter(Boolean).join(' · ')}</span></button></li>`;
+            const bp = vitalOf(vis, 'sys') && vitalOf(vis, 'dia') ? `${vitalOf(vis, 'sys')}/${vitalOf(vis, 'dia')}` : '';
+            return html`<li><button type="button" data-act="goto" data-date="${k}"><b>${longDate(k)}</b><span>${[w ? `${fmtDec(w)} kg` : 'pas de pesée', bp ? `tension ${bp}` : '', nl ? `${plural(nl, 'résultat')}` : 'résultats à noter', vis.doctor ? 'médecin vu' : ''].filter(Boolean).join(' · ')}</span></button></li>`;
           })}</ul>` : html`<p class="empty">Ta première visite est le ${shortDate(v.start)}.</p>`}
         </section>
+        ${vitalsCard(visitDays)}
         <section class="card wide" aria-labelledby="h-labs">
           <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.drop}</span><h2 id="h-labs">Prises de sang</h2></div>
           ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Valeur</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${ref}</small></td></tr>`)}</tbody></table></div>`
             : html`<p class="empty">Tes résultats apparaîtront ici, visite après visite, dès que tu les notes le jour de la visite.</p>`}
         </section>
       </div>`;
+  }
+  /* Santé : la dernière lecture de chaque mesure et leur évolution de visite en visite. */
+  function vitalsCard(visitDays) {
+    const days = visitDays.filter((k) => hasVitals(visitOf(peekDay(k)))).slice(0, 6).reverse();
+    const last = days.length ? days[days.length - 1] : null, reads = last ? vitalsRead(visitOf(peekDay(last))) : [];
+    const cell = (k, key) => { const r = vitalsRead(visitOf(peekDay(k))).find((x) => x.key === key); return r ? html`<span class="vcell ${r.level}">${r.value.replace(/ (mmHg|bpm|%|°C|cm)$/, '')}</span>` : '—'; };
+    return html`<section class="card wide" aria-labelledby="h-vitals">
+      <div class="card-head"><span class="mico m-sport" aria-hidden="true">${ICON.heart}</span><h2 id="h-vitals">Tension et pouls</h2>${last ? html`<span class="pill">${tinyDate(last)}</span>` : ''}</div>
+      ${reads.length ? html`<ul class="vreads">${reads.map((r) => html`<li class="vread ${r.level}"><span class="vdot" aria-hidden="true"></span><span class="vr-txt"><b>${r.what} : ${r.value}</b><span class="vbadge">${r.label}<span class="sr-only"> (${LEVEL_TXT[r.level]})</span></span>${r.tip ? html`<small>${r.tip}</small>` : ''}</span></li>`)}</ul>
+        ${days.length > 1 ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent;margin-top:12px"><table class="lab-table"><thead><tr><th scope="col">Mesure</th>${days.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}</tr></thead><tbody>${[['bp', 'Tension (mmHg)'], ['pulse', 'Pouls (bpm)'], ['spo2', 'SpO₂ (%)'], ['temp', 'Température (°C)'], ['waist', 'Tour de taille (cm)']].filter(([key]) => days.some((k) => vitalsRead(visitOf(peekDay(k))).some((r) => r.key === key))).map(([key, label]) => html`<tr><th scope="row">${label}</th>${days.map((k) => html`<td>${cell(k, key)}</td>`)}</tr>`)}</tbody></table></div>` : ''}`
+        : html`<p class="empty">Note ta tension et ton pouls le jour de la visite : la lecture et l’évolution s’affichent ici, et partent avec ton bilan pour Claude.</p>`}
+    </section>`;
   }
   /* ---------- Rendu général ---------- */
   const view = document.getElementById('view');
@@ -4365,7 +4839,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     toastTimer = setTimeout(() => { el.classList.remove('show'); undoFn = null; }, undoFn ? 6000 : 2600);
   }
   function toTop() { try { window.scrollTo(0, 0); } catch (e) { /* rien */ } }
-  function go(k) { S.ui.date = k; S.ui.form = null; S.ui.confirm = null; render(); }
+  function go(k) { S.ui.date = k; S.ui.form = null; if (S.ui.appt && S.ui.appt.where === 'day') S.ui.appt = null; S.ui.confirm = null; render(); }
 
   /* ---------- Formulaires ---------- */
   function startForm(type, k, id) {
@@ -4380,7 +4854,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     } else if (type === 'symptom') {
       draft = { time: nowTime(), text: '', intensity: null };
     } else if (type === 'sport') {
-      draft = { time: nowTime(), kind: 'seance', type: 'cardio', name: '', minutes: S.settings.sport.minMin, intensity: 1, details: '', tpl: null };
+      draft = { time: nowTime(), kind: 'seance', type: 'cardio', name: '', minutes: S.settings.sport.minMin, intensity: 1, details: '', tpl: null, bpmMax: null, bpmAvg: null };
     } else {
       draft = { time: nowTime(), kind: mealKindAt(nowTime()), text: '' };
     }
@@ -4414,6 +4888,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     } else if (f.type === 'sport') {
       const minutes = Math.round(posNum(dr.minutes) || 0), details = String(dr.details || '').trim().slice(0, 500);
       if (!minutes && !details) { toast('Indique la durée ou ce que tu as fait.'); return false; }
+      for (const f of ['bpmMax', 'bpmAvg']) if (String(dr[f] ?? '').trim() && bpmOf(dr[f]) == null) { toast('Les BPM : un nombre entre 30 et 240.'); S.ui.focus = `#draft-bpm-${f === 'bpmMax' ? 'max' : 'avg'}`; render(); return false; }
       const sportKind = dr.kind === 'quotidien' ? 'quotidien' : 'seance';
       const prev = f.id ? sportOf(peekDay(f.date)).find((x) => x.id === f.id) : null;
       entry = {
@@ -4421,7 +4896,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         id: f.id || newId(), time: dr.time, kind: sportKind,
         type: sportType(dr.type) ? dr.type : sportKind === 'quotidien' ? 'autre-q' : 'autre',
         name: String(dr.name || '').trim().slice(0, 60), minutes: minutes || null,
-        intensity: intIn(dr.intensity, 1, 3, 1), details, tpl: dr.tpl || null
+        intensity: intIn(dr.intensity, 1, 3, 1), details, tpl: dr.tpl || null, bpmMax: bpmOf(dr.bpmMax), bpmAvg: bpmOf(dr.bpmAvg)
       };
     } else {
       if (String(dr.item.name || '').trim()) commitItem({ quiet: true }); // aliment saisi mais pas encore ajouté
@@ -4645,7 +5120,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   };
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
-    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...APPT_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
     'sport-day': (d) => { S.ui.date = d.date; S.ui.form = null; render(); },
     'spt-kind': (d) => {
       const dr = S.ui.form && S.ui.form.draft;
@@ -4713,7 +5188,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const again = S.ui.view === d.view;
       if (again && d.view === 'jour') { go(todayKey()); toTop(); return; } // Accueil touché deux fois : retour à aujourd'hui
       if (d.view === 'reglages' && (again || !S.ui.settingsPage)) S.ui.settingsPage = null;
-      S.ui.view = d.view; S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null;
+      S.ui.view = d.view; S.ui.form = null; S.ui.appt = null; S.ui.confirm = null; S.ui.exportText = null;
       render(); toTop();
     },
     jump: (d) => {
@@ -4981,6 +5456,15 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       mutateSettings((st) => { st.sport.plan[Number(ds.plan)] = t.value || null; });
     } else if (ds.tpl && S.ui.tplEdit) {
       S.ui.tplEdit.draft[ds.tpl] = t.value;
+    } else if (ds.vm) {
+      const def = VITALS.find((x) => x[0] === ds.vm);
+      if (!def) return;
+      const n = num(t.value), empty = !String(t.value).trim();
+      if (!empty && (n == null || n < def[3] || n > def[4])) { toast(`${def[1]} : entre ${def[3]} et ${def[4]} ${def[2]}.`); return; }
+      const v = empty ? null : ds.vm === 'temp' || ds.vm === 'waist' ? round1(n) : Math.round(n);
+      mutateDay(ds.date, 'visit', (d) => { ensureVisit(d)[ds.vm] = v; }, false);
+      if (v != null) t.value = fmtDec(v);
+      safeRender(); // lecture de la mesure
     } else if (ds.visit === 'weight') {
       const w = num(t.value);
       if (String(t.value).trim() && (w == null || w < 20 || w > 400)) { toast('Écris ton poids en kilos, par exemple 82,5.'); return; }
@@ -5001,9 +5485,17 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.form.draft[ds.draft] = t.value;
     } else if (ds.item) {
       onItemInput(ds.item, t.type === 'checkbox' ? t.checked : t.value);
+    } else if (ds.appt) {
+      onApptInput(ds.appt, t, true);
     } else if (ds.ask === 'withWeek') {
       S.ui.ask.withWeek = t.checked;
       refreshReport();
+    } else if (ds.pf === 'photo') {
+      const file = t.files && t.files[0];
+      t.value = '';
+      if (!file || !S.ui.profileEdit) return;
+      photoToAvatar(file).then((url) => { if (S.ui.profileEdit) { S.ui.profileEdit.photo = url; S.ui.profileEdit.emoji = ''; render(); toast('Photo prête : touche « Enregistrer »'); } })
+        .catch(() => toast('Cette image ne passe pas : choisis une photo JPEG ou PNG.'));
     } else if (ds.ask === 'photo') {
       S.ui.ask.photo = (t.files && t.files[0]) || null;
       render();
@@ -5060,6 +5552,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.form.draft[ds.draft] = t.value;
     } else if (ds.item && t.type !== 'checkbox') {
       onItemInput(ds.item, t.value);
+    } else if (ds.vm) {
+      const key = ds.vm, val = t.value;
+      if (VITALS.some((x) => x[0] === key)) mutateDay(ds.date, 'visit', (d) => { ensureVisit(d)[key] = val; }, false);
     } else if (ds.visit && ds.visit !== 'weight') {
       const path = ds.visit, val = t.value;
       mutateDay(ds.date, 'visit', (d) => {
@@ -5070,6 +5565,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.tplEdit.draft[ds.tpl] = t.value;
     } else if (ds.live) {
       onLiveInput(ds.live, t);
+    } else if (ds.appt) {
+      onApptInput(ds.appt, t, false);
     } else if (ds.as) {
       onSheetInput(ds.as, t);
     } else if (ds.pf === 'new') {
@@ -5111,6 +5608,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const t = e.target;
     if (!t.dataset) return;
     if (t.dataset.toggle === 'labs') { S.ui.labsOpen = t.open; return; }
+    if (t.dataset.toggle === 'apptPast') { S.ui.apptPast = t.open; return; }
     if (t.dataset.toggle !== 'report') return;
     S.ui.ask.showReport = t.open;
     refreshReport();
@@ -5155,9 +5653,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const v = S.settings.visit, cures = S.settings.cureNotify ? S.settings.supplements.filter((s) => s.active && s.cure) : [];
     try {
       const pending = await LN.getPending();
-      const ours = ((pending && pending.notifications) || []).filter((n) => n.id >= 7000 && n.id < 7200);
+      const ours = ((pending && pending.notifications) || []).filter((n) => n.id >= 7000 && n.id < 7300);
       if (ours.length) await LN.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
-      if (!v.notify && !cures.length) return;
+      const appts = S.settings.appts.filter((a) => a.remind && a.date >= todayKey()).sort(byWhen).slice(0, 50);
+      if (!v.notify && !cures.length && !appts.length) return;
       let perm = await LN.checkPermissions();
       if (perm.display !== 'granted' && perm.display !== 'denied') perm = await LN.requestPermissions();
       const denied = perm.display !== 'granted';
@@ -5169,8 +5668,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         const eve = fromKey(addDays(k, -1)); eve.setHours(19, 0, 0, 0);
         const morning = fromKey(k); morning.setHours(7, 30, 0, 0);
         const common = { isExactNotification: false, smallIcon: 'ic_stat_monsuivi' };
-        if (eve.getTime() > now) list.push({ ...common, id: 7000 + i * 2, title: 'Demain : visite médicale', body: 'Prise de sang (souvent à jeun, vérifie avec le labo), pesée et médecin. Note tes questions.', schedule: { at: eve, allowWhileIdle: true } });
-        if (morning.getTime() > now) list.push({ ...common, id: 7001 + i * 2, title: 'Aujourd’hui : visite médicale', body: 'Prise de sang, pesée, médecin. Note tout dans Mon suivi pour ton bilan du mois avec Claude.', schedule: { at: morning, allowWhileIdle: true } });
+        if (eve.getTime() > now) list.push({ ...common, id: 7000 + i * 2, title: 'Demain : visite médicale', body: 'Prise de sang (souvent à jeun, vérifie avec le labo), pesée, tension et médecin. Note tes questions.', schedule: { at: eve, allowWhileIdle: true } });
+        if (morning.getTime() > now) list.push({ ...common, id: 7001 + i * 2, title: 'Aujourd’hui : visite médicale', body: 'Prise de sang, pesée, tension, médecin. Note tout dans Mon suivi pour ton bilan du mois avec Claude.', schedule: { at: morning, allowWhileIdle: true } });
       }
       // Cures : la veille de chacun des 4 prochains changements (début, pause, reprise), à 19:00 ; ids 7100 à 7199.
       let id = 7100;
@@ -5186,6 +5685,15 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
           from = day;
         }
       });
+      // Rendez-vous : la veille à 19:00, puis 1 h avant (ou le matin à 8:00 sans heure) ; ids 7200 à 7299.
+      appts.forEach((a, i) => {
+        const eve = fromKey(addDays(a.date, -1)); eve.setHours(19, 0, 0, 0);
+        const soon = fromKey(a.date);
+        if (a.time) { const m = toMin(a.time) - 60; soon.setHours(Math.floor(Math.max(0, m) / 60), Math.max(0, m) % 60, 0, 0); } else soon.setHours(8, 0, 0, 0);
+        const what = `${a.title}${a.time ? ` à ${a.time}` : ''}`, body = [a.place, a.note].filter(Boolean).join(' · ').slice(0, 180) || (a.kind === 'rdv' ? 'Rendez-vous noté dans Mon suivi.' : 'Date notée dans Mon suivi.');
+        if (eve.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7200 + i * 2, title: `Demain : ${what}`, body, schedule: { at: eve, allowWhileIdle: true } });
+        if (soon.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7201 + i * 2, title: a.time ? `Dans 1 h : ${what}` : `Aujourd’hui : ${what}`, body, schedule: { at: soon, allowWhileIdle: true } });
+      });
       if (list.length) await LN.schedule({ notifications: list });
     } catch (e) { /* notifications indisponibles : les rappels restent dans l'app */ }
   }
@@ -5194,7 +5702,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const capApp = capPlugin('App');
   if (capApp && typeof capApp.addListener === 'function') {
     capApp.addListener('backButton', () => {
-      if (S.ui.form || S.ui.confirm || S.ui.exportText != null) { S.ui.form = null; S.ui.confirm = null; S.ui.exportText = null; render(); }
+      if (S.ui.form || S.ui.appt || S.ui.confirm || S.ui.exportText != null) { S.ui.form = null; S.ui.appt = null; S.ui.confirm = null; S.ui.exportText = null; render(); }
       else if (S.ui.view === 'reglages' && S.ui.settingsPage) { S.ui.settingsPage = null; render(); toTop(); }
       else if (S.ui.view !== 'jour') { S.ui.view = 'jour'; render(); toTop(); }
       else if (typeof capApp.minimizeApp === 'function') capApp.minimizeApp();
