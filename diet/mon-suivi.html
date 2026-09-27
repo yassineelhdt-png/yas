@@ -980,7 +980,10 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   });
   function normalizeProfileList(list) {
     const seen = new Set(), out = [];
-    (Array.isArray(list) ? list : []).filter(isObj).forEach((p, i) => { const n = normalizeProfile(p, i); if (!seen.has(n.id)) { seen.add(n.id); out.push(n); } });
+    (Array.isArray(list) ? list : []).filter(isObj).forEach((p, i) => {
+      if (p.id !== MAIN && !/^p[a-z0-9]{3,20}$/.test(String(p.id))) return; // identifiant abîmé : on l'ignore
+      const n = normalizeProfile(p, i); if (!seen.has(n.id)) { seen.add(n.id); out.push(n); }
+    });
     if (!seen.has(MAIN)) out.unshift({ id: MAIN, name: 'Moi', color: 0 });
     return out.slice(0, 8);
   }
@@ -1067,15 +1070,15 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
      On garde le bas de la fourchette (6 semaines) et le mois de pause (4 semaines). Première cure le 10 octobre 2026. */
   const CURE_HINTS = [
     { re: /omb[eé]racetam|noopept/i, on: 6, off: 4, start: '2026-10-10',
-      why: 'Notice du Noopept (omberacetam) : cure de 6 à 12 semaines, puis 1 mois de pause avant la suivante.' }
+      why: 'Notice du Noopept (omberacetam) : cure de 1,5 à 3 mois, puis 1 mois de pause avant la suivante.' }
   ];
   const cureHint = (name) => CURE_HINTS.find((h) => h.re.test(String(name || ''))) || null;
   const hintCure = (name, since) => { const h = cureHint(name); return h ? { start: h.start || since, on: h.on, off: h.off } : null; };
   const SCALES = [
     { key: 'mood', label: 'Humeur', lo: 'au plus bas', hi: 'au top', faces: ['😞', '😕', '😐', '🙂', '😄'] },
     { key: 'energy', label: 'Énergie', lo: 'à plat', hi: 'à fond' },
-    { key: 'focus', label: 'Concentration', lo: 'dispersé', hi: 'focus total' },
-    { key: 'stress', label: 'Stress', lo: 'calme', hi: 'très stressé' },
+    { key: 'focus', label: 'Concentration', lo: 'dispersion', hi: 'focus total' },
+    { key: 'stress', label: 'Stress', lo: 'calme', hi: 'stress fort' },
     { key: 'pain', label: 'Douleur', lo: 'aucune', hi: 'très forte' },
     { key: 'hunger', label: 'Faim', lo: 'aucune', hi: 'très forte' }
   ];
@@ -1196,7 +1199,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       mk('Oméga-3', '1 capsule', 'midi', 'daily', 'Mieux absorbés avec un repas'),
       mk('Vitamine D3 + K2', '1 capsule', 'midi', 'alt', 'En attendant de la faire doser'),
       mk('Complexe B12', '1 comprimé', 'midi', 'alt', 'Pour rester sous la limite de B6'),
-      mk('Créatine', '5 g', 'midi', 'daily', "L'heure n'a pas d'importance"),
+      mk('Créatine', '5 g', 'midi', 'daily', 'L’heure n’a pas d’importance'),
       mk('Potassium', '100 mg', 'midi', 'daily', 'Avec le repas'),
       mk('Zinc-magnésium', '1 capsule', 'aprem', 'daily', 'Jamais à jeun'),
       mk('Potassium', '100 mg', 'aprem', 'daily', 'Avec le repas'),
@@ -1246,7 +1249,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const hasNutriGoals = (g) => ['kcal', 'p', 'g', 'l'].some((k) => g[k]);
   /* Profil santé : envoyé à Claude avec chaque journée, et base de l'IMC. */
   const SEXES = ['homme', 'femme', 'autre'];
-  const ACTIVITY = { sedentaire: 'Sédentaire', leger: 'Légère (1 à 2 fois par semaine)', modere: 'Modérée (3 à 4 fois par semaine)', intense: 'Intense (5 fois et plus)' };
+  const ACTIVITY = { sedentaire: 'Sédentaire', leger: 'Légère (1 à 2 fois par semaine)', modere: 'Modérée (3 à 4 fois par semaine)', intense: 'Intense (5 fois et plus par semaine)' };
   function normalizeHealth(h) {
     h = isObj(h) ? h : {};
     const kg = (v) => { const n = posNum(v); return n && n >= 20 && n <= 400 ? round1(n) : null; };
@@ -1440,12 +1443,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   /* Durée de la nuit : coucher noté la veille (avant midi = après minuit), réveil noté ce jour-là. */
   function nightLength(bed, wake) { const m = nightMinutes(bed, wake); return m == null ? '' : fmtDuration(m); }
   function hasJournal(d) {
-    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.notes) || isObj(d.visit) || num(d.weight) || waterOf(d) || stepsOf(d) || sportOf(d).length));
+    return !!(d && (listOf(d.checkins).length || listOf(d.symptoms).length || listOf(d.meals).length || str(d.wake) || str(d.bed) || str(d.notes) || isObj(d.visit) || num(d.weight) || waterOf(d) || stepsOf(d) || sportOf(d).length));
   }
 
   /* ---------- Visite médicale ---------- */
-  /* Repères habituels (adulte homme) ; le labo donne ses propres normes. Valeurs saisies telles quelles, avec l'unité.
-     4e case facultative : une remarque montrée sous le champ et envoyée à Claude. */
+  /* Repères habituels d'adulte (homme ; ceux d'une femme dans LABS_F) ; le labo donne ses propres normes. Valeurs saisies
+     telles quelles, avec l'unité. 4e case facultative : une remarque montrée sous le champ et envoyée à Claude. */
+  const LABS_F = { hb: '12 à 16 g/dL', ferritin: '15 à 150 µg/L', iron: '50 à 170 µg/dL', creat: '0,5 à 1,1 mg/dL', alt: '< 35 U/L' };
+  const labRef = (key, ref) => (S.settings.health.sex === 'femme' && LABS_F[key]) || ref;
   const LABS = [
     ['vitD', 'Vitamine D (25-OH)', '30 à 100 ng/mL'], ['b12', 'Vitamine B12', '200 à 900 pg/mL'], ['folates', 'Folates (B9)', '> 4 ng/mL'],
     ['ferritin', 'Ferritine', '30 à 300 µg/L'], ['iron', 'Fer', '60 à 170 µg/dL'], ['hb', 'Hémoglobine', '13 à 17 g/dL'],
@@ -1508,7 +1513,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   function prevVisit(k) { const v = S.settings.visit, diff = daysBetween(v.start, k); return diff <= 0 ? null : addDays(v.start, Math.floor((diff - 1) / v.every) * v.every); }
   const weightOf = (d) => { const vis = visitOf(d); return num(vis && vis.weight) ?? num(d && d.weight); };
   const labsFilled = (vis) => !!vis && (Object.values(isObj(vis.labs) ? vis.labs : {}).some((x) => str(x).trim()) || !!str(vis.labsText).trim());
-  const cycleLabel = () => { const e = S.settings.visit.every; return e % 7 === 0 ? `toutes les ${e / 7} semaines` : `tous les ${e} jours`; };
+  const cycleLabel = () => { const e = S.settings.visit.every; return e === 7 ? 'toutes les semaines' : e % 7 === 0 ? `toutes les ${e / 7} semaines` : `tous les ${e} jours`; };
+  /* « 1,5 litre », « 2 litres » : le pluriel commence à 2. */
+  const litres = (ml) => `${fmtL(ml)} litre${ml >= 2000 ? 's' : ''}`;
   const whenLabel = (n) => (n === 0 ? 'aujourd’hui' : n === 1 ? 'demain' : `dans ${n} jours`);
   const shortDate = (k) => { const d = fromKey(k); return `${dayNumber(d.getDate())} ${MONTHS[d.getMonth()]}${yearSuffix(d)}`; };
   function ageOf(birth) {
@@ -1686,11 +1693,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     loading: ['Chargement…', 'var(--muted)', ''],
     saved: ['Enregistré', 'var(--fill)', 'Enregistré sur ton compte Claude.'],
     saving: ['Enregistrement…', 'var(--matin)', ''],
-    local: ['Sur cet appareil', 'var(--muted)', 'Enregistré dans ce navigateur uniquement.'],
+    local: ['Sur cet appareil', 'var(--muted)', 'Enregistré sur cet appareil uniquement.'],
     localOffline: ['Hors ligne', 'var(--muted)', 'Pas de réseau : tout est enregistré sur cet appareil. Envoie ta journée à Claude quand tu retrouves du réseau.'],
     offline: ['Hors ligne', 'var(--matin)', 'Pas de connexion à ton compte Claude pour l’instant. Tes modifications sont gardées sur cet appareil et partiront dès que possible.'],
     error: ['Pas enregistré en ligne', 'var(--danger)', 'L’enregistrement en ligne a échoué. Tes modifications sont gardées sur cet appareil et repartiront au prochain essai.'],
-    localError: ['Pas enregistré', 'var(--danger)', 'Ce navigateur refuse d’enregistrer (stockage plein ou bloqué). Fais une sauvegarde depuis Réglages.']
+    localError: ['Pas enregistré', 'var(--danger)', 'L’appareil refuse d’enregistrer (stockage plein ou bloqué). Fais une sauvegarde depuis Réglages.']
   };
   function syncState() {
     if (store.mode === 'local') return !S.ready ? 'loading' : store.failed ? 'localError' : navigator.onLine === false ? 'localOffline' : 'local';
@@ -2172,7 +2179,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const visit = hasVisit(k), gap = daysBetween(t, k);
     const rel = isToday ? 'Aujourd’hui' : gap === -1 ? 'Hier' : gap === 1 ? 'Demain' : gap < 0 ? `Il y a ${-gap} jours` : `Dans ${gap} jours`;
     const greet = { matin: 'Bonjour', midi: 'Bon appétit', aprem: 'Bon après-midi', soir: 'Bonsoir' }[momentNow()];
-    const hero = html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? `${rel} · ${greet}${PROFILES.list.length > 1 || activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
+    const hero = html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? `${rel} · ${greet}${activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
         <div class="daynav">
           ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
           <button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">${ICON.left}</button>
@@ -2202,17 +2209,17 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   function summaryTiles(k, d) {
     const st = stats(k), ml = waterOf(d), goal = Math.round(S.settings.goals.water * 1000);
     const tot = sumMacros(dayItems(d)), kcalGoal = S.settings.goals.kcal;
-    const cis = listOf(d.checkins).sort(byTime), last = cis[cis.length - 1], mood = last ? scaleValue(last.mood) : null;
+    const cis = listOf(d.checkins).sort(byTime), rated = cis.filter((c) => scaleValue(c.mood)), last = rated[rated.length - 1], mood = last ? scaleValue(last.mood) : null;
     const clamp = (x) => Math.max(0, Math.min(1, x)).toFixed(3);
     const wk = sportWeek(k), sp = S.settings.sport, steps = stepsOf(d);
     const tile = (cls, target, p, inner, big, small, label, short) => html`<button type="button" class="tile ${cls}" ${target.startsWith('tab:') ? html`data-act="tab" data-view="${target.slice(4)}"` : html`data-act="jump" data-v="${target}"`} aria-label="${label}"><span class="ring" style="--p:${clamp(p)}"><span>${inner}</span></span><span class="tile-txt"><b>${big}</b><span class="t-long">${small}</span><span class="t-short" aria-hidden="true">${short}</span></span></button>`;
     return html`<div class="tiles">
       ${tile('c-supps', 'sec-supps', st.total ? st.taken / st.total : 0, ICON.pill, st.total ? `${st.taken}/${st.total}` : '—', 'compléments', `Compléments : ${st.taken} sur ${st.total}`, 'compl.')}
-      ${tile('c-water', 'sec-water', goal ? ml / goal : 0, ICON.drop, `${fmtL(ml)} L`, `sur ${fmtL(goal)} L d’eau`, `Eau : ${fmtL(ml)} litre sur ${fmtL(goal)}`, 'eau')}
+      ${tile('c-water', 'sec-water', goal ? ml / goal : 0, ICON.drop, `${fmtL(ml)} L`, `sur ${fmtL(goal)} L d’eau`, `Eau : ${litres(ml)} sur ${litres(goal)}`, 'eau')}
       ${tile('c-kcal2', 'sec-meals', kcalGoal ? tot.kcal / kcalGoal : 0, ICON.flame, tot.n ? fmtInt(tot.kcal) : '—', kcalGoal ? `sur ${fmtInt(kcalGoal)} kcal` : 'kcal', `Calories : ${fmtInt(tot.kcal)}${kcalGoal ? ` sur ${fmtInt(kcalGoal)}` : ''}`, 'kcal')}
-      ${tile('c-sport', 'tab:sport', wk.count / sp.perWeek, ICON.dumbbell, `${wk.count}/${sp.perWeek}`, 'séances cette semaine', `Sport : ${wk.count} séances sur ${sp.perWeek} cette semaine`, 'sport')}
+      ${tile('c-sport', 'tab:sport', wk.count / sp.perWeek, ICON.dumbbell, `${wk.count}/${sp.perWeek}`, 'séances cette semaine', `Sport : ${plural(wk.count, 'séance')} sur ${sp.perWeek} cette semaine`, 'sport')}
       ${tile('c-sport', 'tab:sport', steps / sp.steps, ICON.steps, steps ? fmtInt(steps) : '—', `sur ${fmtInt(sp.steps)} pas`, `Pas : ${fmtInt(steps)} sur ${fmtInt(sp.steps)}`, 'pas')}
-      ${tile('c-mood', 'sec-checkins', mood ? mood / 5 : 0, mood ? html`<span class="face">${FACES[mood - 1]}</span>` : ICON.smile, mood ? `${mood}/5` : '—', last ? `humeur à ${str(last.time)}` : 'pas de check-in', mood ? `Humeur ${mood} sur 5` : 'Pas encore de check-in', 'humeur')}
+      ${tile('c-mood', 'sec-checkins', mood ? mood / 5 : 0, mood ? html`<span class="face">${FACES[mood - 1]}</span>` : ICON.smile, mood ? `${mood}/5` : '—', last ? `humeur à ${str(last.time)}` : cis.length ? 'humeur pas notée' : 'pas de check-in', mood ? `Humeur ${mood} sur 5` : cis.length ? 'Humeur pas encore notée' : 'Pas encore de check-in', 'humeur')}
     </div>`;
   }
   function waterBlock(k, d) {
@@ -2222,7 +2229,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const cups = Array.from({ length: n }, (_, i) => html`<span class="glass">${i + 1 <= filled ? ICON.glassFull : i < filled ? ICON.glassHalf : ICON.glassEmpty}</span>`);
     return html`<section class="card m-soir" id="sec-water" aria-labelledby="water-title">
       <div class="card-head"><span class="mico" aria-hidden="true">${ICON.drop}</span><h2 id="water-title">Eau</h2><span class="pill">${fmtL(ml)} / ${fmtL(goal)} L</span></div>
-      <div class="glasses" role="img" aria-label="${fmtL(ml)} litre bu sur ${fmtL(goal)}">${cups}</div>
+      <div class="glasses" role="img" aria-label="${litres(ml)} bu${ml >= 2000 ? 's' : ''} sur ${litres(goal)}">${cups}</div>
       <p class="water-sub${left <= 0 ? ' done' : ''}">${left <= 0 ? 'Objectif atteint' : `Encore ${fmtL(left)} L, soit ${plural(glassesLeft, 'verre')}`}</p>
       <div class="actions">
         <button type="button" class="primary" data-act="water-add" data-v="${glass}" data-date="${k}">+ 1 verre (${glass / 10} cl)</button>
@@ -2281,7 +2288,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       <details class="labs" data-toggle="labs"${S.ui.labsOpen || filled ? html` open` : ''}>
         <summary>Résultats de la prise de sang${filled ? html`<span class="pill">${filled} noté${filled > 1 ? 's' : ''}</span>` : ''}</summary>
         <p class="hint">Recopie chaque valeur avec son unité. En gris, le repère habituel ; ton labo indique ses propres normes.</p>
-        <div class="vgrid">${LABS.map(([key, label, ref, note]) => html`<label class="field"><span>${label}</span><input type="text" id="lab-${key}-${k}" data-visit="labs.${key}" data-date="${k}" value="${str(labs[key])}" placeholder="${ref}" autocomplete="off">${note ? html`<small class="lab-note">${note}</small>` : ''}</label>`)}</div>
+        <div class="vgrid">${LABS.map(([key, label, ref, note]) => html`<label class="field"><span>${label}</span><input type="text" id="lab-${key}-${k}" data-visit="labs.${key}" data-date="${k}" value="${str(labs[key])}" placeholder="${labRef(key, ref)}" autocomplete="off">${note ? html`<small class="lab-note">${note}</small>` : ''}</label>`)}</div>
         <label class="field"><span>Autres résultats ou compte rendu du labo</span><textarea id="vlabs-${k}" data-visit="labsText" data-date="${k}" rows="3" placeholder="Colle ici le reste du compte rendu…">${str(vis.labsText)}</textarea></label>
       </details>
       <label class="field"><span>Ce que dit le médecin</span><textarea id="vnotes-${k}" data-visit="notes" data-date="${k}" rows="3" placeholder="Conseils, changement de dose, examens à faire…">${str(vis.notes)}</textarea></label>
@@ -2297,14 +2304,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       <h3 class="vsub" id="vit-${k}"><span class="bpm-ico sm" aria-hidden="true">${ICON.heart}</span>Tension, pouls et mesures</h3>
       <div class="vgrid">
         <div class="field"><span id="bp-l-${k}">Tension (mmHg)</span><div class="bp-in" role="group" aria-labelledby="bp-l-${k}"><input type="text" inputmode="numeric" id="vm-sys-${k}" data-vm="sys" data-date="${k}" value="${val('sys')}" placeholder="120" aria-label="Tension haute (systolique)" autocomplete="off"><span aria-hidden="true">/</span><input type="text" inputmode="numeric" id="vm-dia-${k}" data-vm="dia" data-date="${k}" value="${val('dia')}" placeholder="80" aria-label="Tension basse (diastolique)" autocomplete="off"></div></div>
-        ${inp('pulse', 'Pouls au repos (bpm)', '60 à 100')}
+        ${inp('pulse', 'Pouls au repos (bpm)', '50 à 100')}
         ${inp('spo2', 'Saturation SpO₂ (%)', '95 à 100')}
-        ${inp('temp', 'Température (°C)', '36,1 à 37,5', 'decimal')}
+        ${inp('temp', 'Température (°C)', '35,5 à 37,5', 'decimal')}
         ${inp('waist', 'Tour de taille (cm)', female ? 'moins de 80' : 'moins de 94', 'decimal')}
       </div>
       ${reads.length ? html`<ul class="vreads">${reads.map((r) => html`<li class="vread ${r.level}"><span class="vdot" aria-hidden="true"></span><span class="vr-txt"><b>${r.what} : ${r.value}</b><span class="vbadge">${r.label}<span class="sr-only"> (${LEVEL_TXT[r.level]})</span></span>${r.tip ? html`<small>${r.tip}</small>` : ''}</span></li>`)}</ul>` : ''}
       ${prev.length ? html`<p class="vhist">Avant : ${prev.map((dk) => `${shortDate(dk)} · ${vitalsRead(visitOf(peekDay(dk))).filter((r) => r.key === 'bp' || r.key === 'pulse').map((r) => r.value).join(', ') || 'mesures notées'}`).join('  —  ')}</p>` : ''}
-      <p class="hint" style="margin:6px 0 0">Tension : assis, au calme depuis 5 minutes, bras posé à hauteur du cœur ; fais 2 mesures à 1 minute d’écart et note la seconde. Repères d’adulte au repos : ton médecin juge selon ton cas.</p>
+      <p class="hint" style="margin:6px 0 0">Tension : assis, au calme depuis 5 minutes, bras posé à hauteur du cœur ; fais 2 mesures à 1 minute d’écart et note la moyenne des deux. Repères d’adulte au repos : ton médecin juge selon ton cas.</p>
     </div>`;
   }
   function weekStrip(k) {
@@ -2452,7 +2459,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   }
 
   /* Repas et macros */
-  function nutritionSummary(d) {
+  function nutritionSummary(k, d) {
     const t = sumMacros(dayItems(d)), goals = S.settings.goals;
     const hasGoals = hasNutriGoals(goals);
     if (!t.n && !hasGoals) return '';
@@ -2462,7 +2469,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     };
     const over = goals.kcal && t.kcal > goals.kcal;
     return html`<div class="nutri" aria-label="Total du jour">
-      <div class="nutri-top"><b class="${over ? 'over' : ''}">${fmtInt(t.kcal)}</b><span>${goals.kcal ? `sur ${fmtInt(goals.kcal)} kcal${over ? ` · ${fmtInt(t.kcal - goals.kcal)} de plus` : ` · reste ${fmtInt(goals.kcal - t.kcal)}`}` : 'kcal aujourd’hui'}</span></div>
+      <div class="nutri-top"><b class="${over ? 'over' : ''}">${fmtInt(t.kcal)}</b><span>${goals.kcal ? `sur ${fmtInt(goals.kcal)} kcal${over ? ` · ${fmtInt(t.kcal - goals.kcal)} de plus` : ` · reste ${fmtInt(goals.kcal - t.kcal)}`}` : k === todayKey() ? 'kcal aujourd’hui' : 'kcal ce jour-là'}</span></div>
       <div class="mbars">${MACROS.map(([key, label]) => bar('c-' + key, label, t[key], goals[key], 'g'))}</div>
       ${hasGoals ? '' : html`<p class="per100">Fixe tes objectifs (calories, protéines…) pour suivre ta progression. <button type="button" class="link" data-act="goto-settings" data-v="objectifs">Mes objectifs</button></p>`}
     </div>`;
@@ -2476,7 +2483,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       return html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${kind}${t.n ? ` · ${fmtInt(t.kcal)} kcal` : ''}</span>${m.text ? html`<p class="note">${m.text}</p>` : ''}${items.length ? html`<ul class="items">${items.map((it) => html`<li>${it.name}<span>${num(it.grams) ? `${fmtDec(num(it.grams), 0)} g · ` : ''}${fmtInt(posNum(it.kcal) ?? 0)} kcal</span></li>`)}</ul><p class="macros">${macroLine(t)}</p>` : ''}</div>${rowActions('meal', k, m.id, `${kind.toLowerCase()} de ${str(m.time)}`)}</li>`;
     };
     return html`<section class="jsec" id="sec-meals"><div class="sec-head"><h2>Ce que j’ai mangé</h2>${f ? '' : html`<button type="button" class="primary" data-act="meal-new" data-date="${k}">Ajouter</button>`}</div>
-      ${nutritionSummary(d)}
+      ${nutritionSummary(k, d)}
       ${f && !f.id ? mealForm(f) : ''}
       ${list.length ? html`<ul class="list">${list.map((m) => (f && f.id === m.id ? html`<li class="editing">${mealForm(f)}</li>` : entry(m)))}</ul>`
         : f ? '' : html`<p class="empty">Rien de noté pour l’instant.</p>`}
@@ -2537,6 +2544,10 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       if (food && it.auto) {
         const v = scaleFood(food, posNum(it.grams));
         it.p = valStr(v.p); it.g = valStr(v.g); it.l = valStr(v.l); it.kcal = valStr(v.kcal);
+      } else if (field === 'grams' && it.base) {
+        // aliment déjà dans le repas (sans fiche) : macros et kcal suivent la quantité
+        const from = posNum(it.base.grams), to = posNum(value);
+        if (from && to) ['p', 'g', 'l', 'kcal'].forEach((key) => { it[key] = valStr(round1((posNum(it.base[key]) || 0) * to / from)); });
       }
       const hint = document.getElementById('fi-per100');
       if (hint) hint.textContent = per100Text(food);
@@ -2591,17 +2602,17 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const SCOPE_TEXT = {
     day: {
       title: 'Faire le point avec Claude',
-      what: 'Claude reçoit tout ce que tu as noté ce jour-là : sommeil, compléments, check-ins, symptômes, repas et macros, notes.',
+      what: 'Claude reçoit tout ce que tu as noté ce jour-là : sommeil, compléments, eau, sport et pas, check-ins, ressentis, repas et macros, rendez-vous, notes.',
       placeholder: 'Pourquoi j’ai mal au dos depuis trois jours ?'
     },
     week: {
       title: 'Faire le point de la semaine avec Claude',
-      what: 'Claude reçoit toute la semaine, jour par jour : sommeil, compléments, check-ins, symptômes, repas et macros, notes.',
+      what: 'Claude reçoit toute la semaine, jour par jour : sommeil, compléments, eau, sport et pas, check-ins, ressentis, repas et macros, rendez-vous, notes.',
       placeholder: 'Qu’est-ce qui a changé cette semaine ?'
     },
     visit: {
       title: 'Bilan du mois avec Claude',
-      what: 'Claude reçoit ta visite (poids, prise de sang, médecin) et les 4 semaines d’avant : régularité des compléments, sommeil, check-ins, ressenti, repas et macros, notes.',
+      what: 'Claude reçoit ta visite (poids, tension et mesures, prise de sang, médecin) et tout le suivi depuis la visite précédente : régularité des compléments, sommeil, eau, sport, check-ins, ressentis, repas et macros, notes.',
       placeholder: 'Est-ce que j’ai des carences ? Quelles questions poser au médecin ?'
     }
   };
@@ -2651,7 +2662,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   }
   function fmtStamp(iso) {
     const d = new Date(iso);
-    return Number.isNaN(d.getTime()) ? '' : `le ${d.getDate()} ${MONTHS[d.getMonth()]} à ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return Number.isNaN(d.getTime()) ? '' : `le ${dayNumber(d.getDate())} ${MONTHS[d.getMonth()]}${yearSuffix(d)} à ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
   /* Markdown simple (titres, listes, gras) → HTML, après échappement : rien de la réponse n'est interprété comme du code. */
   function mdToHtml(text) {
@@ -2686,7 +2697,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const reads = vitalsRead(vis);
     if (reads.length) {
       L.push('- Mesures (lecture de l’app, repères d’adulte au repos) :');
-      reads.forEach((r) => L.push(`  - ${r.what} : ${r.value} — ${r.label.toLowerCase()} (${LEVEL_TXT[r.level]})`));
+      reads.forEach((r) => L.push(`  - ${r.what} : ${r.value} — ${r.label.toLowerCase()}${r.level === 'ok' || r.label.toLowerCase() === LEVEL_TXT[r.level] ? '' : ` (${LEVEL_TXT[r.level]})`}`));
       const bpHist = [...Object.keys(S.months)].sort().flatMap((mk) => Object.keys(S.months[mk].days || {}).sort())
         .filter((dk) => dk < k && bpClass(vitalOf(visitOf(peekDay(dk)), 'sys'), vitalOf(visitOf(peekDay(dk)), 'dia'))).slice(-5);
       if (bpHist.length) L.push(`  - Tensions d’avant : ${bpHist.map((dk) => { const v2 = visitOf(peekDay(dk)); return `${shortDate(dk)} ${vitalOf(v2, 'sys')}/${vitalOf(v2, 'dia')}`; }).join(' → ')}`);
@@ -2694,7 +2705,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const got = LABS.filter(([key]) => str(labs[key]).trim());
     if (got.length) {
       L.push('- Prise de sang (valeur notée ; entre parenthèses, repère habituel) :');
-      got.forEach(([key, label, ref, note]) => L.push(`  - ${label} : ${str(labs[key]).trim()} (${ref})${note ? ` — ${note.toLowerCase()}` : ''}`));
+      got.forEach(([key, label, ref, note]) => L.push(`  - ${label} : ${str(labs[key]).trim()} (${labRef(key, ref)})${note ? ` — ${note.toLowerCase()}` : ''}`));
     } else if (!str(vis.labsText).trim()) L.push('- Prise de sang : résultats pas encore notés');
     if (str(vis.labsText).trim()) L.push(`- Autres résultats : ${str(vis.labsText).trim()}`);
     if (str(vis.notes).trim()) L.push(`- Ce que dit le médecin : ${str(vis.notes).trim()}`);
@@ -2778,10 +2789,10 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (nights.length) L.push(`Sommeil : ${fmtDuration(Math.round(avg(nights)))} en moyenne (${plural(nights.length, 'nuit')} notée${nights.length > 1 ? 's' : ''})`);
     const sessions = days.flatMap((dk) => sessionsOf(peekDay(dk))), daily = days.flatMap((dk) => sportOf(peekDay(dk)).filter((a) => a.kind === 'quotidien'));
     const stepDays = days.map((dk) => stepsOf(peekDay(dk))).filter(Boolean);
-    L.push(`Sport : ${plural(sessions.length, 'séance')} en ${days.length} jours (${minutesOf(sessions)} min ; objectif ${S.settings.sport.perWeek} par semaine, soit ${Math.round((S.settings.sport.perWeek * days.length) / 7)})${daily.length ? `, plus ${plural(daily.length, 'activité')} du quotidien (${minutesOf(daily)} min)` : ''}`);
+    L.push(`Sport : ${plural(sessions.length, 'séance')} en ${plural(days.length, 'jour')} (${minutesOf(sessions)} min ; objectif ${S.settings.sport.perWeek} par semaine, soit ${Math.round((S.settings.sport.perWeek * days.length) / 7)})${daily.length ? `, plus ${plural(daily.length, 'activité')} du quotidien (${minutesOf(daily)} min)` : ''}`);
     if (stepDays.length) L.push(`Pas : ${fmtInt(avg(stepDays))} par jour en moyenne (${plural(stepDays.length, 'jour')} noté${stepDays.length > 1 ? 's' : ''}, objectif ${fmtInt(S.settings.sport.steps)})`);
     const drank = days.map((dk) => waterOf(peekDay(dk))).filter((x) => x > 0);
-    if (drank.length) L.push(`Eau : ${fmtL(avg(drank))} L par jour en moyenne (${plural(drank.length, 'jour')} noté${drank.length > 1 ? 's' : ''}, objectif ${fmtDec(S.settings.goals.water)} L, atteint ${plural(drank.filter((x) => x >= S.settings.goals.water * 1000).length, 'fois')})`);
+    if (drank.length) L.push(`Eau : ${fmtL(avg(drank))} L par jour en moyenne (${plural(drank.length, 'jour')} noté${drank.length > 1 ? 's' : ''}, objectif ${fmtDec(S.settings.goals.water)} L, atteint ${drank.filter((x) => x >= S.settings.goals.water * 1000).length} fois)`);
     const cis = days.flatMap((dk) => listOf((peekDay(dk) || {}).checkins));
     const scales = SCALES.map((sc) => { const v = avg(cis.map((c) => scaleValue(c[sc.key])).filter((x) => x != null)); return v != null ? `${sc.label.toLowerCase()} ${fmtAvg(v)}` : ''; }).filter(Boolean);
     if (scales.length) L.push(`Check-ins (${plural(cis.length, 'check-in')}, moyennes sur 5) : ${scales.join(', ')}`);
@@ -2790,7 +2801,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const sups = S.settings.supplements.map((sp) => {
       const sch = days.filter((dk) => isScheduled(sp, dk));
       const cure = sp.active && sp.cure ? ` — en cure (${cureRule(sp.cure)}), au jour de la visite : ${cureStatus(sp.cure, k)}` : '';
-      if (!sch.length) return cure ? `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pas prévu sur ces ${days.length} jours${cure}` : '';
+      if (!sch.length) return cure ? `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pas prévu ${days.length > 1 ? `sur ces ${days.length} jours` : 'ce jour-là'}${cure}` : '';
       return `- ${sp.name}${sp.dose ? ' ' + sp.dose : ''} : pris ${sch.filter((dk) => isTaken(sp.id, dk)).length} fois sur ${sch.length} prévue${sch.length > 1 ? 's' : ''}${cure}`;
     }).filter(Boolean);
     if (sups.length) L.push('Régularité des compléments :', ...sups);
@@ -2809,7 +2820,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (scope === 'week') {
       const days = Array.from({ length: 7 }, (_, i) => addDays(key, i)).filter((dk) => dk <= todayKey());
       const wk = sportWeek(key);
-      return `# Mon suivi — ${weekTitle(key).toLowerCase()}\n\nSport de la semaine : ${plural(wk.count, 'séance')} sur ${S.settings.sport.perWeek} prévues, ${wk.minutes} min\n\n${days.map((dk) => dayReport(dk)).join('\n\n')}`;
+      return `# Mon suivi — ${weekTitle(key).toLowerCase()}\n\nSport de la semaine : ${plural(wk.count, 'séance')} sur ${S.settings.sport.perWeek} prévue${S.settings.sport.perWeek > 1 ? 's' : ''}, ${wk.minutes} min\n\n${days.map((dk) => dayReport(dk)).join('\n\n')}`;
     }
     const before = withWeek ? Array.from({ length: 6 }, (_, i) => dayReport(addDays(key, i - 6), { compact: true })) : [];
     return `# Mon suivi — ${longDate(key).toLowerCase()}\n\n${dayReport(key)}${before.length ? `\n\n## Les 6 jours d’avant (résumé)\n${before.join('\n')}` : ''}`;
@@ -2825,7 +2836,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (h.targetWeight) L.push(`Objectif de poids : ${fmtDec(h.targetWeight)} kg${h.startWeight ? ` (départ ${fmtDec(h.startWeight)} kg)` : ''}`);
     if (h.activity) L.push(`Activité physique : ${ACTIVITY[h.activity].toLowerCase()}`);
     const sp = S.settings.sport;
-    L.push(`Objectif sport : ${sp.perWeek} séances légères de ${sp.minMin} à ${sp.maxMin} min par semaine, ${fmtInt(sp.steps)} pas par jour`);
+    L.push(`Objectif sport : ${plural(sp.perWeek, 'séance')} légère${sp.perWeek > 1 ? 's' : ''} de ${sp.minMin} à ${sp.maxMin} min par semaine, ${fmtInt(sp.steps)} pas par jour`);
     if (h.treatments.trim()) L.push(`Traitements : ${h.treatments.trim()}`);
     if (h.conditions.trim()) L.push(`Problèmes de santé, antécédents : ${h.conditions.trim()}`);
     if (h.allergies.trim()) L.push(`Allergies, intolérances : ${h.allergies.trim()}`);
@@ -2839,7 +2850,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const ask = q || {
       week: 'Fais le point sur ma semaine à partir de ce suivi : comment je vais, les tendances, les liens possibles, et ce que je peux améliorer.',
       days: 'Voici mes dernières journées, que je ne t’avais pas encore envoyées. Fais le point : comment je vais, ce qui a changé d’un jour à l’autre, les liens possibles, et ce que je peux faire demain.',
-      visit: 'Voici ma visite médicale et mes 4 dernières semaines. Analyse ma prise de sang (carences ?), ma tension, mon pouls et mes autres mesures en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon sport, mon alimentation et mon état ; dis-moi ce qui mérite d’être surveillé et quelles questions poser à mon médecin.',
+      visit: 'Voici ma visite médicale et mon suivi depuis la visite précédente. Analyse ma prise de sang (carences ?), ma tension, mon pouls et mes autres mesures en tenant compte de mes compléments et de leur régularité, l’évolution de mon poids, mon sport, mon alimentation et mon état ; dis-moi ce qui mérite d’être surveillé et quelles questions poser à mon médecin.',
       day: 'Fais le point sur mon état du jour à partir de ce suivi : ce qui va, ce qui ne va pas, les liens possibles, et ce que je peux faire demain.'
     }[scope];
     if (scope === 'dossier') { const [from, to] = key.split('_'); return dossierText(from, to); }
@@ -2862,10 +2873,10 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       titles,
       'Règles :',
       scope === 'visit' ? '- Compare chaque valeur de la prise de sang à la norme (celle du labo si elle est notée, sinon le repère donné) et relie-la aux compléments pris et à leur régularité ; signale les carences possibles et ce qui est en excès.' : '',
-      scope === 'visit' ? '- Ne propose jamais de changer un traitement prescrit (par exemple Mounjaro) ni d’arrêter un complément sans le médecin : formule plutôt des questions à lui poser.' : '',
+      scope === 'visit' ? '- Ne propose jamais de changer un traitement prescrit ni d’arrêter un complément sans le médecin : formule plutôt des questions à lui poser.' : '',
       '- Relie ce qui peut l’être (sommeil, repas et macros, compléments, traitement, stress, douleurs) sans inventer de valeurs absentes du journal ; dis ce qui manque pour mieux juger.',
       '- Pour le sport, reste prudent et progressif (séances légères, adaptées à la fatigue et au traitement) ; compte aussi les activités du quotidien.',
-      '- Si quelque chose peut être urgent (douleur dans la poitrine, essoufflement, malaise, sang, fièvre forte, idées noires…), commence par là et conseille d’appeler le 112.',
+      '- Si quelque chose peut être urgent (douleur dans la poitrine, essoufflement, malaise, sang, fièvre forte, idées noires…), commence par là et conseille d’appeler le 112 (ou le 15 en France ; pour des idées suicidaires, le 3114 en France, le 0800 32 123 en Belgique).',
       '- Si un symptôme dure ou revient, ou si une valeur de prise de sang sort des normes, conseille d’en parler à un médecin.',
       S.ui.ask.photo ? '- Une photo est jointe (prise de sang, ordonnance ou autre document) : lis-la et commente les valeurs utiles, en rappelant les normes.' : '',
       q ? `\nMa question : ${q}` : '',
@@ -2982,8 +2993,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (!days.length) return '';
     const t = todayKey(), onlyToday = days.length === 1 && days[0] === t;
     const scope = days.length === 1 ? (hasVisit(days[0]) ? 'visit' : 'day') : 'days', key = days.join(',');
-    const names = days.map((dk) => (dk === t ? 'aujourd’hui' : dk === addDays(t, -1) ? 'hier' : `${WD_LONG[weekdayOf(dk)]} ${fromKey(dk).getDate()}`));
-    const list = names.length > 3 ? `du ${names[0]} à ${names[names.length - 1]}` : names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${names[names.length - 1]}` : names[0];
+    const names = days.map((dk) => (dk === t ? 'aujourd’hui' : dk === addDays(t, -1) ? 'hier' : `${WD_LONG[weekdayOf(dk)]} ${dayNumber(fromKey(dk).getDate())}`));
+    const lastN = names[names.length - 1];
+    const list = names.length > 3 ? `du ${names[0]} ${/^(hier|aujourd’hui)$/.test(lastN) ? 'jusqu’à' : 'au'} ${lastN}` : names.length > 1 ? `${names.slice(0, -1).join(', ')} et ${lastN}` : names[0];
     const off = navigator.onLine === false;
     const title = onlyToday ? 'Ce soir : envoie ta journée à Claude' : `${plural(days.length, 'journée')} pas encore envoyée${days.length > 1 ? 's' : ''} à Claude`;
     const text = `${onlyToday ? 'Tout ce que tu as noté aujourd’hui part en un seul texte.' : `${cap1(list)}, en un seul envoi.`}${off ? ' Pas de réseau pour l’instant : c’est enregistré, envoie dès que tu as le wifi.' : ''}`;
@@ -3274,7 +3286,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     },
     sport: {
       title: 'Sport', icon: 'dumbbell', cls: 'm-sport', render: sportSettings,
-      summary: () => { const sp = S.settings.sport; return `${sp.perWeek} séances de ${sp.minMin} à ${sp.maxMin} min · ${fmtInt(sp.steps)} pas par jour`; }
+      summary: () => { const sp = S.settings.sport; return `${plural(sp.perWeek, 'séance')} de ${sp.minMin} à ${sp.maxMin} min · ${fmtInt(sp.steps)} pas par jour`; }
     },
     aliments: {
       title: 'Mes aliments', icon: 'flame', cls: 'm-matin', render: foodSettings,
@@ -3385,7 +3397,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       <p class="hint appt-when">${isKey(dr.date) ? `${cap1(longDate(dr.date))}${rdv && dr.time ? ` à ${dr.time}` : ''} · ${relDay(dr.date)}` : 'Choisis le jour.'}</p>
       ${rdv ? html`<label class="field"><span>Où (facultatif)</span><input type="text" id="appt-place" data-appt="place" value="${dr.place}" placeholder="Cabinet du Dr Martin, 12 rue des Lilas" maxlength="80" autocomplete="off"></label>` : ''}
       <label class="field"><span>Note (facultatif)</span><textarea id="appt-note" data-appt="note" rows="2" placeholder="${rdv ? 'Venir à jeun, apporter l’ordonnance, questions à poser…' : 'Idée de cadeau, heure de la fête…'}">${dr.note}</textarea></label>
-      ${PLATFORM.native ? html`<label class="switch"><input type="checkbox" id="appt-remind" data-appt="remind"${dr.remind ? html` checked` : ''}> Rappel la veille à 19:00${rdv ? (dr.time ? ' et 1 h avant' : ' et le matin à 8:00') : ''}</label>` : ''}
+      ${PLATFORM.native ? html`<label class="switch"><input type="checkbox" id="appt-remind" data-appt="remind"${dr.remind ? html` checked` : ''}> Rappel la veille à 19:00${rdv && dr.time ? ' et 1 h avant' : ' et le matin à 8:00'}</label>` : ''}
       <div class="actions"><button type="button" class="primary" data-act="appt-save">${f.id ? 'Enregistrer' : 'Ajouter'}</button><button type="button" class="ghost" data-act="appt-cancel">Annuler</button></div>
     </div>`;
   }
@@ -3509,15 +3521,15 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
               const label = `${longDate(dk)} : ${n ? plural(n, 'séance') : pl ? `prévu ${pl.name}` : 'repos'}`;
               return html`<button type="button" class="wdot${n ? ' done' : ''}${pl ? ' planned' : ''}${dk === k ? ' sel' : ''}${dk === t ? ' today' : ''}" data-act="sport-day" data-date="${dk}" aria-label="${label}"${dk === k ? html` aria-current="date"` : ''}><span class="wd">${WD_SHORT[i]}</span><span class="dotc">${n ? ICON.check : ''}</span></button>`;
             })}</div>
-            <div class="goalbar"><div class="track c-sport" role="img" aria-label="${wk.count} séances sur ${sp.perWeek}"><i style="width:${pctWeek}%"></i></div></div>
-            <p class="hint" style="margin:10px 0 0">${wk.minutes ? `${wk.minutes} min de sport` : 'Pas encore de séance'}${avgSteps ? ` · ${fmtInt(avgSteps)} pas par jour en moyenne` : ''}. Objectif : ${sp.perWeek} séances légères de ${sp.minMin} à ${sp.maxMin} min.</p>
+            <div class="goalbar"><div class="track c-sport" role="img" aria-label="${plural(wk.count, 'séance')} sur ${sp.perWeek}"><i style="width:${pctWeek}%"></i></div></div>
+            <p class="hint" style="margin:10px 0 0">${wk.minutes ? `${wk.minutes} min de sport` : 'Pas encore de séance'}${avgSteps ? ` · ${fmtInt(avgSteps)} pas par jour en moyenne` : ''}. Objectif : ${plural(sp.perWeek, 'séance')} légère${sp.perWeek > 1 ? 's' : ''} de ${sp.minMin} à ${sp.maxMin} min.</p>
           </section>
           <section class="card plan m-sport" aria-labelledby="plan-title">
             <div class="card-head"><span class="mico" aria-hidden="true">${ICON.target}</span><h2 id="plan-title">${isToday ? 'Prévu aujourd’hui' : 'Prévu ce jour-là'}</h2>${plan ? html`<span class="pill">${plan.minutes} min</span>` : ''}</div>
             ${plan ? html`<p class="plan-name">${plan.name}</p><p class="hint">${intensityLabel(plan.intensity)} · ${sportType(plan.type)[1]}${plan.details ? ` · ${plan.details}` : ''}</p>`
               : html`<p class="plan-name">Repos</p><p class="hint">Pas de séance prévue. Une marche ou un déménagement comptent aussi : note-les en activité du quotidien.</p>`}
             <div class="actions">
-              ${plan ? (planDone ? html`<span class="mdone">${ICON.check}Séance faite</span>` : html`<button type="button" class="primary" data-act="plan-done" data-date="${k}">C’est fait</button>`) : ''}
+              ${plan && k <= t ? (planDone ? html`<span class="mdone">${ICON.check}Séance faite</span>` : html`<button type="button" class="primary" data-act="plan-done" data-date="${k}">C’est fait</button>`) : ''}
               <button type="button" class="ghost" data-act="spt-new" data-date="${k}">${plan ? 'Autre séance' : 'Noter une séance'}</button>
               <button type="button" class="link" data-act="goto-settings" data-v="sport">Mon programme</button>
             </div>
@@ -3933,7 +3945,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       l.adding = !l.exos.length;
       saveLive(); render();
     },
-    'live-mode': (d) => { const e = liveExo(); if (e) { e.mode = d.v === 'time' ? 'time' : 'reps'; if (e.mode === 'time' && !(num(S.live.draft.sec) > 0)) S.live.draft.sec = 30; saveLive(); render(); } },
+    'live-mode': (d) => {
+      const e = liveExo(), mode = d.v === 'time' ? 'time' : 'reps';
+      if (!e || e.mode === mode) return;
+      if (e.sets.length) { toast('Retire d’abord les séries notées pour compter autrement.'); return; }
+      e.mode = mode;
+      if (mode === 'time' && !(num(S.live.draft.sec) > 0)) S.live.draft.sec = 30;
+      saveLive(); render();
+    },
     'live-step': (d) => {
       const l = S.live, f = d.f, step = Number(d.v);
       const lim = { reps: [0, 300], kg: [0, 500], sec: [0, 3600] }[f];
@@ -4013,7 +4032,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const back = S.live;
       S.live = null; S.ui.confirm = null; saveLive(); stopLiveTicker(); keepAwake(false); restNotify();
       render();
-      toast('Séance abandonnée', () => { if (S.live) return; S.live = back; saveLive(); render(); toast('Séance reprise'); });
+      toast('Séance abandonnée', () => { if (S.live) return; S.live = back; saveLive(); restNotify(); render(); toast('Séance reprise'); });
     }
   };
   /* Champs de la séance (saisie directe) : gardés au fil de l'eau, sans redessiner la page. */
@@ -4166,8 +4185,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (target === 'live' && S.live) {
       // dans la séance en direct : un exercice en durée, une série par tour
       const l = S.live;
-      let e = l.exos.find((x) => norm(x.name) === norm(name));
-      if (!e) { e = { id: newId(), name, mode: 'time', sets: [] }; l.exos.push(e); }
+      let e = l.exos.find((x) => norm(x.name) === norm(name) && (x.mode === 'time' || !x.sets.length));
+      if (e) e.mode = 'time';
+      else { e = { id: newId(), name: l.exos.some((x) => norm(x.name) === norm(name)) ? `${name} (chrono)` : name, mode: 'time', sets: [] }; l.exos.push(e); }
       r.sets.forEach((sec) => e.sets.push({ id: newId(), sec, at: Date.now() }));
       l.cur = e.id; l.adding = false; saveLive();
       toast(`Ajouté à ta séance : ${plural(r.sets.length, 'série')} (${name.toLowerCase()})`);
@@ -4585,7 +4605,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       ${tile('Sport', plural(s.sessions, 'séance'), `${fmtInt(s.sportMin)} min${perWeek != null ? ` · ${fmtDec(perWeek)} par semaine` : ` · objectif ${S.settings.sport.perWeek}`}`, dt(s.sessions, ps.sessions, 'sessions'))}
       ${tile('Pas', s.steps == null ? '—' : fmtInt(s.steps), s.steps == null ? 'rien noté' : 'par jour', dt(s.steps, ps.steps, 'steps'))}
       ${tile('Sommeil', s.sleep == null ? '—' : fmtDuration(Math.round(s.sleep * 60)), s.sleep == null ? 'rien noté' : 'par nuit', dt(s.sleep, ps.sleep, 'sleep'))}
-      ${tile('Humeur', s.mood == null ? '—' : `${fmtAvg(s.mood)}/5`, s.stress != null ? `stress ${fmtAvg(s.stress)}/5` : 'pas de check-in', dt(s.mood, ps.mood, 'mood'))}
+      ${tile('Humeur', s.mood == null ? '—' : `${fmtAvg(s.mood)}/5`, s.stress != null ? `stress ${fmtAvg(s.stress)}/5` : s.mood == null ? 'pas de check-in' : 'moyenne sur 5', dt(s.mood, ps.mood, 'mood'))}
       ${tile('Poids', wLast ? `${fmtDec(wLast.w)} kg` : '—', wLast ? `pesée du ${shortDate(wLast.k)}` : 'pas de pesée', wLast && wBefore ? deltaText(wLast.w, wBefore.w, 'weight') : null)}
     </div>`;
     // colonnes des graphiques
@@ -4703,7 +4723,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const mdCell = (v) => String(v == null || v === '' ? '—' : v).replace(/\|/g, '/').replace(/\s*\n\s*/g, ' ').trim();
   const mdRow = (cells) => `| ${cells.map(mdCell).join(' | ')} |`;
   const mdTable = (head, rows) => [mdRow(head), `|${head.map(() => ' --- ').join('|')}|`, ...rows.map(mdRow)];
-  const fullDate = (k) => `${lowDate(k)} ${fromKey(k).getFullYear()}`;
+  const fullDate = (k) => `${lowDate(k)} ${fromKey(k).getFullYear()}`.replace(/(\d{4}) \1$/, '$1');
   const DOSSIER_ASK = [
     '> **Consigne pour Claude ou une autre IA.** Ce dossier vient de mon journal de santé (app « Mon suivi »). À partir de ces données seulement :',
     '> 1. Fais un bilan général : sommeil, hydratation, alimentation (calories, protéines), activité physique, humeur, stress, douleurs, et leur évolution sur la période.',
@@ -4788,11 +4808,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const withLabs = visits.filter((k) => labsFilled(visitOf(peekDay(k))));
     if (withLabs.length) {
       const rows = LABS.filter(([key]) => withLabs.some((k) => str((visitOf(peekDay(k)).labs || {})[key]).trim()))
-        .map(([key, label, ref]) => [label, ...withLabs.map((k) => str((visitOf(peekDay(k)).labs || {})[key]).trim()), ref]);
-      L.push('', 'Prises de sang (valeur notée ; dernière colonne : repère habituel, le labo donne ses propres normes) :', '', ...mdTable(['Valeur', ...withLabs.map((k) => shortDate(k)), 'Repère'], rows));
+        .map(([key, label, ref]) => [label, ...withLabs.map((k) => str((visitOf(peekDay(k)).labs || {})[key]).trim()), labRef(key, ref)]);
+      L.push('', 'Prises de sang (valeur notée ; dernière colonne : repère habituel, le labo donne ses propres normes) :', '', ...mdTable(['Analyse', ...withLabs.map((k) => shortDate(k)), 'Repère'], rows));
       withLabs.forEach((k) => { const tx = str(visitOf(peekDay(k)).labsText).trim(); if (tx) L.push('', `Autres résultats du ${shortDate(k)} : ${tx}`); });
     }
-    visits.forEach((k) => { const n = str(visitOf(peekDay(k)).notes).trim(); if (n) L.push(`Médecin, ${shortDate(k)} : ${n}`); });
+    visits.forEach((k) => { const n = str(visitOf(peekDay(k)).notes).trim(); if (n) L.push('', `Médecin, ${shortDate(k)} : ${n.replace(/\s*\n\s*/g, ' ')}`); });
     const apPast = apptsBetween(from, to), apNext = apptsBetween(addDays(t, 1), addDays(t, 365));
     if (apPast.length || apNext.length) {
       const row = (a) => [shortDate(a.date), a.time || '', a.title, a.place, a.note.replace(/\s+/g, ' ')];
@@ -4919,7 +4939,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const pts = weighIns(), start = h.startWeight || (pts[0] && pts[0].w);
     let goal = '';
     if (h.targetWeight && wNow) {
-      const left = round1(wNow - h.targetWeight), done = start ? round1(start - wNow) : null;
+      const gain = h.targetWeight > (start || wNow); // objectif de prise de poids
+      const left = round1(gain ? h.targetWeight - wNow : wNow - h.targetWeight), done = start ? round1(start - wNow) : null;
       const pct = start && start !== h.targetWeight ? Math.max(0, Math.min(100, Math.round(((start - wNow) / (start - h.targetWeight)) * 100))) : 0;
       goal = html`<div class="goalbar"><p>Objectif ${fmtDec(h.targetWeight)} kg · ${left > 0 ? `encore ${fmtDec(left)} kg` : 'atteint'}${done ? ` · ${done > 0 ? '−' : '+'}${fmtDec(Math.abs(done))} kg depuis le départ` : ''}</p><div class="track" role="img" aria-label="${pct} % du chemin vers l’objectif"><i style="width:${pct}%"></i></div></div>`;
     }
@@ -4967,7 +4988,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         ${vitalsCard(visitDays)}
         <section class="card wide" aria-labelledby="h-labs">
           <div class="card-head"><span class="mico m-aprem" aria-hidden="true">${ICON.drop}</span><h2 id="h-labs">Prises de sang</h2></div>
-          ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Valeur</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${ref}</small></td></tr>`)}</tbody></table></div>`
+          ${labRows.length ? html`<div class="scroller" style="border:0;border-radius:0;background:transparent"><table class="lab-table"><thead><tr><th scope="col">Analyse</th>${withLabs.map((k) => html`<th scope="col">${tinyDate(k)}</th>`)}<th scope="col">Repère</th></tr></thead><tbody>${labRows.map(([key, label, ref]) => html`<tr><th scope="row">${label}</th>${withLabs.map((k) => html`<td>${str(((visitOf(peekDay(k)) || {}).labs || {})[key]) || '—'}</td>`)}<td><small>${labRef(key, ref)}</small></td></tr>`)}</tbody></table></div>`
             : html`<p class="empty">Tes résultats apparaîtront ici, visite après visite, dès que tu les notes le jour de la visite.</p>`}
         </section>
       </div>`;
@@ -5024,9 +5045,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     return !!(a && view.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox' && a.type !== 'file');
   }
   function safeRender() { if (isEditing()) { pendingRender = true; return; } render(); }
+  // Un rendu différé attend que le doigt ou la souris soit relâché : le clic en cours arrive d'abord à son bouton.
+  let pressing = false;
+  document.addEventListener('pointerdown', () => { pressing = true; if (S.live && S.live.sound !== false) unlockAudio(); }, true);
+  document.addEventListener('pointercancel', () => { pressing = false; }, true);
+  document.addEventListener('pointerup', () => { pressing = false; if (pendingRender) setTimeout(() => { if (pendingRender && !isEditing()) render(); }, 0); }, true);
   document.addEventListener('focusout', () => {
     if (!pendingRender) return;
-    setTimeout(() => { if (pendingRender && !isEditing()) render(); }, 60);
+    setTimeout(() => { if (pendingRender && !pressing && !isEditing()) render(); }, 60);
   });
 
   let toastTimer = null;
@@ -5167,7 +5193,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       await Share.share({ title: name, files: [res.uri], dialogTitle: 'Enregistrer ou envoyer' });
       return true;
     } catch (e) {
-      return /cancel/i.test(String((e && (e.message || e.name)) || e));
+      return /cancel/i.test(String((e && (e.message || e.name)) || e)) ? 'cancel' : false;
     }
   }
   /* Propose le fichier ; renvoie true quand il est parti (enregistré, partagé ou téléchargé). */
@@ -5183,10 +5209,13 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         if (code === 'rate_limited') { toast('Réessaie dans un instant.'); return false; }
       }
     } else if (PLATFORM.native) {
-      if (await saveFileNative(name, data)) return true;
+      const r = await saveFileNative(name, data);
+      if (r) return r === true; // « cancel » : fermé sans rien enregistrer, pas de texte de secours
     } else if (!PLATFORM.artifact && downloadBlob(name, data)) {
       return true; // navigateur ou app PC : le fichier est téléchargé
     }
+    // la zone de texte de secours vit dans Réglages → Données
+    S.ui.view = 'reglages'; S.ui.settingsPage = 'donnees';
     S.ui.exportText = data;
     S.ui.focus = '#export-text';
     S.ui.select = true;
@@ -5211,7 +5240,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const items = [
       ['profil', 'Ton profil santé', 'âge, taille, poids, traitements', hasProfile()],
       ['complements', 'Tes compléments', 'matin, midi, 16h, soir, et leurs cures', st.supplements.length > 0],
-      ['visite', 'Ta visite médicale', `première le ${shortDate(nextVisit(todayKey()))}, à ajuster`, seen('visite')],
+      ['visite', 'Ta visite médicale', `${daysBetween(S.settings.visit.start, todayKey()) > 0 ? 'prochaine' : 'première'} le ${shortDate(nextVisit(todayKey()))}, à ajuster`, seen('visite')],
       ['objectifs', 'Tes objectifs du jour', `eau ${fmtDec(st.goals.water)} L, calories, protéines`, seen('objectifs')]
     ];
     const done = items.filter((x) => x[3]).length;
@@ -5247,7 +5276,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     try { obj = JSON.parse(String(raw).trim()); } catch (e) { obj = null; }
     if (!isObj(obj)) return null;
     const exp = new Date(obj.exported);
-    const when = Number.isNaN(exp.getTime()) ? '' : ` du ${exp.getDate()} ${MONTHS[exp.getMonth()]} ${exp.getFullYear()}`;
+    const when = Number.isNaN(exp.getTime()) ? '' : ` du ${dayNumber(exp.getDate())} ${MONTHS[exp.getMonth()]} ${exp.getFullYear()}`;
     if (obj.scope === 'day' && isObj(obj.days)) {
       const days = sanitizeDays(obj.days), keys = Object.keys(days).sort();
       if (!keys.length) return null;
@@ -5471,7 +5500,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const dr = mealDraft();
       const x = dr && dr.items.find((i) => i.id === d.id);
       if (!x) return;
-      dr.item = { name: x.name, grams: x.grams ? fmtDec(x.grams) : '', p: fmtDec(x.p), g: fmtDec(x.g), l: fmtDec(x.l), kcal: fmtDec(x.kcal), auto: false, kcalAuto: false, save: false };
+      dr.item = { name: x.name, grams: x.grams ? fmtDec(x.grams) : '', p: fmtDec(x.p), g: fmtDec(x.g), l: fmtDec(x.l), kcal: fmtDec(x.kcal), auto: false, kcalAuto: false, save: false,
+        base: { grams: x.grams, p: x.p, g: x.g, l: x.l, kcal: x.kcal } };
       dr.editItem = x.id;
       S.ui.focus = '#fi-grams';
       render();
@@ -5542,7 +5572,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const i = S.settings.supplements.findIndex((x) => x.id === d.sid), back = clone(S.settings.supplements[i]);
       S.ui.openSup = null;
       mutateSettings((st) => { st.supplements = st.supplements.filter((x) => x.id !== d.sid); });
-      toast('Complément supprimé', back && (() => { mutateSettings((st) => { if (!st.supplements.some((x) => x.id === back.id)) st.supplements.splice(Math.min(i, st.supplements.length), 0, back); }); toast('Remis'); }));
+      scheduleReminders();
+      toast('Complément supprimé', back && (() => { mutateSettings((st) => { if (!st.supplements.some((x) => x.id === back.id)) st.supplements.splice(Math.min(i, st.supplements.length), 0, back); }); scheduleReminders(); toast('Remis'); }));
     },
     'food-add': () => {
       const fd = S.ui.foodDraft, name = String(fd.name || '').trim();
@@ -5661,7 +5692,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const def = VITALS.find((x) => x[0] === ds.vm);
       if (!def) return;
       const n = num(t.value), empty = !String(t.value).trim();
-      if (!empty && (n == null || n < def[3] || n > def[4])) { toast(`${def[1]} : entre ${def[3]} et ${def[4]} ${def[2]}.`); return; }
+      if (!empty && (n == null || n < def[3] || n > def[4])) {
+        toast(`${def[1]} : entre ${def[3]} et ${def[4]} ${def[2]}.`);
+        const old = vitalOf(visitOf(peekDay(ds.date)), ds.vm); t.value = old == null ? '' : fmtDec(old);
+        return;
+      }
       const v = empty ? null : ds.vm === 'temp' || ds.vm === 'waist' ? round1(n) : Math.round(n);
       mutateDay(ds.date, 'visit', (d) => { ensureVisit(d)[ds.vm] = v; }, false);
       if (v != null) t.value = fmtDec(v);
@@ -5754,8 +5789,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     } else if (ds.item && t.type !== 'checkbox') {
       onItemInput(ds.item, t.value);
     } else if (ds.vm) {
-      const key = ds.vm, val = t.value;
-      if (VITALS.some((x) => x[0] === key)) mutateDay(ds.date, 'visit', (d) => { ensureVisit(d)[key] = val; }, false);
+      const key = ds.vm, val = t.value, def = VITALS.find((x) => x[0] === key), n = num(val);
+      if (def && (!val.trim() || (n != null && n >= def[3] && n <= def[4]))) mutateDay(ds.date, 'visit', (d) => { ensureVisit(d)[key] = val.trim() ? n : null; }, false);
     } else if (ds.visit && ds.visit !== 'weight') {
       const path = ds.visit, val = t.value;
       mutateDay(ds.date, 'visit', (d) => {
@@ -5848,7 +5883,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
 
   /* App Android : rappels de la visite médicale (la veille à 19:00, le matin à 7:30), pour les 6 prochaines.
      Identifiants 7000 à 7099 réservés à ces rappels : on les annule tous puis on les recrée. */
-  async function scheduleReminders() {
+  let remindChain = Promise.resolve();
+  const scheduleReminders = () => (remindChain = remindChain.then(doScheduleReminders, doScheduleReminders));
+  async function doScheduleReminders() {
     const LN = capPlugin('LocalNotifications');
     if (!LN || !S.settings) return;
     const v = S.settings.visit, cures = S.settings.cureNotify ? S.settings.supplements.filter((s) => s.active && s.cure) : [];
@@ -5881,7 +5918,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
           eve.setHours(19, 0, 0, 0);
           const pause = ph.phase === 'prise';
           const title = pause ? `Demain : pause ${deName(s.name)}` : `Demain : ${ph.phase === 'avant' ? 'début de la cure' : 'reprise'} ${deName(s.name)}`;
-          const body = pause ? `${s.cure.off} semaines sans, reprise le ${shortDate(addDays(day, s.cure.off * 7))}.` : `${s.cure.on} semaines de prise, jusqu’au ${shortDate(addDays(day, s.cure.on * 7 - 1))} inclus.`;
+          const body = pause ? `${plural(s.cure.off, 'semaine')} sans, reprise le ${shortDate(addDays(day, s.cure.off * 7))}.` : `${plural(s.cure.on, 'semaine')} de prise, jusqu’au ${shortDate(addDays(day, s.cure.on * 7 - 1))} inclus.`;
           if (eve.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: id++, title, body, schedule: { at: eve, allowWhileIdle: true } });
           from = day;
         }
@@ -5890,7 +5927,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       appts.forEach((a, i) => {
         const eve = fromKey(addDays(a.date, -1)); eve.setHours(19, 0, 0, 0);
         const soon = fromKey(a.date);
-        if (a.time) { const m = toMin(a.time) - 60; soon.setHours(Math.floor(Math.max(0, m) / 60), Math.max(0, m) % 60, 0, 0); } else soon.setHours(8, 0, 0, 0);
+        if (a.time) { soon.setHours(0, 0, 0, 0); soon.setMinutes(toMin(a.time) - 60); } else soon.setHours(8, 0, 0, 0); // 00:30 → 23:30 la veille
         const what = `${a.title}${a.time ? ` à ${a.time}` : ''}`, body = [a.place, a.note].filter(Boolean).join(' · ').slice(0, 180) || (a.kind === 'rdv' ? 'Rendez-vous noté dans Mon suivi.' : 'Date notée dans Mon suivi.');
         if (eve.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7200 + i * 2, title: `Demain : ${what}`, body, schedule: { at: eve, allowWhileIdle: true } });
         if (soon.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7201 + i * 2, title: a.time ? `Dans 1 h : ${what}` : `Aujourd’hui : ${what}`, body, schedule: { at: soon, allowWhileIdle: true } });
@@ -5903,7 +5940,10 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const capApp = capPlugin('App');
   if (capApp && typeof capApp.addListener === 'function') {
     capApp.addListener('backButton', () => {
-      if (S.ui.form || S.ui.appt || S.ui.confirm || S.ui.exportText != null) { S.ui.form = null; S.ui.appt = null; S.ui.confirm = null; S.ui.exportText = null; render(); }
+      if (S.ui.form || S.ui.appt || S.ui.confirm || S.ui.exportText != null || S.ui.tplEdit || S.ui.pendingRestore || S.ui.restoreOpen || S.ui.profileEdit || S.ui.profileAdd || S.ui.openSup) {
+        Object.assign(S.ui, { form: null, appt: null, confirm: null, exportText: null, tplEdit: null, pendingRestore: null, restoreOpen: false, profileEdit: null, profileAdd: false, openSup: null });
+        render();
+      }
       else if (S.ui.view === 'reglages' && S.ui.settingsPage) { S.ui.settingsPage = null; render(); toTop(); }
       else if (S.ui.view !== 'jour') { S.ui.view = 'jour'; render(); toTop(); }
       else if (typeof capApp.minimizeApp === 'function') capApp.minimizeApp();
