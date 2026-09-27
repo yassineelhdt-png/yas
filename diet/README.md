@@ -9,6 +9,14 @@ Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, a
 prises de sang visite par visite) et **Réglages** (profil santé, objectifs du jour, visite médicale, sport,
 compléments, mes aliments, Claude, sauvegarde et données).
 
+**Profils** (Réglages → *Profils*, ou la pastille en haut à droite) : un journal par personne (moi, ma mère…).
+Chaque profil a ses compléments, repas, sport, visites et réglages ; on passe de l'un à l'autre en un appui.
+Un nouveau profil démarre vide. Avec un compte Claude, la liste des profils suit le compte d'un appareil à l'autre.
+
+**Chrono** (onglet Sport) : chronomètre avec tours (sprints…), ou intervalles effort / récup × tours (préréglages
+Sprints, Corde, Tabata) avec bips à 3, 2, 1 et vibration aux changements. Il se note dans la journée, ou dans la
+séance en direct si elle est en cours (une série par tour).
+
 **Séance en direct** (onglet Sport) : « Commencer maintenant » (ou la séance prévue) lance le chrono ; pour chaque
 exercice, les séries se notent en répétitions (charge, répétitions en réserve) ou en durée (avec un chrono), et le
 repos démarre tout seul après chaque série (1, 1 min 30, 2 ou 3 min, + 15 s, passer), avec vibration et son. L'écran
@@ -68,7 +76,10 @@ modification de `diet/` (workflow « Mon suivi ») :
 
 ## Données
 
-- **Séance en cours** : sur l'appareil seulement (`localStorage`, clé `mon-suivi-live-v1`) jusqu'à « Terminer ».
+- **Séance en cours** et **chrono** : sur l'appareil seulement (`mon-suivi-live-v1`, `mon-suivi-chrono-v1`).
+- **Profils** : liste dans `mon-suivi-profiles-v1` (et `data/users/<id>/profiles` avec un compte). Le profil principal
+  garde les emplacements ci-dessous ; un autre profil ajoute `@<profil>` aux clés de l'appareil et utilise la
+  collection `data/users/<id>/profiles/<profil>` sur le compte.
 - **Compte Claude** : `data/users/<id>/settings` (liste, objectifs, profil santé, visite, sport, mes aliments) et un
   document par mois, `data/users/<id>/mAAAA-MM`
   (`{ days: { "AAAA-MM-JJ": { taken, water, steps, sport, wake, bed, checkins, symptoms, meals, notes, visit, claude, sent } } }`).

@@ -587,6 +587,56 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .livebar{ position:fixed; z-index:25; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom, 0px)); display:inline-flex; align-items:center; gap:9px; max-width:calc(100% - 32px); padding:11px 18px; border:0; border-radius:999px; background:var(--accent); color:var(--on-accent); font-weight:800; font-size:15px; font-variant-numeric:tabular-nums; box-shadow:0 8px 24px rgba(26,20,23,.22); white-space:nowrap; }
 @media (min-width:1000px){ .livebar{ left:calc(50% + 50px); bottom:calc(24px + env(safe-area-inset-bottom, 0px)); } }
 
+/* Profils */
+.avatar{ --pc:var(--accent); --pco:var(--on-accent); flex:none; width:30px; height:30px; border-radius:50%; display:inline-grid; place-items:center; background:var(--pc); color:var(--pco); font-weight:800; font-size:14px; line-height:1; }
+.avatar.big{ width:46px; height:46px; font-size:19px; }
+.c1{ --pc:var(--soir); --pco:var(--soir-on); } .c2{ --pc:var(--midi); --pco:var(--midi-on); } .c3{ --pc:var(--aprem); --pco:var(--aprem-on); } .c4{ --pc:var(--matin); --pco:var(--matin-on); }
+.who{ display:inline-flex; align-items:center; gap:8px; min-width:0; max-width:42vw; min-height:40px; padding:4px 13px 4px 4px; border:1px solid var(--line); border-radius:999px; background:var(--surface); color:var(--ink); font-weight:800; font-size:14px; }
+.who-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:370px){ .who-name{ display:none; } .who{ padding-right:4px; } }
+.profile-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.profile{ display:flex; flex-direction:column; gap:12px; padding:12px 14px; border-radius:18px; background:var(--surface-2); border:1px solid var(--line); }
+.profile.on{ border-color:var(--accent-line); background:var(--accent-tint); }
+.pf-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; }
+.pf-txt{ flex:1 1 140px; min-width:0; display:flex; flex-direction:column; line-height:1.3; }
+.pf-txt b{ font-size:17px; font-weight:800; }
+.pf-txt span{ font-size:13.5px; font-weight:600; color:var(--muted); }
+.pf-actions{ display:flex; align-items:center; gap:6px; }
+.pill.on{ background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.pf-edit{ margin:0; }
+.pf-colors .swatch{ width:40px; height:40px; min-height:40px; padding:0; border-radius:50%; background:var(--pc); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--line); }
+.pf-colors .swatch.c0{ --pc:var(--accent); }
+.pf-colors .swatch[aria-pressed="true"]{ box-shadow:0 0 0 3px var(--ink); }
+.pf-add{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px; }
+.pf-add .primary{ min-height:46px; }
+
+/* Chrono */
+.chrono-card .card-head{ flex-wrap:wrap; }
+.chrono-card .card-head .seg{ margin-left:auto; }
+.chr-face{ display:flex; justify-content:center; padding:8px 0 14px; }
+.chr-time{ font-family:var(--font-display); font-weight:600; font-size:clamp(46px, 13vw, 64px); letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
+.chr-btns{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.chr-btns .big{ flex:1 1 140px; max-width:240px; }
+.laps{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto; }
+.laps li{ display:flex; align-items:baseline; gap:12px; padding:8px 12px; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); font-variant-numeric:tabular-nums; }
+.laps li span{ flex:1; font-weight:700; }
+.laps li b{ font-size:18px; font-weight:800; }
+.laps li small{ color:var(--muted); font-weight:600; min-width:64px; text-align:right; }
+.laps li.best{ border-color:var(--accent-line); background:var(--accent-tint); }
+.chr-save{ display:flex; flex-direction:column; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+.chr-save .primary{ align-self:flex-start; }
+.chr-done{ margin:4px 0 12px; font-weight:800; font-size:17px; }
+.step-out{ display:inline-grid; place-items:center; width:92px; min-height:52px; font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; border-radius:14px; border:1px solid var(--line); background:var(--surface); }
+.chrono-card .steps{ margin:12px 0 10px; }
+.chrono-card > .chips{ margin-bottom:4px; }
+.it-face{ --ph:var(--accent); display:flex; justify-content:center; padding:6px 0 16px; }
+.it-face[data-phase="rest"]{ --ph:var(--soir); }
+.it-ring{ --p:1; width:220px; height:220px; max-width:100%; border-radius:50%; background:conic-gradient(var(--ph) calc(var(--p) * 1turn), var(--bub) 0); display:grid; place-items:center; }
+.it-ring > span{ width:188px; height:188px; border-radius:50%; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+.it-ring small{ font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.it-ring small:first-child{ color:var(--ph); font-size:15px; }
+.it-ring .chr-time{ font-size:52px; }
+
 /* Messages */
 .toast-wrap{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; padding:0 16px calc(88px + env(safe-area-inset-bottom, 0px)); pointer-events:none; }
 @media (min-width:1000px){ .toast-wrap{ padding-bottom:calc(20px + env(safe-area-inset-bottom, 0px)); left:100px; } }
@@ -600,6 +650,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     <div class="top-in">
       <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true" focusable="false"><rect class="b-bg" width="512" height="512" rx="116"/><g transform="rotate(-40 256 256)"><rect x="100" y="188" width="156" height="136" rx="68" fill="#FFFFFF"/><rect x="178" y="188" width="78" height="136" fill="#FFFFFF"/><rect x="256" y="188" width="156" height="136" rx="68" fill="#FFC2C9"/><rect x="256" y="188" width="78" height="136" fill="#FFC2C9"/></g></svg>Mon suivi</span>
       <span class="sync" id="sync">Chargement…</span>
+      <button type="button" class="who" id="who" data-act="goto-settings" data-v="profils" hidden></button>
     </div>
   </header>
   <main id="view"><p class="loading">Chargement de tes données…</p></main>
@@ -656,6 +707,41 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
   const str = (v) => (typeof v === 'string' ? v : '');
   const listOf = (v) => (Array.isArray(v) ? v.filter(isObj) : []);
+  /* ---------- Profils ----------
+     Plusieurs personnes sur le même appareil (moi, ma mère…) : chaque profil a ses propres données.
+     Le profil « main » garde les clés d'origine, les autres ajoutent « @<id> » :
+       mon-suivi-v1@<id> (sans compte), mon-suivi-cloud-v1@<id> (copie du compte), mon-suivi-live-v1@<id> (séance en cours),
+       et, avec un compte Claude, la collection data/users/<compte>/profiles/<id> au lieu de data/users/<compte>.
+     La liste des profils est dans PROFILES_KEY (et dans le document data/users/<compte>/profiles) ;
+     le profil affiché est choisi par appareil. */
+  const PROFILES_KEY = 'mon-suivi-profiles-v1';
+  const MAIN = 'main';
+  const PROFILE_COLORS = ['accent', 'soir', 'midi', 'aprem', 'matin'];
+  const normalizeProfile = (p, i) => ({
+    id: p.id === MAIN || /^p[a-z0-9]{3,20}$/.test(String(p.id)) ? String(p.id) : MAIN,
+    name: String(p.name || '').trim().slice(0, 30) || (p.id === MAIN ? 'Moi' : 'Profil'),
+    color: Number.isInteger(p.color) && p.color >= 0 && p.color < PROFILE_COLORS.length ? p.color : i % PROFILE_COLORS.length
+  });
+  function normalizeProfileList(list) {
+    const seen = new Set(), out = [];
+    (Array.isArray(list) ? list : []).filter(isObj).forEach((p, i) => { const n = normalizeProfile(p, i); if (!seen.has(n.id)) { seen.add(n.id); out.push(n); } });
+    if (!seen.has(MAIN)) out.unshift({ id: MAIN, name: 'Moi', color: 0 });
+    return out.slice(0, 8);
+  }
+  function loadProfiles() {
+    const raw = lsGet(PROFILES_KEY);
+    const list = normalizeProfileList(isObj(raw) ? raw.list : null);
+    const active = isObj(raw) && list.some((p) => p.id === raw.active) ? raw.active : MAIN;
+    const purge = isObj(raw) && Array.isArray(raw.purge) ? raw.purge.filter((x) => /^p[a-z0-9]{3,20}$/.test(String(x))) : [];
+    return { list, active, cloudPending: !!(isObj(raw) && raw.cloudPending), purge };
+  }
+  const PROFILES = loadProfiles();
+  const saveProfiles = () => lsSet(PROFILES_KEY, { list: PROFILES.list, active: PROFILES.active, cloudPending: PROFILES.cloudPending, purge: PROFILES.purge });
+  const activeProfile = () => PROFILES.list.find((p) => p.id === PROFILES.active) || PROFILES.list[0];
+  const scoped = (base, pid = PROFILES.active) => (pid === MAIN ? base : `${base}@${pid}`);
+  const lsKey = () => scoped(LS_KEY);
+  const cacheKey = () => scoped(CACHE_KEY);
+  const profileCollection = (uid, pid = PROFILES.active) => (pid === MAIN ? `data/users/${uid}` : `data/users/${uid}/profiles/${pid}`);
   const byTime = (a, b) => (toMin(a.time) ?? 9999) - (toMin(b.time) ?? 9999);
   const bytes = (s) => new TextEncoder().encode(s).length;
   const plural = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
@@ -784,6 +870,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
       drop: '<path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/>',
       person: '<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
+      people: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M15.8 14.3A5.5 5.5 0 0 1 21.5 20"/>',
       dumbbell: '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
       pause: '<path d="M9 5.5v13M15 5.5v13"/>',
       send: '<path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5z"/>',
@@ -824,7 +911,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       mk('Mounjaro', '2,5 mg', 'matin', 'weekly', 'Dose prescrite par ton médecin')
     ];
   }
-  const freshSettings = () => normalizeSettings({ created: todayKey(), supplements: defaultSupplements(todayKey()) });
+  // Profil principal : la liste de départ ; autre profil (ma mère…) : un journal vide, première visite dans 4 semaines.
+  const freshSettings = () => (PROFILES.active === MAIN
+    ? normalizeSettings({ created: todayKey(), supplements: defaultSupplements(todayKey()) })
+    : normalizeSettings({ created: todayKey(), supplements: [], visit: { start: addDays(todayKey(), 28), every: 28 } }));
   function normalizeGoals(g) {
     const out = { kcal: null, p: null, g: null, l: null, water: 2.5, glass: 250 };
     if (!isObj(g)) return out;
@@ -940,12 +1030,12 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 
   /* ---------- État ---------- */
   const S = {
-    settings: null, months: {}, ready: false,
+    settings: null, months: {}, ready: false, live: null, chrono: null,
     ui: {
       view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null,
       restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
-      calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null,
+      calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', switching: false,
       foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       // Claude : question en cours, réponse (scope « day » ou « week » + clé), photo jointe
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null }
@@ -1173,7 +1263,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {},
     dirtyDays: {},        // { 'm2026-09': { '2026-09-26': { 'taken:abc': true, notes: true } } }
     writingDays: {},      // la même chose, pour les écritures en cours
-    connectTry: 0, connectTimer: null, retryTry: 0, retryTimer: null, lsTimer: null, status: null
+    connectTry: 0, connectTimer: null, retryTry: 0, retryTimer: null, lsTimer: null, status: null,
+    gen: 0, db: null, uid0: null // gen change à chaque changement de profil ; db et uid0 : le compte, gardés d'un profil à l'autre
   };
 
   function lsGet(key) { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
@@ -1210,12 +1301,12 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     clearTimeout(store.lsTimer); store.lsTimer = null;
     if (!S.settings) return true;
     if (store.mode === 'local') {
-      store.failed = !lsSet(LS_KEY, { settings: S.settings, months: S.months });
+      store.failed = !lsSet(lsKey(), { settings: S.settings, months: S.months });
       refreshSync();
       return !store.failed;
     }
     if (!store.uid) return false;
-    return lsSet(CACHE_KEY, { v: 1, uid: store.uid, trusted: store.trusted, settings: S.settings, months: S.months, pending: pendingSnapshot() });
+    return lsSet(cacheKey(), { v: 1, uid: store.uid, trusted: store.trusted, settings: S.settings, months: S.months, pending: pendingSnapshot() });
   }
   function persistSoon() { clearTimeout(store.lsTimer); store.lsTimer = setTimeout(persistNow, LOCAL_DELAY); }
 
@@ -1310,6 +1401,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
 
   async function flush(docId) {
+    const gen = store.gen;
     clearTimeout(store.timers[docId]); delete store.timers[docId];
     if (store.mode !== 'cloud' || !store.online || store.stopped) return;
     if (store.inflight.has(docId)) { store.again.add(docId); return; }
@@ -1337,6 +1429,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     try {
       await withOneRetry(() => (isMonth ? writeMonth(ref, full, writing) : ref.set(full)));
     } catch (e) { error = e || { code: 'unavailable' }; }
+    if (gen !== store.gen) return; // profil quitté entre-temps
     store.inflight.delete(docId);
     delete store.writingDays[docId];
     if (error) { restore(); onWriteError(error); }
@@ -1394,6 +1487,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (store.refs[ds.id] === raw) return; // document inchangé depuis la dernière livraison
       store.refs[ds.id] = raw;
       const id = ds.id, data = clone(raw) || {}, sig = stable(data);
+      if (id === 'profiles') { changed = mergeCloudProfiles(data.list) || changed; return; } // liste des profils (autre appareil)
       const busy = store.dirty.has(id) || store.inflight.has(id) || !!store.timers[id];
       if (!busy) {
         if (sig === store.last[id]) return;
@@ -1409,7 +1503,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   function subscribe() {
     if (store.unsub || store.stopped) return;
     try {
-      store.unsub = store.col.onSnapshot(onRemote, (e) => {
+      const gen = store.gen;
+      store.unsub = store.col.onSnapshot((snap) => { if (gen === store.gen) onRemote(snap); }, (e) => {
+        if (gen !== store.gen) return;
         store.unsub = null;
         const code = e && e.code;
         if (code === 'revoked') { stopSync(); return; }
@@ -1485,8 +1581,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     if (store.online || store.stopped || store.connecting || !store.col) return;
     clearTimeout(store.connectTimer); store.connectTimer = null;
     store.connecting = true;
+    const gen = store.gen;
     let snap = null, error = null;
     try { snap = await withTimeout(store.col.get(), GET_TIMEOUT, null); } catch (e) { error = e; }
+    if (gen !== store.gen) return;
     store.connecting = false;
     if (!snap) {
       store.connectTry++;
@@ -1554,19 +1652,28 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
   async function init() {
     refreshSync();
-    localData = lsGet(LS_KEY);
     const caps = await getCapabilities();
     store.downloads = caps.downloads || null;
     store.sample = caps.sample;
     if (store.sample && typeof store.sample.limits === 'function') {
       store.sample.limits().then((l) => { store.sampleImages = (l && l.images) || null; if (S.ready && store.sampleImages) safeRender(); }).catch(() => {});
     }
-    if (!caps.db || !caps.uid) { startLocal(); return; }
-    try { store.col = caps.db.collection('data/users/' + caps.uid); } catch (e) { startLocal(); return; }
+    store.db = caps.db && caps.uid ? caps.db : null;
+    store.uid0 = store.db ? caps.uid : null;
+    startProfile();
+    if (store.db) syncProfiles();
+  }
+  /* Démarre le profil affiché : ses données sur l'appareil, puis celles du compte s'il y en a un. */
+  function startProfile() {
+    localData = lsGet(lsKey());
+    S.live = loadLive();
+    S.chrono = loadChrono();
+    if (!store.db) { startLocal(); return; }
+    try { store.col = store.db.collection(profileCollection(store.uid0)); } catch (e) { startLocal(); return; }
     store.mode = 'cloud';
-    store.uid = caps.uid;
-    const cache = lsGet(CACHE_KEY);
-    if (isObj(cache) && cache.uid === caps.uid && isObj(cache.settings)) startFromCache(cache);
+    store.uid = store.uid0;
+    const cache = lsGet(cacheKey());
+    if (isObj(cache) && cache.uid === store.uid && isObj(cache.settings)) startFromCache(cache);
     refreshSync();
     connect();
   }
@@ -2176,6 +2283,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   function profileText() {
     const h = S.settings.health, age = ageOf(h.birth), cw = currentWeight(), w = weightNow(), b = bmi(), g = S.settings.goals;
     const L = [];
+    if (PROFILES.active !== MAIN) L.push(`Profil : ${activeProfile().name}`);
     const who = [h.sex ? cap1(h.sex) : '', age != null ? `${age} ans` : '', h.height ? `${fmtHeight(h.height)}` : '',
       w ? `${fmtDec(w)} kg${cw ? ` (pesée du ${shortDate(cw.k)})` : ' (poids de départ)'}` : '', b ? `IMC ${fmtDec(b)}` : ''].filter(Boolean);
     if (who.length) L.push(`Mon profil : ${who.join(', ')}`);
@@ -2535,9 +2643,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     return html`<section class="set-sec">
       <div class="sec-head"><p class="hint" style="margin:0">Touche un complément pour le modifier. Pour « un jour sur deux », le premier jour décide lesquels tombent.</p><button type="button" class="primary" data-act="sup-add">Ajouter</button></div>
       ${groups}${sups.length ? '' : html`<p class="empty">Ta liste est vide.</p>`}
-      <div class="reset">${S.ui.confirm === 'reset'
+      ${PROFILES.active !== MAIN ? '' : html`<div class="reset">${S.ui.confirm === 'reset'
         ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
-        : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>
+        : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>`}
       ${PLATFORM.native && sups.some((x) => x.cure) ? html`<label class="switch" style="margin-top:14px"><input type="checkbox" id="cure-notify" data-setting="cureNotify"${S.settings.cureNotify ? html` checked` : ''}> Notification la veille d’un début, d’une pause ou d’une reprise de cure (19:00)</label>
         ${store.notifyDenied ? html`<p class="hint">Les notifications sont bloquées : autorise-les pour Mon suivi dans les réglages Android.</p>` : ''}` : ''}
     </section>`;
@@ -2604,6 +2712,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     </section>`;
   }
   const SETTINGS_PAGES = {
+    profils: {
+      title: 'Profils', icon: 'people', cls: 'm-sport', render: profilesSettings,
+      summary: () => PROFILES.list.map((x) => (x.id === PROFILES.active ? `${x.name} (affiché)` : x.name)).join(' · ')
+    },
     profil: {
       title: 'Profil santé', icon: 'person', cls: 'm-midi', render: profileSettings,
       summary: () => {
@@ -2640,7 +2752,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       summary: () => (store.mode === 'cloud' ? 'Synchronisées avec ton compte Claude' : 'Sur cet appareil · sauvegarder, restaurer')
     }
   };
-  const SETTINGS_GROUPS = [['Moi', ['profil', 'objectifs']], ['Suivi', ['visite', 'sport', 'complements', 'aliments']], ['Claude et données', ['claude', 'donnees']]];
+  const SETTINGS_GROUPS = [['Moi', ['profils', 'profil', 'objectifs']], ['Suivi', ['visite', 'sport', 'complements', 'aliments']], ['Claude et données', ['claude', 'donnees']]];
   function renderSettings() {
     const page = SETTINGS_PAGES[S.ui.settingsPage];
     if (page) {
@@ -2715,6 +2827,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       </div>
       <div class="daygrid">
         <div class="col">
+          ${chronoCard()}
           <section class="card m-sport" aria-labelledby="sw-title">
             <div class="card-head"><span class="mico" aria-hidden="true">${ICON.dumbbell}</span><h2 id="sw-title">${startOfWeek(k) === startOfWeek(t) ? 'Cette semaine' : `Semaine du ${shortDate(wk.start)}`}</h2><span class="pill">${wk.count} / ${sp.perWeek} séances</span></div>
             <div class="wdots">${wk.days.map((dk, i) => {
@@ -2854,17 +2967,16 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   ];
   const exoMode = (name) => { const e = EXOS.find(([n]) => norm(n) === norm(name)); return e ? e[1] : 'reps'; };
   function loadLive() {
-    const l = lsGet(LIVE_KEY);
+    const l = lsGet(scoped(LIVE_KEY));
     if (!isObj(l) || !Number.isFinite(l.start) || !isKey(l.date) || !Array.isArray(l.exos)) return null;
     l.exos = l.exos.filter(isObj).map((e) => ({ id: String(e.id || newId()), name: str(e.name) || 'Exercice', mode: e.mode === 'time' ? 'time' : 'reps', sets: Array.isArray(e.sets) ? e.sets.filter(isObj) : [] }));
     l.draft = isObj(l.draft) ? l.draft : { exo: '', reps: 10, kg: '', rir: null, sec: 30 };
     return l;
   }
   function saveLive() {
-    if (S.live) { if (!lsSet(LIVE_KEY, S.live)) toast('Cet appareil refuse d’enregistrer la séance en cours : ne ferme pas l’app avant de l’enregistrer.'); }
-    else { try { localStorage.removeItem(LIVE_KEY); } catch (e) { /* rien */ } }
+    if (S.live) { if (!lsSet(scoped(LIVE_KEY), S.live)) toast('Cet appareil refuse d’enregistrer la séance en cours : ne ferme pas l’app avant de l’enregistrer.'); }
+    else { try { localStorage.removeItem(scoped(LIVE_KEY)); } catch (e) { /* rien */ } }
   }
-  S.live = loadLive();
   const liveExo = (l = S.live) => (l && l.exos.find((e) => e.id === l.cur)) || null;
   const fmtClock = (ms, up) => {
     const t = Math.max(0, up ? Math.ceil(ms / 1000) : Math.floor(ms / 1000)), h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
@@ -2935,7 +3047,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       if (on && !wakeLock && !wakeAsking && navigator.wakeLock && document.visibilityState === 'visible') {
         wakeAsking = true;
         try { wakeLock = await navigator.wakeLock.request('screen'); } finally { wakeAsking = false; }
-        if (!S.live) { const w = wakeLock; wakeLock = null; await w.release(); return; }
+        if (!S.live && !chronoRunning()) { const w = wakeLock; wakeLock = null; await w.release(); return; }
         wakeLock.addEventListener('release', () => { wakeLock = null; });
       } else if (!on && wakeLock) { const w = wakeLock; wakeLock = null; await w.release(); }
     } catch (e) { wakeLock = null; }
@@ -3225,6 +3337,356 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     if (document.visibilityState === 'visible') { keepAwake(true); liveTick(); } else saveLive();
   });
 
+  /* ---------- Chrono (sprints, corde à sauter) ----------
+     Deux modes : chronomètre avec tours, et intervalles (effort / récup × tours) avec bips 3-2-1 et vibration.
+     L'état reste sur l'appareil (CHRONO_KEY, par profil) et se calcule depuis les heures de départ : il survit à une fermeture. */
+  const CHRONO_KEY = 'mon-suivi-chrono-v1';
+  // clé, nom noté, type d'activité, intensité
+  const CHRONO_ACTS = [['sprint', 'Sprints', 'course', 3], ['corde', 'Corde à sauter', 'corde', 2], ['course', 'Course', 'course', 2], ['velo', 'Vélo', 'velo', 2], ['autre', 'Autre', 'autre', 2]];
+  // nom, effort (s), récup (s), tours, activité
+  const INT_PRESETS = [['Sprints', 20, 40, 8, 'sprint'], ['Corde', 60, 30, 5, 'corde'], ['Tabata', 20, 10, 8, 'autre']];
+  const freshChrono = () => ({ mode: 'sw', act: 'sprint', sw: { run: null, acc: 0, laps: [] }, it: { work: 20, rest: 40, rounds: 8, run: null, acc: 0, done: false } });
+  function loadChrono() {
+    const c = lsGet(scoped(CHRONO_KEY));
+    if (!isObj(c) || !isObj(c.sw) || !isObj(c.it) || !Array.isArray(c.sw.laps)) return freshChrono();
+    return c;
+  }
+  const saveChrono = () => { if (S.chrono) lsSet(scoped(CHRONO_KEY), S.chrono); };
+  const swElapsed = (c = S.chrono) => c.sw.acc + (c.sw.run ? Date.now() - c.sw.run : 0);
+  const itElapsed = (c = S.chrono) => c.it.acc + (c.it.run ? Date.now() - c.it.run : 0);
+  const chronoRunning = () => !!(S.chrono && (S.chrono.sw.run || S.chrono.it.run));
+  const fmtTenths = (ms) => { const t = Math.max(0, Math.floor(ms / 100)), m = Math.floor(t / 600), s = Math.floor((t % 600) / 10); return `${m}:${pad(s)},${t % 10}`; };
+  /* Où en sont les intervalles : tour, effort ou récup, temps restant ; fini après le dernier effort. */
+  function itPhase(ms, it = S.chrono.it) {
+    const w = it.work * 1000, r = it.rest * 1000, cyc = w + r, total = it.rounds * w + (it.rounds - 1) * r;
+    if (ms >= total) return { done: true, round: it.rounds, phase: 'fin', left: 0, dur: 1, total };
+    const round = Math.floor(ms / cyc) + 1, within = ms % cyc;
+    return within < w ? { round, phase: 'work', left: w - within, dur: w, total } : { round, phase: 'rest', left: cyc - within, dur: r, total };
+  }
+  const PHASE_LABEL = { work: 'Effort', rest: 'Récup', fin: 'Terminé' };
+  function tone(freq, dur) {
+    if (!audioCtx) return;
+    try {
+      const t0 = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.45, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t0); o.stop(t0 + dur + 0.03);
+    } catch (e) { /* pas de son sur cet appareil */ }
+  }
+  let chronoTimer = null;
+  const chronoMem = { key: null, sec: null };
+  function chronoTick() {
+    const c = S.chrono;
+    if (!chronoRunning()) { stopChrono(); return; }
+    if (c.sw.run) { const t = fmtTenths(swElapsed(c)); document.querySelectorAll('[data-tick="sw"]').forEach((el) => { if (el.textContent !== t) el.textContent = t; }); }
+    if (c.it.run) {
+      const ph = itPhase(itElapsed(c));
+      if (ph.done) { finishIntervals(); return; }
+      const key = `${ph.round}-${ph.phase}`, sec = Math.ceil(ph.left / 1000);
+      if (key !== chronoMem.key) {
+        if (chronoMem.key) { tone(ph.phase === 'work' ? 1175 : 660, 0.5); buzz(); }
+        chronoMem.key = key; chronoMem.sec = null;
+        const card = document.querySelector('[data-tick="it-card"]');
+        if (card) card.dataset.phase = ph.phase;
+        document.querySelectorAll('[data-tick="it-phase"]').forEach((el) => { el.textContent = PHASE_LABEL[ph.phase]; });
+        document.querySelectorAll('[data-tick="it-round"]').forEach((el) => { el.textContent = `Tour ${ph.round} sur ${c.it.rounds}`; });
+      } else if (sec >= 1 && sec <= 3 && sec !== chronoMem.sec && ph.dur > 4000) { chronoMem.sec = sec; tone(880, 0.12); }
+      const left = fmtClock(ph.left, true);
+      document.querySelectorAll('[data-tick="it-left"]').forEach((el) => { if (el.textContent !== left) el.textContent = left; });
+      document.querySelectorAll('[data-tick="it-ring"]').forEach((el) => el.style.setProperty('--p', (ph.left / ph.dur).toFixed(4)));
+    }
+  }
+  function startChrono() { if (!chronoTimer) chronoTimer = setInterval(chronoTick, 100); keepAwake(true); chronoTick(); }
+  function stopChrono() { clearInterval(chronoTimer); chronoTimer = null; if (!S.live) keepAwake(false); }
+  function finishIntervals() {
+    const it = S.chrono.it, ph = itPhase(0, it);
+    Object.assign(it, { acc: ph.total, run: null, done: true });
+    saveChrono(); stopChrono();
+    tone(1175, 0.35); setTimeout(() => tone(1175, 0.6), 420); buzz();
+    toast(`Intervalles terminés : ${it.rounds} × ${fmtSec(it.work)}`);
+    safeRender();
+  }
+  /* Ce que le chrono a mesuré, pour la journée ou pour la séance en cours. */
+  function chronoResult(mode) {
+    const c = S.chrono, a = CHRONO_ACTS.find((x) => x[0] === c.act) || CHRONO_ACTS[0];
+    if (mode === 'sw') {
+      const total = swElapsed(c), laps = c.sw.laps, splits = laps.map((t, i) => t - (i ? laps[i - 1] : 0));
+      if (total < 1000) return null;
+      return { a, total, sets: splits.length ? splits.map((x) => Math.max(1, Math.round(x / 1000))) : [Math.round(total / 1000)],
+        details: splits.length ? `${plural(splits.length, 'tour')} : ${splits.map(fmtTenths).join(' · ')} (total ${fmtTenths(total)})` : `Chrono : ${fmtTenths(total)}` };
+    }
+    const it = c.it, ms = itElapsed(c), ph = itPhase(ms), w = it.work * 1000, cyc = w + it.rest * 1000;
+    const rounds = ph.done ? it.rounds : Math.floor(ms / cyc) + (ms % cyc >= w ? 1 : 0);
+    if (!rounds) return null;
+    return { a, total: ms, sets: Array(rounds).fill(it.work),
+      details: `${rounds} × ${fmtSec(it.work)} d’effort, ${fmtSec(it.rest)} de récup${ph.done ? '' : ` (arrêté au tour ${ph.round} sur ${it.rounds})`}` };
+  }
+  function chronoSave(mode) {
+    const r = chronoResult(mode);
+    if (!r) { toast('Rien à noter pour l’instant.'); return; }
+    const [, label, type, intensity] = r.a;
+    if (S.live) {
+      // pendant une séance en direct : un exercice en durée, une série par tour
+      const l = S.live;
+      let e = l.exos.find((x) => norm(x.name) === norm(label));
+      if (!e) { e = { id: newId(), name: label, mode: 'time', sets: [] }; l.exos.push(e); }
+      r.sets.forEach((sec) => e.sets.push({ id: newId(), sec, at: Date.now() }));
+      l.cur = e.id; l.adding = false; saveLive();
+      toast(`Ajouté à ta séance : ${plural(r.sets.length, 'série')} (${label.toLowerCase()})`);
+    } else {
+      const t = todayKey(), minutes = Math.max(1, Math.round(r.total / 60000));
+      const entry = { id: newId(), time: timeOf(Date.now() - r.total), kind: 'seance', type, name: label, minutes, intensity, details: r.details.slice(0, 500), tpl: null };
+      mutateDay(t, 'sport', (d) => { d.sport.push(entry); }, false);
+      S.ui.date = t;
+      toast(`Noté dans ta journée : ${label}, ${minutes} min`);
+    }
+    if (mode === 'sw') S.chrono.sw = { run: null, acc: 0, laps: [] }; else Object.assign(S.chrono.it, { run: null, acc: 0, done: false });
+    saveChrono(); render();
+  }
+  function chronoCard() {
+    const c = S.chrono;
+    const acts = html`<div class="chips" role="group" aria-label="Activité">${CHRONO_ACTS.map(([key, name]) => html`<button type="button" data-act="chr-act" data-v="${key}" aria-pressed="${bool(c.act === key)}">${name}</button>`)}</div>`;
+    const saveLbl = S.live ? 'Ajouter à ma séance' : 'Noter dans ma journée';
+    let body;
+    if (c.mode === 'sw') {
+      const ms = swElapsed(c), run = !!c.sw.run, laps = c.sw.laps, splits = laps.map((t, i) => t - (i ? laps[i - 1] : 0));
+      const best = splits.length > 1 ? Math.min(...splits) : null;
+      body = html`<div class="chr-face"><b class="chr-time" data-tick="sw" role="timer" aria-label="Temps">${fmtTenths(ms)}</b></div>
+        <div class="chr-btns">${run
+          ? html`<button type="button" class="ghost big" data-act="sw-pause">Pause</button><button type="button" class="primary big" data-act="sw-lap">Tour ${laps.length + 1}</button>`
+          : html`<button type="button" class="primary big" data-act="sw-start">${ms ? 'Reprendre' : 'Démarrer'}</button>${ms ? html`<button type="button" class="ghost big" data-act="sw-reset">Remettre à zéro</button>` : ''}`}</div>
+        ${splits.length ? html`<ol class="laps" reversed>${splits.map((x, i) => html`<li class="${x === best ? 'best' : ''}"><span>Tour ${i + 1}${x === best ? ' · meilleur' : ''}</span><b>${fmtTenths(x)}</b><small>${fmtTenths(laps[i])}</small></li>`).reverse()}</ol>` : ''}
+        ${!run && ms >= 1000 ? html`<div class="chr-save">${acts}<button type="button" class="primary" data-act="sw-save">${saveLbl}</button></div>` : ''}`;
+    } else {
+      const it = c.it, ms = itElapsed(c), ph = itPhase(ms), started = !!it.run || it.acc > 0 || it.done;
+      const total = it.rounds * it.work + (it.rounds - 1) * it.rest;
+      const step = (f, label, v, st) => html`<div class="field stepper"><span id="it-${f}-l">${label}</span><div class="step" role="group" aria-labelledby="it-${f}-l"><button type="button" class="icon" data-act="it-step" data-f="${f}" data-v="${-st}" aria-label="${label} : moins">−</button><output id="it-${f}" class="step-out">${v}</output><button type="button" class="icon" data-act="it-step" data-f="${f}" data-v="${st}" aria-label="${label} : plus">+</button></div></div>`;
+      if (!started) {
+        body = html`<div class="chips" role="group" aria-label="Préréglages">${INT_PRESETS.map(([name, w, r, n]) => html`<button type="button" data-act="it-preset" data-v="${name}">${name} · ${fmtSec(w)} / ${fmtSec(r)} × ${n}</button>`)}</div>
+          <div class="steps">${step('work', 'Effort (s)', it.work, 5)}${step('rest', 'Récup (s)', it.rest, 5)}${step('rounds', 'Tours', it.rounds, 1)}</div>
+          <p class="hint" style="margin:0">${it.rounds} × ${fmtSec(it.work)} d’effort, ${fmtSec(it.rest)} de récup : ${fmtSec(total)} en tout. Bips à 3, 2, 1 et à chaque changement.</p>
+          <div class="chr-btns"><button type="button" class="primary big" data-act="it-start">Démarrer</button></div>`;
+      } else if (!it.done) {
+        body = html`<div class="it-face" data-tick="it-card" data-phase="${ph.phase}">
+            <div class="it-ring" data-tick="it-ring" style="--p:${(ph.left / ph.dur).toFixed(4)}"><span><small data-tick="it-phase">${PHASE_LABEL[ph.phase]}</small><b class="chr-time" data-tick="it-left" role="timer">${fmtClock(ph.left, true)}</b><small data-tick="it-round">Tour ${ph.round} sur ${it.rounds}</small></span></div>
+          </div>
+          <div class="chr-btns">${it.run
+            ? html`<button type="button" class="ghost big" data-act="it-pause">Pause</button><button type="button" class="primary big" data-act="it-skip">Passer</button>`
+            : html`<button type="button" class="primary big" data-act="it-resume">Reprendre</button><button type="button" class="ghost big" data-act="it-stop">Arrêter</button>`}</div>`;
+      } else {
+        const r = chronoResult('it');
+        body = html`<p class="chr-done">${r ? r.details : 'Arrêté avant la fin du premier effort.'}</p>
+          ${r ? html`<div class="chr-save">${acts}<button type="button" class="primary" data-act="it-save">${saveLbl}</button></div>` : ''}
+          <div class="chr-btns"><button type="button" class="ghost" data-act="it-reset">Recommencer</button></div>`;
+      }
+    }
+    return html`<section class="card chrono-card m-sport" id="sec-chrono" aria-labelledby="chr-title">
+      <div class="card-head"><span class="mico" aria-hidden="true">${ICON.timer}</span><h2 id="chr-title">Chrono</h2>
+        <div class="seg" role="group" aria-label="Mode du chrono"><button type="button" data-act="chr-mode" data-v="sw" aria-pressed="${bool(c.mode === 'sw')}">Chrono</button><button type="button" data-act="chr-mode" data-v="it" aria-pressed="${bool(c.mode === 'it')}">Intervalles</button></div></div>
+      ${body}
+    </section>`;
+  }
+  const CHRONO_ACTIONS = {
+    'chr-mode': (d) => { S.chrono.mode = d.v === 'it' ? 'it' : 'sw'; saveChrono(); render(); },
+    'chr-act': (d) => { S.chrono.act = d.v; saveChrono(); render(); },
+    'sw-start': () => { unlockAudio(); S.chrono.sw.run = Date.now(); saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); startChrono(); },
+    'sw-pause': () => { const sw = S.chrono.sw; sw.acc = swElapsed(); sw.run = null; saveChrono(); S.ui.focus = '[data-act="sw-start"]'; render(); },
+    'sw-lap': () => { S.chrono.sw.laps.push(swElapsed()); saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); },
+    'sw-reset': () => { S.chrono.sw = { run: null, acc: 0, laps: [] }; saveChrono(); render(); },
+    'sw-save': () => chronoSave('sw'),
+    'it-preset': (d) => {
+      const p = INT_PRESETS.find((x) => x[0] === d.v);
+      if (!p) return;
+      Object.assign(S.chrono.it, { work: p[1], rest: p[2], rounds: p[3] });
+      S.chrono.act = p[4]; saveChrono(); render();
+    },
+    'it-step': (d) => {
+      const it = S.chrono.it, f = d.f, lim = { work: [5, 600], rest: [0, 600], rounds: [1, 50] }[f];
+      it[f] = Math.min(lim[1], Math.max(lim[0], it[f] + Number(d.v)));
+      saveChrono(); render();
+    },
+    'it-start': () => {
+      unlockAudio(); tone(1175, 0.3);
+      Object.assign(S.chrono.it, { run: Date.now(), acc: 0, done: false });
+      chronoMem.key = null; chronoMem.sec = null;
+      saveChrono(); S.ui.focus = '[data-act="it-pause"]'; render(); startChrono();
+    },
+    'it-pause': () => { const it = S.chrono.it; it.acc = itElapsed(); it.run = null; saveChrono(); S.ui.focus = '[data-act="it-resume"]'; render(); },
+    'it-resume': () => { unlockAudio(); S.chrono.it.run = Date.now(); saveChrono(); S.ui.focus = '[data-act="it-pause"]'; render(); startChrono(); },
+    'it-skip': () => {
+      const it = S.chrono.it, ms = itElapsed(), ph = itPhase(ms);
+      it.acc = ms + ph.left; if (it.run) it.run = Date.now();
+      saveChrono(); chronoTick();
+    },
+    'it-stop': () => { const it = S.chrono.it; it.acc = itElapsed(); it.run = null; it.done = true; saveChrono(); render(); },
+    'it-reset': () => { Object.assign(S.chrono.it, { run: null, acc: 0, done: false }); saveChrono(); render(); },
+    'it-save': () => chronoSave('it')
+  };
+  /* ---------- Profils : changer, créer, modifier, supprimer ---------- */
+  const initial = (name) => (String(name || '').trim().charAt(0) || '?').toUpperCase();
+  const avatar = (p, big) => html`<span class="avatar c${p.color}${big ? ' big' : ''}" aria-hidden="true">${initial(p.name)}</span>`;
+  function refreshWho() {
+    const el = document.getElementById('who');
+    if (!el) return;
+    const p = activeProfile();
+    el.hidden = !S.ready;
+    el.innerHTML = String(html`${avatar(p)}<span class="who-name">${p.name}</span>`);
+    el.setAttribute('aria-label', `Profil : ${p.name}. Changer de profil`);
+  }
+  /* Liste des profils sur le compte Claude (document data/users/<compte>/profiles). */
+  const profilesRef = () => store.db.doc(`data/users/${store.uid0}/profiles`);
+  async function pushProfiles() {
+    if (!store.db || !store.uid0) return true;
+    try { await profilesRef().set({ list: PROFILES.list }); PROFILES.cloudPending = false; saveProfiles(); return true; }
+    catch (e) { PROFILES.cloudPending = true; saveProfiles(); return false; }
+  }
+  function mergeCloudProfiles(list) {
+    if (!Array.isArray(list) || PROFILES.cloudPending) return false;
+    const next = normalizeProfileList(list);
+    if (stable(next) === stable(PROFILES.list)) return false;
+    PROFILES.list = next;
+    saveProfiles(); refreshWho();
+    if (!next.some((p) => p.id === PROFILES.active)) switchProfile(MAIN, { force: true });
+    return true;
+  }
+  async function syncProfiles() {
+    let snap = null;
+    try { snap = await withTimeout(profilesRef().get(), GET_TIMEOUT, null); } catch (e) { snap = null; }
+    if (!snap) return; // hors ligne : on garde la liste de l'appareil
+    // profils supprimés hors ligne : on efface maintenant leur journal en ligne
+    for (const pid of [...PROFILES.purge]) if (await deleteProfileData(pid)) { PROFILES.purge = PROFILES.purge.filter((x) => x !== pid); saveProfiles(); }
+    const data = snap.exists ? snap.data() : null;
+    if (PROFILES.cloudPending || !isObj(data) || !Array.isArray(data.list)) { if (PROFILES.cloudPending || PROFILES.list.length > 1) await pushProfiles(); return; }
+    if (mergeCloudProfiles(data.list) && S.ready) safeRender();
+  }
+  /* Changer de profil sans recharger la page : ce qui attend est enregistré, la synchro de ce profil est coupée
+     (le compteur store.gen fait ignorer ce qui arriverait encore pour lui), puis le profil choisi démarre. */
+  async function settle() {
+    if (store.mode === 'local') { persistNow(); return; }
+    flushAll();
+    const t0 = Date.now();
+    while ((store.inflight.size || (store.online && !store.stopped && store.dirty.size)) && Date.now() - t0 < 4000) await sleep(100);
+    persistNow();
+  }
+  function detach() {
+    store.gen++;
+    if (store.unsub) { try { store.unsub(); } catch (e) { /* déjà fermé */ } }
+    clearTimeout(store.retryTimer); clearTimeout(store.connectTimer); clearTimeout(store.lsTimer);
+    Object.values(store.timers).forEach(clearTimeout);
+    Object.assign(store, { online: false, connecting: false, stopped: false, failed: false, col: null, unsub: null, trusted: true,
+      dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {}, dirtyDays: {}, writingDays: {},
+      connectTry: 0, connectTimer: null, retryTry: 0, retryTimer: null, lsTimer: null, status: null });
+  }
+  function resetForProfile() {
+    const a = S.ui.ask;
+    if (a.ctl) { try { a.ctl.abort(); } catch (e) { /* déjà arrêtée */ } }
+    stopChrono(); S.chrono = null;
+    S.settings = null; S.months = {}; S.ready = false;
+    const t = todayKey();
+    Object.assign(S.ui, { view: 'jour', date: t, weekOf: startOfWeek(t), monthOf: t.slice(0, 7), year: new Date().getFullYear(),
+      form: null, confirm: null, exportText: null, openSup: null, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
+      settingsPage: null, tplEdit: null, profileEdit: null, foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
+      ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null } });
+  }
+  async function switchProfile(pid, { force = false } = {}) {
+    if (!PROFILES.list.some((p) => p.id === pid) || (pid === PROFILES.active && !force) || S.ui.switching) return false;
+    if (S.live && !force) { toast('Termine ou abandonne ta séance en cours avant de changer de profil.'); return false; }
+    S.ui.switching = true;
+    try {
+      await settle();
+      detach();
+      PROFILES.active = pid; saveProfiles();
+      resetForProfile();
+      render();
+      startProfile();
+      scheduleReminders();
+      toTop();
+    } finally { S.ui.switching = false; }
+    return true;
+  }
+  const newProfileId = () => 'p' + newId().replace(/[^a-z0-9]/g, '').slice(0, 12);
+  async function deleteProfileData(pid) {
+    [LS_KEY, CACHE_KEY, LIVE_KEY, CHRONO_KEY].forEach((k) => { try { localStorage.removeItem(scoped(k, pid)); } catch (e) { /* rien */ } });
+    if (!store.db || !store.uid0) return true;
+    try {
+      const col = store.db.collection(profileCollection(store.uid0, pid));
+      const snap = await withTimeout(col.get(), GET_TIMEOUT, null);
+      if (!snap) return false;
+      for (const d of snap.docs) await col.doc(d.id).delete();
+      return true;
+    } catch (e) { return false; }
+  }
+  function profilesSettings() {
+    const act = activeProfile(), pe = S.ui.profileEdit;
+    const editForm = (p) => html`<div class="form pf-edit" role="group" aria-label="Modifier ${p.name}">
+        <label class="field"><span>Prénom</span><input type="text" id="pf-name" data-pf="name" value="${pe.name}" maxlength="30" autocomplete="off"></label>
+        <div class="field"><span id="pf-col">Couleur</span><div class="chips pf-colors" role="group" aria-labelledby="pf-col">${PROFILE_COLORS.map((c, i) => html`<button type="button" class="swatch c${i}" data-act="profile-color" data-v="${i}" aria-pressed="${bool(pe.color === i)}" aria-label="Couleur ${i + 1}"></button>`)}</div></div>
+        <div class="actions"><button type="button" class="primary" data-act="profile-save">Enregistrer</button><button type="button" class="ghost" data-act="profile-cancel">Annuler</button>
+          ${p.id === MAIN ? '' : p.id === act.id ? html`<span class="hint" style="margin:0">Pour le supprimer, passe d’abord sur un autre profil.</span>`
+            : S.ui.confirm === `profile:${p.id}` ? html`<span class="row-actions"><button type="button" class="link danger" data-act="profile-del" data-id="${p.id}">Oui, supprimer ${p.name} et son journal</button><button type="button" class="link" data-act="confirm-cancel">Non</button></span>`
+            : html`<button type="button" class="link danger" data-act="profile-del-ask" data-id="${p.id}">Supprimer ce profil</button>`}</div>
+      </div>`;
+    return html`<section class="set-sec">
+      <p class="hint">Chaque profil a son propre journal : compléments, repas, sport, visites et réglages. Passe de ton suivi à celui de ta mère en un appui.</p>
+      <ul class="profile-list">${PROFILES.list.map((p) => html`<li class="profile${p.id === act.id ? ' on' : ''}">
+          <div class="pf-row">${avatar(p, true)}
+            <span class="pf-txt"><b>${p.name}</b><span>${p.id === act.id ? 'Affiché en ce moment' : p.id === MAIN ? 'Profil principal' : 'Autre profil'}</span></span>
+            <span class="pf-actions">${p.id === act.id ? html`<span class="pill on">Actif</span>` : html`<button type="button" class="primary" data-act="profile-use" data-id="${p.id}">Utiliser</button>`}
+              ${pe && pe.id === p.id ? '' : html`<button type="button" class="link" data-act="profile-edit" data-id="${p.id}" aria-label="Modifier ${p.name}">Modifier</button>`}</span>
+          </div>
+          ${pe && pe.id === p.id ? editForm(p) : ''}
+        </li>`)}</ul>
+      ${PROFILES.list.length < 8 ? html`<h2 class="sub-title" style="margin-top:22px">Nouveau profil</h2>
+        <div class="pf-add"><label class="field grow"><span>Prénom</span><input type="text" id="pf-new" data-pf="new" value="${S.ui.profileNew}" placeholder="Maman" maxlength="30" autocomplete="off" enterkeyhint="done"></label><button type="button" class="primary" data-act="profile-add">Créer et utiliser</button></div>
+        <p class="hint" style="margin-top:8px">Le nouveau profil démarre vide : ajoute ses compléments, sa visite et ses objectifs dans ses réglages.</p>` : ''}
+      <p class="hint" style="margin-top:14px">${store.mode === 'cloud' ? 'Les profils suivent ton compte Claude : tu les retrouves sur tes autres appareils.' : 'Les profils restent sur cet appareil. Pour en passer un sur un autre appareil : fais une sauvegarde dans ce profil, puis restaure-la dans le même profil là-bas.'}${PLATFORM.native ? ' Les rappels (visite, cures) suivent le profil affiché.' : ''}</p>
+    </section>`;
+  }
+  async function addProfile() {
+    const name = String(S.ui.profileNew || '').trim().slice(0, 30);
+    if (!name) { toast('Écris le prénom du nouveau profil.'); S.ui.focus = '#pf-new'; render(); return; }
+    if (PROFILES.list.length >= 8) return;
+    const used = new Set(PROFILES.list.map((p) => p.color));
+    const color = [...PROFILE_COLORS.keys()].find((i) => !used.has(i)) ?? PROFILES.list.length % PROFILE_COLORS.length;
+    const p = { id: newProfileId(), name, color };
+    PROFILES.list.push(p); saveProfiles(); pushProfiles();
+    S.ui.profileNew = '';
+    if (await switchProfile(p.id)) toast(`Profil ${name} créé : tu es sur son journal`);
+    else { safeRender(); toast(`Profil ${name} créé`); }
+  }
+  const PROFILE_ACTIONS = {
+    'profile-use': async (d) => { const p = PROFILES.list.find((x) => x.id === d.id); if (p && await switchProfile(p.id)) toast(`Profil : ${p.name}`); },
+    'profile-add': () => addProfile(),
+    'profile-edit': (d) => { const p = PROFILES.list.find((x) => x.id === d.id); if (p) { S.ui.profileEdit = { id: p.id, name: p.name, color: p.color }; S.ui.confirm = null; S.ui.focus = '#pf-name'; render(); } },
+    'profile-color': (d) => { if (S.ui.profileEdit) { S.ui.profileEdit.color = Number(d.v); render(); } },
+    'profile-cancel': () => { S.ui.profileEdit = null; S.ui.confirm = null; render(); },
+    'profile-save': () => {
+      const pe = S.ui.profileEdit, p = pe && PROFILES.list.find((x) => x.id === pe.id);
+      if (!p) return;
+      const name = String(pe.name || '').trim().slice(0, 30);
+      if (!name) { toast('Écris un prénom.'); return; }
+      p.name = name; p.color = pe.color;
+      saveProfiles(); pushProfiles();
+      S.ui.profileEdit = null;
+      refreshWho(); render(); toast('Profil enregistré');
+    },
+    'profile-del-ask': (d) => { S.ui.confirm = `profile:${d.id}`; S.ui.focus = '[data-act="profile-del"]'; render(); },
+    'profile-del': async (d) => {
+      const p = PROFILES.list.find((x) => x.id === d.id);
+      if (!p || p.id === MAIN || p.id === PROFILES.active) return;
+      PROFILES.list = PROFILES.list.filter((x) => x.id !== p.id);
+      saveProfiles();
+      S.ui.confirm = null; S.ui.profileEdit = null;
+      render();
+      const [, okData] = await Promise.all([pushProfiles(), deleteProfileData(p.id)]);
+      if (!okData) { PROFILES.purge.push(p.id); saveProfiles(); }
+      toast(okData ? `Profil ${p.name} supprimé` : `Profil ${p.name} supprimé. Son journal en ligne sera effacé à la prochaine connexion.`);
+    }
+  };
+
   /* ---------- Rendu : Santé ---------- */
   const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
   const tinyDate = (k) => { const d = fromKey(k); return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`; };
@@ -3381,7 +3843,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     document.querySelectorAll('.nav [data-view]').forEach((b) => {
       if (b.dataset.view === S.ui.view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
-    if (!S.ready) { view.innerHTML = '<p class="loading">Chargement de tes données…</p>'; return; }
+    if (!S.ready) { view.innerHTML = '<p class="loading">Chargement de tes données…</p>'; refreshWho(); return; }
     pendingRender = false;
     const explicit = S.ui.focus, keep = explicit || focusedButton();
     view.innerHTML = String((VIEWS[S.ui.view] || renderDay)());
@@ -3393,7 +3855,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     S.ui.focus = null; S.ui.select = false;
     if (S.ui.view === 'sante') bindChart();
     if (S.live) { startLiveTicker(); keepAwake(true); }
-    refreshLivebar();
+    if (chronoRunning()) startChrono();
+    refreshLivebar(); refreshWho();
   }
   function isEditing() {
     const a = document.activeElement;
@@ -3564,7 +4027,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   const backupJSON = () => JSON.stringify({ app: 'mon-suivi', version: 1, exported: new Date().toISOString(), settings: S.settings, months: S.months }, null, 2);
   const dayBackupJSON = (k) => JSON.stringify({ app: 'mon-suivi', version: 1, scope: 'day', exported: new Date().toISOString(), days: { [k]: peekDay(k) } }, null, 2);
   const scopeFor = (k) => (hasVisit(k) ? 'visit' : 'day');
-  function exportJSON() { offerFile(`mon-suivi-sauvegarde-${todayKey()}.json`, backupJSON()); }
+  const fileTag = () => (PROFILES.active === MAIN ? '' : `${norm(activeProfile().name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'profil'}-`);
+  function exportJSON() { offerFile(`mon-suivi-${fileTag()}sauvegarde-${todayKey()}.json`, backupJSON()); }
   function exportCSV() { offerFile(`mon-suivi-journal-${todayKey()}.csv`, buildCSV()); }
   function copyExport() {
     copyText(S.ui.exportText || '').then((ok) => {
@@ -3656,7 +4120,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   };
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
-    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS,
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...PROFILE_ACTIONS,
     'sport-day': (d) => { S.ui.date = d.date; S.ui.form = null; render(); },
     'spt-kind': (d) => {
       const dr = S.ui.form && S.ui.form.draft;
@@ -3911,7 +4375,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     },
     'day-backup': (d) => {
       if (!hasJournal(peekDay(d.date)) && !Object.values((peekDay(d.date) || {}).taken || {}).some(Boolean)) { toast('Rien de noté ce jour-là.'); return; }
-      offerFile(`mon-suivi-journee-${d.date}.json`, dayBackupJSON(d.date));
+      offerFile(`mon-suivi-${fileTag()}journee-${d.date}.json`, dayBackupJSON(d.date));
     },
     'restore-yes': () => { if (S.ui.pendingRestore) applyRestore(S.ui.pendingRestore); },
     'restore-no': () => { S.ui.pendingRestore = null; render(); },
@@ -4060,6 +4524,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.tplEdit.draft[ds.tpl] = t.value;
     } else if (ds.live) {
       onLiveInput(ds.live, t);
+    } else if (ds.pf === 'new') {
+      S.ui.profileNew = t.value;
+    } else if (ds.pf === 'name' && S.ui.profileEdit) {
+      S.ui.profileEdit.name = t.value;
     } else if (ds.ask === 'q') {
       S.ui.ask.q = t.value;
       refreshReport();
@@ -4083,6 +4551,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   app.addEventListener('keydown', (e) => {
     const t = e.target;
     if (e.key === 'Enter' && t && t.dataset && t.dataset.live === 'exo' && S.live) { e.preventDefault(); pickExo(t.value); }
+    if (e.key === 'Enter' && t && t.dataset && t.dataset.pf === 'new') { e.preventDefault(); S.ui.profileNew = t.value; addProfile(); }
+    if (e.key === 'Enter' && t && t.dataset && t.dataset.pf === 'name') { e.preventDefault(); S.ui.profileEdit.name = t.value; PROFILE_ACTIONS['profile-save'](); }
   });
   /* Le texte pour Claude affiché suit la question et la case « 6 jours d'avant ». */
   function refreshReport() {
