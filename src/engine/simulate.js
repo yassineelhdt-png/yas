@@ -15,6 +15,8 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   const target = tune.target ?? +S.targetH * 60;
   const L = tune.lunch ?? +S.lunch, D = tune.dinner ?? +S.dinner, P = tune.pause ?? +S.pause, BP = tune.bigPause ?? +S.bigPause;
   const SP = +S.sport + +S.shower, SES = +S.session, T = +S.travel;
+  // durée minimale d'une session (0 = règles de la v1, qui acceptaient des sessions de quelques minutes)
+  const MIN = tune.minSession ?? +(S.minSession || 0);
 
   let t = start;
   let studied = init.studied || 0, streak = init.streak || 0, sinceBig = init.sinceBig || 0;
@@ -23,9 +25,9 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   let hi = 0, guard = 0;
 
   const push = (it) => { if (it.e > it.s) items.push(it); };
-  // lieu d'étude hors séances : la maison, ou la bibliothèque d'Erasme (init.at = "bibli", pas de trajets)
-  const home = init.at || "maison";
-  const loc = () => (onCampus ? "campus" : home);
+  // lieu d'étude hors séances (maison, erasme, p4p, uz) ; « campus » entre deux séances à Erasme
+  let base = init.at || "maison";
+  const loc = () => (onCampus ? "campus" : base);
   const markMissed = (h) => missed.push({ ...h, missed: true });
 
   // minutes de séances fixes encore à venir (elles comptent dans l'objectif)
@@ -68,6 +70,15 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   while (guard++ < 500) {
     const nh = hard[hi];
 
+    // horaire imposé par un lieu (trajet vers le lieu, départ à la fermeture, se poser en rentrant) : jamais sauté
+    if (nh && nh.wall && t >= nh.s) {
+      const d = nh.e - nh.s;
+      push({ ...nh, s: t, e: t + d });
+      t += d; streak = 0; hi++;
+      if (nh.at) base = nh.at;
+      continue;
+    }
+
     // séance déjà terminée (lever tardif) → manquée
     if (nh && nh.kind === "fixed" && nh.e <= t) { markMissed(nh); hi++; continue; }
 
@@ -89,8 +100,9 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
     if (nh && t >= nh.s) {
       if (nh.kind === "travel" && nh.dir === "back") {
         if (!lunch && t >= lunchAt(null) - 10) { meal("lunch", L); continue; }
-        push({ kind: "travel", dir: "back", s: t, e: t + T });
+        push({ kind: "travel", dir: "back", s: t, e: t + T, at: nh.at });
         t += T; onCampus = false; streak = 0; hi++;
+        if (nh.at) base = nh.at; // après la séance, direction le lieu de travail du jour
         continue;
       }
       if (nh.kind === "travel") {
@@ -142,14 +154,35 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
     }
 
     let len = Math.min(SES - streak, selfLeft, gap);
-    if (!lunch && la > t) len = Math.min(len, la - t);
-    if (!dinner && isFinite(da) && da > t) len = Math.min(len, da - t);
-    if (len < 15 && gap <= len + 5 && selfLeft > len) {
-      push({ kind: "free", s: t, e: nh.s, loc: loc() });
-      t = nh.s; streak = 0;
-      continue;
+    const toLunch = !lunch && la > t ? la - t : Infinity;
+    const toDinner = !dinner && isFinite(da) && da > t ? da - t : Infinity;
+    len = Math.min(len, toLunch, toDinner);
+    if (MIN > 0 && len < MIN) {
+      // pas de session de quelques minutes
+      if (gap < MIN) { // pas le temps avant la prochaine séance
+        push({ kind: "free", s: t, e: nh.s, loc: loc() });
+        t = nh.s; streak = 0;
+        continue;
+      }
+      if (Math.min(toLunch, toDinner) < MIN) { // repas un peu avancé
+        if (toLunch <= toDinner) meal("lunch", Math.min(L, gap));
+        else meal("dinner", Math.min(D, gap));
+        continue;
+      }
+      if (SES - streak < MIN) { // fin de session trop courte : pause d'abord
+        push({ kind: "pause", s: t, e: t + Math.min(P, gap), loc: loc() });
+        t += Math.min(P, gap); streak = 0;
+        continue;
+      }
+      len = MIN; // reste de l'objectif : dernière session arrondie à la durée minimale
+    } else if (MIN <= 0) {
+      if (len < 15 && gap <= len + 5 && selfLeft > len) {
+        push({ kind: "free", s: t, e: nh.s, loc: loc() });
+        t = nh.s; streak = 0;
+        continue;
+      }
+      if (len <= 0) len = Math.max(1, Math.min(SES, selfLeft, gap));
     }
-    if (len <= 0) len = Math.max(1, Math.min(SES, selfLeft, gap));
     push({ kind: "study", s: t, e: t + len, loc: loc() });
     t += len; studied += len; streak += len; sinceBig += len;
   }
@@ -167,5 +200,5 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
     if (last && last.kind === "study" && it.kind === "study" && last.e === it.s && last.loc === it.loc && it.e - last.s <= SES) last.e = it.e;
     else merged.push(it);
   }
-  return { items: merged, missed, end: t, workEnd, studied, lunch, dinner };
+  return { items: merged, missed, end: t, workEnd, studied, lunch, dinner, at: base };
 }

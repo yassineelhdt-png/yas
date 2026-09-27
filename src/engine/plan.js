@@ -6,13 +6,96 @@ import { SUBJ, evLabel } from "./labels.js";
 import { weekNo, isBlocus, dayEvents, buildHard } from "./events.js";
 import { fitDay, goHome } from "./fit.js";
 import { rotKey, prepFor, assign, assignGrouped } from "./tasks.js";
+import { PLACES, placeInfo } from "./places.js";
+import { goalUnits } from "./goals.js";
 
 const noDay = () => null;
+const minSession = (S) => +(S.minSession || 0) || 30;
+const byStart = (a, b) => a.s - b.s;
 
-/** Journée simulée et calée sur l'heure de fin ; à la bibliothèque, retour à la maison avant le sport. */
+/** Lieu du jour : choix du jour, sinon lun–ven hors congés = lieu des réglages, sinon la maison. */
+function placeOfDay(ds, w, S, day) {
+  if (PLACES[day.place]) return { key: day.place, set: true };
+  if (typeof day.lib === "boolean") return { key: day.lib ? "erasme" : "maison", set: true }; // ancienne version
+  if (w < 1 || w > 5 || H.closed[ds] || S.weekdayLib === false) return { key: "maison", set: false };
+  return { key: PLACES[S.weekdayPlace] ? S.weekdayPlace : "maison", set: false };
+}
+
+/**
+ * Début de journée : préparation, trajet vers le lieu (pas avant l'ouverture).
+ * Si le lieu ouvre tard, on étudie d'abord à la maison puis on part (trajet imposé = « wall »).
+ * Retourne { start, pre, walls, at } — at : lieu où l'on est au début de l'étude.
+ */
+function morning(res, S, day, P, hard) {
+  const W = res.wake, prep = +S.prep;
+  const prepItem = (e) => (e > W ? [{ kind: "prep", s: W, e, long: e - W > prep + 10 }] : []);
+  const ready = day.start ? m(day.start) : W + prep; // prêt à étudier chez soi
+  if (!P) return { start: ready, pre: prepItem(ready), walls: [], at: "maison" };
+
+  const wanted = day.start ? m(day.start) : W + prep + P.travel; // arrivée souhaitée sur place
+  let arrive = Math.max(wanted, P.open, W + P.travel);
+  const first = hard[0];
+  // (hors Erasme) moins d'une heure sur place avant de partir en séance : on va directement à la séance
+  if (first && !P.campus && first.s < arrive + 60 && first.s >= arrive) {
+    const back = hard.find((h) => h.kind === "travel" && h.dir === "back");
+    if (back) back.at = P.key;
+    return { start: ready, pre: prepItem(ready), walls: [], at: "maison" };
+  }
+  if (first && first.s < arrive) {
+    if (P.campus) {
+      // séance à Erasme avant l'arrivée prévue : on arrive pour la séance
+      if (!day.start) arrive = Math.max(W + P.travel, first.s);
+    } else {
+      // on part de la maison pour la séance, puis on rejoint le lieu du jour
+      const back = hard.find((h) => h.kind === "travel" && h.dir === "back");
+      if (back) back.at = P.key;
+      return { start: ready, pre: prepItem(ready), walls: [], at: "maison" };
+    }
+  }
+  const leave = arrive - P.travel;
+  const trip = { kind: "travel", dir: "place", at: P.key, s: leave, e: arrive };
+  if (arrive > wanted && leave - ready >= minSession(S)) {
+    return { start: ready, pre: prepItem(ready), walls: [{ ...trip, wall: true }], at: "maison" };
+  }
+  return { start: arrive, pre: [...prepItem(leave), trip], walls: [], at: P.key };
+}
+
+/**
+ * Journée simulée et calée sur l'heure de fin.
+ * Sur un lieu : départ à la fermeture si on continue à la maison (trajet + se poser), sinon fin à la
+ * fermeture au plus tard ; retour à la maison avant le sport si on finit sur place.
+ */
 function runDay(res, S, start, hard, init) {
-  if (!res.atLib) return fitDay(start, hard, S, init, res.endAt);
-  return goHome(fitDay(start, hard, S, { ...init, at: "bibli" }, res.endAt), +S.travel);
+  const P = res.placeInfo, E = res.endAt;
+  if (!P) return fitDay(start, hard, S, init, E);
+  const C = P.close, home = P.travel + +S.prep;
+  const closing = C > start
+    ? [{ kind: "travel", dir: "home", wall: true, at: "maison", closing: true, s: C, e: C + P.travel }, { kind: "settle", wall: true, s: C + P.travel, e: C + home }]
+    : [];
+  const withClosing = [...hard, ...closing].sort(byStart);
+  let r;
+  if (E != null) {
+    // continuer à la maison seulement si ça vaut une vraie session après être rentré
+    if (closing.length && E - (C + home) >= minSession(S)) r = fitDay(start, withClosing, S, init, E);
+    else {
+      r = fitDay(start, hard, S, init, Math.min(E, C));
+      if (E > C) r = { ...r, closedAt: C }; // le lieu ferme avant l'heure de fin voulue
+    }
+  } else {
+    r = fitDay(start, hard, S, init, null);
+    if (closing.length && r.workEnd > C) r = fitDay(start, withClosing, S, init, null);
+  }
+  return r.at && r.at !== "maison" ? goHome(r, P.travel) : r;
+}
+
+/** Où l'on est à l'instant `time` d'une journée déjà simulée. */
+function whereAt(items, time, first) {
+  let at = first;
+  for (const it of items) {
+    if (it.s >= time) break;
+    if (it.at && it.e <= time) at = it.at;
+  }
+  return at;
 }
 const freshWeekMin = () => ({ CHIM: 0, PHYS: 0, MATH: 0, BIO: 0 });
 
@@ -51,7 +134,7 @@ function planSunday(res, S, day, pre, weekMin) {
     { subj: "CONC", kind: "corr", title: "Correction · partie sciences", detail: "Chaque erreur : pourquoi, notion en cause, règle à retenir → fiche d'erreurs", min: 150 },
     { subj: "CONC", kind: "remed", title: "Remédiation ciblée", detail: "Revoir la théorie des notions les plus ratées, refaire les questions fausses", min: 999 }
   ];
-  const r = runDay(res, S, t, [], { studied: did, lunch: true, streak: +S.session, sinceBig: did - 180 });
+  const r = runDay(res, S, t, res.walls.filter((h) => h.s >= t), { studied: did, lunch: true, streak: +S.session, sinceBig: did - 180, at: res.at0 });
   res.items = [...pre, ...preItems, ...r.items];
   res.end = r.end;
   res.workEnd = r.workEnd;
@@ -100,7 +183,8 @@ function weekdayQueue(res, S, getDay, backlog) {
   }
   // ce qui n'a pas tenu hier passe en tête
   for (const x of backlog) {
-    const c = { ...x, kind: "backlog", title: x.title.replace(" du jour", "") + " · reporté" };
+    // « · reporté » une seule fois, même si la tâche est reportée plusieurs jours de suite
+    const c = { ...x, kind: "backlog", title: x.title.replace(" du jour", "").replace(/( · reporté)+$/, "") + " · reporté" };
     delete c.after;
     queue.push(c);
   }
@@ -119,40 +203,46 @@ function weekdayQueue(res, S, getDay, backlog) {
   return queue;
 }
 
-function planOne(ds, S, getDay, backlog, weekMin) {
+function planOne(ds, S, getDay, backlog, weekMin, goals) {
   const day = getDay(ds) || {};
   const w = dow(ds);
   const wake = m(day.wake || S.wake);
-  // journée à la bibliothèque d'Erasme : choix du jour, sinon lun–ven hors congés (réglage)
-  const atLib = typeof day.lib === "boolean" ? day.lib : !!S.weekdayLib && w >= 1 && w <= 5 && !H.closed[ds];
-  const trip = atLib ? +S.travel : 0; // trajet du matin vers la bibliothèque
-  // début de l'étude : saisi, sinon lever + préparation (+ trajet) ; jamais avant d'avoir pu arriver
-  const start = Math.max(day.start ? m(day.start) : wake + +S.prep + trip, wake + trip);
-  // heure de fin : celle du jour, sinon celle des réglages (vide = dès que l'objectif est atteint)
-  const endStr = day.end || S.endAt;
+  const place = placeOfDay(ds, w, S, day);
   const res = {
-    date: ds, dow: w, week: weekNo(ds), wake, start, startSet: !!day.start,
-    endAt: endStr ? m(endStr) : null, endSet: !!day.end, atLib, libSet: typeof day.lib === "boolean",
+    date: ds, dow: w, week: weekNo(ds), wake, startSet: !!day.start, endSet: !!day.end,
+    place: place.key, placeSet: place.set, placeInfo: placeInfo(place.key, S),
     closed: H.closed[ds] || null, blocus: isBlocus(ds), events: [], warnings: []
   };
-  const leave = start - trip;
-  const pre = leave > wake ? [{ kind: "prep", s: wake, e: leave, long: leave - wake > +S.prep + 10 }] : [];
-  if (trip > 0) pre.push({ kind: "travel", dir: "to", lib: true, s: leave, e: start });
+
+  let hard = [], queue;
+  if (w !== 0) {
+    res.events = dayEvents(ds, S, day.ov);
+    // à Erasme, les séances sont sur place : pas de trajets entre elles
+    if (w !== 6) hard = buildHard(res.events, res.placeInfo?.campus ? { ...S, travel: 0 } : S);
+  }
+  const mo = morning(res, S, day, res.placeInfo, hard);
+  const start = mo.start;
+  res.start = start;
+  res.at0 = mo.at;
+  res.walls = mo.walls;
+  // heure de fin : celle du jour, sinon celle des réglages (vide = dès que l'objectif est atteint) ;
+  // une heure du petit matin (ex. 00:30) veut dire après minuit
+  let end = (day.end || S.endAt) ? m(day.end || S.endAt) : null;
+  if (end != null && end <= start && end < 360) end += 1440;
+  res.endAt = end;
+  const pre = mo.pre;
   if (w === 0) return planSunday(res, S, day, pre, weekMin);
 
-  res.events = dayEvents(ds, S, day.ov);
-  let hard = [], queue;
   if (w === 6) queue = saturdayQueue(res, S, getDay, backlog);
-  else {
-    queue = weekdayQueue(res, S, getDay, backlog);
-    // à la bibliothèque d'Erasme, les séances sont sur place : pas de trajets entre elles
-    hard = buildHard(res.events, atLib ? { ...S, travel: 0 } : S);
-  }
+  else queue = weekdayQueue(res, S, getDay, backlog);
+  hard = [...hard, ...mo.walls].sort(byStart);
+  // commencer l'après-midi : déjeuner déjà pris
+  const init = { at: mo.at, lunch: start >= 810 };
 
   const rp = day.replan;
   if (rp && typeof rp.at === "number") {
     // replanification : ce qui précède `at` est figé (passé), la suite est recalculée
-    const full = runDay(res, S, start, hard, {});
+    const full = runDay(res, S, start, hard, init);
     const before = [];
     for (const it of full.items) {
       if (it.s >= rp.at) continue;
@@ -161,29 +251,32 @@ function planOne(ds, S, getDay, backlog, weekMin) {
       before.push(c);
     }
     const r = runDay(res, S, rp.at, hard.filter((h) => h.e > rp.at), {
-      replan: true, studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0
+      replan: true, studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0,
+      at: whereAt(full.items, rp.at, mo.at)
     });
     res.missed = r.missed;
     res.items = [...pre, ...before, { kind: "replan", s: rp.at, e: rp.at, studied: rp.studied || 0 }, ...r.items];
     res.end = r.end;
     res.workEnd = r.workEnd;
     res.fit = r.fit;
+    res.closedAt = r.closedAt;
     res.replanAt = rp.at;
     res.replanStudied = rp.studied || 0;
   } else {
-    const r = runDay(res, S, start, hard, {});
+    const r = runDay(res, S, start, hard, init);
     res.missed = r.missed;
     res.items = [...pre, ...r.items];
     res.end = r.end;
     res.workEnd = r.workEnd;
     res.fit = r.fit;
+    res.closedAt = r.closedAt;
   }
-  res.backlogOut = finish(res, S, queue, weekMin);
+  res.backlogOut = finish(res, S, queue, weekMin, goals);
   return res;
 }
 
 /** Remplit les sessions, numérote les blocs, calcule les totaux et les alertes. */
-function finish(res, S, queue, weekMin) {
+function finish(res, S, queue, weekMin, goals) {
   // segments = suites de sessions d'étude non coupées par une séance / une épreuve
   let seg = 0, had = false;
   for (const it of res.items) {
@@ -192,7 +285,7 @@ function finish(res, S, queue, weekMin) {
   }
   const chunks = res.items.filter((it) => it.kind === "study");
   const grouped = res.mode === "semaine" || res.mode === "conge";
-  const carry = (grouped ? assignGrouped : assign)(chunks, queue, weekMin, res.blocus);
+  const carry = grouped ? assignGrouped(chunks, queue, weekMin, res.blocus, goals) : assign(chunks, queue, weekMin, res.blocus);
   if (chunks.length && res.mode !== "concours") chunks[0].note = "Commence par 10 min d'Anki : rappel actif d'hier";
 
   // ce qui compte dans l'objectif net
@@ -228,6 +321,10 @@ function finish(res, S, queue, weekMin) {
   res.studyStart = counted.reduce((a, it) => Math.min(a, it.s), 1e9);
 
   const fit = res.fit;
+  // informations (pas des problèmes)
+  res.notes = [];
+  if (res.closedAt != null && res.placeInfo) res.notes.push(res.placeInfo.short + " ferme à " + hm(res.closedAt) + " : fin du programme à " + hm(res.workEnd) + ".");
+  if (fit?.mode === "stretch" && fit.early) res.notes.push("Objectif atteint à " + hm(res.workEnd) + " : pas besoin de continuer jusqu'à " + hm(fit.endAt) + ".");
   if (fit?.mode === "squeeze") {
     // seulement ce qui existe dans la journée
     const b = fit.breaks, parts = [], has = (k) => res.items.some((it) => it.kind === k && !it.past);
@@ -263,13 +360,13 @@ export function planWeek(ds, rawSettings, getDay = noDay) {
   return [...weekPass(mon, addDays(mon, 5), S, getDay), planOne(addDays(mon, 6), S, getDay, [], {})];
 }
 
-// Lundi → `until` en une passe : le report (backlog) et l'équilibre des matières (weekMin)
-// se transmettent d'un jour à l'autre.
+// Lundi → `until` en une passe : le report (backlog), l'équilibre des matières (weekMin) et ce qui
+// reste des objectifs de la semaine (goals) se transmettent d'un jour à l'autre.
 function weekPass(mon, until, S, getDay) {
-  const out = [], weekMin = freshWeekMin();
+  const out = [], weekMin = freshWeekMin(), goals = goalUnits(mon, S);
   let backlog = [];
   for (let d = mon; d <= until; d = addDays(d, 1)) {
-    const r = planOne(d, S, getDay, backlog, weekMin);
+    const r = planOne(d, S, getDay, backlog, weekMin, goals);
     backlog = r.backlogOut || [];
     r.backlogCarried = backlog;
     out.push(r);

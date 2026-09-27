@@ -44,9 +44,14 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   s'il y a de la marge, pauses et repas s'allongent pour finir pile à l'heure (au-delà : « Temps libre »
   après le dîner) ; s'il en manque, les repas puis les pauses raccourcissent, et en dernier recours
   l'objectif net baisse (avec une alerte). Le dîner a lieu pendant le programme quand il finit après 20h.
-- **Journée à la bibliothèque d'Erasme** du lundi au vendredi (hors congés) : un trajet le matin, un le soir
-  (retour à la maison puis sport), aucun aller-retour entre les cours. Le week-end : à la maison.
-  Modifiable pour un jour donné (carte « Où tu travailles ») ou pour toute la semaine (Réglages).
+- **Lieux** : Maison, Erasme (8:00–20:45, 25 min), Play4Peace (9:00–23:00, 25 min), UZ (8:00–22:00, 50 min),
+  horaires et trajets réglables. Lun–ven hors congés : Erasme par défaut ; le week-end : la maison ;
+  choix du jour dans la carte « Où tu travailles ». Arrivée au plus tôt à l'ouverture ; si la fin est
+  après la fermeture : départ à la fermeture, trajet, 20 min pour se poser, et la suite à la maison.
+- **Sessions d'au moins 30 min** : plus de mini-sessions de quelques minutes.
+- **Objectifs de la semaine** (Réglages) : annales, théorie à rattraper, exercices… pour chaque semaine
+  ou pour une semaine précise. Placés sur le temps libre (jamais pendant les séances), avec une carte de
+  progression (planifié / coché / ce qui manque) dans les vues Jour et Semaine.
 
 - Carte **« En ce moment »** : le créneau en cours, le temps restant et ce qui suit.
 - Barre de navigation en bas sur téléphone, onglets en haut sur tablette / PC ; le bouton retour ramène à la vue Jour.
@@ -57,7 +62,7 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - Sauvegarde / restauration des données.
 - Réglages protégés : un champ vidé revient à la valeur par défaut au lieu de casser le planning.
 
-Sans heure de fin ni journée à la bibliothèque, le moteur de planification est **identique à la v1** : un test compare, jour par jour
+Sans les ajouts de la v2 (heure de fin, lieux, sessions minimales, objectifs), le moteur est **identique à la v1** : un test compare, jour par jour
 et sur tout le quadrimestre, les plannings produits par la v2 et par l'app d'origine (`legacy/horaire-9h-v1.html`).
 
 ## Développement
@@ -86,6 +91,8 @@ src/
     events.js      séances du jour, trajets
     simulate.js    déroulé de la journée (sessions, pauses, repas, sport)
     fit.js         calage sur l'heure de fin (pauses étirées / raccourcies, objectif réduit)
+    places.js      lieux (horaires, trajets)
+    goals.js       objectifs de la semaine
     tasks.js       quoi travailler dans chaque session
     plan.js        plan du jour / de la semaine (modes semaine, samedi, concours, congé)
   ui/            vues Jour, Semaine, Réglages, Méthode (lit-html)

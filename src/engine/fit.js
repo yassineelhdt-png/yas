@@ -10,6 +10,8 @@ const CAPS = { pause: 30, bigPause: 60, lunch: 75, dinner: 75 };
 // durées minimales quand on raccourcit les pauses pour caser l'objectif avant l'heure de fin (min)
 const FLOORS = { pause: 5, bigPause: 10, lunch: 30, dinner: 30 };
 const MAX_STEP = 45;
+// au-delà de cette marge (pauses déjà au maximum), on finit plus tôt plutôt que d'ajouter du temps libre
+const MAX_SLACK = 60;
 const BREAKS = new Set(["pause", "bigpause", "lunch", "dinner"]);
 
 /** Durées des pauses et repas étirées de `e` minutes (la grande pause deux fois plus), plafonnées. */
@@ -105,8 +107,10 @@ export function fitDay(start, hard, S, init, endAt) {
       best = r;
       stretch = e;
     }
-    const r = best.workEnd < endAt ? pad(best, endAt - best.workEnd, stretched(S, stretch), dine) : best;
-    return { ...r, fit: { mode: "stretch", endAt, stretch, breaks: stretched(S, stretch) } };
+    const slack = endAt - best.workEnd;
+    const early = slack > MAX_SLACK;
+    const r = slack > 0 && !early ? pad(best, slack, stretched(S, stretch), dine) : best;
+    return { ...r, fit: { mode: "stretch", endAt, stretch, breaks: stretched(S, stretch), early } };
   }
 
   // un peu juste : pauses et repas raccourcis (jusqu'au minimum) pour garder l'objectif entier

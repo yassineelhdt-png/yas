@@ -6,6 +6,7 @@ import { dayView } from "./day.js";
 import { weekView } from "./week.js";
 import { settingsView } from "./settings.js";
 import { methodView } from "./method.js";
+import { openGoals } from "./settings.js";
 import { icons } from "./icons.js";
 import { platform } from "../platform.js";
 
@@ -25,13 +26,14 @@ let root;
 const native = platform.native ? import("../native.js") : null;
 
 // ---------- planning (recalculé seulement si les données ou la date changent) ----------
-let memo = { key: null, value: null };
+const memo = { day: {}, week: {} };
 function plan(kind, ds) {
-  const key = kind + "|" + ds + "|" + dataRev();
-  if (memo.key !== key) {
-    memo = { key, value: kind === "day" ? E.planDay(ds, state.settings, getDay) : E.planWeek(ds, state.settings, getDay) };
+  const key = ds + "|" + dataRev(), slot = memo[kind];
+  if (slot.key !== key) {
+    slot.key = key;
+    slot.value = kind === "day" ? E.planDay(ds, state.settings, getDay) : E.planWeek(ds, state.settings, getDay);
   }
-  return memo.value;
+  return slot.value;
 }
 
 // ---------- transitions ----------
@@ -95,6 +97,12 @@ const nav = {
   setReplanOpen(open) {
     state.replanOpen = open;
     notify();
+  },
+  /** Réglages, section objectifs, sur la semaine affichée */
+  editGoals() {
+    openGoals(E.monday(state.date));
+    goView("reglages");
+    requestAnimationFrame(() => document.getElementById("goals")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 };
 
@@ -104,7 +112,7 @@ function currentView() {
     case "semaine": return weekView(plan("week", state.date), nav);
     case "reglages": return settingsView();
     case "methode": return methodView();
-    default: return dayView(plan("day", state.date), nav);
+    default: return dayView(plan("day", state.date), nav, plan("week", state.date));
   }
 }
 

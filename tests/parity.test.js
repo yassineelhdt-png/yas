@@ -1,6 +1,6 @@
 // Le moteur réécrit doit produire exactement les mêmes plannings que la v1 (legacy/horaire-9h-v1.html),
 // pour tous les jours du quadrimestre et plusieurs profils de réglages / saisies,
-// quand les ajouts de la v2 (heure de fin, journées à la bibliothèque) sont désactivés.
+// quand les ajouts de la v2 (heure de fin, lieux, sessions minimales, objectifs) sont désactivés.
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { describe, expect, it } from "vitest";
@@ -55,15 +55,29 @@ const PROFILES = {
   "saisies aléatoires #2": [{ travel: 20, lunch: 60, bigPause: 30, targetH: 8.5 }, randomDays(42)]
 };
 
-// La v1 n'a ni heure de fin ni journées à la bibliothèque : on les désactive pour comparer.
-const V1 = { endAt: "", weekdayLib: false };
-const NEW_KEYS = ["endAt", "endSet", "workEnd", "fit", "atLib", "libSet"];
+// La v1 n'a ni heure de fin, ni lieux, ni durée minimale de session, ni objectifs de la semaine :
+// on les désactive pour comparer (et on garde le trajet de la v1, 30 min).
+const V1 = { endAt: "", weekdayPlace: "maison", minSession: 0, goals: { base: [], weeks: {} } };
+const NEW_KEYS = ["endAt", "endSet", "workEnd", "fit", "place", "placeSet", "placeInfo", "at0", "walls", "notes", "closedAt"];
 // retire les clés à valeur undefined (JSON) et les champs ajoutés en v2, pour comparer les données
-const plain = (x) => JSON.parse(JSON.stringify(x, (k, v) => (NEW_KEYS.includes(k) ? undefined : v)));
+// v1 : « · reporté » s'accumulait quand une tâche était reportée plusieurs fois (corrigé en v2) ;
+// deux tâches qui ne différaient que par là sont maintenant une seule tâche
+const once = (v) => (typeof v === "string" ? v.replace(/( · reporté)+/g, " · reporté") : v);
+function mergeTasks(tasks) {
+  const out = [];
+  for (const t of tasks) {
+    const last = out[out.length - 1];
+    if (last && last.title === t.title) last.min += t.min;
+    else out.push({ ...t });
+  }
+  return out;
+}
+const plain = (x) => JSON.parse(JSON.stringify(x, (k, v) =>
+  NEW_KEYS.includes(k) ? undefined : k === "tasks" && Array.isArray(v) ? mergeTasks(v.map((t) => ({ ...t, title: once(t.title) }))) : once(v)));
 
 describe("parité avec la v1", () => {
   for (const [name, [profile, getDay]] of Object.entries(PROFILES)) {
-    const settings = { ...profile, ...V1 };
+    const settings = { travel: 30, ...profile, ...V1 };
     it(`planDay — ${name}`, () => {
       for (const ds of ALL) {
         expect(plain(E.planDay(ds, settings, getDay)), ds).toEqual(plain(Legacy.planDay(ds, settings, getDay)));

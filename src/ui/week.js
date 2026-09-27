@@ -3,6 +3,7 @@ import { html, nothing } from "lit-html";
 import * as E from "../engine/index.js";
 import { cv, shortDay, dayMonth, mainTask } from "./format.js";
 import { icons } from "./icons.js";
+import { goalsCard } from "./goals.js";
 
 const HR = 38; // hauteur d'une heure (px)
 const LEGEND = [["CHIM", "Chimie"], ["PHYS", "Physique"], ["MATH", "Maths"], ["BIO", "Bio"], ["CHQ2", "Chimie Q2"], ["CONC", "Concours"], ["REV", "Révision"]];
@@ -85,6 +86,7 @@ export function weekView(week, nav) {
       </div>
     </div>
     <div class="wcards">
+      ${goalsCard(week, { onEdit: nav.editGoals })}
       <div class="card">
         <h2>Répartition de la semaine</h2>
         <p class="sub">${E.hdur(net)} nettes au total, dont ${E.hdur(fixed)} en séances à l'unif.</p>

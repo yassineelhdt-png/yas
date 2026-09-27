@@ -148,3 +148,22 @@
   .bloc-h, .replan-line, .endrow { padding-left: 53px; }
   .now-title { font-size: 19px; }
 }
+
+/* ---------- lieu du jour ---------- */
+.placecard .places { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; margin: 4px 0 8px; }
+.placecard .places button { padding: 6px 4px; font-size: 13px; }
+.placecard .sub { margin: 0; }
+.notebox { background: var(--accent-soft); color: var(--ink-2); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: grid; gap: 4px; }
+
+/* ---------- objectifs ---------- */
+.gpill { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 1px 6px; border-radius: 5px; background: color-mix(in srgb, var(--c) 15%, var(--surface)); color: var(--c); vertical-align: 1px; white-space: nowrap; }
+.goal-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.goal { display: grid; gap: 4px; padding: 9px 0; border-top: 1px solid var(--line-2); }
+.goalcard .sub + .goal { border-top: 0; }
+.goal-l1 { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; font-weight: 500; }
+.goal-l1 em { font-style: normal; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; }
+.goal-bar { position: relative; height: 8px; border-radius: 99px; background: var(--line-2); overflow: hidden; }
+.goal-bar span { position: absolute; inset: 0 auto 0 0; border-radius: 99px; transition: width .4s var(--ease); }
+.goal-bar .pl { background: color-mix(in srgb, var(--c) 35%, var(--surface)); }
+.goal-bar .dn { background: var(--c); }
+.goal small { color: var(--muted); font-size: 12.5px; }

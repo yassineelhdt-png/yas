@@ -25,6 +25,21 @@ export function methodView() {
         <li>À la bibliothèque : retour à la maison (${st.travel} min) après la fin, puis sport.</li>
       </ul>
 
+      <h2>Lieux</h2>
+      <ul>
+        <li>Erasme (${st.erasmeOpen}–${st.erasmeClose}, ${st.travel} min de trajet), Play4Peace (${st.p4pOpen}–${st.p4pClose}, ${st.p4pTravel} min), UZ (${st.uzOpen}–${st.uzClose}, ${st.uzTravel} min) ou la maison : à choisir chaque jour dans « Où tu travailles ».</li>
+        <li>Tu arrives au plus tôt à l'ouverture ; si le lieu ouvre tard, tu commences à la maison puis tu pars.</li>
+        <li>Si ta fin est après la fermeture : départ à la fermeture, trajet, ${st.prep} min pour te poser, et tu continues à la maison. Si ça ne vaut pas une vraie session, le programme finit à la fermeture.</li>
+        <li>À Erasme, tu restes sur place entre les cours ; depuis un autre lieu, les séances ont leurs trajets.</li>
+      </ul>
+
+      <h2>Objectifs de la semaine</h2>
+      <ul>
+        <li>Annales, théorie à rattraper, exercices… (Réglages → Objectifs de la semaine), pour chaque semaine ou pour une semaine précise.</li>
+        <li>Ils prennent la place des exercices habituels de la matière, sur ton temps libre : jamais pendant les séances, la guidance ou la permanence. Une annale (${E.dur(240)} par défaut) est placée d'un seul tenant quand c'est possible.</li>
+        <li>La carte « Objectifs de la semaine » montre ce qui est planifié et ce que tu as coché ; s'il manque du temps, elle le dit.</li>
+      </ul>
+
       <h2>Ce qui compte dans les ${st.targetH}h</h2>
       <ul>
         <li>Étude perso, séminaires, exercices, TP, guidance, permanence, appuis : oui.</li>
@@ -34,7 +49,7 @@ export function methodView() {
       <h2>Trois blocs</h2>
       <ul>
         <li>Bloc 1 jusqu'au déjeuner (entre 12h et 13h15), bloc 2 jusqu'à une grande pause de ${st.bigPause} min, bloc 3 le soir.</li>
-        <li>Sessions de ${st.session} min maximum, ${st.pause} min de pause entre deux.</li>
+        <li>Sessions de ${st.minSession} min minimum et ${st.session} min maximum, ${st.pause} min de pause entre deux.</li>
         <li>Le sport (${st.sport} min + douche) est toujours la dernière chose de la journée, après le programme.</li>
         <li>Tu peux choisir l'heure à laquelle tu commences : tout le programme se décale.</li>
       </ul>
@@ -46,9 +61,7 @@ export function methodView() {
 
       <h2>Semaine de cours</h2>
       <ul>
-        <li>${st.weekdayLib
-          ? "Du lundi au vendredi (hors congés), tu passes la journée à la bibliothèque d'Erasme : un trajet le matin, un le soir, et tu restes sur place entre les cours. Le week-end, tu travailles à la maison."
-          : "Tu travailles à la maison : un aller-retour à Erasme pour chaque groupe de séances."} Tu peux changer pour un jour donné dans « Où tu travailles ».</li>
+        <li>Du lundi au vendredi (hors congés), tu travailles à : ${(E.PLACES[st.weekdayPlace] || E.PLACES.maison).name}. Le week-end, à la maison. Tu peux changer pour un jour donné dans « Où tu travailles ».</li>
         <li>Tu ne vas pas aux cours magistraux : le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l'heure du cours.</li>
         <li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li>
         <li>La veille d'un séminaire : préparation de la série.</li>

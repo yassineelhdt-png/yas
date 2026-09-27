@@ -5,12 +5,15 @@ import * as E from "../engine/index.js";
 import { state, S, getDay, saveDay, toast } from "../store.js";
 import { longDate, cv, mainTask, shownTasks } from "./format.js";
 import { icons } from "./icons.js";
+import { goalsCard } from "./goals.js";
 
 const PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie" };
 const MAJOR = new Set(["study", "fixed", "exam"]);
 
 // ---------- libellés ----------
-function minorLabel(it, st) {
+const placeShort = (key) => E.PLACES[key]?.short || key;
+
+function minorLabel(it, st, res = {}) {
   switch (it.kind) {
     case "prep": return it.long ? ["Avant de commencer", "Tu as choisi de commencer à " + E.hm(it.e)] : ["Réveil & préparation", "Eau, petit-déj, bureau prêt, téléphone en mode concentration"];
     case "pause": return ["Pause", "Debout, eau, loin des écrans"];
@@ -19,10 +22,13 @@ function minorLabel(it, st) {
     case "dinner": return ["Dîner", ""];
     case "sport": return ["Sport " + st.sport + " min + douche", "Dernier truc de la journée"];
     case "travel":
+      if (it.dir === "home" && it.closing) return ["Départ : " + placeShort(res.place) + " ferme", "Retour à la maison, tu continues là-bas"];
       if (it.dir === "home") return ["Retour à la maison", "Sport en rentrant"];
-      if (it.lib) return ["Trajet vers la bibliothèque", "Bibliothèque d'Erasme : tu y restes jusqu'à la fin, cours compris"];
+      if (it.dir === "place") return ["Trajet vers " + placeShort(it.at), it.at === "erasme" ? "Tu restes sur place entre les cours" : ""];
+      if (it.dir === "back" && it.at) return ["Trajet vers " + placeShort(it.at), "Après les séances"];
       if (it.dir !== "to") return ["Retour", "Anki sur le téléphone possible (non compté)"];
       return ["Trajet vers Erasme", (it.dest ? it.destLabel + " · " + it.dest : "") + (it.snack ? ". Prends une collation : tu mangeras après les séances" : "") + (it.late ? ". Pars tout de suite" : "")];
+    case "settle": return ["Te poser à la maison", "Douche rapide, bureau prêt, puis tu reprends"];
     case "free":
       if (it.slack) return ["Temps libre", "De la marge pour finir à l'heure : repos, marche, appel…"];
       return [it.done ? "Libre" : "Transition", it.note || (it.done ? "Ton quota du jour est atteint" : "Range, prépare tes affaires")];
@@ -31,11 +37,11 @@ function minorLabel(it, st) {
 }
 
 /** Titre court d'un créneau, quel que soit son type */
-function itemTitle(it, st) {
+function itemTitle(it, st, res) {
   if (it.kind === "study") return mainTask(it)?.title || "Étude";
   if (it.kind === "exam") return it.title;
   if (it.kind === "fixed") return E.evLabel(it);
-  return minorLabel(it, st)[0];
+  return minorLabel(it, st, res)[0];
 }
 
 function itemColor(it) {
@@ -105,9 +111,13 @@ const act = {
     saveDay(state.date, { ov });
   },
   toggleEthique(on) { saveDay(state.date, { ethique: !on }); },
-  toggleLib(atLib) {
-    saveDay(state.date, { lib: !atLib, replan: undefined });
-    toast(atLib ? "Journée à la maison" : "Journée à la bibliothèque d'Erasme");
+  setPlace(key) {
+    saveDay(state.date, { place: key, lib: undefined, replan: undefined });
+    toast(key === "maison" ? "Journée à la maison" : "Journée à " + E.PLACES[key].short);
+  },
+  placeAuto() {
+    saveDay(state.date, { place: undefined, lib: undefined, replan: undefined });
+    toast("Lieu habituel rétabli");
   },
   replanClear() {
     state.replanOpen = false;
@@ -147,17 +157,17 @@ function nowCard(res, st, nm) {
   let body;
   if (cur) {
     const left = cur.e - nm, pct = ((nm - cur.s) / (cur.e - cur.s)) * 100;
-    const sub = cur.kind === "fixed" ? cur.room : cur.kind === "study" ? mainTask(cur)?.detail : cur.kind === "exam" ? cur.detail : minorLabel(cur, st)[1];
+    const sub = cur.kind === "fixed" ? cur.room : cur.kind === "study" ? mainTask(cur)?.detail : cur.kind === "exam" ? cur.detail : minorLabel(cur, st, res)[1];
     body = html`
       <div class="now-l1"><span class="now-kicker">En ce moment</span><span class="now-left mono">encore ${E.dur(left)}</span></div>
-      <div class="now-title">${itemTitle(cur, st)}</div>
+      <div class="now-title">${itemTitle(cur, st, res)}</div>
       ${sub ? html`<div class="now-sub">${sub}</div>` : nothing}
       <div class="now-bar"><span style="width:${pct.toFixed(1)}%"></span></div>
       <div class="now-times mono"><span>${E.hm(cur.s)}</span><span>${E.hm(cur.e)}</span></div>`;
   } else if (nm < items[0].s) {
     body = html`
       <div class="now-l1"><span class="now-kicker">Pas encore commencé</span><span class="now-left mono">dans ${E.dur(items[0].s - nm)}</span></div>
-      <div class="now-title">${itemTitle(items[0], st)} à ${E.hm(items[0].s)}</div>`;
+      <div class="now-title">${itemTitle(items[0], st, res)} à ${E.hm(items[0].s)}</div>`;
   } else {
     body = html`
       <div class="now-l1"><span class="now-kicker">Journée terminée</span></div>
@@ -167,7 +177,7 @@ function nowCard(res, st, nm) {
   return html`
     <button class="card nowcard" style="--c:${c}" @click=${() => document.querySelector(".row.now, .row.next")?.scrollIntoView({ behavior: "smooth", block: "center" })}>
       ${body}
-      ${next && cur ? html`<div class="now-next"><span class="lbl">Ensuite</span> <b>${itemTitle(next, st)}</b> <span class="mono">${E.hm(next.s)}</span></div>` : nothing}
+      ${next && cur ? html`<div class="now-next"><span class="lbl">Ensuite</span> <b>${itemTitle(next, st, res)}</b> <span class="mono">${E.hm(next.s)}</span></div>` : nothing}
     </button>`;
 }
 
@@ -197,7 +207,7 @@ function header(res, st, ctx) {
           <label><span class="lbl">Je commence à</span><input type="time" step="300" .value=${live(E.hm(res.start))} @change=${(e) => act.start(e.target.value)}></label>
           <label><span class="lbl">Je finis à</span><input type="time" step="300" .value=${live(E.hm(res.endAt ?? res.workEnd))} @change=${(e) => act.end(e.target.value)}></label>
           <span class="auto">
-            <span>Début ${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min" + (res.atLib ? " + trajet" : "")}</span>
+            <span>Début ${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min" + (res.place !== "maison" ? " + trajet" : "")}</span>
             <span>Fin ${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
           </span>
         </div>
@@ -215,6 +225,7 @@ function header(res, st, ctx) {
       </div>
       ${blocs.length ? html`<div class="blocsum">${blocs.map((k) => html`<span>Bloc ${k} <b>${E.hdur(res.blocs[k])}</b></span>`)}</div>` : nothing}
       ${res.warnings.length ? html`<div class="warnbox" role="alert">${res.warnings.map((w) => html`<span>${w}</span>`)}</div>` : nothing}
+      ${res.notes?.length ? html`<div class="notebox">${res.notes.map((n) => html`<span>${n}</span>`)}</div>` : nothing}
     </section>`;
 }
 
@@ -247,7 +258,7 @@ function row(it, res, st, ctx, flags) {
     const metaHtml = meta.map((x) => html`<span>${x}</span>`);
     body = html`
       <div class="l1">
-        <div class="ttl">${itemTitle(it, st)}</div>
+        <div class="ttl">${itemTitle(it, st, res)}</div>
         ${isNow ? html`<span class="nowtag">En cours</span>` : nothing}
         <span class="len">${E.dur(d)}</span>
         ${!it.past && !it.missed ? html`<button class="chk" aria-pressed=${done ? "true" : "false"} aria-label="Marquer comme fait" @click=${() => act.toggleDone(it.key)}>${icons.check()}</button>` : nothing}
@@ -256,13 +267,13 @@ function row(it, res, st, ctx, flags) {
         ? html`<div class="where">${pill}<span class="lbl">Local</span><b>${it.room || "non indiqué"}</b></div>${meta.length ? html`<div class="meta">${metaHtml}</div>` : nothing}`
         : pill !== nothing || meta.length ? html`<div class="meta">${pill}${metaHtml}</div>` : nothing}
       ${it.kind === "study" && it.tasks
-        ? html`<ul class="tasks">${shownTasks(it).map((t) => html`<li style="--c:${cv(t.subj)}"><i></i><span>${t.title}</span><em>${t.min} min</em>${t.detail ? html`<small>${t.detail}</small>` : nothing}</li>`)}</ul>
+        ? html`<ul class="tasks">${shownTasks(it).map((t) => html`<li style="--c:${cv(t.subj)}" class=${t.kind === "goal" ? "goal-task" : ""}><i></i><span>${t.title}${t.kind === "goal" ? html` <b class="gpill">Objectif</b>` : nothing}</span><em>${t.min} min</em>${t.detail ? html`<small>${t.detail}</small>` : nothing}</li>`)}</ul>
           ${it.note ? html`<div class="note">${it.note}</div>` : nothing}
           ${it.loc === "campus" ? html`<div class="note">Sur le campus : bibliothèque ou salle d'étude</div>` : nothing}`
         : nothing}
       ${it.kind === "exam" && it.detail ? html`<div class="meta detail"><span>${it.detail}</span></div>` : nothing}`;
   } else {
-    const [title, sub] = minorLabel(it, st);
+    const [title, sub] = minorLabel(it, st, res);
     body = html`<b>${title}</b><span class="mono dur">${E.dur(d)}</span>${isNow ? html`<span class="nowtag">Maintenant</span>` : nothing}${sub ? html`<small>${sub}</small>` : nothing}`;
   }
   return html`
@@ -326,14 +337,19 @@ function aside(res, st, ctx) {
     }
     cards.push(html`<div class="card"><h2>Pris du retard ?</h2><p class="sub">Recalcule la suite de la journée à partir de maintenant, sans perdre ce qui est déjà fait.</p>${inner}</div>`);
   }
+  const P = res.placeInfo;
   cards.push(html`
-    <div class="card"><h2>Où tu travailles</h2>
-      <div class="ev" style="--c:var(--accent)"><div class="t"><i></i>Bibliothèque d'Erasme</div>
-        <div class="d">${res.atLib
-          ? "Trajet de " + st.travel + " min le matin et le soir, tu restes sur place entre les cours."
-          : "À la maison : trajets seulement pour les séances à l'unif."}${res.libSet ? " · choisi pour ce jour" : ""}</div>
-        <button class="sw" role="switch" aria-checked=${res.atLib ? "true" : "false"} aria-label="Journée à la bibliothèque d'Erasme" @click=${() => act.toggleLib(res.atLib)}></button></div>
+    <div class="card placecard"><h2>Où tu travailles</h2>
+      <div class="seg places" role="radiogroup" aria-label="Lieu de travail">
+        ${E.PLACE_KEYS.map((k) => html`<button role="radio" aria-checked=${res.place === k ? "true" : "false"} @click=${() => act.setPlace(k)}>${E.PLACES[k].short}</button>`)}
+      </div>
+      <p class="sub">${P
+        ? html`${P.name} · ouvert ${E.hm(P.open)}–${E.hm(P.close)} · trajet ${P.travel} min.
+            ${P.campus ? " Tu restes sur place entre les cours." : " Les séances à Erasme ont leurs propres trajets."}`
+        : "À la maison : trajets seulement pour les séances à l'unif."}
+        ${res.placeSet ? html`<br><button class="linkbtn" @click=${act.placeAuto}>Revenir au lieu habituel</button>` : nothing}</p>
     </div>`);
+  if (ctx.week) cards.push(goalsCard(ctx.week, { onEdit: ctx.editGoals, compact: true }));
   if (res.mode === "concours") {
     cards.push(html`
       <div class="card"><h2>Dimanche concours</h2><p class="sub">Éthique & empathie : un dimanche sur ${st.ethiqueEvery}. Le raisonnement, tous les dimanches.</p>
@@ -368,7 +384,7 @@ function aside(res, st, ctx) {
 }
 
 // ---------- vue ----------
-export function dayView(res, nav) {
+export function dayView(res, nav, week) {
   const st = S(), ds = state.date, day = getDay(ds) || {}, done = day.done || {};
   const isToday = ds === E.todayStr(), nm = E.nowMin();
   let doneMin = res.replanStudied || 0;
@@ -376,7 +392,7 @@ export function dayView(res, nav) {
   const nextWake = E.m((getDay(E.addDays(ds, 1)) || {}).wake || st.wake);
   const ctx = {
     ds, day, done, isToday, nm, doneMin, target: st.targetH * 60, nextWake, bed: nextWake - st.sleepH * 60,
-    go: nav.go, setReplanOpen: nav.setReplanOpen
+    go: nav.go, setReplanOpen: nav.setReplanOpen, week, editGoals: nav.editGoals
   };
   return html`
     ${header(res, st, ctx)}

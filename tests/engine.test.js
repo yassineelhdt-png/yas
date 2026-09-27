@@ -89,6 +89,10 @@ describe("saisies du jour", () => {
   });
 });
 
+// en semaine, par défaut : journée à la bibliothèque d'Erasme, qui ferme à 20:45
+const weekday = (d) => E.dow(d) >= 1 && E.dow(d) <= 5 && !E.H.closed[d];
+const defaultEnd = (d) => (weekday(d) ? "20:45" : "21:00");
+
 describe("heure de fin", () => {
   const at = (p, kind) => p.items.find((it) => it.kind === kind);
 
@@ -98,11 +102,11 @@ describe("heure de fin", () => {
     return lastFixed >= 0 && !p.items.slice(lastFixed).some((it) => it.kind === "study");
   };
 
-  it("finit à 21:00 par défaut, avec 9h nettes, en étirant les pauses", () => {
+  it("finit à 21:00 (20:45 à Erasme en semaine), avec 9h nettes, en étirant les pauses", () => {
     for (const d of days) {
       const p = E.planDay(d, {});
-      if (!doneAtLastClass(p)) expect(fin(p), d).toBe("21:00");
-      expect(p.workEnd, d).toBeLessThanOrEqual(21 * 60);
+      if (!doneAtLastClass(p) && !p.fit.early) expect(fin(p), d).toBe(defaultEnd(d));
+      expect(p.workEnd, d).toBeLessThanOrEqual(E.m(defaultEnd(d)));
       expect(p.net, d).toBeGreaterThanOrEqual(9 * 60);
       expect(p.fit.mode, d).toBe("stretch");
     }
@@ -110,8 +114,11 @@ describe("heure de fin", () => {
     expect(at(p, "pause").e - at(p, "pause").s).toBeGreaterThan(10);
   });
 
-  it("commence à 9h → fini à 21h", () => {
-    for (const d of days) expect(fin(E.planDay(d, {}, () => ({ start: "09:00" }))), d).toBe("21:00");
+  it("commence à 9h → fini à l'heure", () => {
+    for (const d of days) {
+      const p = E.planDay(d, {}, () => ({ start: "09:00" }));
+      if (!doneAtLastClass(p) && !p.fit.early) expect(fin(p), d).toBe(defaultEnd(d));
+    }
   });
 
   it("mange le soir pendant le programme quand on finit après 20h", () => {
@@ -124,7 +131,7 @@ describe("heure de fin", () => {
     }
   });
 
-  it("pas de double trajet : après un retour d'Erasme, pas de « retour de la bibliothèque »", () => {
+  it("pas deux trajets à la suite", () => {
     for (const d of days) {
       const it = E.planDay(d, {}).items;
       for (let i = 1; i < it.length; i++) expect(it[i - 1].kind === "travel" && it[i].kind === "travel", d).toBe(false);
@@ -132,20 +139,20 @@ describe("heure de fin", () => {
   });
 
   it("heure de fin du jour : prioritaire sur les réglages", () => {
-    const p = E.planDay("2026-10-05", {}, () => ({ start: "09:00", end: "23:00" }));
+    const p = E.planDay("2026-10-10", {}, () => ({ start: "09:00", end: "23:00" }));
     expect(fin(p)).toBe("23:00");
     expect(p.net).toBeGreaterThanOrEqual(9 * 60);
     expect(p.endSet).toBe(true);
   });
 
   it("un peu juste : repas raccourcis d'abord, les 9h sont gardées", () => {
-    const p = E.planDay("2026-10-06", {}, () => ({ start: "10:30" }));
+    const p = E.planDay("2026-10-10", {}, () => ({ start: "10:00" }));
     expect(p.fit.mode).toBe("squeeze");
     expect(fin(p)).toBe("21:00");
     expect(p.net).toBeGreaterThanOrEqual(9 * 60);
     expect(p.fit.breaks.pause).toBe(10); // les petites pauses ne bougent pas tant que les repas suffisent
     for (const it of p.items) if (it.kind === "lunch" || it.kind === "dinner") expect(it.e - it.s).toBeGreaterThanOrEqual(30);
-    expect(p.warnings.some((w) => w.startsWith("Pour faire tes 9h avant 21:00 : repas de 30 min"))).toBe(true);
+    expect(p.warnings.some((w) => w.startsWith("Pour faire tes 9h avant 21:00 : repas de"))).toBe(true);
   });
 
   it("trop peu de temps : objectif réduit et alerte", () => {
@@ -153,77 +160,168 @@ describe("heure de fin", () => {
     expect(p.fit.mode).toBe("cut");
     expect(p.workEnd).toBeLessThanOrEqual(21 * 60);
     expect(p.net).toBeLessThan(9 * 60);
-    expect(p.warnings.some((w) => w.startsWith("Pour finir à 21:00"))).toBe(true);
+    expect(p.warnings.some((w) => w.startsWith("Pour finir à 20:45"))).toBe(true);
   });
 
   it("fin avant le début : ignorée avec une alerte", () => {
-    const p = E.planDay("2026-10-06", {}, () => ({ start: "09:00", end: "08:00" }));
+    const p = E.planDay("2026-10-10", {}, () => ({ start: "09:00", end: "08:00" }));
     expect(p.fit.mode).toBe("invalid");
     expect(p.warnings.some((w) => w.includes("avant le début"))).toBe(true);
   });
 
-  it("en semaine : retour de la bibliothèque puis sport ; le week-end : sport directement", () => {
-    const wk = E.planDay("2026-10-06", {});
-    const tail = wk.items.slice(-2).map((it) => it.kind + (it.dir ? "/" + it.dir : ""));
-    expect(tail).toEqual(["travel/home", "sport"]);
-    expect(wk.items.at(-2).s).toBe(wk.workEnd);
-    for (const d of ["2026-10-10", "2026-10-11"]) expect(E.planDay(d, {}).items.at(-2).kind, d).not.toBe("travel");
-  });
-});
-
-describe("journée à la bibliothèque d'Erasme", () => {
-  const trips = (p) => p.items.filter((it) => it.kind === "travel");
-
-  it("lun–ven : un trajet le matin, un le soir, aucun entre les cours", () => {
-    for (const d of days) {
-      const p = E.planDay(d, {});
-      if (!p.atLib) continue;
-      const t = trips(p);
-      expect(t.map((x) => x.dir), d).toEqual(["to", "home"]);
-      expect(t[0].e, d).toBe(p.start); // on arrive à la bibli au moment de commencer
-      expect(p.items.filter((it) => it.kind === "study").every((it) => it.loc === "bibli"), d).toBe(true);
-    }
-  });
-
-  it("week-end et congés : à la maison, trajets seulement pour les séances", () => {
-    for (const d of ["2026-10-10", "2026-10-11", "2026-11-11", "2026-12-24"]) {
-      const p = E.planDay(d, {});
-      expect(p.atLib, d).toBe(false);
-      expect(p.items.some((it) => it.lib || it.dir === "home"), d).toBe(false);
-    }
-  });
-
-  it("début automatique : lever + préparation + trajet", () => {
-    const p = E.planDay("2026-10-06", {});
-    expect(E.hm(p.start)).toBe("08:20");
-    expect(E.hm(E.planDay("2026-10-10", {}).start)).toBe("07:50");
-  });
-
-  it("choix du jour prioritaire : maison un mardi, bibli un samedi", () => {
-    const home = E.planDay("2026-10-06", {}, () => ({ lib: false }));
-    expect(home.atLib).toBe(false);
-    expect(home.libSet).toBe(true);
-    expect(trips(home).some((t) => t.dir === "to" && !t.lib)).toBe(true); // trajet pour l'appui de midi
-    const sat = E.planDay("2026-10-10", {}, () => ({ lib: true }));
-    expect(trips(sat).map((t) => t.dir)).toEqual(["to", "home"]);
-  });
-
-  it("réglage désactivé : comme avant, à la maison", () => {
-    expect(E.planDay("2026-10-06", { weekdayLib: false }).atLib).toBe(false);
+  it("fin après minuit (00:30) : le lendemain, pas avant le début", () => {
+    const p = E.planDay("2026-10-10", {}, () => ({ start: "14:00", end: "00:30" }));
+    expect(p.endAt).toBe(24 * 60 + 30);
+    expect(p.fit.mode).not.toBe("invalid");
   });
 
   it("la replanification garde l'heure de fin", () => {
     const p = E.planDay("2026-10-06", {}, () => ({ replan: { at: 900, studied: 240, lunch: true } }));
-    expect(fin(p)).toBe("21:00");
+    expect(fin(p)).toBe("20:45");
   });
 
-  it("les créneaux ne se chevauchent pas, quelle que soit l'heure de fin", () => {
-    for (const end of ["19:00", "20:00", "20:45", "21:00", "22:00", "23:00"]) {
-      for (const d of days) {
-        const p = E.planDay(d, {}, () => ({ start: "09:00", end }));
-        for (let i = 1; i < p.items.length; i++) expect(p.items[i].s, `${d} ${end} #${i}`).toBeGreaterThanOrEqual(p.items[i - 1].e);
-        expect(p.workEnd, `${d} ${end}`).toBeLessThanOrEqual(E.m(end) + (p.fit.mode === "late" ? 600 : 0));
+  it("les créneaux ne se chevauchent pas, quels que soient le lieu et l'heure de fin", () => {
+    for (const place of ["maison", "erasme", "p4p", "uz"]) {
+      for (const end of ["19:00", "20:45", "21:00", "22:00", "23:00", "00:00"]) {
+        for (const d of days) {
+          const p = E.planDay(d, {}, () => ({ start: "09:00", end, place }));
+          for (let i = 1; i < p.items.length; i++) expect(p.items[i].s, `${d} ${place} ${end} #${i}`).toBeGreaterThanOrEqual(p.items[i - 1].e);
+        }
       }
     }
+  });
+});
+
+describe("lieux", () => {
+  const trips = (p) => p.items.filter((it) => it.kind === "travel");
+  const kinds = (p) => p.items.map((it) => it.kind + (it.dir ? "/" + it.dir : ""));
+
+  it("lun–ven : Erasme, un trajet de 25 min le matin et un le soir, aucun entre les cours", () => {
+    for (const d of days) {
+      const p = E.planDay(d, {});
+      if (!weekday(d)) continue;
+      expect(p.place, d).toBe("erasme");
+      const t = trips(p);
+      expect(t.map((x) => x.dir), d).toEqual(["place", "home"]);
+      expect(t[0].e - t[0].s, d).toBe(25);
+      expect(t[0].e, d).toBe(p.start); // on arrive à la bibli au moment de commencer
+    }
+  });
+
+  it("week-end et congés : à la maison", () => {
+    for (const d of ["2026-10-10", "2026-10-11", "2026-11-11", "2026-12-24"]) {
+      const p = E.planDay(d, {});
+      expect(p.place, d).toBe("maison");
+      expect(p.items.some((it) => it.dir === "place" || it.dir === "home"), d).toBe(false);
+    }
+  });
+
+  it("début automatique : lever + préparation + trajet, jamais avant l'ouverture", () => {
+    expect(E.hm(E.planDay("2026-10-06", {}).start)).toBe("08:15"); // 7:30 + 20 + 25
+    expect(E.hm(E.planDay("2026-10-10", {}).start)).toBe("07:50");
+    const uz = E.planDay("2026-10-06", {}, () => ({ place: "uz" }));
+    expect(E.hm(uz.start)).toBe("08:40"); // 50 min de trajet
+  });
+
+  it("Erasme ferme à 20:45 : départ, 20 min pour se poser à la maison, reprise jusqu'à l'heure de fin", () => {
+    const p = E.planDay("2026-10-05", {}, () => ({ start: "14:00", end: "00:00" }));
+    const k = kinds(p);
+    const close = p.items.find((it) => it.dir === "home" && it.closing);
+    expect(E.hm(close.s)).toBe("20:45");
+    const settle = p.items.find((it) => it.kind === "settle");
+    expect(E.hm(settle.e)).toBe("21:30");
+    const after = p.items.filter((it) => it.kind === "study" && it.s >= settle.e);
+    expect(after.length).toBeGreaterThan(0);
+    expect(after.every((it) => it.loc === "maison")).toBe(true);
+    expect(fin(p)).toBe("00:00");
+    expect(k.at(-1)).toBe("sport"); // pas de second retour : on est déjà à la maison
+    expect(k.filter((x) => x === "travel/home").length).toBe(1);
+  });
+
+  it("Erasme avec fin à 21:00 : pas la peine de rentrer pour 15 min, fin à la fermeture", () => {
+    const p = E.planDay("2026-10-05", {}, () => ({ end: "21:00" }));
+    expect(fin(p)).toBe("20:45");
+    expect(p.notes.some((n) => n.includes("Erasme ferme à 20:45"))).toBe(true);
+  });
+
+  it("Play4Peace ouvre à 9:00 : étude à la maison d'abord, puis trajet", () => {
+    const p = E.planDay("2026-10-10", {}, () => ({ place: "p4p", start: "08:00", end: "23:00" }));
+    const trip = p.items.find((it) => it.dir === "place");
+    expect(E.hm(trip.s)).toBe("08:35");
+    expect(E.hm(trip.e)).toBe("09:00");
+    expect(p.items.some((it) => it.kind === "study" && it.loc === "maison" && it.e <= trip.s)).toBe(true);
+    expect(p.items.filter((it) => it.kind === "study" && it.s >= trip.e).every((it) => it.loc === "p4p")).toBe(true);
+  });
+
+  it("hors Erasme, séance peu après l'ouverture : on va directement à la séance, puis au lieu", () => {
+    const p = E.planDay("2026-10-07", {}, () => ({ place: "p4p", start: "08:00" }));
+    expect(p.items.some((it) => it.dir === "place")).toBe(false);
+    expect(p.items.find((it) => it.dir === "back").at).toBe("p4p");
+  });
+
+  it("choix du jour prioritaire ; ancien réglage bibli oui / non respecté", () => {
+    expect(E.planDay("2026-10-06", {}, () => ({ place: "maison" })).place).toBe("maison");
+    expect(E.planDay("2026-10-10", {}, () => ({ place: "uz" })).place).toBe("uz");
+    expect(E.planDay("2026-10-06", {}, () => ({ lib: false })).place).toBe("maison");
+    expect(E.planDay("2026-10-06", { weekdayLib: false }).place).toBe("maison");
+    expect(E.planDay("2026-10-06", { weekdayPlace: "p4p" }).place).toBe("p4p");
+  });
+});
+
+describe("sessions", () => {
+  it("jamais de session de moins de 30 min", () => {
+    for (const place of ["maison", "erasme", "p4p", "uz"]) {
+      for (const start of [null, "09:00", "10:15", "12:00"]) {
+        for (const d of days) {
+          const p = E.planDay(d, {}, () => (start ? { start, place } : { place }));
+          for (const it of p.items) if (it.kind === "study") expect(it.e - it.s, `${d} ${place} ${start} ${E.hm(it.s)}`).toBeGreaterThanOrEqual(30);
+        }
+      }
+    }
+  });
+
+  it("« reporté » une seule fois dans les titres", () => {
+    for (const d of days) {
+      for (const it of E.planDay(d, {}).items) for (const t of it.tasks || []) expect(t.title, d).not.toMatch(/reporté · reporté/);
+    }
+  });
+});
+
+describe("objectifs de la semaine", () => {
+  const goalMin = (week) => {
+    const out = {};
+    for (const r of week) for (const it of r.items) for (const t of it.tasks || []) if (t.kind === "goal") out[t.gid] = (out[t.gid] || 0) + t.min;
+    return out;
+  };
+
+  it("les annales habituelles sont placées dans la semaine, sans dépasser l'objectif", () => {
+    for (const mon of ["2026-10-05", "2026-11-09", "2026-12-07"]) {
+      const g = goalMin(E.planWeek(mon, {}));
+      expect(g["annale-math"], mon).toBe(240);
+      expect(g["annale-chim"], mon).toBeGreaterThan(0);
+      expect(g["annale-chim"], mon).toBeLessThanOrEqual(480);
+      expect(g["annale-phys"], mon).toBeLessThanOrEqual(480);
+    }
+  });
+
+  it("jamais pendant la permanence ni la guidance : seulement dans les sessions d'étude", () => {
+    for (const r of E.planWeek("2026-10-05", {})) {
+      for (const it of r.items) if (it.kind !== "study") expect((it.tasks || []).some((t) => t.kind === "goal")).toBe(false);
+    }
+  });
+
+  it("une semaine personnalisée remplace les objectifs habituels", () => {
+    const goals = { base: [{ id: "a", kind: "annale", subj: "CHIM", count: 1, hours: 4 }], weeks: { "2026-10-12": [{ id: "t", kind: "theorie", subj: "BIO", count: 1, hours: 2, label: "chapitre 3" }] } };
+    const w1 = goalMin(E.planWeek("2026-10-05", { goals }));
+    const w2 = goalMin(E.planWeek("2026-10-12", { goals }));
+    expect(w1.a).toBe(240);
+    expect(w2.a).toBeUndefined();
+    expect(w2.t).toBe(120);
+    const title = E.planWeek("2026-10-12", { goals }).flatMap((r) => r.items.flatMap((it) => it.tasks || [])).find((t) => t.gid === "t").title;
+    expect(title).toBe("Théorie de bio · chapitre 3");
+  });
+
+  it("sans objectif : comme avant (rotation des matières)", () => {
+    expect(Object.keys(goalMin(E.planWeek("2026-10-05", { goals: { base: [], weeks: {} } })))).toEqual([]);
   });
 });

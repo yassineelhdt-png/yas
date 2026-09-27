@@ -33,3 +33,19 @@ legend { font-family: var(--display); font-weight: 650; font-size: 16px; padding
 .method ul { padding-left: 18px; display: grid; gap: 4px; }
 .cyc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .cyc span { font-family: var(--mono); font-size: 12.5px; padding: 3px 8px; border-radius: 6px; background: color-mix(in srgb, var(--c-eth) 14%, var(--surface)); color: var(--c-eth); }
+
+/* ---------- éditeur d'objectifs ---------- */
+fieldset.goals { grid-column: 1 / -1; display: grid; gap: 10px; padding-bottom: 14px; }
+fieldset.goals > .sub { margin: 4px 0 0; }
+.goallist { display: grid; gap: 8px; }
+.goalrow { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-left: 4px solid var(--c, var(--line)); border-radius: 12px; background: var(--surface-2); }
+.goalrow.ro { border-left-color: var(--line); }
+.goalrow small { color: var(--muted); font-size: 12.5px; }
+.goalrow .gr1, .goalrow .gr2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.goalrow select, .goalrow input { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 6px 8px; font-size: 14px; }
+.goalrow input[type=number] { width: 4.2em; font-family: var(--mono); }
+.goalrow .glabel { flex: 1 1 180px; min-width: 0; }
+.goalrow label { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); }
+.linkbtn.danger { color: var(--warn); margin-left: auto; }
+fieldset.goals .fr { grid-template-columns: auto minmax(0, 1fr); }
+fieldset.goals .fr select { max-width: 100%; width: 100%; }

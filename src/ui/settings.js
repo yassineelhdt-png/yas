@@ -4,6 +4,9 @@ import { live } from "lit-html/directives/live.js";
 import { state, S, notify, saveSettings, resetSettings, setTheme, toast, exportData, parseBackup, importData } from "../store.js";
 import { platform } from "../platform.js";
 import { icons } from "./icons.js";
+import * as E from "../engine/index.js";
+import { goalName } from "./goals.js";
+import { MOISC } from "./format.js";
 
 // [clé, libellé, type, options] — type : time | date | bool | sel | min | h | sem
 // options.min / options.max bornent les nombres
@@ -17,6 +20,7 @@ const FORM = [
   ]],
   ["Rythme", [
     ["session", "Session de concentration max", "min", { min: 15 }],
+    ["minSession", "Session minimale (jamais moins)", "min", { min: 15, max: 90 }],
     ["pause", "Micro-pause", "min"],
     ["bigPause", "Grande pause", "min"],
     ["lunch", "Déjeuner", "min"],
@@ -24,9 +28,19 @@ const FORM = [
     ["sport", "Sport", "min"],
     ["shower", "Douche après le sport", "min"]
   ]],
+  ["Lieux", [
+    ["weekdayPlace", "Lieu du lundi au vendredi (hors congés)", "sel", { str: true, choices: [["maison", "Maison"], ["erasme", "Erasme"], ["p4p", "Play4Peace"], ["uz", "UZ"]] }],
+    ["travel", "Erasme : trajet (aussi pour les séances)", "min"],
+    ["erasmeOpen", "Erasme : ouverture", "time"],
+    ["erasmeClose", "Erasme : fermeture", "time"],
+    ["p4pTravel", "Play4Peace : trajet", "min"],
+    ["p4pOpen", "Play4Peace : ouverture", "time"],
+    ["p4pClose", "Play4Peace : fermeture", "time"],
+    ["uzTravel", "UZ : trajet", "min"],
+    ["uzOpen", "UZ : ouverture", "time"],
+    ["uzClose", "UZ : fermeture", "time"]
+  ]],
   ["Unif · Erasme", [
-    ["weekdayLib", "Lun–ven : journée à la bibliothèque d'Erasme", "bool"],
-    ["travel", "Trajet maison ↔ Erasme (aller simple)", "min"],
     ["guidChimDay", "Guidance chimie : jour", "sel", { choices: [[2, "Mardi"], [3, "Mercredi"], [4, "Jeudi"]] }],
     ["guidChimDur", "Guidance chimie : durée", "min", { min: 15 }],
     ["permPhysDay", "Permanence physique : jour", "sel", { choices: [[1, "Lundi"], [2, "Mardi"], [3, "Mercredi"], [4, "Jeudi"], [5, "Vendredi"]] }],
@@ -69,8 +83,10 @@ function field([key, label, type, opt = {}], st) {
     input = html`<button class="sw" role="switch" id=${id} aria-checked=${v ? "true" : "false"} aria-label=${label} @click=${() => saveSettings({ [key]: !v })}></button>`;
   } else if (type === "sel") {
     // ?selected pour le premier affichage, .value pour les mises à jour (ex. retour aux réglages de base)
-    input = html`<select id=${id} .value=${live(String(+v))} @change=${(e) => { saveSettings({ [key]: +e.target.value }); toast("Réglage enregistré"); }}>
-      ${opt.choices.map(([val, name]) => html`<option value=${val} ?selected=${+v === val}>${name}</option>`)}</select>`;
+    // opt.str : valeurs texte (ex. lieu), sinon nombres (ex. jour de la semaine)
+    const cast = (x) => (opt.str ? String(x) : +x);
+    input = html`<select id=${id} .value=${live(String(cast(v)))} @change=${(e) => { saveSettings({ [key]: cast(e.target.value) }); toast("Réglage enregistré"); }}>
+      ${opt.choices.map(([val, name]) => html`<option value=${val} ?selected=${cast(v) === val}>${name}</option>`)}</select>`;
   } else {
     input = html`<input type="number" id=${id} inputmode="decimal" min=${opt.min ?? 0} max=${opt.max ?? nothing} step=${type === "h" ? "0.5" : type === "sem" ? "1" : "5"}
       .value=${live(String(v))} @change=${(e) => saveNumber(key, e.target.value, opt)}><span class="u">${type === "sem" ? "sem." : type}</span>`;
@@ -148,12 +164,99 @@ function importControls() {
     </div>`;
 }
 
+// ---------- objectifs de la semaine ----------
+let goalWeek = "base"; // « base » = objectifs habituels, sinon le lundi de la semaine modifiée
+
+/** Ouvre l'éditeur d'objectifs sur une semaine (depuis les vues Jour / Semaine). */
+export function openGoals(mon) {
+  goalWeek = mon;
+}
+
+function weekOptions() {
+  const out = [];
+  for (let mon = E.addDays(E.H.semesterStart, 7), i = 0; i < 16; mon = E.addDays(mon, 7), i++) {
+    const a = E.pd(mon), b = E.pd(E.addDays(mon, 6));
+    out.push([mon, "S" + E.weekNo(mon) + " · " + a.getDate() + " " + MOISC[a.getMonth()] + " → " + b.getDate() + " " + MOISC[b.getMonth()]]);
+  }
+  return out;
+}
+
+function goalsState(st) {
+  const g = st.goals || {};
+  return { base: Array.isArray(g.base) ? g.base : [], weeks: g.weeks && typeof g.weeks === "object" ? g.weeks : {} };
+}
+
+function saveGoals(G, msg) {
+  saveSettings({ goals: G });
+  if (msg) toast(msg);
+}
+
+function editList(st, fn, msg) {
+  const G = goalsState(st);
+  const list = goalWeek === "base" ? G.base : G.weeks[goalWeek] || [];
+  const next = fn(list.map((g) => ({ ...g })));
+  saveGoals(goalWeek === "base" ? { ...G, base: next } : { ...G, weeks: { ...G.weeks, [goalWeek]: next } }, msg);
+}
+
+function goalRow(g, i, st) {
+  const set = (patch, msg) => editList(st, (l) => { l[i] = { ...l[i], ...patch }; return l; }, msg);
+  const kinds = Object.entries(E.GOAL_KINDS);
+  return html`
+    <div class="goalrow" style="--c:var(${"--c-" + (g.subj || "rev").toLowerCase()})">
+      <div class="gr1">
+        <select aria-label="Type d'objectif" .value=${live(g.kind)} @change=${(e) => set({ kind: e.target.value, hours: E.GOAL_KINDS[e.target.value].hours })}>
+          ${kinds.map(([k, v]) => html`<option value=${k} ?selected=${g.kind === k}>${v.name}</option>`)}
+        </select>
+        <select aria-label="Matière" .value=${live(g.subj)} @change=${(e) => set({ subj: e.target.value })}>
+          ${E.GOAL_SUBJECTS.map((k) => html`<option value=${k} ?selected=${g.subj === k}>${E.SUBJ[k]}</option>`)}
+        </select>
+        <button class="linkbtn danger" @click=${() => editList(st, (l) => l.filter((_, j) => j !== i), "Objectif retiré")}>Retirer</button>
+      </div>
+      <div class="gr2">
+        <label>Nombre <input type="number" min="1" max="20" step="1" inputmode="numeric" .value=${live(String(g.count ?? 1))} @change=${(e) => set({ count: Math.max(1, Math.round(+e.target.value || 1)) })}></label>
+        <label>× <input type="number" min="0.5" max="20" step="0.5" inputmode="decimal" .value=${live(String(g.hours ?? 1))} @change=${(e) => set({ hours: Math.max(0.5, +e.target.value || 1) })}> h</label>
+        <input type="text" class="glabel" placeholder="Précision (chapitre, année…)" .value=${live(g.label || "")} @change=${(e) => set({ label: e.target.value.trim() })}>
+      </div>
+      <small>${goalName(g)}</small>
+    </div>`;
+}
+
+function goalsFieldset(st) {
+  const G = goalsState(st);
+  const isBase = goalWeek === "base";
+  const own = !isBase && Array.isArray(G.weeks[goalWeek]);
+  const list = isBase ? G.base : own ? G.weeks[goalWeek] : G.base;
+  const total = list.reduce((a, g) => a + Math.max(1, Math.round(+g.count || 1)) * (+g.hours || 0), 0);
+  const editable = isBase || own;
+  return html`
+    <fieldset class="goals" id="goals">
+      <legend>Objectifs de la semaine</legend>
+      <p class="sub">Annales, théorie à rattraper, exercices… L'app les place sur ton temps d'étude libre (jamais pendant les séances, la guidance ou la permanence), avant les exercices habituels.</p>
+      <div class="fr"><label for="goal-week">Semaine</label>
+        <div class="in"><select id="goal-week" .value=${live(goalWeek)} @change=${(e) => { goalWeek = e.target.value; notify(); }}>
+          <option value="base" ?selected=${isBase}>Chaque semaine (habituels)</option>
+          ${weekOptions().map(([mon, name]) => html`<option value=${mon} ?selected=${goalWeek === mon}>${name}${Array.isArray(G.weeks[mon]) ? " · perso" : ""}</option>`)}
+        </select></div>
+      </div>
+      ${!isBase && !own ? html`
+        <p class="sub">Cette semaine suit tes objectifs habituels (ci-dessous).</p>
+        <div class="btnrow"><button class="btn" @click=${() => saveGoals({ ...G, weeks: { ...G.weeks, [goalWeek]: G.base.map((g) => ({ ...g })) } }, "Semaine personnalisée")}>Personnaliser cette semaine</button></div>` : nothing}
+      ${own ? html`<div class="btnrow"><button class="btn ghost" @click=${() => { const w = { ...G.weeks }; delete w[goalWeek]; saveGoals({ ...G, weeks: w }, "Objectifs habituels rétablis"); }}>Revenir aux objectifs habituels</button></div>` : nothing}
+      <div class="goallist ${editable ? "" : "readonly"}">
+        ${list.length ? list.map((g, i) => (editable ? goalRow(g, i, st) : html`<div class="goalrow ro"><small>${goalName(g)}</small></div>`)) : html`<p class="sub">Aucun objectif.</p>`}
+      </div>
+      ${editable ? html`<div class="btnrow"><button class="btn primary" @click=${() => editList(st, (l) => [...l, { id: "g" + Date.now().toString(36), kind: "annale", subj: "CHIM", count: 1, hours: 4, label: "" }], "Objectif ajouté")}>Ajouter un objectif</button></div>` : nothing}
+      <p class="sub">Total : ${E.dur(Math.round(total * 60))} par semaine.</p>
+    </fieldset>`;
+}
+
 export function settingsView() {
   const st = S();
   const themes = [["auto", "Auto"], ["light", "Clair"], ["dark", "Sombre"]];
   return html`
     <section class="settings">
       <h1>Réglages</h1>
+      ${goalsFieldset(st)}
       ${FORM.map(([legend, fields]) => html`<fieldset><legend>${legend}</legend>${fields.map((f) => field(f, st))}</fieldset>`)}
 
       <fieldset>

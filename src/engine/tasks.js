@@ -77,9 +77,11 @@ export function assign(chunks, queue, weekMin, blocus) {
 /**
  * Semaine : chaque matière forme UN bloc continu dans la journée (on n'y revient jamais).
  * Les « segments » sont les suites de sessions d'étude non coupées par une séance à l'unif.
+ * `goals` (facultatif) : objectifs de la semaine restant à placer ; ils remplacent le temps de
+ * rotation (exercices, fiches) des matières concernées, et sont décomptés au fur et à mesure.
  * Retourne ce qui doit être reporté au lendemain.
  */
-export function assignGrouped(chunks, queue, weekMin, blocus) {
+export function assignGrouped(chunks, queue, weekMin, blocus, goals = []) {
   const groups = {}, order = [];
   for (const q0 of queue) {
     const q = { ...q0 };
@@ -111,13 +113,19 @@ export function assignGrouped(chunks, queue, weekMin, blocus) {
   const level = Math.round(C / Math.max(1, nT) / 5) * 5; // durée cible d'un bloc de rotation
   const carry = [];
 
-  const isRot = (k) => ROT.includes(k);
+  const goalLeft = (k) => goals.reduce((a, u) => a + (u.subj === k ? u.left : 0), 0);
+  const nextGoal = (k) => goals.find((u) => u.subj === k && u.left > 0);
+  // matières « à remplir » : la rotation habituelle, plus celles qui ont un objectif en cours
+  const fillKeys = [...ROT, ...new Set(goals.filter((u) => !ROT.includes(u.subj)).map((u) => u.subj))];
+  const isRot = (k) => ROT.includes(k) || goalLeft(k) > 0;
   const ready = (g, now) => !g.after || g.after <= now + 15 || g.readyPart;
   function rotPick() {
+    // d'abord une matière avec un objectif en cours, sinon la moins travaillée de la semaine
     let best = null;
-    for (const k of ROT) {
-      if (groups[k]) continue;
-      if (!best || (weekMin[k] || 0) < (weekMin[best] || 0)) best = k;
+    for (const k of fillKeys) {
+      if (groups[k] || !isRot(k)) continue;
+      const kg = goalLeft(k) > 0, bg = best && goalLeft(best) > 0;
+      if (!best || (kg && !bg) || (kg === bg && (weekMin[k] || 0) < (weekMin[best] || 0))) best = k;
     }
     return best;
   }
@@ -134,12 +142,22 @@ export function assignGrouped(chunks, queue, weekMin, blocus) {
       while (min > 0 && ci < sg.chunks.length) {
         const ch = sg.chunks[ci], room = ch.e - ch.s - off, take = Math.min(room, min), last = ch.tasks[ch.tasks.length - 1];
         if (last && last.title === t0.title) last.min += take;
-        else ch.tasks.push({ subj: t0.subj, kind: t0.kind, title: t0.title, detail: t0.detail, min: take });
+        else ch.tasks.push({ subj: t0.subj, kind: t0.kind, title: t0.title, detail: t0.detail, min: take, ...(t0.gid ? { gid: t0.gid } : {}) });
         const rk = rotKey(t0.subj);
         if (weekMin[rk] !== undefined) weekMin[rk] += take;
         min -= take; off += take; rem -= take;
         if (off >= ch.e - ch.s) { ci++; off = 0; }
       }
+    }
+    // temps de remplissage d'une matière : objectifs de la semaine d'abord, puis rotation habituelle
+    function layRot(k, min) {
+      for (let u = nextGoal(k); u && min > 0; u = nextGoal(k)) {
+        const take = Math.min(u.left, min);
+        lay({ subj: k, kind: "goal", gid: u.gid, title: u.title, detail: u.detail }, take);
+        u.left -= take;
+        min -= take;
+      }
+      if (min > 0) lay(ROT.includes(k) ? rotTask(k, min, blocus) : filler(), min);
     }
 
     let guard = 0;
@@ -164,13 +182,15 @@ export function assignGrouped(chunks, queue, weekMin, blocus) {
         if (any.length) pick = any[0];
       }
       if (!pick) {
-        if (lastKey && isRot(lastKey)) lay(rotTask(lastKey, rem, blocus), rem);
+        if (lastKey && (ROT.includes(lastKey) || goalLeft(lastKey) > 0)) layRot(lastKey, rem);
         else lay(filler(), rem);
         break;
       }
 
       const g = groups[pick];
-      let A = Math.min(isRot(pick) ? Math.max(g.req, level) : g.req, rem);
+      // un objectif en cours (ex. annale de 4h) : on vise l'unité entière d'un seul tenant
+      const unit = nextGoal(pick);
+      let A = Math.min(isRot(pick) ? Math.max(g.req + (unit ? unit.left : 0), level) : g.req, rem);
       const tail = rem - A;
       if (tail > 0 && tail < 45 && isRot(pick) && !cands.some((k) => k !== pick && groups[k].req <= tail)) A = rem;
       // caler la fin du bloc sur une fin de session (pas de miettes de 5 min)
@@ -193,16 +213,16 @@ export function assignGrouped(chunks, queue, weekMin, blocus) {
       const th = byKind((t) => t.kind === "th");
       const pr = byKind((t) => t.kind === "prep" && t.min >= 30);
       const sq = byKind((t) => t.kind === "prep" && t.min < 30);
-      const ex = A > g.req && isRot(pick) ? [rotTask(pick, A - g.req, blocus)] : [];
+      const ex = A > g.req && isRot(pick) ? [{ fill: true, min: A - g.req }] : [];
       const thReady = !g.after || g.after <= now + 15;
       const seq = thReady ? [...bl, ...th, ...pr, ...ex, ...sq] : [...bl, ...pr, ...ex, ...th, ...sq];
       let left = A;
       for (const t0 of seq) {
         const take = Math.min(t0.min, left);
-        if (take > 0) { lay(t0, take); left -= take; }
+        if (take > 0) { if (t0.fill) layRot(pick, take); else lay(t0, take); left -= take; }
         if (t0.min - take >= 20 && (t0.kind === "th" || t0.kind === "backlog")) carry.push({ ...t0, min: t0.min - take });
       }
-      if (left > 0) lay(isRot(pick) ? rotTask(pick, left, blocus) : filler(), left);
+      if (left > 0) { if (isRot(pick)) layRot(pick, left); else lay(filler(), left); }
       g.done = true;
       lastKey = pick;
     }
