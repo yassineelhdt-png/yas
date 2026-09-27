@@ -89,9 +89,9 @@ describe("saisies du jour", () => {
   });
 });
 
-// en semaine, par défaut : journée à la bibliothèque d'Erasme, qui ferme à 20:45
+// en semaine, par défaut : journée à la bibliothèque d'Erasme (fermeture 20:45), fin à la maison à 21:00
 const weekday = (d) => E.dow(d) >= 1 && E.dow(d) <= 5 && !E.H.closed[d];
-const defaultEnd = (d) => (weekday(d) ? "20:45" : "21:00");
+const defaultEnd = () => "21:00";
 
 describe("heure de fin", () => {
   const at = (p, kind) => p.items.find((it) => it.kind === kind);
@@ -102,7 +102,7 @@ describe("heure de fin", () => {
     return lastFixed >= 0 && !p.items.slice(lastFixed).some((it) => it.kind === "study");
   };
 
-  it("finit à 21:00 (20:45 à Erasme en semaine), avec 9h nettes, en étirant les pauses", () => {
+  it("finit à 21:00, avec 9h nettes, en étirant les pauses", () => {
     for (const d of days) {
       const p = E.planDay(d, {});
       if (!doneAtLastClass(p) && !p.fit.early) expect(fin(p), d).toBe(defaultEnd(d));
@@ -160,7 +160,7 @@ describe("heure de fin", () => {
     expect(p.fit.mode).toBe("cut");
     expect(p.workEnd).toBeLessThanOrEqual(21 * 60);
     expect(p.net).toBeLessThan(9 * 60);
-    expect(p.warnings.some((w) => w.startsWith("Pour finir à 20:45"))).toBe(true);
+    expect(p.warnings.some((w) => w.startsWith("Pour finir à 21:00"))).toBe(true);
   });
 
   it("fin avant le début : ignorée avec une alerte", () => {
@@ -177,7 +177,7 @@ describe("heure de fin", () => {
 
   it("la replanification garde l'heure de fin", () => {
     const p = E.planDay("2026-10-06", {}, () => ({ replan: { at: 900, studied: 240, lunch: true } }));
-    expect(fin(p)).toBe("20:45");
+    expect(fin(p)).toBe("21:00");
   });
 
   it("les créneaux ne se chevauchent pas, quels que soient le lieu et l'heure de fin", () => {
@@ -238,19 +238,40 @@ describe("lieux", () => {
     expect(k.filter((x) => x === "travel/home").length).toBe(1);
   });
 
-  it("Erasme avec fin à 21:00 : pas la peine de rentrer pour 15 min, fin à la fermeture", () => {
-    const p = E.planDay("2026-10-05", {}, () => ({ end: "21:00" }));
+  it("fin de journée à la maison : on quitte Erasme avant la fermeture, le trajet sert de pause", () => {
+    for (const d of days) {
+      if (!weekday(d)) continue;
+      const p = E.planDay(d, {});
+      const i = p.items.findIndex((it) => it.dir === "home");
+      const trip = p.items[i];
+      expect(trip.s, d).toBeLessThanOrEqual(E.m("20:45"));
+      // juste après une session ou une séance, jamais collé à une autre pause
+      expect(["study", "fixed"], d).toContain(p.items[i - 1].kind);
+      expect(["pause", "bigpause"], d).not.toContain(p.items[i + 1].kind);
+      const after = p.items.slice(i + 1).filter((it) => it.kind === "study");
+      if (trip.leave) {
+        expect(after.length, d).toBeGreaterThan(0);
+        expect(after.every((it) => it.loc === "maison"), d).toBe(true);
+        expect(fin(p), d).toBe("21:00");
+      } else expect(after.length, d).toBe(0); // objectif atteint avec la dernière séance
+    }
+  });
+
+  it("réglage « rester sur place jusqu'à la fin » : fin à la fermeture d'Erasme", () => {
+    const p = E.planDay("2026-10-05", { homeTail: 0 }, () => ({ end: "21:00" }));
     expect(fin(p)).toBe("20:45");
     expect(p.notes.some((n) => n.includes("Erasme ferme à 20:45"))).toBe(true);
+    expect(p.items.filter((it) => it.kind === "study").every((it) => it.loc === "erasme")).toBe(true);
   });
 
   it("Play4Peace ouvre à 9:00 : étude à la maison d'abord, puis trajet", () => {
-    const p = E.planDay("2026-10-10", {}, () => ({ place: "p4p", start: "08:00", end: "23:00" }));
+    const p = E.planDay("2026-10-10", {}, () => ({ place: "p4p", start: "07:40", end: "23:00" }));
     const trip = p.items.find((it) => it.dir === "place");
     expect(E.hm(trip.s)).toBe("08:35");
     expect(E.hm(trip.e)).toBe("09:00");
     expect(p.items.some((it) => it.kind === "study" && it.loc === "maison" && it.e <= trip.s)).toBe(true);
-    expect(p.items.filter((it) => it.kind === "study" && it.s >= trip.e).every((it) => it.loc === "p4p")).toBe(true);
+    const home = p.items.find((it) => it.leave);
+    expect(p.items.filter((it) => it.kind === "study" && it.s >= trip.e && it.e <= home.s).every((it) => it.loc === "p4p")).toBe(true);
   });
 
   it("hors Erasme, séance peu après l'ouverture : on va directement à la séance, puis au lieu", () => {
@@ -269,15 +290,34 @@ describe("lieux", () => {
 });
 
 describe("sessions", () => {
-  it("jamais de session de moins de 30 min", () => {
+  it("jamais de session de moins de 50 min", () => {
     for (const place of ["maison", "erasme", "p4p", "uz"]) {
-      for (const start of [null, "09:00", "10:15", "12:00"]) {
+      for (const [start, end] of [[null, null], ["09:00", null], ["10:15", "22:00"], ["12:00", null], ["14:00", "00:00"]]) {
         for (const d of days) {
-          const p = E.planDay(d, {}, () => (start ? { start, place } : { place }));
-          for (const it of p.items) if (it.kind === "study") expect(it.e - it.s, `${d} ${place} ${start} ${E.hm(it.s)}`).toBeGreaterThanOrEqual(30);
+          const p = E.planDay(d, {}, () => ({ place, ...(start ? { start } : {}), ...(end ? { end } : {}) }));
+          for (const it of p.items) if (it.kind === "study") expect(it.e - it.s, `${d} ${place} ${start} ${E.hm(it.s)}`).toBeGreaterThanOrEqual(50);
         }
       }
     }
+  });
+
+  it("horaires ronds : tout tombe sur des multiples de 5 min", () => {
+    for (const place of ["maison", "erasme", "p4p", "uz"]) {
+      for (const day of [{}, { wake: "07:37" }, { start: "09:00", end: "22:00" }, { end: "19:00" }]) {
+        for (const d of days) {
+          const p = E.planDay(d, {}, () => ({ place, ...day }));
+          for (const it of p.items) {
+            if (it.kind === "prep") continue; // commence au lever
+            expect(it.s % 5, `${d} ${place} ${JSON.stringify(day)} ${it.kind} ${E.hm(it.s)}`).toBe(0);
+            expect(it.e % 5, `${d} ${place} ${JSON.stringify(day)} ${it.kind} ${E.hm(it.e)}`).toBe(0);
+          }
+        }
+      }
+    }
+  });
+
+  it("pas d'objectif net largement dépassé", () => {
+    for (const d of days) expect(E.planDay(d, {}).net, d).toBeLessThanOrEqual(9 * 60 + 15);
   });
 
   it("« reporté » une seule fois dans les titres", () => {
@@ -297,10 +337,25 @@ describe("objectifs de la semaine", () => {
   it("les annales habituelles sont placées dans la semaine, sans dépasser l'objectif", () => {
     for (const mon of ["2026-10-05", "2026-11-09", "2026-12-07"]) {
       const g = goalMin(E.planWeek(mon, {}));
-      expect(g["annale-math"], mon).toBe(240);
-      expect(g["annale-chim"], mon).toBeGreaterThan(0);
+      // semaine de cours : au moins une annale de chimie et une de physique, en entier
+      expect(g["annale-chim"], mon).toBeGreaterThanOrEqual(240);
+      expect(g["annale-phys"], mon).toBeGreaterThanOrEqual(240);
       expect(g["annale-chim"], mon).toBeLessThanOrEqual(480);
-      expect(g["annale-phys"], mon).toBeLessThanOrEqual(480);
+      expect(g["annale-math"] || 0, mon).toBeLessThanOrEqual(240);
+    }
+    // vacances : toutes les annales de la semaine
+    expect(goalMin(E.planWeek("2026-12-21", {}))).toEqual({ "annale-chim": 480, "annale-phys": 480, "annale-math": 240 });
+  });
+
+  it("une annale de 4h = deux blocs de 2h d'un seul tenant", () => {
+    for (const mon of ["2026-10-05", "2026-11-09", "2026-12-21"]) {
+      const blocks = E.planWeek(mon, {}).flatMap((r) => r.items.filter((it) => (it.tasks || []).some((t) => t.kind === "goal")));
+      expect(blocks.length, mon).toBeGreaterThan(0);
+      for (const b of blocks) {
+        expect(b.e - b.s, mon).toBe(120);
+        expect(b.tasks.length, mon).toBe(1);
+        expect(b.tasks[0].title, mon).toMatch(/^Annale de (chimie|physique|maths)( \d\/\d)? · (1re|2e) partie$/);
+      }
     }
   });
 

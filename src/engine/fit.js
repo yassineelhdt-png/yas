@@ -10,9 +10,13 @@ const CAPS = { pause: 30, bigPause: 60, lunch: 75, dinner: 75 };
 // durées minimales quand on raccourcit les pauses pour caser l'objectif avant l'heure de fin (min)
 const FLOORS = { pause: 5, bigPause: 10, lunch: 30, dinner: 30 };
 const MAX_STEP = 45;
+// pas de 5 min : les heures restent rondes (10:10, pas 10:08)
+const STEP = 5;
 // au-delà de cette marge (pauses déjà au maximum), on finit plus tôt plutôt que d'ajouter du temps libre
 const MAX_SLACK = 60;
 const BREAKS = new Set(["pause", "bigpause", "lunch", "dinner"]);
+// rien ne se décale avant ces éléments : séances, épreuves, trajets (dont le retour à la maison)
+const BARRIERS = new Set(["fixed", "exam", "travel", "settle"]);
 
 /** Durées des pauses et repas étirées de `e` minutes (la grande pause deux fois plus), plafonnées. */
 function stretched(S, e) {
@@ -41,21 +45,21 @@ function squeezed(S, e) {
 const sameBreaks = (a, b) => a.pause === b.pause && a.bigPause === b.bigPause && a.lunch === b.lunch && a.dinner === b.dinner;
 
 /**
- * Ajoute `extra` minutes avant la dernière suite de sessions (après la dernière séance fixe) :
- * la dernière pause s'allonge, ou un bloc « Temps libre » s'insère si la marge est grande.
+ * Ajoute `extra` minutes avant la dernière suite de sessions (après la dernière séance, le dernier
+ * trajet) : la dernière pause s'allonge, ou un bloc « Temps libre » s'insère si la marge est grande.
  * Tout ce qui suit est décalé d'autant.
  */
 function pad(r, extra, br, dine) {
   const items = r.items;
-  let lastFixed = -1;
-  items.forEach((it, i) => { if (it.kind === "fixed" || it.kind === "exam") lastFixed = i; });
-  const firstStudy = items.findIndex((it, i) => i > lastFixed && it.kind === "study");
+  let bar = -1;
+  items.forEach((it, i) => { if (BARRIERS.has(it.kind) && it.e > it.s) bar = i; });
+  const firstStudy = items.findIndex((it, i) => i > bar && it.kind === "study");
   if (firstStudy < 0) return r;
   let lastStudy = firstStudy;
   items.forEach((it, i) => { if (it.kind === "study") lastStudy = i; });
   // dernière pause suivie d'au moins une session ; le dîner, s'il y en a un, pour une grande marge
   let j = -1, dinner = -1;
-  for (let i = firstStudy; i < lastStudy; i++) {
+  for (let i = bar + 1; i < lastStudy; i++) {
     if (BREAKS.has(items[i].kind)) j = i;
     if (items[i].kind === "dinner") dinner = i;
   }
@@ -73,8 +77,13 @@ function pad(r, extra, br, dine) {
     const blocks = [{ kind: "free", slack: true, s, e: s + extra, loc }];
     // pas encore dîné et la marge tombe le soir : elle commence par le dîner
     const D = br.dinner;
-    if (dine && dinner < 0 && !items.some((it) => it.kind === "dinner") && s >= 1080 && extra >= D + 15) {
-      blocks.splice(0, 1, { kind: "dinner", s, e: s + D, loc }, { kind: "free", slack: true, s: s + D, e: s + extra, loc });
+    if (dine && dinner < 0 && !items.some((it) => it.kind === "dinner") && s + extra >= 1110 && extra >= Math.min(D, 45)) {
+      // dîner aussi long que possible (jusqu'au plafond), le reste en temps libre (au moins 15 min) :
+      // après le dîner, ou avant s'il serait trop tôt (avant 18h)
+      const C = CAPS.dinner, d = extra <= C ? extra : extra - C >= 15 ? C : extra - 15;
+      const meal = (a) => ({ kind: "dinner", s: a, e: a + d, loc });
+      const rest = (a, b) => (b > a ? [{ kind: "free", slack: true, s: a, e: b, loc }] : []);
+      blocks.splice(0, 1, ...(s >= 1080 ? [meal(s), ...rest(s + d, s + extra)] : [...rest(s, s + extra - d), meal(s + extra - d)]));
     }
     out.splice(at, 0, ...blocks);
     from = at + blocks.length;
@@ -98,7 +107,7 @@ export function fitDay(start, hard, S, init, endAt) {
 
   if (base.workEnd <= endAt) {
     let best = base, stretch = 0, prev = stretched(S, 0);
-    for (let e = 1; e <= MAX_STEP; e++) {
+    for (let e = STEP; e <= MAX_STEP; e += STEP) {
       const br = stretched(S, e);
       if (sameBreaks(br, prev)) break; // tout est au plafond
       prev = br;
@@ -108,21 +117,34 @@ export function fitDay(start, hard, S, init, endAt) {
       stretch = e;
     }
     const slack = endAt - best.workEnd;
-    const early = slack > MAX_SLACK;
+    // le dîner pris pendant le programme occupe une partie de la marge
+    const dinnerRoom = dine && !best.items.some((it) => it.kind === "dinner") ? CAPS.dinner : 0;
+    const early = slack - dinnerRoom > MAX_SLACK;
     const r = slack > 0 && !early ? pad(best, slack, stretched(S, stretch), dine) : best;
     return { ...r, fit: { mode: "stretch", endAt, stretch, breaks: stretched(S, stretch), early } };
   }
 
   // un peu juste : pauses et repas raccourcis (jusqu'au minimum) pour garder l'objectif entier
   let prev = squeezed(S, 0);
-  for (let e = 1; e <= MAX_STEP; e++) {
+  for (let e = STEP; e <= MAX_STEP; e += STEP) {
     const br = squeezed(S, e);
     if (sameBreaks(br, prev)) break;
     prev = br;
-    const r = sim(br);
+    let r = sim(br);
     if (r.workEnd <= endAt) {
-      const out = r.workEnd < endAt ? pad(r, endAt - r.workEnd, br, dine) : r;
-      return { ...out, fit: { mode: "squeeze", endAt, squeeze: e, breaks: br } };
+      // un pas peut faire gagner beaucoup (une session de plus avant une séance) : on rend aux repas
+      // et aux pauses ce qui n'est pas nécessaire
+      let b = br;
+      for (const k of ["pause", "bigPause", "dinner", "lunch"]) {
+        while (b[k] + STEP <= +S[k]) {
+          const nb = { ...b, [k]: b[k] + STEP }, r2 = sim(nb);
+          if (r2.workEnd > endAt) break;
+          b = nb;
+          r = r2;
+        }
+      }
+      const out = r.workEnd < endAt ? pad(r, endAt - r.workEnd, b, dine) : r;
+      return { ...out, fit: { mode: "squeeze", endAt, squeeze: e, breaks: b } };
     }
   }
 

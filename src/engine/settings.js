@@ -3,10 +3,11 @@ export const DEFAULTS = Object.freeze({
   // Journée — endAt : heure de fin du programme (vide = dès que l'objectif est atteint)
   wake: "07:30", prep: 20, targetH: 9, sleepH: 8, endAt: "21:00",
   // Rythme — minSession : durée minimale d'une session d'étude (0 = comme la v1)
-  session: 90, minSession: 30, pause: 10, bigPause: 20, lunch: 45, dinner: 45, sport: 30, shower: 15,
+  session: 90, minSession: 50, pause: 10, bigPause: 20, lunch: 45, dinner: 45, sport: 30, shower: 15,
   // Lieux — weekdayPlace : lieu du lundi au vendredi hors congés (maison | erasme | p4p | uz) ;
-  // travel : trajet maison ↔ Erasme (aller simple), aussi pour aller aux séances
-  weekdayPlace: "erasme",
+  // travel : trajet maison ↔ Erasme (aller simple), aussi pour aller aux séances ;
+  // homeTail : étude gardée pour la maison en fin de journée (0 = rester sur place jusqu'à la fin)
+  weekdayPlace: "erasme", homeTail: 90,
   travel: 25, erasmeOpen: "08:00", erasmeClose: "20:45",
   p4pOpen: "09:00", p4pClose: "23:00", p4pTravel: 25,
   uzOpen: "08:00", uzClose: "22:00", uzTravel: 50,

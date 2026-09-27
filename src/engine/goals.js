@@ -32,15 +32,48 @@ export function goalsOfWeek(mon, S) {
   return Array.isArray(own) ? own : Array.isArray(G.base) ? G.base : [];
 }
 
-/** Unités à placer dans la semaine (une par annale, etc.), avec le temps restant `left`. */
+/**
+ * Unités à placer dans la semaine (une par annale, etc.), avec le temps restant `left`.
+ * Les matières alternent (chimie 1, physique 1, maths 1, chimie 2…) pour ne pas en laisser une de côté.
+ */
 export function goalUnits(mon, S) {
-  const units = [];
+  const lists = [];
   for (const g of goalsOfWeek(mon, S)) {
     const count = Math.max(1, Math.round(+g.count || 1)), min = Math.round((+g.hours || 0) * 60);
     if (min <= 0 || !SUBJ[g.subj]) continue;
-    for (let n = 1; n <= count; n++) {
-      units.push({ gid: g.id, subj: g.subj, left: min, total: min, title: goalTitle(g, n), detail: (GOAL_KINDS[g.kind] || GOAL_KINDS.autre).detail });
-    }
+    const detail = (GOAL_KINDS[g.kind] || GOAL_KINDS.autre).detail, list = [];
+    for (let n = 1; n <= count; n++) list.push({ gid: g.id, subj: g.subj, left: min, total: min, title: goalTitle(g, n), detail });
+    lists.push(list);
   }
+  const units = [];
+  for (let i = 0; lists.some((l) => i < l.length); i++) for (const l of lists) if (i < l.length) units.push(l[i]);
   return units;
+}
+
+// Un objectif se fait en gros blocs d'un seul tenant : une annale de 4h = 2 blocs de 2h.
+export const GOAL_BLOCK = 120;
+
+/** Durées des blocs d'un objectif de `min` minutes (blocs égaux d'au plus 2h, au moins `floor`). */
+export function goalBlocks(min, floor = 0) {
+  const n = Math.max(1, Math.ceil(min / GOAL_BLOCK)), out = [];
+  let rest = min;
+  for (let i = n; i > 0; i--) {
+    const b = Math.max(floor, Math.round(rest / i / 5) * 5);
+    out.push(b);
+    rest -= b;
+  }
+  return out;
+}
+
+/** Intitulé d'un bloc : « Annale de chimie 1/2 · 1re partie » si l'objectif se fait en plusieurs blocs. */
+export function blockTitle(u, done, floor = 0) {
+  const lens = goalBlocks(u.total, floor);
+  if (lens.length < 2) return u.title;
+  let part = 1, acc = 0;
+  for (const b of lens) {
+    if (acc + b > done) break;
+    acc += b;
+    part++;
+  }
+  return u.title + " · " + (part === 1 ? "1re" : Math.min(part, lens.length) + "e") + " partie";
 }

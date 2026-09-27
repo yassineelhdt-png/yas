@@ -20,7 +20,7 @@ const FORM = [
   ]],
   ["Rythme", [
     ["session", "Session de concentration max", "min", { min: 15 }],
-    ["minSession", "Session minimale (jamais moins)", "min", { min: 15, max: 90 }],
+    ["minSession", "Session minimale (jamais moins)", "min", { min: 30, max: 90 }],
     ["pause", "Micro-pause", "min"],
     ["bigPause", "Grande pause", "min"],
     ["lunch", "Déjeuner", "min"],
@@ -30,6 +30,7 @@ const FORM = [
   ]],
   ["Lieux", [
     ["weekdayPlace", "Lieu du lundi au vendredi (hors congés)", "sel", { str: true, choices: [["maison", "Maison"], ["erasme", "Erasme"], ["p4p", "Play4Peace"], ["uz", "UZ"]] }],
+    ["homeTail", "Fin de journée à la maison : étude gardée pour la maison (0 = rester sur place)", "min", { min: 0, max: 240 }],
     ["travel", "Erasme : trajet (aussi pour les séances)", "min"],
     ["erasmeOpen", "Erasme : ouverture", "time"],
     ["erasmeClose", "Erasme : fermeture", "time"],
@@ -231,7 +232,7 @@ function goalsFieldset(st) {
   return html`
     <fieldset class="goals" id="goals">
       <legend>Objectifs de la semaine</legend>
-      <p class="sub">Annales, théorie à rattraper, exercices… L'app les place sur ton temps d'étude libre (jamais pendant les séances, la guidance ou la permanence), avant les exercices habituels.</p>
+      <p class="sub">Annales, théorie à rattraper, exercices… L'app les place en blocs de 2h d'un seul tenant (une annale de 4h = 2 × 2h), au plus deux par jour, sur ton temps d'étude libre (jamais pendant les séances, la guidance ou la permanence).</p>
       <div class="fr"><label for="goal-week">Semaine</label>
         <div class="in"><select id="goal-week" .value=${live(goalWeek)} @change=${(e) => { goalWeek = e.target.value; notify(); }}>
           <option value="base" ?selected=${isBase}>Chaque semaine (habituels)</option>

@@ -46,12 +46,16 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   l'objectif net baisse (avec une alerte). Le dîner a lieu pendant le programme quand il finit après 20h.
 - **Lieux** : Maison, Erasme (8:00–20:45, 25 min), Play4Peace (9:00–23:00, 25 min), UZ (8:00–22:00, 50 min),
   horaires et trajets réglables. Lun–ven hors congés : Erasme par défaut ; le week-end : la maison ;
-  choix du jour dans la carte « Où tu travailles ». Arrivée au plus tôt à l'ouverture ; si la fin est
-  après la fermeture : départ à la fermeture, trajet, 20 min pour se poser, et la suite à la maison.
-- **Sessions d'au moins 30 min** : plus de mini-sessions de quelques minutes.
+  choix du jour dans la carte « Où tu travailles ». Arrivée au plus tôt à l'ouverture.
+- **Fin de journée à la maison** : une fois les séances finies, quand il reste environ 1h30 d'étude
+  (Réglages → Lieux), retour à la maison : le trajet sert de pause, la fin (et le dîner) se fait à la maison.
+  Au plus tard à la fermeture : départ, trajet, 20 min pour se poser, et la suite à la maison.
+- **Horaires ronds et sessions d'au moins 50 min** : pauses et repas s'allongent par pas de 5 min ; plus de
+  petit bout de session (deux sessions équilibrées à la place).
 - **Objectifs de la semaine** (Réglages) : annales, théorie à rattraper, exercices… pour chaque semaine
-  ou pour une semaine précise. Placés sur le temps libre (jamais pendant les séances), avec une carte de
-  progression (planifié / coché / ce qui manque) dans les vues Jour et Semaine.
+  ou pour une semaine précise. En gros blocs de 2h d'un seul tenant (une annale de 4h = 2 × 2h), au plus
+  deux par jour, jamais pendant les séances, avec une carte de progression (planifié / coché / ce qui manque)
+  dans les vues Jour et Semaine.
 
 - Carte **« En ce moment »** : le créneau en cours, le temps restant et ce qui suit.
 - Barre de navigation en bas sur téléphone, onglets en haut sur tablette / PC ; le bouton retour ramène à la vue Jour.
@@ -62,7 +66,7 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - Sauvegarde / restauration des données.
 - Réglages protégés : un champ vidé revient à la valeur par défaut au lieu de casser le planning.
 
-Sans les ajouts de la v2 (heure de fin, lieux, sessions minimales, objectifs), le moteur est **identique à la v1** : un test compare, jour par jour
+Sans les ajouts de la v2 (heure de fin, lieux, sessions minimales, objectifs, horaires ronds), le moteur est **identique à la v1** : un test compare, jour par jour
 et sur tout le quadrimestre, les plannings produits par la v2 et par l'app d'origine (`legacy/horaire-9h-v1.html`).
 
 ## Développement

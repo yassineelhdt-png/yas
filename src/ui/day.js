@@ -23,6 +23,7 @@ function minorLabel(it, st, res = {}) {
     case "sport": return ["Sport " + st.sport + " min + douche", "Dernier truc de la journée"];
     case "travel":
       if (it.dir === "home" && it.closing) return ["Départ : " + placeShort(res.place) + " ferme", "Retour à la maison, tu continues là-bas"];
+      if (it.dir === "home" && it.leave) return ["Retour à la maison", "Le trajet te sert de pause : tu finis la journée à la maison"];
       if (it.dir === "home") return ["Retour à la maison", "Sport en rentrant"];
       if (it.dir === "place") return ["Trajet vers " + placeShort(it.at), it.at === "erasme" ? "Tu restes sur place entre les cours" : ""];
       if (it.dir === "back" && it.at) return ["Trajet vers " + placeShort(it.at), "Après les séances"];

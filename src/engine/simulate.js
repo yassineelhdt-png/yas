@@ -10,7 +10,11 @@ const DIN_PREF = 1140;   // 19:00
 const DIN_LATE = 1230;   // 20:30
 
 // `tune` (facultatif) remplace l'objectif net et la durée des pauses / repas : sert à caler la fin
-// de journée sur une heure précise (voir fitDay dans plan.js).
+// de journée sur une heure précise (voir fitDay dans fit.js).
+// `init` : état au début (déjà étudié, repas pris, lieu…), plus deux options :
+// - leave { tail, travel } : sur un lieu, on rentre à la maison dès qu'il reste `tail` min d'étude ou
+//   moins (après les séances) ; le trajet sert de pause et la fin se fait à la maison ;
+// - blocks [min…] : blocs d'objectif (ex. annale : 2 × 120 min) posés d'un seul tenant, dès que possible.
 export function simulateDay(start, hard, S, init = {}, tune = {}) {
   const target = tune.target ?? +S.targetH * 60;
   const L = tune.lunch ?? +S.lunch, D = tune.dinner ?? +S.dinner, P = tune.pause ?? +S.pause, BP = tune.bigPause ?? +S.bigPause;
@@ -29,6 +33,11 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   let base = init.at || "maison";
   const loc = () => (onCampus ? "campus" : base);
   const markMissed = (h) => missed.push({ ...h, missed: true });
+  const leave = init.leave || null;
+  const blocks = [...(init.blocks || [])];
+  let goalN = 0;
+  // plus rien d'imposé avant la fin, à part le départ à la fermeture du lieu
+  const onlyClosing = () => { for (let k = hi; k < hard.length; k++) if (!hard[k].closing) return false; return true; };
 
   // minutes de séances fixes encore à venir (elles comptent dans l'objectif)
   function remFixed() {
@@ -57,6 +66,7 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   }
   function dinnerAt(selfLeft, nh) {
     if (dinner) return Infinity;
+    if (nh && nh.closing) nh = null; // la fermeture du lieu n'est pas une séance
     // on termine avant de manger… sauf si la journée doit finir tard (tune.dine) : dîner pendant le programme
     if (!nh && selfLeft <= 60 && !tune.dine) return Infinity;
     return Math.min(Math.max(DIN_PREF, t + Math.max(0, 90 - sinceBig)), DIN_LATE);
@@ -69,6 +79,15 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
 
   while (guard++ < 500) {
     const nh = hard[hi];
+
+    // déjà rentré à la maison : la fermeture du lieu ne concerne plus la journée
+    if (nh && nh.closing && nh.kind === "travel" && base === "maison" && !onCampus) {
+      while (hard[hi] && hard[hi].closing) hi++;
+      continue;
+    }
+
+    // objectif atteint avant la fermeture du lieu : la journée s'arrête là (retour ensuite)
+    if (nh && nh.closing && nh.kind === "travel" && target - studied - remFixed() <= 0) break;
 
     // horaire imposé par un lieu (trajet vers le lieu, départ à la fermeture, se poser en rentrant) : jamais sauté
     if (nh && nh.wall && t >= nh.s) {
@@ -118,7 +137,16 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
 
     const gap = nh ? nh.s - t : Infinity;
     const selfLeft = target - studied - remFixed();
-    if (selfLeft <= 0 && !nh) break;
+    if (selfLeft <= 0 && (!nh || onlyClosing())) break;
+
+    // fin de journée à la maison : on part juste après une session, le trajet sert de pause
+    // (une dernière session qu'on ne peut pas couper en deux se fait aussi à la maison)
+    const lastOne = selfLeft < 2 * MIN && leave && leave.tail >= MIN;
+    if (leave && base !== "maison" && !onCampus && streak > 0 && selfLeft > 0 && (selfLeft <= leave.tail || lastOne) && onlyClosing()) {
+      push({ kind: "travel", dir: "home", at: "maison", leave: true, s: t, e: t + leave.travel });
+      t += leave.travel; streak = 0; base = "maison";
+      continue;
+    }
 
     const la = lunchAt(nh), da = dinnerAt(selfLeft, nh);
     if (!lunch && t >= la - 10 && gap >= 30) { meal("lunch", Math.min(L, gap)); continue; }
@@ -126,7 +154,8 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
 
     // le sport est toujours le dernier élément de la journée : en cours de journée, une grande pause sépare les blocs
     const nextMeal = Math.min(la, da);
-    if (sinceBig >= (lunch ? 180 : 240) && nextMeal - t > 45 && gap >= BP && selfLeft > 30) {
+    // (pas juste après le retour à la maison : le trajet sert déjà de pause)
+    if (sinceBig >= (lunch ? 180 : 240) && nextMeal - t > 45 && gap >= BP && selfLeft > 30 && !items.at(-1)?.leave) {
       // fin de journée tardive : la grande pause du soir est le dîner
       if (tune.dine && !dinner && t >= 1080 && gap >= 30) { meal("dinner", Math.min(D, gap)); continue; }
       push({ kind: "bigpause", s: t, e: t + BP, loc: loc() });
@@ -157,8 +186,26 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
     const toLunch = !lunch && la > t ? la - t : Infinity;
     const toDinner = !dinner && isFinite(da) && da > t ? da - t : Infinity;
     len = Math.min(len, toLunch, toDinner);
+    const room = Math.min(gap, toLunch, toDinner); // jusqu'à la prochaine séance ou le prochain repas
+    // bloc d'objectif (annale…) : d'un seul tenant, au début d'une session, s'il tient avant la suite
+    if (blocks.length && streak === 0 && room >= blocks[0] && (selfLeft === blocks[0] || selfLeft - blocks[0] >= MIN)) {
+      const b = blocks.shift();
+      push({ kind: "study", s: t, e: t + b, loc: loc(), goal: goalN++ });
+      t += b; studied += b; streak += b; sinceBig += b;
+      continue;
+    }
     if (MIN > 0 && len < MIN) {
       // pas de session de quelques minutes
+      if (gap < MIN && nh.closing && nh.kind === "travel") { // le lieu ferme bientôt : autant rentrer maintenant
+        for (; hard[hi] && hard[hi].closing; hi++) {
+          const w = hard[hi], d = w.e - w.s;
+          push({ ...w, s: t, e: t + d });
+          t += d;
+          if (w.at) base = w.at;
+        }
+        streak = 0;
+        continue;
+      }
       if (gap < MIN) { // pas le temps avant la prochaine séance
         push({ kind: "free", s: t, e: nh.s, loc: loc() });
         t = nh.s; streak = 0;
@@ -175,6 +222,15 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
         continue;
       }
       len = MIN; // reste de l'objectif : dernière session arrondie à la durée minimale
+    } else if (MIN > 0 && len < selfLeft && selfLeft - len < MIN) {
+      // il resterait une miette (< MIN) à la fin : deux sessions équilibrées, ou une un peu plus longue
+      // (le repas attend quelques minutes si besoin, pas une séance)
+      if (selfLeft >= 2 * MIN) len = Math.min(len, selfLeft - Math.floor(selfLeft / 2 / 5) * 5);
+      else if (selfLeft <= gap) len = selfLeft;
+    } else if (MIN > 0 && len === SES - streak && len < room) {
+      // pas de miette avant la prochaine séance ou le prochain repas : deux sessions équilibrées
+      const roomRest = room - len - P;
+      if (roomRest > 0 && roomRest < MIN && room - P >= 2 * MIN) len = room - P - Math.floor((room - P) / 2 / 5) * 5;
     } else if (MIN <= 0) {
       if (len < 15 && gap <= len + 5 && selfLeft > len) {
         push({ kind: "free", s: t, e: nh.s, loc: loc() });
@@ -197,7 +253,7 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
   const merged = [];
   for (const it of items) {
     const last = merged[merged.length - 1];
-    if (last && last.kind === "study" && it.kind === "study" && last.e === it.s && last.loc === it.loc && it.e - last.s <= SES) last.e = it.e;
+    if (last && last.kind === "study" && it.kind === "study" && last.e === it.s && last.loc === it.loc && it.e - last.s <= SES && last.goal == null && it.goal == null) last.e = it.e;
     else merged.push(it);
   }
   return { items: merged, missed, end: t, workEnd, studied, lunch, dinner, at: base };
