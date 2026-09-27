@@ -68,10 +68,10 @@ h1,h2,h3{ margin:0; text-wrap:balance; }
 /* Barre du haut */
 .top{ position:sticky; top:env(safe-area-inset-top, 0px); z-index:10; background:var(--surface); background:color-mix(in srgb, var(--surface) 90%, transparent); -webkit-backdrop-filter:saturate(1.4) blur(14px); backdrop-filter:saturate(1.4) blur(14px); border-bottom:1px solid var(--line); }
 .top-in{ max-width:1120px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px 16px; min-height:54px; }
-.brand{ display:inline-flex; align-items:center; gap:9px; font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-.01em; }
+.brand{ display:inline-flex; align-items:center; gap:9px; white-space:nowrap; font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-.01em; }
 .brand svg{ width:28px; height:28px; }
 .brand .b-bg{ fill:var(--accent); }
-.sync{ margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--muted); }
+.sync{ margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--muted); white-space:nowrap; min-width:0; overflow:hidden; text-overflow:ellipsis; }
 .sync::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--dot, var(--muted)); }
 
 /* Navigation : en bas sur téléphone et tablette, sur le côté sur grand écran */
@@ -187,6 +187,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .cap.on::after{ background:rgba(0,0,0,.14); }
 .cap svg{ position:absolute; left:4px; top:50%; width:15px; height:15px; margin-top:-7.5px; color:var(--mo); }
 .cap.just{ animation:pop .24s ease-out; }
+.entry.fresh{ animation:fresh 2.4s ease-out; border-radius:12px; }
+@keyframes fresh{ 0%, 40%{ background:var(--accent-tint); } 100%{ background:transparent; } }
 @keyframes pop{ 0%{ transform:scale(.86); } 60%{ transform:scale(1.08); } 100%{ transform:scale(1); } }
 .it-main{ flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:baseline; column-gap:8px; }
 .it-name{ font-weight:800; }
@@ -245,7 +247,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .dot[aria-pressed="true"]{ background:var(--ink); border-color:var(--ink); color:var(--bg); }
 .dot.emoji[aria-pressed="true"]{ background:var(--matin-tint); border-color:var(--matin); box-shadow:inset 0 0 0 2px var(--matin); color:inherit; }
 .ends{ display:flex; justify-content:space-between; width:262px; max-width:100%; margin-top:5px; font-size:12px; font-weight:600; color:var(--muted); }
-.seg{ display:inline-flex; padding:3px; gap:3px; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; }
+.seg{ display:inline-flex; max-width:100%; padding:3px; gap:3px; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; }
+.field > .seg{ display:flex; width:max-content; }
+.field > .seg button{ flex:1 1 auto; min-width:0; }
 .seg button{ border:0; background:transparent; border-radius:999px; padding:8px 14px; font-weight:700; color:var(--muted); min-height:38px; }
 .seg button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); }
 .notes{ min-height:110px; }
@@ -550,16 +554,32 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
 .live-clock{ font-family:var(--font-display); font-size:clamp(34px, 9vw, 52px); font-weight:600; letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
 .live-body{ display:flex; flex-direction:column; gap:16px; padding:16px 18px 18px; }
-.rest{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:12px 14px; border-radius:18px; background:var(--surface-2); border:1px solid var(--line); }
+.rest{ display:flex; align-items:center; gap:14px; padding:12px 14px; border-radius:18px; background:var(--surface-2); border:1px solid var(--line); }
+#live, #sec-sport, #sec-chrono{ scroll-margin-top:calc(env(safe-area-inset-top, 0px) + 72px); }
+.rest-side{ flex:1; min-width:0; display:grid; align-items:center; }
+.rest-side > *{ grid-area:1 / 1; }
+.rest-ghost{ visibility:hidden; pointer-events:none; }
+.rest-idle{ display:flex; flex-direction:column; gap:10px; }
+.rest-idle .chips{ display:grid; grid-template-columns:repeat(auto-fit, minmax(76px, 1fr)); }
+.rest-ring.idle{ background:var(--bub); }
+.rest-ring.idle b{ color:var(--muted); }
 .rest-lbl{ font-weight:800; }
-.rest .chips button{ min-height:44px; padding:8px 16px; font-size:15px; }
-.rest.on{ justify-content:center; gap:16px 22px; padding:16px; background:var(--accent-tint); border-color:var(--accent-line); }
-.rest-ring{ --p:1; flex:none; width:132px; height:132px; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--p) * 1turn), var(--bub) 0); display:grid; place-items:center; }
-.rest-ring > span{ width:112px; height:112px; border-radius:50%; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.rest .chips button{ min-height:44px; padding:6px 8px; font-size:15px; }
+.rest.on{ background:var(--accent-tint); border-color:var(--accent-line); }
+.rest-ring{ --p:1; flex:none; width:124px; height:124px; border-radius:50%; background:conic-gradient(var(--accent) calc(var(--p) * 1turn), var(--bub) 0); display:grid; place-items:center; }
+.rest-ring > span{ width:104px; height:104px; border-radius:50%; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; }
 .rest-ring small{ font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
 .rest-ring b{ font-family:var(--font-display); font-size:32px; font-weight:600; line-height:1.1; font-variant-numeric:tabular-nums; }
-.rest-actions{ display:flex; flex-wrap:wrap; gap:8px; }
-.rest-actions button{ min-height:50px; font-size:16px; padding:10px 18px; }
+.rest-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.rest-actions button{ min-height:50px; font-size:16px; padding:10px 12px; white-space:nowrap; }
+.rest-actions .primary{ grid-column:1 / -1; }
+@media (max-width:380px){
+  .rest{ gap:10px; padding:10px; } .rest-ring{ width:92px; height:92px; } .rest-ring > span{ width:78px; height:78px; } .rest-ring small{ font-size:10px; letter-spacing:.02em; } .rest-ring b{ font-size:24px; }
+  .rest-idle .chips{ grid-template-columns:1fr 1fr; } .rest .chips button{ padding:4px 2px; font-size:14px; }
+  .rest-actions button{ padding:8px 4px; font-size:14px; }
+  .field > .seg{ width:100%; } .field > .seg button{ padding:8px 6px; }
+}
+@media (max-width:370px){ .sync{ font-size:0; gap:0; } }
 .switch.small{ font-size:14px; color:var(--muted); }
 .exo-tabs button{ min-height:44px; font-size:15px; }
 .exo-tabs .n{ display:inline-grid; place-items:center; min-width:22px; height:22px; margin-left:4px; padding:0 6px; border-radius:999px; background:var(--accent); color:var(--on-accent); font-size:12px; font-variant-numeric:tabular-nums; }
@@ -627,8 +647,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .laps li b{ font-size:18px; font-weight:800; }
 .laps li small{ color:var(--muted); font-weight:600; min-width:64px; text-align:right; }
 .laps li.best{ border-color:var(--accent-line); background:var(--accent-tint); }
-.chr-save{ display:flex; flex-direction:column; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
-.chr-save .primary{ align-self:flex-start; }
+.add-sheet{ display:flex; flex-direction:column; gap:12px; margin-top:14px; padding:14px; border-radius:16px; background:var(--accent-tint); border:1px solid var(--accent-line); }
+.add-sheet h3{ font-size:17px; font-weight:800; }
+.add-sheet .actions .big{ flex:1 1 220px; }
 .chr-done{ margin:4px 0 12px; font-weight:800; font-size:17px; }
 .step-out{ display:inline-grid; place-items:center; width:92px; min-height:52px; font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; border-radius:14px; border:1px solid var(--line); background:var(--surface); }
 .chrono-card .steps{ margin:12px 0 10px; }
@@ -2880,7 +2901,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     const planDone = plan && sessionsOf(d).some((a) => a.tpl === plan.id);
     const entry = (a) => {
       const kc = kcalBurned(a);
-      return html`<li class="entry"><span class="t">${str(a.time)}</span><div class="e-body"><span class="kind">${KIND_LABEL[a.kind] || 'Activité'} · ${intensityLabel(a.intensity).toLowerCase()}</span><p class="note"><b>${entryName(a)}</b>${a.minutes ? ` · ${a.minutes} min` : ''}${kc ? ` · ≈ ${kc} kcal` : ''}</p>${a.details ? html`<p class="note muted">${a.details}</p>` : ''}${a.note ? html`<p class="note muted">${a.note}</p>` : ''}</div>${rowActions('spt', k, a.id, `${entryName(a)} de ${str(a.time)}`)}</li>`;
+      return html`<li class="entry${S.ui.just === a.id ? ' fresh' : ''}"><span class="t">${str(a.time)}</span><div class="e-body"><span class="kind">${KIND_LABEL[a.kind] || 'Activité'} · ${intensityLabel(a.intensity).toLowerCase()}</span><p class="note"><b>${entryName(a)}</b>${a.minutes ? ` · ${a.minutes} min` : ''}${kc ? ` · ≈ ${kc} kcal` : ''}</p>${a.details ? html`<p class="note muted">${a.details}</p>` : ''}${a.note ? html`<p class="note muted">${a.note}</p>` : ''}</div>${rowActions('spt', k, a.id, `${entryName(a)} de ${str(a.time)}`)}</li>`;
     };
     return html`<h1 class="page-title">Sport</h1>
       ${S.live ? livePanel() : isToday ? liveLauncher(plan, planDone) : ''}
@@ -2893,7 +2914,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       </div>
       <div class="daygrid">
         <div class="col">
-          ${chronoCard()}
           <section class="card m-sport" aria-labelledby="sw-title">
             <div class="card-head"><span class="mico" aria-hidden="true">${ICON.dumbbell}</span><h2 id="sw-title">${startOfWeek(k) === startOfWeek(t) ? 'Cette semaine' : `Semaine du ${shortDate(wk.start)}`}</h2><span class="pill">${wk.count} / ${sp.perWeek} séances</span></div>
             <div class="wdots">${wk.days.map((dk, i) => {
@@ -2914,6 +2934,15 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
               <button type="button" class="link" data-act="goto-settings" data-v="sport">Mon programme</button>
             </div>
           </section>
+          ${chronoCard()}
+        </div>
+        <div class="col">
+          <section class="jsec" id="sec-sport"><div class="sec-head"><h2>Ce que j’ai fait</h2>${f ? '' : html`<button type="button" class="primary" data-act="spt-new" data-date="${k}">Ajouter</button>`}</div>
+            ${burned.length ? html`<p class="hint">Environ ${fmtInt(burned.reduce((a, b) => a + b, 0))} kcal dépensées en activité (estimation d’après ton poids).</p>` : ''}
+            ${f && !f.id ? sportForm(f) : ''}
+            ${acts.length ? html`<ul class="list">${acts.map((a) => (f && f.id === a.id ? html`<li class="editing">${sportForm(f)}</li>` : entry(a)))}</ul>`
+              : f ? '' : html`<p class="empty">Rien de noté ce jour-là. Une séance, une marche, un déménagement : tout compte.</p>`}
+          </section>
           <section class="card m-sport" aria-labelledby="steps-title">
             <div class="card-head"><span class="mico" aria-hidden="true">${ICON.steps}</span><h2 id="steps-title">Pas</h2><span class="pill">objectif ${fmtInt(sp.steps)}</span></div>
             <div class="steps-row">
@@ -2922,14 +2951,6 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
             </div>
             <div class="goalbar"><div class="track c-sport" role="img" aria-label="${fmtInt(steps)} pas sur ${fmtInt(sp.steps)}"><i style="width:${Math.min(100, Math.round((steps / sp.steps) * 100))}%"></i></div></div>
             <p class="hint" style="margin:10px 0 0">${steps >= sp.steps ? 'Objectif atteint.' : `Encore ${fmtInt(sp.steps - steps)} pas.`} Recopie le nombre affiché par ton téléphone ou ta montre.</p>
-          </section>
-        </div>
-        <div class="col">
-          <section class="jsec" id="sec-sport"><div class="sec-head"><h2>Ce que j’ai fait</h2>${f ? '' : html`<button type="button" class="primary" data-act="spt-new" data-date="${k}">Ajouter</button>`}</div>
-            ${burned.length ? html`<p class="hint">Environ ${fmtInt(burned.reduce((a, b) => a + b, 0))} kcal dépensées en activité (estimation d’après ton poids).</p>` : ''}
-            ${f && !f.id ? sportForm(f) : ''}
-            ${acts.length ? html`<ul class="list">${acts.map((a) => (f && f.id === a.id ? html`<li class="editing">${sportForm(f)}</li>` : entry(a)))}</ul>`
-              : f ? '' : html`<p class="empty">Rien de noté ce jour-là. Une séance, une marche, un déménagement : tout compte.</p>`}
           </section>
           <section class="card" aria-labelledby="sc-title">
             <div class="card-head"><span class="mico m-sport" aria-hidden="true">${ICON.chart}</span><h2 id="sc-title">Séances par semaine</h2></div>
@@ -3160,16 +3181,27 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       document.querySelectorAll('[data-tick="rest"]').forEach((el) => { if (el.textContent !== restTxt) el.textContent = restTxt; });
       document.querySelectorAll('[data-tick="rest-ring"]').forEach((el) => el.style.setProperty('--p', (left / (l.rest.dur * 1000)).toFixed(4)));
     }
+    updateLivebar();
+  }
+  /* Le bandeau en bas des autres onglets : séance en cours, repos, chrono ou intervalles. */
+  function livebarText() {
+    const parts = [], now = Date.now(), l = S.live, c = S.chrono;
+    if (l) { parts.push(`Séance ${fmtClock(now - l.start)}`); if (l.rest) parts.push(`repos ${fmtClock(l.rest.start + l.rest.dur * 1000 - now, true)}`); }
+    if (c && c.sw.run) parts.push(`chrono ${fmtClock(swElapsed(c))}`);
+    if (c && c.it.run) { const ph = itPhase(itElapsed(c)); if (!ph.done) parts.push(`${PHASE_LABEL[ph.phase].toLowerCase()} ${fmtClock(ph.left, true)} · tour ${ph.round}/${c.it.rounds}`); }
+    return cap1(parts.join(' · '));
+  }
+  function updateLivebar() {
     const bar = document.getElementById('livebar');
-    if (bar && !bar.hidden) bar.querySelector('.lb-txt').textContent = `Séance ${elapsed}${restTxt ? ` · repos ${restTxt}` : ''}`;
+    if (bar && !bar.hidden) { const t = livebarText(); if (bar.querySelector('.lb-txt').textContent !== t) bar.querySelector('.lb-txt').textContent = t; }
   }
   function startLiveTicker() { if (!liveTimer) liveTimer = setInterval(liveTick, 250); liveTick(); }
   function stopLiveTicker() { clearInterval(liveTimer); liveTimer = null; }
   function refreshLivebar() {
     const bar = document.getElementById('livebar');
     if (!bar) return;
-    bar.hidden = !S.live || S.ui.view === 'sport';
-    if (!bar.hidden) liveTick();
+    bar.hidden = !(S.live || chronoRunning()) || S.ui.view === 'sport';
+    if (!bar.hidden) updateLivebar();
   }
 
   /* Rendu : bouton de départ (onglet Sport, aujourd'hui) et séance en cours. */
@@ -3190,18 +3222,25 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       <button type="button" class="icon" data-act="live-step" data-f="${f}" data-v="${step}" aria-label="${label} : plus ${String(step).replace('.', ',')}">+</button>
     </div></div>`;
   }
+  /* Les deux faces du bloc repos. La face cachée reste en place, invisible et inerte : le bloc garde toujours la même hauteur. */
+  function restOn(on) {
+    const a = (v) => (on ? v : '');
+    return html`<div class="rest-actions${on ? '' : ' rest-ghost'}"${on ? '' : html` aria-hidden="true" inert`}><button type="button" class="ghost"${a(html` data-act="live-rest-add" data-v="-15"`)}>− 15 s</button><button type="button" class="ghost"${a(html` data-act="live-rest-add" data-v="15"`)}>+ 15 s</button><button type="button" class="primary"${a(html` data-act="live-rest-skip"`)}>Passer</button></div>`;
+  }
+  function restIdle(l, on) {
+    return html`<div class="rest-idle${on ? '' : ' rest-ghost'}"${on ? '' : html` aria-hidden="true" inert`}>
+      <div class="chips" role="group" aria-label="Lancer un repos">${REST_CHOICES.map((v) => html`<button type="button"${on ? html` data-act="live-rest" data-v="${v}" aria-pressed="${bool(l.restDur === v)}"` : ''}>${fmtRest(v)}</button>`)}</div>
+      <label class="switch small"><input type="checkbox"${on ? html` id="live-auto" data-live="auto"` : ''}${l.autoRest !== false ? html` checked` : ''}> Après chaque série</label>
+    </div>`;
+  }
   function livePanel() {
     const l = S.live, exo = liveExo(l), dr = l.draft, tot = liveTotals(l), fin = l.finishing;
     const tp = S.settings.sport.templates.find((x) => x.id === l.tpl);
-    const rest = l.rest
-      ? html`<div class="rest on" role="group" aria-label="Repos en cours">
-          <div class="rest-ring" data-tick="rest-ring" style="--p:1"><span><small>Repos</small><b data-tick="rest">${fmtClock(l.rest.start + l.rest.dur * 1000 - Date.now(), true)}</b></span></div>
-          <div class="rest-actions"><button type="button" class="ghost" data-act="live-rest-add" data-v="-15">− 15 s</button><button type="button" class="ghost" data-act="live-rest-add" data-v="15">+ 15 s</button><button type="button" class="primary" data-act="live-rest-skip">Passer</button></div>
-        </div>`
-      : html`<div class="rest" role="group" aria-labelledby="rest-lbl"><span class="rest-lbl" id="rest-lbl">Repos</span>
-          <div class="chips">${REST_CHOICES.map((v) => html`<button type="button" data-act="live-rest" data-v="${v}" aria-pressed="${bool(l.restDur === v)}">${fmtRest(v)}</button>`)}</div>
-          <label class="switch small"><input type="checkbox" id="live-auto" data-live="auto"${l.autoRest !== false ? html` checked` : ''}> Après chaque série</label>
-        </div>`;
+    // Même mise en page au repos et hors repos : rien ne bouge sous le doigt quand le repos commence ou se termine.
+    const rest = html`<div class="rest${l.rest ? ' on' : ''}" role="group" aria-label="${l.rest ? 'Repos en cours' : 'Repos'}">
+        <div class="rest-ring${l.rest ? '' : ' idle'}" data-tick="rest-ring" style="--p:1"><span><small>${l.rest ? 'Repos' : 'Repos prévu'}</small><b data-tick="rest">${fmtClock(l.rest ? l.rest.start + l.rest.dur * 1000 - Date.now() : l.restDur * 1000, true)}</b></span></div>
+        <div class="rest-side">${l.rest ? restOn(true) : restIdle(l, true)}${l.rest ? restIdle(l, false) : restOn(false)}</div>
+      </div>`;
     const tabs = html`<div class="exo-tabs chips" role="group" aria-label="Exercices de la séance">${l.exos.map((e) => html`<button type="button" data-act="live-exo" data-id="${e.id}" aria-pressed="${bool(e.id === l.cur)}">${e.name}${e.sets.length ? html` <span class="n">${e.sets.length}</span>` : ''}</button>`)}<button type="button" class="add" data-act="live-exo-new" aria-pressed="${bool(!!l.adding)}">+ Exercice</button></div>`;
     const inSession = new Set(l.exos.map((e) => norm(e.name)));
     const adding = l.adding || !l.exos.length ? html`<div class="exo-add">
@@ -3226,7 +3265,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         </div>
       </div>` : '';
     const finish = fin ? html`<div class="finish" role="group" aria-labelledby="fin-title">
-        <h3 id="fin-title">Terminer la séance</h3>
+        <h3 id="fin-title">Ajouter à mon activité du jour</h3>
         <p class="hint" style="margin:0">${tot.sets ? `${plural(tot.exos, 'exercice')} · ${plural(tot.sets, 'série')}${tot.reps ? ` · ${fmtInt(tot.reps)} répétitions` : ''}` : 'Aucune série notée : la séance sera enregistrée avec sa durée.'}</p>
         <div class="form-row">
           <label class="field field-time"><span>Durée (min)</span><input type="text" inputmode="numeric" id="live-fin-min" data-live="finMinutes" value="${fin.minutes == null ? '' : String(fin.minutes)}" autocomplete="off"></label>
@@ -3234,7 +3273,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
         </div>
         <div class="chips" role="group" aria-label="Activité">${SPORT_TYPES.seance.map(([key, name]) => html`<button type="button" data-act="live-fin-type" data-v="${key}" aria-pressed="${bool(fin.type === key)}">${name}</button>`)}</div>
         <div class="field"><span id="fin-int">Intensité</span><div class="seg" role="group" aria-labelledby="fin-int">${INTENSITIES.map(([v, t]) => html`<button type="button" data-act="live-fin-int" data-v="${v}" aria-pressed="${bool(fin.intensity === v)}">${t}</button>`)}</div></div>
-        <div class="actions"><button type="button" class="primary big" data-act="live-save">Enregistrer la séance</button><button type="button" class="ghost big" data-act="live-finish-cancel">Continuer</button></div>
+        <div class="actions"><button type="button" class="primary big" data-act="live-save">Ajouter à mon activité du jour</button><button type="button" class="ghost big" data-act="live-finish-cancel">Continuer la séance</button></div>
       </div>` : '';
     return html`<section class="live" id="live" aria-labelledby="live-title">
       <div class="live-top">
@@ -3359,9 +3398,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const l = S.live, min = Math.max(1, Math.round((Date.now() - l.start) / 60000));
       l.finishing = { minutes: min <= 300 ? min : null, name: l.name, type: l.type, intensity: suggestIntensity(l) };
       l.rest = null; l.chrono = null; restNotify();
-      saveLive(); S.ui.focus = '[data-act="live-save"]'; render();
+      saveLive(); S.ui.focus = '[data-act="live-save"]'; S.ui.reveal = '#live'; render();
     },
-    'live-finish-cancel': () => { S.live.finishing = null; saveLive(); render(); },
+    'live-finish-cancel': () => { S.live.finishing = null; saveLive(); S.ui.reveal = '#live'; render(); },
     'live-fin-type': (d) => { S.live.finishing.type = d.v; saveLive(); render(); },
     'live-fin-int': (d) => { S.live.finishing.intensity = Number(d.v); saveLive(); render(); },
     'live-save': () => {
@@ -3375,8 +3414,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       const date = l.date;
       S.live = null; saveLive(); stopLiveTicker(); keepAwake(false); restNotify();
       Object.assign(S.ui, { view: 'sport', date, confirm: null });
-      render(); toTop();
-      toast(`Séance enregistrée : ${entry.name}, ${minutes} min`);
+      S.ui.just = entry.id; S.ui.reveal = '#sec-sport'; render();
+      toast(`Ajouté à ton activité du jour : ${entry.name}, ${minutes} min`);
     },
     'live-abandon-ask': () => { S.ui.confirm = 'live'; S.ui.focus = '[data-act="live-abandon"]'; render(); },
     'live-abandon': () => {
@@ -3387,6 +3426,13 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     }
   };
   /* Champs de la séance (saisie directe) : gardés au fil de l'eau, sans redessiner la page. */
+  /* Fiche de fin du chrono : nom et durée tapés au fil de l'eau. */
+  function onSheetInput(f, t) {
+    const sh = S.chrono && S.chrono.sheet;
+    if (!sh) return;
+    if (f === 'name') { sh.name = t.value.slice(0, 60); sh.nameTouched = true; } else if (f === 'minutes') sh.minutes = t.value;
+    saveChrono();
+  }
   function onLiveInput(f, t) {
     const l = S.live;
     if (!l) return;
@@ -3417,6 +3463,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   function loadChrono() {
     const c = lsGet(scoped(CHRONO_KEY));
     if (!isObj(c) || !isObj(c.sw) || !isObj(c.it) || !Array.isArray(c.sw.laps)) return freshChrono();
+    if (!isObj(c.sheet) || !['sw', 'it'].includes(c.sheet.mode)) c.sheet = null;
     return c;
   }
   const saveChrono = () => { if (S.chrono) lsSet(scoped(CHRONO_KEY), S.chrono); };
@@ -3466,9 +3513,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       document.querySelectorAll('[data-tick="it-left"]').forEach((el) => { if (el.textContent !== left) el.textContent = left; });
       document.querySelectorAll('[data-tick="it-ring"]').forEach((el) => el.style.setProperty('--p', (ph.left / ph.dur).toFixed(4)));
     }
+    updateLivebar();
   }
   function startChrono() { if (!chronoTimer) chronoTimer = setInterval(chronoTick, 100); keepAwake(true); chronoTick(); }
-  function stopChrono() { clearInterval(chronoTimer); chronoTimer = null; if (!S.live) keepAwake(false); }
+  function stopChrono() { clearInterval(chronoTimer); chronoTimer = null; if (!S.live) keepAwake(false); refreshLivebar(); }
   function finishIntervals() {
     const it = S.chrono.it, ph = itPhase(0, it);
     Object.assign(it, { acc: ph.total, run: null, done: true });
@@ -3492,32 +3540,59 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     return { a, total: ms, sets: Array(rounds).fill(it.work),
       details: `${rounds} × ${fmtSec(it.work)} d’effort, ${fmtSec(it.rest)} de récup${ph.done ? '' : ` (arrêté au tour ${ph.round} sur ${it.rounds})`}` };
   }
-  function chronoSave(mode) {
-    const r = chronoResult(mode);
-    if (!r) { toast('Rien à noter pour l’instant.'); return; }
-    const [, label, type, intensity] = r.a;
-    if (S.live) {
-      // pendant une séance en direct : un exercice en durée, une série par tour
+  /* La fiche de fin : nom, activité, durée et intensité, pré-remplis et modifiables. */
+  function chronoSheet(mode) {
+    const c = S.chrono, r = chronoResult(mode);
+    if (!r) return null;
+    if (!c.sheet || c.sheet.mode !== mode) {
+      const a = CHRONO_ACTS.find((x) => x[0] === c.act) || CHRONO_ACTS[0];
+      c.sheet = { mode, act: a[0], name: (mode === 'it' && c.it.preset) || a[1], nameTouched: false, minutes: Math.max(1, Math.round(r.total / 60000)), intensity: a[3] };
+    }
+    return { sh: c.sheet, r };
+  }
+  function addSheet(mode) {
+    const got = chronoSheet(mode);
+    if (!got) return '';
+    const { sh } = got;
+    return html`<div class="add-sheet" role="group" aria-labelledby="as-title">
+      <h3 id="as-title">Ajouter à mon activité du jour</h3>
+      <div class="form-row">
+        <label class="field grow"><span>Nom</span><input type="text" id="as-name" data-as="name" value="${str(sh.name)}" maxlength="60" autocomplete="off"></label>
+        <label class="field field-time"><span>Durée (min)</span><input type="text" inputmode="numeric" id="as-min" data-as="minutes" value="${String(sh.minutes)}" autocomplete="off"></label>
+      </div>
+      <div class="chips" role="group" aria-label="Activité">${CHRONO_ACTS.map(([key, name]) => html`<button type="button" data-act="as-act" data-v="${key}" aria-pressed="${bool(sh.act === key)}">${name}</button>`)}</div>
+      <div class="field"><span id="as-int">Intensité</span><div class="seg" role="group" aria-labelledby="as-int">${INTENSITIES.map(([v, t]) => html`<button type="button" data-act="as-int" data-v="${v}" aria-pressed="${bool(sh.intensity === v)}">${t}</button>`)}</div></div>
+      <div class="actions"><button type="button" class="primary big" data-act="as-save" data-mode="${mode}">Ajouter à mon activité du jour</button>${S.live ? html`<button type="button" class="ghost" data-act="as-live" data-mode="${mode}">Ajouter à la séance en cours</button>` : ''}</div>
+    </div>`;
+  }
+  function chronoSave(mode, target) {
+    const got = chronoSheet(mode);
+    if (!got) { toast('Rien à noter pour l’instant.'); return; }
+    const { sh, r } = got, a = CHRONO_ACTS.find((x) => x[0] === sh.act) || CHRONO_ACTS[0];
+    const name = String(sh.name || '').trim().slice(0, 60) || a[1];
+    if (target === 'live' && S.live) {
+      // dans la séance en direct : un exercice en durée, une série par tour
       const l = S.live;
-      let e = l.exos.find((x) => norm(x.name) === norm(label));
-      if (!e) { e = { id: newId(), name: label, mode: 'time', sets: [] }; l.exos.push(e); }
+      let e = l.exos.find((x) => norm(x.name) === norm(name));
+      if (!e) { e = { id: newId(), name, mode: 'time', sets: [] }; l.exos.push(e); }
       r.sets.forEach((sec) => e.sets.push({ id: newId(), sec, at: Date.now() }));
       l.cur = e.id; l.adding = false; saveLive();
-      toast(`Ajouté à ta séance : ${plural(r.sets.length, 'série')} (${label.toLowerCase()})`);
+      toast(`Ajouté à ta séance : ${plural(r.sets.length, 'série')} (${name.toLowerCase()})`);
     } else {
-      const t = todayKey(), minutes = Math.max(1, Math.round(r.total / 60000));
-      const entry = { id: newId(), time: timeOf(Date.now() - r.total), kind: 'seance', type, name: label, minutes, intensity, details: r.details.slice(0, 500), tpl: null };
+      const minutes = Math.round(num(sh.minutes) || 0);
+      if (!(minutes >= 1 && minutes <= 600)) { toast('Indique la durée en minutes.'); S.ui.focus = '#as-min'; render(); return; }
+      const t = todayKey();
+      const entry = { id: newId(), time: timeOf(Date.now() - r.total), kind: 'seance', type: a[2], name, minutes, intensity: intIn(sh.intensity, 1, 3, a[3]), details: r.details.slice(0, 500), tpl: null };
       mutateDay(t, 'sport', (d) => { d.sport.push(entry); }, false);
-      S.ui.date = t;
-      toast(`Noté dans ta journée : ${label}, ${minutes} min`);
+      S.ui.date = t; S.ui.just = entry.id;
+      toast(`Ajouté à ton activité du jour : ${name}, ${minutes} min`);
     }
     if (mode === 'sw') S.chrono.sw = { run: null, acc: 0, laps: [] }; else Object.assign(S.chrono.it, { run: null, acc: 0, done: false });
+    S.chrono.sheet = null;
     saveChrono(); render();
   }
   function chronoCard() {
     const c = S.chrono;
-    const acts = html`<div class="chips" role="group" aria-label="Activité">${CHRONO_ACTS.map(([key, name]) => html`<button type="button" data-act="chr-act" data-v="${key}" aria-pressed="${bool(c.act === key)}">${name}</button>`)}</div>`;
-    const saveLbl = S.live ? 'Ajouter à ma séance' : 'Noter dans ma journée';
     let body;
     if (c.mode === 'sw') {
       const ms = swElapsed(c), run = !!c.sw.run, laps = c.sw.laps, splits = laps.map((t, i) => t - (i ? laps[i - 1] : 0));
@@ -3527,13 +3602,13 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
           ? html`<button type="button" class="ghost big" data-act="sw-pause">Pause</button><button type="button" class="primary big" data-act="sw-lap">Tour ${laps.length + 1}</button>`
           : html`<button type="button" class="primary big" data-act="sw-start">${ms ? 'Reprendre' : 'Démarrer'}</button>${ms ? html`<button type="button" class="ghost big" data-act="sw-reset">Remettre à zéro</button>` : ''}`}</div>
         ${splits.length ? html`<ol class="laps" reversed>${splits.map((x, i) => html`<li class="${x === best ? 'best' : ''}"><span>Tour ${i + 1}${x === best ? ' · meilleur' : ''}</span><b>${fmtTenths(x)}</b><small>${fmtTenths(laps[i])}</small></li>`).reverse()}</ol>` : ''}
-        ${!run && ms >= 1000 ? html`<div class="chr-save">${acts}<button type="button" class="primary" data-act="sw-save">${saveLbl}</button></div>` : ''}`;
+        ${!run && ms >= 1000 ? addSheet('sw') : ''}`;
     } else {
       const it = c.it, ms = itElapsed(c), ph = itPhase(ms), started = !!it.run || it.acc > 0 || it.done;
       const total = it.rounds * it.work + (it.rounds - 1) * it.rest;
       const step = (f, label, v, st) => html`<div class="field stepper"><span id="it-${f}-l">${label}</span><div class="step" role="group" aria-labelledby="it-${f}-l"><button type="button" class="icon" data-act="it-step" data-f="${f}" data-v="${-st}" aria-label="${label} : moins">−</button><output id="it-${f}" class="step-out">${v}</output><button type="button" class="icon" data-act="it-step" data-f="${f}" data-v="${st}" aria-label="${label} : plus">+</button></div></div>`;
       if (!started) {
-        body = html`<div class="chips" role="group" aria-label="Préréglages">${INT_PRESETS.map(([name, w, r, n]) => html`<button type="button" data-act="it-preset" data-v="${name}">${name} · ${fmtSec(w)} / ${fmtSec(r)} × ${n}</button>`)}</div>
+        body = html`<div class="chips" role="group" aria-label="Préréglages">${INT_PRESETS.map(([name, w, r, n]) => html`<button type="button" data-act="it-preset" data-v="${name}" aria-pressed="${bool(it.preset === name && it.work === w && it.rest === r && it.rounds === n)}">${name} · ${fmtSec(w)} / ${fmtSec(r)} × ${n}</button>`)}</div>
           <div class="steps">${step('work', 'Effort (s)', it.work, 5)}${step('rest', 'Récup (s)', it.rest, 5)}${step('rounds', 'Tours', it.rounds, 1)}</div>
           <p class="hint" style="margin:0">${it.rounds} × ${fmtSec(it.work)} d’effort, ${fmtSec(it.rest)} de récup : ${fmtSec(total)} en tout. Bips à 3, 2, 1 et à chaque changement.</p>
           <div class="chr-btns"><button type="button" class="primary big" data-act="it-start">Démarrer</button></div>`;
@@ -3546,9 +3621,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
             : html`<button type="button" class="primary big" data-act="it-resume">Reprendre</button><button type="button" class="ghost big" data-act="it-stop">Arrêter</button>`}</div>`;
       } else {
         const r = chronoResult('it');
-        body = html`<p class="chr-done">${r ? r.details : 'Arrêté avant la fin du premier effort.'}</p>
-          ${r ? html`<div class="chr-save">${acts}<button type="button" class="primary" data-act="it-save">${saveLbl}</button></div>` : ''}
-          <div class="chr-btns"><button type="button" class="ghost" data-act="it-reset">Recommencer</button></div>`;
+        body = html`<p class="chr-done">${r ? `Terminé : ${r.details}` : 'Arrêté avant la fin du premier effort.'}</p>
+          ${r ? addSheet('it') : ''}
+          <div class="chr-btns"><button type="button" class="link" data-act="it-reset">${r ? 'Recommencer sans noter' : 'Recommencer'}</button></div>`;
       }
     }
     return html`<section class="card chrono-card m-sport" id="sec-chrono" aria-labelledby="chr-title">
@@ -3559,26 +3634,36 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
   }
   const CHRONO_ACTIONS = {
     'chr-mode': (d) => { S.chrono.mode = d.v === 'it' ? 'it' : 'sw'; saveChrono(); render(); },
-    'chr-act': (d) => { S.chrono.act = d.v; saveChrono(); render(); },
-    'sw-start': () => { unlockAudio(); S.chrono.sw.run = Date.now(); saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); startChrono(); },
+    'as-act': (d) => {
+      const sh = S.chrono.sheet, a = CHRONO_ACTS.find((x) => x[0] === d.v);
+      if (!sh || !a) return;
+      sh.act = a[0]; sh.intensity = a[3]; if (!sh.nameTouched) sh.name = a[1];
+      S.chrono.act = a[0]; saveChrono(); render();
+    },
+    'as-int': (d) => { if (S.chrono.sheet) { S.chrono.sheet.intensity = Number(d.v); saveChrono(); render(); } },
+    'as-save': (d) => chronoSave(d.mode, 'day'),
+    'as-live': (d) => chronoSave(d.mode, 'live'),
+    'sw-start': () => { unlockAudio(); S.chrono.sw.run = Date.now(); S.chrono.sheet = null; saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); startChrono(); },
     'sw-pause': () => { const sw = S.chrono.sw; sw.acc = swElapsed(); sw.run = null; saveChrono(); S.ui.focus = '[data-act="sw-start"]'; render(); },
     'sw-lap': () => { S.chrono.sw.laps.push(swElapsed()); saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); },
-    'sw-reset': () => { S.chrono.sw = { run: null, acc: 0, laps: [] }; saveChrono(); render(); },
-    'sw-save': () => chronoSave('sw'),
+    'sw-reset': () => { S.chrono.sw = { run: null, acc: 0, laps: [] }; S.chrono.sheet = null; saveChrono(); render(); },
     'it-preset': (d) => {
       const p = INT_PRESETS.find((x) => x[0] === d.v);
       if (!p) return;
-      Object.assign(S.chrono.it, { work: p[1], rest: p[2], rounds: p[3] });
+      Object.assign(S.chrono.it, { work: p[1], rest: p[2], rounds: p[3], preset: p[0] });
       S.chrono.act = p[4]; saveChrono(); render();
     },
     'it-step': (d) => {
       const it = S.chrono.it, f = d.f, lim = { work: [5, 600], rest: [0, 600], rounds: [1, 50] }[f];
       it[f] = Math.min(lim[1], Math.max(lim[0], it[f] + Number(d.v)));
+      const p = INT_PRESETS.find((x) => x[0] === it.preset);
+      if (!p || p[1] !== it.work || p[2] !== it.rest || p[3] !== it.rounds) it.preset = null;
       saveChrono(); render();
     },
     'it-start': () => {
       unlockAudio(); tone(1175, 0.3);
       Object.assign(S.chrono.it, { run: Date.now(), acc: 0, done: false });
+      S.chrono.sheet = null;
       chronoMem.key = null; chronoMem.sec = null;
       saveChrono(); S.ui.focus = '[data-act="it-pause"]'; render(); startChrono();
     },
@@ -3590,8 +3675,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       saveChrono(); chronoTick();
     },
     'it-stop': () => { const it = S.chrono.it; it.acc = itElapsed(); it.run = null; it.done = true; saveChrono(); render(); },
-    'it-reset': () => { Object.assign(S.chrono.it, { run: null, acc: 0, done: false }); saveChrono(); render(); },
-    'it-save': () => chronoSave('it')
+    'it-reset': () => { Object.assign(S.chrono.it, { run: null, acc: 0, done: false }); S.chrono.sheet = null; saveChrono(); render(); }
   };
   /* ---------- Profils : changer, créer, modifier, supprimer ---------- */
   const initial = (name) => (String(name || '').trim().charAt(0) || '?').toUpperCase();
@@ -4246,9 +4330,13 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
     S.ui.just = null;
     if (keep) {
       const el = view.querySelector(keep);
-      if (el) { try { el.focus(explicit ? undefined : { preventScroll: true }); if (S.ui.select && el.select) el.select(); } catch (e) { /* rien */ } }
+      // Un bouton qu'on vient de toucher est déjà sous le doigt : pas de défilement ; un champ à remplir, lui, vient à l'écran.
+      if (el) { try { el.focus({ preventScroll: !(explicit && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) }); if (S.ui.select && el.select) el.select(); } catch (e) { /* rien */ } }
     }
-    S.ui.focus = null; S.ui.select = false;
+    // Un bloc qui remplace ce qu'il y avait à l'écran (fin de séance…) est amené en haut, sous l'en-tête.
+    const shown = S.ui.reveal && view.querySelector(S.ui.reveal);
+    if (shown) { try { shown.scrollIntoView({ block: 'start' }); } catch (e) { /* rien */ } }
+    S.ui.focus = null; S.ui.select = false; S.ui.reveal = null;
     if (S.ui.view === 'sante') { bindChart(); drawBilanCharts(); }
     if (S.live) { startLiveTicker(); keepAwake(true); }
     if (chronoRunning()) startChrono();
@@ -4982,6 +5070,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
       S.ui.tplEdit.draft[ds.tpl] = t.value;
     } else if (ds.live) {
       onLiveInput(ds.live, t);
+    } else if (ds.as) {
+      onSheetInput(ds.as, t);
     } else if (ds.pf === 'new') {
       S.ui.profileNew = t.value;
     } else if (ds.pf === 'name' && S.ui.profileEdit) {

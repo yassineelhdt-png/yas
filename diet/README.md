@@ -30,14 +30,18 @@ Chaque profil a ses compléments, repas, sport, visites et réglages ; on passe 
 Un nouveau profil démarre vide. Avec un compte Claude, la liste des profils suit le compte d'un appareil à l'autre.
 
 **Chrono** (onglet Sport) : chronomètre avec tours (sprints…), ou intervalles effort / récup × tours (préréglages
-Sprints, Corde, Tabata) avec bips à 3, 2, 1 et vibration aux changements. Il se note dans la journée, ou dans la
-séance en direct si elle est en cours (une série par tour).
+Sprints, Corde, Tabata) avec bips à 3, 2, 1 et vibration aux changements. En pause ou à la fin, une fiche
+« Ajouter à mon activité du jour » propose un nom, une durée, l'activité et l'intensité, tous modifiables ; pendant une
+séance en direct, « Ajouter à la séance en cours » y range les tours (une série par tour). Le bandeau du bas suit
+aussi le chrono sur les autres onglets.
 
 **Séance en direct** (onglet Sport) : « Commencer maintenant » (ou la séance prévue) lance le chrono ; pour chaque
 exercice, les séries se notent en répétitions (charge, répétitions en réserve) ou en durée (avec un chrono), et le
-repos démarre tout seul après chaque série (1, 1 min 30, 2 ou 3 min, + 15 s, passer), avec vibration et son. L'écran
-reste allumé, un bandeau rappelle la séance sur les autres onglets, et la séance en cours survit à une fermeture de
-l'app. « Terminer » l'enregistre dans la journée avec le détail des séries, que Claude reçoit.
+repos démarre tout seul après chaque série (1, 1 min 30, 2 ou 3 min, + 15 s, passer), avec vibration et son ; le bloc
+du repos garde la même taille pour que rien ne bouge sous le doigt. L'écran reste allumé, un bandeau rappelle la
+séance sur les autres onglets, et la séance en cours survit à une fermeture de l'app. « Terminer la séance » ouvre
+« Ajouter à mon activité du jour » : nom, durée, type et intensité (proposée d'après les séries) avant d'enregistrer
+dans la journée avec le détail des séries, que Claude reçoit.
 
 **Sport** : objectif de 5 séances légères de 30 à 45 min par semaine (réglable), avec la semaine en 7 pastilles, la
 séance prévue du jour (« C'est fait » la note en un appui), les pas du jour (objectif 8 000), les séances et les
