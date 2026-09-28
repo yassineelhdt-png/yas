@@ -1,5 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--safe-t) + 70px); }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--safe-t) + 70px); scroll-padding-bottom: calc(var(--bottomnav-h) + var(--safe-b) + 16px); }
 body {
   margin: 0;
   background: var(--bg);
@@ -70,6 +70,7 @@ label.btn { cursor: pointer; }
   border: 1px solid var(--line);
   color: var(--ink-2);
 }
+.chip.mono { font-weight: 500; } /* IBM Plex Mono n'existe qu'en 400 / 500 */
 .chip.mode-concours { background: color-mix(in srgb, var(--c-conc) 14%, var(--surface)); border-color: color-mix(in srgb, var(--c-conc) 35%, var(--line)); color: var(--c-conc); }
 .chip.mode-samedi { background: color-mix(in srgb, var(--c-chq2) 14%, var(--surface)); border-color: color-mix(in srgb, var(--c-chq2) 35%, var(--line)); color: var(--c-chq2); }
 .chip.mode-conge { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, var(--line)); }
@@ -78,7 +79,8 @@ label.btn { cursor: pointer; }
   font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
   padding: 2px 7px; border-radius: 5px;
   background: color-mix(in srgb, var(--c) 15%, var(--surface));
-  color: var(--c);
+  /* texte un peu plus foncé que la couleur de la matière : lisible en petit (4,5:1) */
+  color: color-mix(in srgb, var(--c) 75%, var(--ink));
   white-space: nowrap;
 }
 
@@ -87,7 +89,7 @@ label.btn { cursor: pointer; }
   position: relative; flex: none;
   width: 44px; height: 26px;
   border-radius: 99px; border: 0; padding: 0;
-  background: var(--line);
+  background: var(--control);
   transition: background-color .2s var(--ease);
 }
 .sw::after {
@@ -104,6 +106,19 @@ label.btn { cursor: pointer; }
 .seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
 .seg button { border: 0; background: none; padding: 5px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
 .seg button[aria-checked="true"] { background: var(--ink); color: var(--bg); }
+
+/* retour visuel au toucher (la surbrillance native est désactivée) */
+:is(.nowcard, .seg button, .tab, .btab, .whead button):active { filter: brightness(.95); }
+
+/* écrans tactiles : cibles d'au moins 44 px, et champs à 16 px (sinon iOS zoome à chaque saisie) */
+@media (pointer: coarse) {
+  .btn, .tab { min-height: 44px; }
+  .seg button { min-height: 40px; }
+  .nb { width: 44px; height: 44px; }
+  .linkbtn, .sw { position: relative; }
+  .linkbtn::after, .sw::before { content: ""; position: absolute; inset: -12px -6px; }
+  .backup textarea { font-size: 16px; }
+}
 
 .warnbox { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: grid; gap: 4px; }
 

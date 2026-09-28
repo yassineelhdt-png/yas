@@ -1,7 +1,7 @@
 /* ---------- réglages ---------- */
 .settings { display: grid; gap: 16px; padding-top: 18px; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 820px) { .settings { grid-template-columns: 1fr 1fr; } }
-.settings h1 { grid-column: 1 / -1; font-family: var(--display); font-size: 30px; margin: 0; letter-spacing: -.02em; }
+.settings h1 { grid-column: 1 / -1; font-family: var(--display); font-size: clamp(26px, 5.4vw, 32px); line-height: 1.1; margin: 0; letter-spacing: -.02em; }
 fieldset { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); padding: 6px 16px 10px; margin: 0; min-width: 0; box-shadow: var(--shadow); }
 legend { font-family: var(--display); font-weight: 650; font-size: 16px; padding: 0 6px; }
 .fr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line-2); min-height: 48px; }
@@ -10,7 +10,7 @@ legend { font-family: var(--display); font-weight: 650; font-size: 16px; padding
 .fr .in { display: flex; align-items: center; gap: 6px; }
 .fr input[type=number], .fr input[type=time], .fr input[type=date], .fr select {
   border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2);
-  padding: 6px 8px; font-family: var(--mono); font-size: 14px; max-width: 160px;
+  padding: 6px 8px; font-family: var(--mono); font-size: 16px; max-width: 160px;
 }
 .fr input[type=number] { width: 5.5em; }
 .fr .u { font-size: 12.5px; color: var(--muted); min-width: 26px; }
@@ -27,7 +27,7 @@ legend { font-family: var(--display); font-weight: 650; font-size: 16px; padding
 
 /* ---------- méthode ---------- */
 .method { max-width: 720px; padding-top: 18px; }
-.method h1 { font-family: var(--display); font-size: 30px; margin: 0 0 6px; letter-spacing: -.02em; }
+.method h1 { font-family: var(--display); font-size: clamp(26px, 5.4vw, 32px); line-height: 1.1; margin: 0 0 6px; letter-spacing: -.02em; }
 .method h2 { font-family: var(--display); font-size: 19px; margin: 26px 0 6px; }
 .method p, .method li { color: var(--ink-2); max-width: 65ch; }
 .method ul { padding-left: 18px; display: grid; gap: 4px; }
@@ -42,7 +42,7 @@ fieldset.goals > .sub { margin: 4px 0 0; }
 .goalrow.ro { border-left-color: var(--line); }
 .goalrow small { color: var(--muted); font-size: 12.5px; }
 .goalrow .gr1, .goalrow .gr2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.goalrow select, .goalrow input { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 6px 8px; font-size: 14px; }
+.goalrow select, .goalrow input { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 6px 8px; font-size: 16px; }
 .goalrow input[type=number] { width: 4.2em; font-family: var(--mono); }
 .goalrow .glabel { flex: 1 1 180px; min-width: 0; }
 .goalrow label { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); }

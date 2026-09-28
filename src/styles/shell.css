@@ -25,6 +25,8 @@
 .sync[data-s="error"] i { background: var(--warn); }
 .sync[data-s="connecting"] i { animation: pulse 1s infinite alternate; }
 @keyframes pulse { to { opacity: .3; } }
+/* tablette en écran partagé : le point de couleur suffit (libellé au survol) */
+@media (max-width: 899px) { .sync span { display: none; } }
 
 /* ---------- contenu ---------- */
 .wrap {

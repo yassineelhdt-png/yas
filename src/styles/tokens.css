@@ -44,9 +44,11 @@
 
 :root {
   color-scheme: light;
-  --bg: #EDF0F3; --surface: #FFFFFF; --surface-2: #F5F7F9; --ink: #111922; --ink-2: #3A4652; --muted: #66727F; --line: #D8DEE4; --line-2: #E6EAEE;
+  --bg: #EDF0F3; --surface: #FFFFFF; --surface-2: #F5F7F9; --ink: #111922; --ink-2: #3A4652; --muted: #5C6874; --line: #D8DEE4; --line-2: #E6EAEE;
+  /* bord / piste des contrôles vides (case « fait », interrupteur) : 3:1 au moins contre la carte */
+  --control: #8A94A0;
   --accent: #1A47D6; --accent-ink: #FFFFFF; --accent-soft: #E3E9FB;
-  --ok: #17804A; --warn: #A8660B; --warn-soft: #FBF0DE;
+  --ok: #17804A; --warn: #8F5600; --warn-soft: #FBF0DE;
   --c-chim: #0A8581; --c-phys: #5543D1; --c-math: #B86200; --c-bio: #2C8538; --c-medig: #7A6955;
   --c-chq2: #03668A; --c-conc: #BF2F4E; --c-rais: #B0407A; --c-eth: #84559B; --c-rev: #3B6897;
   --c-sport: #D35E28; --c-break: #A3ADB8;
@@ -70,7 +72,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0D1218; --surface: #151C24; --surface-2: #1A232D; --ink: #E7ECF1; --ink-2: #B9C3CD; --muted: #8793A0; --line: #2A3440; --line-2: #222C37;
+    --bg: #0D1218; --surface: #151C24; --surface-2: #1A232D; --ink: #E7ECF1; --ink-2: #B9C3CD; --muted: #8793A0; --line: #2A3440; --line-2: #222C37; --control: #66727F;
     --accent: #7B9BFF; --accent-ink: #0D1218; --accent-soft: #1E2A4A;
     --ok: #4CC27F; --warn: #E3A64B; --warn-soft: #33281A;
     --c-chim: #2FBFB9; --c-phys: #9486FF; --c-math: #EEA23F; --c-bio: #5DC36B; --c-medig: #B9A68F;
@@ -82,7 +84,7 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0D1218; --surface: #151C24; --surface-2: #1A232D; --ink: #E7ECF1; --ink-2: #B9C3CD; --muted: #8793A0; --line: #2A3440; --line-2: #222C37;
+  --bg: #0D1218; --surface: #151C24; --surface-2: #1A232D; --ink: #E7ECF1; --ink-2: #B9C3CD; --muted: #8793A0; --line: #2A3440; --line-2: #222C37; --control: #66727F;
   --accent: #7B9BFF; --accent-ink: #0D1218; --accent-soft: #1E2A4A;
   --ok: #4CC27F; --warn: #E3A64B; --warn-soft: #33281A;
   --c-chim: #2FBFB9; --c-phys: #9486FF; --c-math: #EEA23F; --c-bio: #5DC36B; --c-medig: #B9A68F;

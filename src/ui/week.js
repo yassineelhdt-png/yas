@@ -31,7 +31,9 @@ function block(it, y) {
   const tip = E.hm(it.s) + "–" + E.hm(it.e) + " " + lab + (sub ? " · " + sub : "");
   let text = nothing;
   if (ht >= 20) text = ht >= 34 && sub ? html`${lab}<small>${sub}</small>` : sub ? lab + " · " + sub : lab;
-  return html`<div class=${cls} style="top:${top.toFixed(1)}px;height:${ht.toFixed(1)}px;--c:${c}" title=${tip}>${text}</div>`;
+  // --l : lignes de texte qui tiennent dans le bloc (12,6 px par ligne)
+  const lines = Math.max(1, Math.floor((ht - 4) / 12.6));
+  return html`<div class=${cls} style="top:${top.toFixed(1)}px;height:${ht.toFixed(1)}px;--c:${c};--l:${lines}" title=${tip}>${text}</div>`;
 }
 
 export function weekView(week, nav) {

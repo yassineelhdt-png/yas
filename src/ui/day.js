@@ -212,10 +212,10 @@ function header(res, st, ctx) {
             <span>Fin ${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
           </span>
         </div>
-        ${isToday ? html`<div class="wbtns"><button class="btn primary" @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}>Je commence maintenant</button></div>` : nothing}
+        ${isToday ? html`<div class="wbtns"><button class="btn primary" @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}>Je commence<span class="wide"> maintenant</span></button></div>` : nothing}
         <div class="facts">
-          <div class="fact"><span class="lbl">Début</span><b>${res.studyStart < 1e9 ? E.hm(res.studyStart) : "—"}</b></div>
-          <div class="fact"><span class="lbl">Fin</span><b>${E.hm(res.workEnd)}</b></div>
+          <div class="fact wide"><span class="lbl">Début</span><b>${res.studyStart < 1e9 ? E.hm(res.studyStart) : "—"}</b></div>
+          <div class="fact wide"><span class="lbl">Fin</span><b>${E.hm(res.workEnd)}</b></div>
           <div class="fact"><span class="lbl">Net</span><b>${E.hdur(res.net)}</b></div>
           <div class="fact"><span class="lbl">Coucher</span><b>${E.hm(bed)}</b></div>
         </div>
