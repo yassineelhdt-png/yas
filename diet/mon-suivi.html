@@ -379,6 +379,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .visit-head h2{ font-family:var(--font-display); font-weight:600; font-size:20px; letter-spacing:-.02em; }
 .visit-head p{ margin:2px 0 0; color:var(--muted); font-size:14px; font-weight:600; }
 .vchecks{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.vmove{ display:flex; flex-direction:column; gap:8px; margin:-4px 0 14px; padding:12px 14px; border-radius:14px; background:var(--surface-2); border:1px dashed var(--soir-line); }
+.vmove > span{ font-weight:800; font-size:14px; }
 .vcheck{ display:inline-flex; align-items:center; gap:9px; border:1.5px solid var(--line); background:var(--surface-2); color:var(--ink); border-radius:999px; padding:8px 16px 8px 10px; font-weight:800; min-height:44px; }
 .vbox{ width:22px; height:22px; border-radius:7px; border:2px solid var(--soir); display:grid; place-items:center; }
 .vbox svg{ width:14px; height:14px; }
@@ -1271,10 +1273,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     kcal: round1(posNum(f.kcal) ?? 0), p: round1(posNum(f.p) ?? 0), g: round1(posNum(f.g) ?? 0), l: round1(posNum(f.l) ?? 0)
   });
   /* Visite médicale (prise de sang, pesée, médecin) : première le lundi 28 septembre 2026, puis toutes les 4 semaines. */
-  const VISIT_START = '2026-09-28';
+  const VISIT_START = '2026-09-28', VISIT_MOVED_TO = '2026-10-02';
   function normalizeVisit(v) {
     const every = Math.round(num(v && v.every) || 28);
-    return { start: v && isKey(v.start) ? v.start : VISIT_START, every: every >= 7 && every <= 120 ? every : 28, notify: !(v && v.notify === false) };
+    const out = { start: v && isKey(v.start) ? v.start : VISIT_START, every: every >= 7 && every <= 120 ? every : 28, notify: !(v && v.notify === false), moved: !!(v && v.moved) };
+    // Prise de sang du lundi 28 septembre 2026 pas faite : la visite enregistrée à cette date passe au vendredi 2 octobre
+    // (une seule fois ; « moved » garde la date choisie ensuite, même si c'est de nouveau le 28).
+    if (v && v.start === VISIT_START && !v.moved && todayKey() >= VISIT_START) { out.start = VISIT_MOVED_TO; out.moved = true; }
+    return out;
   }
   /* Rendez-vous (avec heure et lieu) et dates à retenir (toute la journée). */
   const APPT_CATS = {
@@ -2278,6 +2284,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     return html`<section class="card visit" id="visit" aria-labelledby="visit-title">
       <div class="visit-head"><span class="mico m-soir" aria-hidden="true">${ICON.visit}</span><div><h2 id="visit-title">Visite médicale</h2><p>${k === todayKey() ? 'Aujourd’hui · ' : ''}prise de sang, pesée, tension et médecin, ${cycleLabel()}</p></div></div>
       <div class="vchecks">${check('blood', 'Prise de sang faite')}${check('doctor', 'Vu le médecin')}</div>
+      ${isVisitDay(k) && !vis.blood && k >= addDays(todayKey(), -3) ? visitMoveRow(k) : ''}
       <div class="vweight">
         <label class="field"><span>Poids (kg)</span><input type="text" inputmode="decimal" id="vw-${k}" data-visit="weight" data-date="${k}" value="${w ? fmtDec(w) : ''}" placeholder="—" autocomplete="off"></label>
         ${delta != null ? html`<p class="delta">${delta === 0 ? 'Stable' : `${delta > 0 ? '+' : '−'}${fmtDec(Math.abs(delta))} kg`} depuis le ${shortDate(prev.k)}</p>`
@@ -2314,6 +2321,17 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       <p class="hint" style="margin:6px 0 0">Tension : assis, au calme depuis 5 minutes, bras posé à hauteur du cœur ; fais 2 mesures à 1 minute d’écart et note la moyenne des deux. Repères d’adulte au repos : ton médecin juge selon ton cas.</p>
     </div>`;
   }
+  /* Visite pas faite ce jour-là : on la reporte (les suivantes repartent de la nouvelle date). */
+  function visitMoveRow(k) {
+    const from = k > todayKey() ? k : todayKey();
+    const days = Array.from({ length: 7 }, (_, i) => addDays(from, i + 1));
+    const lbl = (dk) => (dk === addDays(todayKey(), 1) ? 'Demain' : `${WD_SHORT[weekdayOf(dk)]} ${fromKey(dk).getDate()}`);
+    return html`<div class="vmove" role="group" aria-labelledby="vmove-${k}">
+      <span id="vmove-${k}">Pas faite ${k === todayKey() ? 'aujourd’hui' : 'ce jour-là'} ? Reporter à :</span>
+      <div class="chips">${days.map((dk) => html`<button type="button" data-act="visit-move" data-from="${k}" data-v="${dk}" aria-label="Reporter la visite au ${longDate(dk)}">${lbl(dk)}</button>`)}</div>
+    </div>`;
+  }
+  const visitIsEmpty = (vis) => !vis || (!vis.blood && !vis.doctor && !num(vis.weight) && !labsFilled(vis) && !str(vis.notes).trim() && !hasVitals(vis));
   function weekStrip(k) {
     const start = startOfWeek(k), t = todayKey();
     const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
@@ -3173,7 +3191,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     return html`<section class="set-sec">
       <p class="next-visit m-soir"><span class="mico" aria-hidden="true">${ICON.visit}</span><span><b>Prochaine visite : ${longDate(nv).replace(/^./, (c) => c.toLowerCase())}</b><span>${cap1(whenLabel(n))} · prise de sang, pesée, tension et médecin</span></span></p>
       <div class="form-grid">
-        <label class="field"><span>Première visite</span><input type="date" id="visit-start" data-vset="start" value="${v.start}"></label>
+        <label class="field"><span>Visite de départ</span><input type="date" id="visit-start" data-vset="start" value="${v.start}"></label>
         <label class="field"><span>Tous les (jours)</span><input type="number" inputmode="numeric" min="7" max="120" id="visit-every" data-vset="every" value="${v.every}"></label>
       </div>
       <p class="hint">Ensuite : ${after.join(' · ')}. La semaine d’avant, un rappel s’affiche sur l’accueil. Le jour même, l’accueil montre la visite (poids, prise de sang, médecin) et le bilan des ${v.every} jours à envoyer à Claude.</p>
@@ -5453,6 +5471,19 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       mutateDay(d.date, 'taken:' + sids[0], (day) => { sids.forEach((sid) => { day.taken[sid] = true; }); });
       toast(`${MOMENTS.find((m) => m.key === d.v).label} : tout est coché`);
     },
+    'visit-move': (d) => {
+      if (!isKey(d.v) || !isKey(d.from) || d.v <= d.from) return;
+      const before = { ...S.settings.visit }, vis = visitOf(peekDay(d.from)), empty = visitIsEmpty(vis);
+      mutateSettings((st) => { st.visit.start = d.v; st.visit.moved = true; }, false);
+      if (vis && empty) mutateDay(d.from, 'visit', (day) => { day.visit = null; }, false); // rien de noté : ce jour n'est plus un jour de visite
+      S.ui.dayTab = 'apercu';
+      render(); scheduleReminders();
+      toast(`Visite reportée au ${lowDate(d.v)} ; ensuite ${cycleLabel()}`, () => {
+        mutateSettings((st) => { st.visit = { ...before }; }, false);
+        if (vis && empty) mutateDay(d.from, 'visit', (day) => { day.visit = vis; }, false);
+        render(); scheduleReminders(); toast('Visite remise');
+      });
+    },
     'visit-check': (d) => {
       mutateDay(d.date, 'visit', (day) => { const vis = ensureVisit(day); vis[d.v] = !vis[d.v]; });
     },
@@ -5712,7 +5743,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       if (key === 'start' && !isKey(t.value)) { toast('Choisis la date de ta première visite.'); return; }
       const every = Math.round(num(t.value) || 0);
       if (key === 'every' && (every < 7 || every > 120)) { toast('Entre 7 et 120 jours.'); t.value = S.settings.visit.every; return; }
-      mutateSettings((st) => { st.visit[key] = key === 'notify' ? t.checked : key === 'every' ? every : t.value; });
+      mutateSettings((st) => { st.visit[key] = key === 'notify' ? t.checked : key === 'every' ? every : t.value; if (key === 'start') st.visit.moved = true; });
       scheduleReminders();
     } else if (ds.ui === 'dataDate') {
       S.ui.dataDate = isKey(t.value) ? t.value : null;

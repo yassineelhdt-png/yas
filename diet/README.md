@@ -74,11 +74,12 @@ indique la date de reprise ; la veille d'un début, d'une pause ou d'une reprise
 (et une notification à 19:00 dans l'app Android). L'omberacetam est réglé sur 6 semaines de prise puis 4 de pause
 à partir du 10 octobre 2026 (notice du Noopept : cure de 1,5 à 3 mois, puis 1 mois de pause avant la suivante).
 
-**Visite médicale toutes les 4 semaines** (première le lundi 28 septembre 2026, réglable) : pesée, tension, pouls au
+**Visite médicale toutes les 4 semaines** (vendredi 2 octobre 2026, reportée du lundi 28 septembre ; réglable) : pesée, tension, pouls au
 repos, saturation, température et tour de taille (avec une lecture : optimale, normale haute, hypertension de grade 1
 à 3 selon l'ESH 2023, pouls lent ou rapide, fièvre…, et les conseils de mesure), prise de sang (valeurs avec repères
 habituels), avis du médecin, et bilan des 28 jours d'avant à envoyer à Claude. Rappel sur la page
-du jour la semaine d'avant, notification la veille à 19:00 et le matin à 7:30 dans l'app Android.
+du jour la semaine d'avant, notification la veille à 19:00 et le matin à 7:30 dans l'app Android. Visite pas faite ? Sur sa carte, « Reporter à » (demain ou un des 7 jours suivants) la décale ; les suivantes
+repartent de la nouvelle date, et ce qui a déjà été noté reste sur son jour.
 
 **Faire le point avec Claude** : chaque journée (ou semaine) devient un texte structuré, prêt à coller dans un
 projet Claude. L'app marche sans réseau ; le soir (à partir de 18 h), l'accueil rappelle les journées pas encore
