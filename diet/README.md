@@ -9,8 +9,8 @@ secondaires), repas avec aliments et macros (protéines, glucides, lipides, calo
 (les rappels du jour regroupés : visite, cures, envoi à Claude, sauvegarde, premiers pas) et les rendez-vous ; puis un
 onglet par partie : *Compléments*, *Eau et repas*, *Journal* (check-ins, ressentis, sommeil, notes), *Claude*, et
 *Visite* le jour de la visite. La barre d'onglets reste en haut ; les anneaux et les rappels ouvrent le bon onglet.
-Réglages → *Affichage* : « Tout sur une page » pour retrouver l'accueil d'avant, à faire défiler (choix gardé sur
-l'appareil).
+Réglages → *Affichage* : « Tout sur une page » pour retrouver l'accueil d'avant, à faire défiler, et le thème
+(celui de l'appareil, clair ou sombre) ; ces choix restent sur l'appareil.
 
 Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, avec six anneaux de résumé, « Bonjour » ou
 « Bonsoir » et une petite scène du moment : lever du soleil, plein midi, fin d'après-midi, nuit étoilée, reprises en tête
@@ -28,12 +28,20 @@ journée, et le dossier complet les liste.
 **Confort** : « Annuler » quelques secondes après chaque suppression (check-in, repas, ressenti, séance, complément,
 aliment, séance type, séance en direct abandonnée) ; « Premiers pas » pour un profil qui démarre vide ; dans l'app
 sans compte, rappel de sauvegarde tous les 14 jours (le journal n'existe que sur l'appareil) et date de la dernière
-dans *Données* ; deux colonnes dès 760 px (tablette).
+dans *Données* ; deux colonnes dès 760 px (tablette). On passe d'un champ à l'autre sans que le clavier se
+referme, et ce qui en dépend suit tout de suite (verdict de tension, pas restants, durée de la nuit). Les saisies
+acceptent les écritures courantes (« 6 500 » pas, « 2 000 » kcal, taille « 1,80 » ou « 180 cm ») ; une valeur
+impossible est refusée avec un message et l'ancienne revient.
+
+**Sommeil** : la nuit va du coucher de la veille au réveil du matin. Le matin, « Je me lève » ; le soir dès 18 h,
+« Je vais me coucher » (aussi en raccourci sur l'aperçu) note l'heure ; couché après minuit (jusqu'à 5 h), le coucher
+est rangé sur la nuit de la veille.
 
 **Mes moyennes** (Santé) : semaine, mois ou année, d'une période à l'autre ; huit moyennes avec l'écart à la période
 d'avant (compléments, eau, calories, sport, pas, sommeil, humeur, poids), un graphique par mesure (une colonne par
 jour, ou par mois pour l'année, avec l'objectif) et la régularité de chaque complément. Les jours où l'app n'a pas
-servi ne comptent pas dans les moyennes.
+servi ne comptent pas dans les moyennes. La période en cours se compare aux mêmes premiers jours de la période
+d'avant (lundi → mardi contre lundi → mardi), et le nombre de séances par semaine part du premier jour noté.
 
 **Dossier complet** (Réglages → *Données*, ou « Dossier de cette période » dans Mes moyennes) : un fichier Markdown
 pour Claude, une autre IA ou un médecin, sur tout le journal, 12 mois, 3 mois, 30 jours ou les dates choisies :
@@ -50,8 +58,9 @@ leurs photos suivent le compte d'un appareil à l'autre.
 **Chrono** (onglet Sport) : chronomètre avec tours (sprints…), ou intervalles effort / récup × tours (préréglages
 Sprints, Corde, Tabata) avec bips à 3, 2, 1 et vibration aux changements. En pause ou à la fin, une fiche
 « Ajouter à mon activité du jour » propose un nom, une durée, l'activité et l'intensité, tous modifiables ; pendant une
-séance en direct, « Ajouter à la séance en cours » y range les tours (une série par tour). Le bandeau du bas suit
-aussi le chrono sur les autres onglets.
+séance en direct, « Ajouter à la séance en cours » y range les tours (une série par tour). La séance est notée à
+l'heure du départ ; les pauses et les phases passées ne comptent pas dans la durée, et le temps après le dernier tour
+compte comme un tour. Le bandeau du bas suit aussi le chrono sur les autres onglets.
 
 **Séance en direct** (onglet Sport) : « Commencer maintenant » (ou la séance prévue) lance le chrono ; pour chaque
 exercice, les séries se notent en répétitions (charge, répétitions en réserve) ou en durée (avec un chrono), et le
@@ -94,7 +103,8 @@ où l'app tourne :
 
 Réglages → *Tes données* : sauvegarde complète (fichier ou texte), une journée (texte pour Claude en `.md`, ou
 sauvegarde de ce jour seul en `.json`), restauration depuis un fichier ou un texte collé (avec confirmation), tableau
-`.csv`. Sur Android, les fichiers passent par le menu de partage (Fichiers, Drive, Claude…).
+`.csv` (avec tension, pouls, prise de sang, avis du médecin, BPM des séances et rendez-vous). Les fichiers d'un autre
+profil portent son nom (`mon-suivi-maman-journal-….csv`). Sur Android, les fichiers passent par le menu de partage (Fichiers, Drive, Claude…).
 
 ## Installer
 

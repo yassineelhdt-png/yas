@@ -150,6 +150,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 @media (min-width:720px){ .card,.jsec{ padding:18px 20px; } }
 .card-head{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
 .card-head h2{ flex:1; font-size:20px; font-weight:800; letter-spacing:-.01em; }
+[data-patch]{ display:contents; }
 .pill{ flex:none; font-size:13px; font-weight:800; padding:4px 10px; border-radius:999px; background:var(--surface-2); border:1px solid var(--line); font-variant-numeric:tabular-nums; }
 .mico{ flex:none; width:34px; height:34px; border-radius:11px; background:var(--m, var(--ink)); color:var(--mo, var(--bg)); display:grid; place-items:center; }
 .mico svg{ width:20px; height:20px; }
@@ -512,6 +513,9 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .qa-ico{ flex:none; width:36px; height:36px; border-radius:11px; display:grid; place-items:center; background:var(--accent-tint); color:var(--accent-2); }
 .qa-ico svg{ width:20px; height:20px; }
 .qa[data-act="water-add"] .qa-ico{ background:var(--soir-tint); color:var(--soir); }
+.qa[data-act="bed-now"] .qa-ico{ background:var(--soir); color:var(--soir-on); }
+.qa[data-act="wake-now"] .qa-ico{ background:var(--matin-tint); color:var(--matin); }
+.chip.night{ border:1px solid var(--soir); background:var(--soir-tint); color:var(--ink); }
 .qa-txt{ display:flex; flex-direction:column; min-width:0; line-height:1.2; }
 .qa-txt b{ font-size:15px; font-weight:800; }
 .qa-txt small{ font-size:12.5px; font-weight:700; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1125,6 +1129,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     ...Object.fromEntries(Object.entries({
       visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
+      sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
+      moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
       grid: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
       bowl: '<path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 7.5c0-1.2 1-1.6 1-2.8M12 7.5c0-1.2 1-1.6 1-2.8M16 7.5c0-1.2 1-1.6 1-2.8"/>',
       calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
@@ -2069,6 +2075,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const UI_KEY = 'mon-suivi-ui-v1';
   const uiPrefs = (() => { const v = lsGet(UI_KEY); return isObj(v) ? v : {}; })();
   const homeTabs = () => uiPrefs.home !== 'page';
+  /* Thème : celui de l'appareil (par défaut), ou clair / sombre imposé ici. Dans l'artefact, « Système » laisse faire claude.ai. */
+  let themeSet = false;
+  function applyTheme() {
+    const t = uiPrefs.theme, root = document.documentElement;
+    if (t === 'light' || t === 'dark') { root.setAttribute('data-theme', t); themeSet = true; }
+    else if (themeSet) { root.removeAttribute('data-theme'); themeSet = false; }
+  }
+  applyTheme();
   // clé, libellé, icône, libellé court (téléphone)
   const DAY_TABS = [['apercu', 'Aperçu', 'grid'], ['visite', 'Visite', 'visit'], ['supps', 'Compléments', 'pill'], ['repas', 'Eau et repas', 'bowl', 'Repas'], ['journal', 'Journal', 'smile'], ['claude', 'Claude', 'spark']];
   // L'onglet où vit chaque section (pour les anneaux, les rappels et les formulaires).
@@ -2122,7 +2136,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         ${quick('water-add', 'drop', `+ 1 verre`, `${fmtL(ml)} / ${fmtL(goal)} L`, { v: glass })}
         ${quick('ci-new', 'smile', 'Check-in', last ? `dernier à ${str(last.time)}` : 'humeur, énergie…')}
         ${quick('meal-new', 'bowl', 'Repas', listOf(d.meals).length ? plural(listOf(d.meals).length, 'repas noté') : 'rien de noté')}
-        ${quick('sym-new', 'heart', 'Ressenti', listOf(d.symptoms).length ? plural(listOf(d.symptoms).length, 'noté') : 'douleur, sensation')}
+        ${isToday && !str(d.wake) && new Date().getHours() >= 5 && new Date().getHours() < 12 ? quick('wake-now', 'sun', 'Je me lève', 'noter le réveil')
+          : bedNowOffer(k, d, isToday) ? quick('bed-now', 'moon', 'Je me couche', 'noter le coucher')
+          : quick('sym-new', 'heart', 'Ressenti', listOf(d.symptoms).length ? plural(listOf(d.symptoms).length, 'noté') : 'douleur, sensation')}
       </div>
     </section>`;
   }
@@ -2164,6 +2180,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   }
   const HOME_ACTIONS = {
     'day-tab': (d) => setDayTab(d.v),
+    'theme-set': (d) => {
+      uiPrefs.theme = ['light', 'dark'].includes(d.v) ? d.v : 'system';
+      lsSet(UI_KEY, uiPrefs); applyTheme(); render();
+      toast({ light: 'Thème clair', dark: 'Thème sombre', system: 'Thème de l’appareil' }[uiPrefs.theme]);
+    },
     'home-layout': (d) => {
       uiPrefs.home = d.v === 'page' ? 'page' : 'tabs';
       lsSet(UI_KEY, uiPrefs);
@@ -2174,7 +2195,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const tabs = homeTabs();
     return html`<section class="set-sec">
       <div class="field"><span id="home-l">Accueil</span><div class="seg" role="group" aria-labelledby="home-l"><button type="button" data-act="home-layout" data-v="tabs" aria-pressed="${bool(tabs)}">En onglets</button><button type="button" data-act="home-layout" data-v="page" aria-pressed="${bool(!tabs)}">Tout sur une page</button></div></div>
-      <p class="hint">${tabs ? 'L’aperçu montre l’essentiel et ce qu’il y a à faire maintenant ; compléments, eau et repas, journal et Claude ont chacun leur onglet.' : 'Toute la journée sur une seule page, à faire défiler.'} Ce choix reste sur cet appareil.</p>
+      <p class="hint" style="margin:6px 0 14px">${tabs ? 'L’aperçu montre l’essentiel et ce qu’il y a à faire maintenant ; compléments, eau et repas, journal et Claude ont chacun leur onglet.' : 'Toute la journée sur une seule page, à faire défiler.'}</p>
+      <div class="field"><span id="theme-l">Thème</span><div class="seg" role="group" aria-labelledby="theme-l">${[['system', 'Appareil'], ['light', 'Clair'], ['dark', 'Sombre']].map(([v, l]) => html`<button type="button" data-act="theme-set" data-v="${v}" aria-pressed="${bool((uiPrefs.theme || 'system') === v)}">${l}</button>`)}</div></div>
+      <p class="hint">« Appareil » suit le mode clair ou sombre du téléphone ou de l’ordinateur. Ces choix restent sur cet appareil.</p>
     </section>`;
   }
 
@@ -2316,7 +2339,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         ${inp('temp', 'Température (°C)', '35,5 à 37,5', 'decimal')}
         ${inp('waist', 'Tour de taille (cm)', female ? 'moins de 80' : 'moins de 94', 'decimal')}
       </div>
-      ${reads.length ? html`<ul class="vreads">${reads.map((r) => html`<li class="vread ${r.level}"><span class="vdot" aria-hidden="true"></span><span class="vr-txt"><b>${r.what} : ${r.value}</b><span class="vbadge">${r.label}<span class="sr-only"> (${LEVEL_TXT[r.level]})</span></span>${r.tip ? html`<small>${r.tip}</small>` : ''}</span></li>`)}</ul>` : ''}
+      <div data-patch="vreads-${k}">${reads.length ? html`<ul class="vreads">${reads.map((r) => html`<li class="vread ${r.level}"><span class="vdot" aria-hidden="true"></span><span class="vr-txt"><b>${r.what} : ${r.value}</b><span class="vbadge">${r.label}<span class="sr-only"> (${LEVEL_TXT[r.level]})</span></span>${r.tip ? html`<small>${r.tip}</small>` : ''}</span></li>`)}</ul>` : ''}</div>
       ${prev.length ? html`<p class="vhist">Avant : ${prev.map((dk) => `${shortDate(dk)} · ${vitalsRead(visitOf(peekDay(dk))).filter((r) => r.key === 'bp' || r.key === 'pulse').map((r) => r.value).join(', ') || 'mesures notées'}`).join('  —  ')}</p>` : ''}
       <p class="hint" style="margin:6px 0 0">Tension : assis, au calme depuis 5 minutes, bras posé à hauteur du cœur ; fais 2 mesures à 1 minute d’écart et note la moyenne des deux. Repères d’adulte au repos : ton médecin juge selon ton cas.</p>
     </div>`;
@@ -2351,13 +2374,23 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const prev = peekDay(addDays(k, -1));
     const wake = str(d.wake), night = nightLength(prev && prev.bed, wake);
     return html`<section class="card" id="sec-sleep" aria-labelledby="sleep-title">
-      <div class="card-head"><span class="scene" aria-hidden="true">${SCENE.soir}</span><h2 id="sleep-title">Sommeil</h2>${night ? html`<span class="pill">Nuit de ${night}</span>` : ''}</div>
+      <div class="card-head"><span class="scene" aria-hidden="true">${SCENE.soir}</span><h2 id="sleep-title">Sommeil</h2><span data-patch="night-${k}">${night ? html`<span class="pill">Nuit de ${night}</span>` : ''}</span></div>
       <div class="sleep">
         <label class="field"><span>Réveil</span><input type="time" id="wake-${k}" data-bind="wake" data-date="${k}" value="${wake}"></label>
         <label class="field"><span>Coucher</span><input type="time" id="bed-${k}" data-bind="bed" data-date="${k}" value="${str(d.bed)}"></label>
-        ${!wake && isToday ? html`<button type="button" class="chip" data-act="wake-now" data-date="${k}">Je viens de me lever</button>` : ''}
+        ${!wake && isToday && new Date().getHours() >= 5 ? html`<button type="button" class="chip" data-act="wake-now" data-date="${k}">Je viens de me lever</button>` : ''}
+        ${bedNowOffer(k, d, isToday) ? html`<button type="button" class="chip night" data-act="bed-now">Je vais me coucher</button>` : ''}
       </div>
+      <p class="hint" style="margin:10px 0 0">La nuit va du coucher de la veille au réveil du matin. Couché après minuit ? « Je vais me coucher » la range sur la bonne nuit.</p>
     </section>`;
+  }
+  /* « Je vais me coucher » : le soir dès 18 h, ou après minuit (jusqu'à 5 h) pour la nuit de la veille. */
+  function bedNowOffer(k, d, isToday) {
+    if (!isToday) return false;
+    const h = new Date().getHours();
+    if (h >= 18) return !str(d.bed);
+    if (h < 5) return !str((peekDay(addDays(k, -1)) || {}).bed);
+    return false;
   }
   function supplementItem(s, k) {
     const on = isTaken(s.id, k), just = S.ui.just === `${s.id}|${k}`;
@@ -2370,9 +2403,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const list = S.settings.supplements.filter((s) => s.active && s.cure && !isTaken(s.id, k) && curePhase(s.cure, k).phase !== 'prise' && !(s.since && k < s.since));
     if (!list.length) return '';
     return html`<ul class="cure-notes">${list.map((s) => {
-      const ph = curePhase(s.cure, k), when = whenLabel(ph.left);
-      const txt = ph.phase === 'avant' ? `Début de la cure le ${lowDate(ph.next)} (${when}) · ${cureRule(s.cure)}`
-        : `En pause, semaine ${ph.week} sur ${ph.of} · reprise le ${lowDate(ph.next)} (${when})`;
+      const ph = curePhase(s.cure, k), gap = daysBetween(todayKey(), ph.next), when = gap >= 0 ? ` (${whenLabel(gap)})` : '';
+      const txt = ph.phase === 'avant' ? `Début de la cure le ${lowDate(ph.next)}${when} · ${cureRule(s.cure)}`
+        : `En pause, semaine ${ph.week} sur ${ph.of} · reprise le ${lowDate(ph.next)}${when}`;
       return html`<li class="m-${s.moment}"><span class="mico" aria-hidden="true">${ph.phase === 'avant' ? ICON.pill : ICON.pause}</span><span class="ctxt"><b>${s.name}${s.dose ? ` ${s.dose}` : ''}</b><span>${txt}</span></span></li>`;
     })}</ul>`;
   }
@@ -2498,7 +2531,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const entry = (m) => {
       const items = mealItems(m), t = sumMacros(items);
       const kind = str(m.kind) || 'Repas';
-      return html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${kind}${t.n ? ` · ${fmtInt(t.kcal)} kcal` : ''}</span>${m.text ? html`<p class="note">${m.text}</p>` : ''}${items.length ? html`<ul class="items">${items.map((it) => html`<li>${it.name}<span>${num(it.grams) ? `${fmtDec(num(it.grams), 0)} g · ` : ''}${fmtInt(posNum(it.kcal) ?? 0)} kcal</span></li>`)}</ul><p class="macros">${macroLine(t)}</p>` : ''}</div>${rowActions('meal', k, m.id, `${kind.toLowerCase()} de ${str(m.time)}`)}</li>`;
+      return html`<li class="entry"><span class="t">${str(m.time)}</span><div class="e-body"><span class="kind">${kind}${t.n ? ` · ${fmtInt(t.kcal)} kcal` : ''}</span>${m.text ? html`<p class="note">${m.text}</p>` : ''}${items.length ? html`<ul class="items">${items.map((it) => html`<li>${it.name}<span>${num(it.grams) ? `${fmtDec(num(it.grams), 0)} g · ` : ''}${fmtInt(posNum(it.kcal) ?? 0)} kcal</span></li>`)}</ul><p class="macros">${macroLine(t)}</p>` : ''}</div>${rowActions('meal', k, m.id, `${kind === 'Collation' ? 'la' : 'le'} ${kind.toLowerCase()} de ${str(m.time)}`)}</li>`;
     };
     return html`<section class="jsec" id="sec-meals"><div class="sec-head"><h2>Ce que j’ai mangé</h2>${f ? '' : html`<button type="button" class="primary" data-act="meal-new" data-date="${k}">Ajouter</button>`}</div>
       ${nutritionSummary(k, d)}
@@ -2639,7 +2672,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const a = S.ui.ask, txt = SCOPE_TEXT[scope];
     const sent = scope !== 'week' ? (peekDay(key) || {}).sent : null;
     return html`<section class="jsec claude" id="claude" aria-labelledby="claude-title">
-      <div class="sec-head"><h2 id="claude-title">${txt.title}</h2>${isObj(sent) ? html`<span class="pill sent">${ICON.check}Envoyée ${fmtStamp(sent.at)}</span>` : ''}</div>
+      <div class="sec-head"><h2 id="claude-title">${txt.title}</h2>${isObj(sent) ? html`<span class="pill sent">${ICON.check}${scope === 'visit' ? 'Envoyé' : 'Envoyée'} ${fmtStamp(sent.at)}</span>` : ''}</div>
       ${navigator.onLine === false ? html`<p class="hint offline">Hors ligne : tout est enregistré sur cet appareil. Envoie à Claude dès que tu retrouves du réseau, ce soir avec le wifi par exemple.</p>` : ''}
       <p class="hint">${txt.what}${hasProfile() ? ' Ton profil santé est ajouté.' : ' Remplis ton profil santé (Réglages) pour que Claude te connaisse : âge, taille, traitements.'}</p>
       <label class="field"><span>Ta question (facultatif)</span><textarea id="ask-q" data-ask="q" rows="2" placeholder="${txt.placeholder}">${a.q}</textarea></label>
@@ -2772,7 +2805,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       if (str(a.note).trim()) L.push(`  Notes de séance : ${str(a.note).trim()}`);
     });
     if (sch.length || extra.length) {
-      L.push(`Compléments : ${taken.length} sur ${sch.length} pris`);
+      L.push(sch.length ? `Compléments : ${taken.length} sur ${sch.length} pris` : 'Compléments : rien de prévu ce jour-là');
       const fmtSup = (s) => `${s.name}${s.dose ? ' ' + s.dose : ''} (${MOMENTS.find((m) => m.key === s.moment).label.toLowerCase()})`;
       if (taken.length || extra.length) L.push(`- Pris : ${[...taken, ...extra].map(fmtSup).join(', ')}`);
       if (missed.length) L.push(`- Pas pris : ${missed.map(fmtSup).join(', ')}`);
@@ -2916,7 +2949,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const a = S.ui.ask;
     if (!store.sample || a.status === 'thinking' || a.status === 'streaming') return;
     if (navigator.onLine === false) {
-      Object.assign(a, { scope, key, status: 'error', text: '', error: 'Pas de réseau : ta journée est bien enregistrée. Demande à Claude dès que tu as du réseau.' });
+      Object.assign(a, { scope, key, status: 'error', text: '', error: 'Pas de réseau : tout est bien enregistré. Demande à Claude dès que tu as du réseau.' });
       renderAsk();
       return;
     }
@@ -3163,7 +3196,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       <h2 class="sub-title">Médical</h2>
       <label class="field"><span>Traitements en cours</span><textarea id="h-treatments" data-hset="treatments" rows="2" placeholder="Mounjaro 2,5 mg une fois par semaine depuis…">${h.treatments}</textarea></label>
       <label class="field"><span>Problèmes de santé, antécédents</span><textarea id="h-conditions" data-hset="conditions" rows="2" placeholder="Tension, asthme, opération, carence connue…">${h.conditions}</textarea></label>
-      <label class="field"><span>Allergies et intolérances</span><textarea id="h-allergies" data-hset="allergies" rows="2" placeholder="Pénicilline, lactose…">${h.allergies}</textarea></label>
+      <label class="field"><span>Allergies et intolérances</span><textarea id="h-allergies" data-hset="allergies" maxlength="1000" rows="2" placeholder="Pénicilline, lactose…">${h.allergies}</textarea></label>
       <label class="field"><span>Autres infos pour Claude</span><textarea id="set-profile" data-setting="profile" rows="3" placeholder="Ce que tu veux que Claude sache en plus : études, sport, sommeil…">${S.settings.profile}</textarea></label>
       <p class="hint">Tout ce profil est ajouté à chaque envoi à Claude (journée, semaine, bilan du mois).</p>
     </section>`;
@@ -3316,7 +3349,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     },
     affichage: {
       title: 'Affichage', icon: 'grid', cls: 'm-aprem', render: displaySettings,
-      summary: () => (homeTabs() ? 'Accueil en onglets' : 'Accueil : tout sur une page')
+      summary: () => `${homeTabs() ? 'Accueil en onglets' : 'Accueil : tout sur une page'} · thème ${{ light: 'clair', dark: 'sombre' }[uiPrefs.theme] || 'de l’appareil'}`
     },
     donnees: {
       title: 'Sauvegarde et données', icon: 'save', cls: 'm-soir', render: dataSettings,
@@ -3567,8 +3600,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
               <label class="field"><span>Nombre de pas</span><input type="text" inputmode="numeric" id="steps-${k}" data-bind="steps" data-date="${k}" value="${steps ? String(steps) : ''}" placeholder="0" autocomplete="off"></label>
               <div class="actions"><button type="button" class="ghost" data-act="steps-add" data-v="1000" data-date="${k}">+ 1 000</button><button type="button" class="ghost" data-act="steps-add" data-v="500" data-date="${k}">+ 500</button></div>
             </div>
-            <div class="goalbar"><div class="track c-sport" role="img" aria-label="${fmtInt(steps)} pas sur ${fmtInt(sp.steps)}"><i style="width:${Math.min(100, Math.round((steps / sp.steps) * 100))}%"></i></div></div>
-            <p class="hint" style="margin:10px 0 0">${steps >= sp.steps ? 'Objectif atteint.' : `Encore ${fmtInt(sp.steps - steps)} pas.`} Recopie le nombre affiché par ton téléphone ou ta montre.</p>
+            <div data-patch="steps-${k}"><div class="goalbar"><div class="track c-sport" role="img" aria-label="${fmtInt(steps)} pas sur ${fmtInt(sp.steps)}"><i style="width:${Math.min(100, Math.round((steps / sp.steps) * 100))}%"></i></div></div>
+            <p class="hint" style="margin:10px 0 0">${steps >= sp.steps ? 'Objectif atteint.' : `Encore ${fmtInt(sp.steps - steps)} pas.`} Recopie le nombre affiché par ton téléphone ou ta montre.</p></div>
           </section>
           <section class="card" aria-labelledby="sc-title">
             <div class="card-head"><span class="mico m-sport" aria-hidden="true">${ICON.chart}</span><h2 id="sc-title">Séances par semaine</h2></div>
@@ -3602,7 +3635,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const weeks = Array.from({ length: 8 }, (_, i) => { const w = addDays(cur, (i - 7) * 7), s = sportWeek(w); return { w, n: s.count, min: s.minutes }; });
     if (!weeks.some((x) => x.n)) return html`<p class="empty">Ton historique apparaîtra ici dès ta première séance.</p>`;
     const colW = innerWidth >= 900 ? (Math.min(view.clientWidth || 900, 1120) - 90) / 2 - 40 : (view.clientWidth || 360) - 66;
-    const W = Math.round(Math.max(270, Math.min(560, colW))), H = 190, padL = 10, padR = 10, padT = 22, padB = 28;
+    // marge de droite réservée à « Objectif N » : il ne chevauche plus la dernière colonne
+    const W = Math.round(Math.max(270, Math.min(560, colW))), H = 190, padL = 10, padR = 66, padT = 22, padB = 28;
     const top = Math.max(sp.perWeek, ...weeks.map((x) => x.n)) + 1;
     const slot = (W - padL - padR) / weeks.length, bw = Math.min(24, slot * 0.55);
     const Y = (v) => padT + (1 - v / top) * (H - padT - padB), base = H - padB;
@@ -3614,7 +3648,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(`Séances par semaine : ${weeks.map((x) => `semaine du ${shortDate(x.w)}, ${x.n}`).join(' ; ')}`)}">`
       + `<line x1="${padL}" x2="${W - padR}" y1="${base}" y2="${base}" stroke="var(--line)" stroke-width="1"/>`
       + `<line x1="${padL}" x2="${W - padR}" y1="${Y(sp.perWeek).toFixed(1)}" y2="${Y(sp.perWeek).toFixed(1)}" stroke="var(--muted)" stroke-width="1"/>`
-      + `<text x="${W - padR}" y="${(Y(sp.perWeek) - 6).toFixed(1)}" text-anchor="end" font-size="12" font-weight="700" fill="var(--ink)">${esc(`Objectif ${sp.perWeek}`)}</text>`
+      + `<text x="${W - padR + 6}" y="${(Y(sp.perWeek) + 4).toFixed(1)}" text-anchor="start" font-size="11.5" font-weight="700" fill="var(--ink)">${esc(`Objectif ${sp.perWeek}`)}</text>`
       + weeks.map((x, i) => {
         const cx = padL + slot * i + slot / 2, bx = cx - bw / 2;
         const tip = `<title>${esc(`Semaine du ${shortDate(x.w)} : ${plural(x.n, 'séance')}, ${x.min} min`)}</title>`;
@@ -4076,8 +4110,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     saveLive();
   }
   document.addEventListener('visibilitychange', () => {
-    if (!S.live) return;
-    if (document.visibilityState === 'visible') { keepAwake(true); liveTick(); } else saveLive();
+    if (!S.live && !chronoRunning()) return;
+    if (document.visibilityState === 'visible') { keepAwake(true); if (S.live) liveTick(); if (chronoRunning()) chronoTick(); } else if (S.live) saveLive();
   });
 
   /* ---------- Chrono (sprints, corde à sauter) ----------
@@ -4160,13 +4194,15 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (mode === 'sw') {
       const total = swElapsed(c), laps = c.sw.laps, splits = laps.map((t, i) => t - (i ? laps[i - 1] : 0));
       if (total < 1000) return null;
-      return { a, total, sets: splits.length ? splits.map((x) => Math.max(1, Math.round(x / 1000))) : [Math.round(total / 1000)],
+      const rest = laps.length ? total - laps[laps.length - 1] : 0; // temps après le dernier « Tour »
+      const parts = laps.length && rest >= 1000 ? [...splits, rest] : splits;
+      return { a, total, first: c.sw.first || null, sets: parts.length ? parts.map((x) => Math.max(1, Math.round(x / 1000))) : [Math.round(total / 1000)],
         details: splits.length ? `${plural(splits.length, 'tour')} : ${splits.map(fmtTenths).join(' · ')} (total ${fmtTenths(total)})` : `Chrono : ${fmtTenths(total)}` };
     }
     const it = c.it, ms = itElapsed(c), ph = itPhase(ms), w = it.work * 1000, cyc = w + it.rest * 1000;
     const rounds = ph.done ? it.rounds : Math.floor(ms / cyc) + (ms % cyc >= w ? 1 : 0);
     if (!rounds) return null;
-    return { a, total: ms, sets: Array(rounds).fill(it.work),
+    return { a, total: Math.max(0, ms - (it.skipped || 0)), first: it.first || null, sets: Array(rounds).fill(it.work),
       details: `${rounds} × ${fmtSec(it.work)} d’effort, ${fmtSec(it.rest)} de récup${ph.done ? '' : ` (arrêté au tour ${ph.round} sur ${it.rounds})`}` };
   }
   /* La fiche de fin : nom, activité, durée et intensité, pré-remplis et modifiables. */
@@ -4213,13 +4249,13 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const minutes = Math.round(num(sh.minutes) || 0);
       if (!(minutes >= 1 && minutes <= 600)) { toast('Indique la durée en minutes.'); S.ui.focus = '#as-min'; render(); return; }
       for (const f of ['bpmMax', 'bpmAvg']) if (String(sh[f] ?? '').trim() && bpmOf(sh[f]) == null) { toast('Les BPM : un nombre entre 30 et 240.'); S.ui.focus = `#as-bpm-${f === 'bpmMax' ? 'max' : 'avg'}`; render(); return; }
-      const t = todayKey();
-      const entry = { id: newId(), time: timeOf(Date.now() - r.total), kind: 'seance', type: a[2], name, minutes, intensity: intIn(sh.intensity, 1, 3, a[3]), bpmMax: bpmOf(sh.bpmMax), bpmAvg: bpmOf(sh.bpmAvg), details: r.details.slice(0, 500), tpl: null };
+      const startAt = r.first || Date.now() - r.total, t = toKey(new Date(startAt)) <= todayKey() ? toKey(new Date(startAt)) : todayKey();
+      const entry = { id: newId(), time: timeOf(startAt), kind: 'seance', type: a[2], name, minutes, intensity: intIn(sh.intensity, 1, 3, a[3]), bpmMax: bpmOf(sh.bpmMax), bpmAvg: bpmOf(sh.bpmAvg), details: r.details.slice(0, 500), tpl: null };
       mutateDay(t, 'sport', (d) => { d.sport.push(entry); }, false);
       S.ui.date = t; S.ui.just = entry.id;
       toast(`Ajouté à ton activité du jour : ${name}, ${minutes} min`);
     }
-    if (mode === 'sw') S.chrono.sw = { run: null, acc: 0, laps: [] }; else Object.assign(S.chrono.it, { run: null, acc: 0, done: false });
+    if (mode === 'sw') S.chrono.sw = { run: null, acc: 0, laps: [] }; else Object.assign(S.chrono.it, { run: null, acc: 0, done: false, skipped: 0, first: null });
     S.chrono.sheet = null;
     saveChrono(); render();
   }
@@ -4275,7 +4311,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     'as-int': (d) => { if (S.chrono.sheet) { S.chrono.sheet.intensity = Number(d.v); saveChrono(); render(); } },
     'as-save': (d) => chronoSave(d.mode, 'day'),
     'as-live': (d) => chronoSave(d.mode, 'live'),
-    'sw-start': () => { unlockAudio(); S.chrono.sw.run = Date.now(); S.chrono.sheet = null; saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); startChrono(); },
+    'sw-start': () => { unlockAudio(); const sw = S.chrono.sw; sw.run = Date.now(); if (!sw.acc || !sw.first) sw.first = sw.acc ? Date.now() - sw.acc : sw.run; S.chrono.sheet = null; saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); startChrono(); },
     'sw-pause': () => { const sw = S.chrono.sw; sw.acc = swElapsed(); sw.run = null; saveChrono(); S.ui.focus = '[data-act="sw-start"]'; render(); },
     'sw-lap': () => { S.chrono.sw.laps.push(swElapsed()); saveChrono(); S.ui.focus = '[data-act="sw-lap"]'; render(); },
     'sw-reset': () => { S.chrono.sw = { run: null, acc: 0, laps: [] }; S.chrono.sheet = null; saveChrono(); render(); },
@@ -4294,7 +4330,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     },
     'it-start': () => {
       unlockAudio(); tone(1175, 0.3);
-      Object.assign(S.chrono.it, { run: Date.now(), acc: 0, done: false });
+      Object.assign(S.chrono.it, { run: Date.now(), acc: 0, done: false, skipped: 0, first: Date.now() });
       S.chrono.sheet = null;
       chronoMem.key = null; chronoMem.sec = null;
       saveChrono(); S.ui.focus = '[data-act="it-pause"]'; render(); startChrono();
@@ -4303,11 +4339,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     'it-resume': () => { unlockAudio(); S.chrono.it.run = Date.now(); saveChrono(); S.ui.focus = '[data-act="it-pause"]'; render(); startChrono(); },
     'it-skip': () => {
       const it = S.chrono.it, ms = itElapsed(), ph = itPhase(ms);
-      it.acc = ms + ph.left; if (it.run) it.run = Date.now();
+      it.acc = ms + ph.left; it.skipped = (it.skipped || 0) + ph.left; if (it.run) it.run = Date.now(); // le temps sauté ne compte pas dans la durée
       saveChrono(); chronoTick();
     },
     'it-stop': () => { const it = S.chrono.it; it.acc = itElapsed(); it.run = null; it.done = true; saveChrono(); render(); },
-    'it-reset': () => { Object.assign(S.chrono.it, { run: null, acc: 0, done: false }); S.chrono.sheet = null; saveChrono(); render(); }
+    'it-reset': () => { Object.assign(S.chrono.it, { run: null, acc: 0, done: false, skipped: 0, first: null }); S.chrono.sheet = null; saveChrono(); render(); }
   };
   /* ---------- Profils : changer, créer, modifier, supprimer ---------- */
   const initial = (name) => (String(name || '').trim().charAt(0) || '?').toUpperCase();
@@ -4551,7 +4587,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const ms = keys.map(dayMetrics), pick = (f) => ms.map((m) => m[f]);
     const sch = ms.reduce((a, m) => a + m.suppSch, 0), took = ms.reduce((a, m) => a + m.suppTook, 0);
     return {
-      days: ms.length, filled: ms.filter((m) => m.used).length, supp: sch ? took / sch : null, suppTook: took, suppSch: sch,
+      days: ms.length, filled: ms.filter((m) => m.used).length,
+      // jours depuis le premier jour rempli : la moyenne par semaine ne compte pas les semaines d'avant l'app
+      span: ms.findIndex((m) => m.used) < 0 ? 0 : ms.length - ms.findIndex((m) => m.used), supp: sch ? took / sch : null, suppTook: took, suppSch: sch,
       water: mean(pick('water')), waterHit: ms.filter((m) => m.water != null && m.water >= S.settings.goals.water).length,
       kcal: mean(pick('kcal')), p: mean(pick('p')), sessions: ms.reduce((a, m) => a + m.sessions, 0), sportMin: ms.reduce((a, m) => a + (m.sport || 0), 0),
       steps: mean(pick('steps')), sleep: mean(pick('sleep')), mood: mean(pick('mood')), stress: mean(pick('stress')), pain: mean(pick('pain')), energy: mean(pick('energy'))
@@ -4579,7 +4617,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     { id: 'prot', title: 'Protéines', color: 'var(--c-kcal)', val: (m) => m.p, goal: () => S.settings.goals.p, goalFmt: (v) => `${fmtG(v)} g`, fmt: (v) => `${fmtG(v)} g`,
       head: (s) => (s.p == null ? 'rien noté' : `${fmtG(s.p)} g par jour`) },
     { id: 'sport', title: 'Sport', color: 'var(--c-sport)', big: true, val: (m) => m.sport, yearVal: (s) => s.sportMin || null, fmt: (v) => `${fmtInt(v)} min`,
-      head: (s, p) => `${plural(s.sessions, 'séance')} · ${fmtInt(s.sportMin)} min${p.kind !== 'semaine' && s.days >= 7 ? ` · ${fmtDec(s.sessions / (s.days / 7))} séance${s.sessions / (s.days / 7) >= 2 ? 's' : ''} par semaine` : ''}` },
+      head: (s, p) => `${plural(s.sessions, 'séance')} · ${fmtInt(s.sportMin)} min${p.kind !== 'semaine' && s.span >= 7 ? ` · ${fmtDec(s.sessions / (s.span / 7))} séance${s.sessions / (s.span / 7) >= 2 ? 's' : ''} par semaine` : ''}` },
     { id: 'steps', title: 'Pas', color: 'var(--c-sport)', val: (m) => m.steps, goal: () => S.settings.sport.steps, goalFmt: (v) => fmtInt(v), fmt: (v) => `${fmtInt(v)} pas`,
       head: (s) => (s.steps == null ? 'rien noté' : `${fmtInt(s.steps)} par jour`) },
     { id: 'sleep', title: 'Sommeil', color: 'var(--c-mind)', val: (m) => m.sleep, goal: () => 8, goalFmt: () => '8 h', fmt: (v) => fmtDuration(Math.round(v * 60)),
@@ -4607,7 +4645,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     metricsCache.clear();
     const t = todayKey(), bs = S.ui.bilan, p = periodOf(bs.kind, bs.anchor);
     const past = daysIn(p.start, p.end < t ? p.end : t).filter((k) => k <= t);
-    const pp = periodOf(bs.kind, shiftPeriod(p, -1)), prevDays = daysIn(pp.start, pp.end).filter((k) => k <= t);
+    const pp = periodOf(bs.kind, shiftPeriod(p, -1));
+    // période en cours : face aux mêmes premiers jours de la période d'avant (lundi → mardi contre lundi → mardi)
+    const prevDays = daysIn(pp.start, p.start <= t && t <= p.end ? (addDays(pp.start, past.length - 1) < pp.end ? addDays(pp.start, past.length - 1) : pp.end) : pp.end).filter((k) => k <= t);
     const s = summarize(past), ps = summarize(prevDays);
     const isCurrent = p.start <= t && t <= p.end, canNext = p.end < t;
     const vsLabel = `par rapport à ${bs.kind === 'semaine' ? 'la semaine' : bs.kind === 'mois' ? 'le mois' : 'l’année'} d’avant`;
@@ -4615,12 +4655,12 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const wins = weighIns(), wIn = wins.filter((x) => x.k >= p.start && x.k <= p.end), wLast = wIn[wIn.length - 1], wBefore = wLast ? wins.filter((x) => x.k < wLast.k).pop() : null;
     const cmp = ps.filled > 0, dt = (a, b, kind) => (cmp ? deltaText(a, b, kind) : null);
     const tile = (label, value, sub, dl) => html`<div class="stat"><span>${label}</span><b>${value}</b>${sub ? html`<small>${sub}</small>` : ''}${dl ? html`<em class="delta ${dl.cls}" title="${vsLabel}">${dl.text}</em>` : ''}</div>`;
-    const perWeek = s.days >= 7 ? s.sessions / (s.days / 7) : null;
+    const perWeek = bs.kind !== 'semaine' && s.span >= 7 ? s.sessions / (s.span / 7) : null;
     const tiles = html`<div class="stats bilan-tiles">
       ${tile('Compléments', s.supp == null ? '—' : `${Math.round(s.supp * 100)} %`, s.suppSch ? `${s.suppTook} pris sur ${s.suppSch}` : 'rien de coché', dt(s.supp, ps.supp, 'supp'))}
       ${tile('Eau', s.water == null ? '—' : `${fmtL(s.water * 1000)} L`, s.water == null ? 'rien noté' : `par jour · objectif ${fmtDec(S.settings.goals.water)} L`, dt(s.water, ps.water, 'water'))}
       ${tile('Calories', s.kcal == null ? '—' : fmtInt(s.kcal), s.kcal == null ? 'rien noté' : `kcal par jour · protéines ${fmtG(s.p)} g`, dt(s.kcal, ps.kcal, 'kcal'))}
-      ${tile('Sport', plural(s.sessions, 'séance'), `${fmtInt(s.sportMin)} min${perWeek != null ? ` · ${fmtDec(perWeek)} par semaine` : ` · objectif ${S.settings.sport.perWeek}`}`, dt(s.sessions, ps.sessions, 'sessions'))}
+      ${tile('Sport', plural(s.sessions, 'séance'), `${fmtInt(s.sportMin)} min${perWeek != null ? ` · ${fmtDec(perWeek)} par semaine` : ` · objectif ${S.settings.sport.perWeek} par semaine`}`, dt(s.sessions, ps.sessions, 'sessions'))}
       ${tile('Pas', s.steps == null ? '—' : fmtInt(s.steps), s.steps == null ? 'rien noté' : 'par jour', dt(s.steps, ps.steps, 'steps'))}
       ${tile('Sommeil', s.sleep == null ? '—' : fmtDuration(Math.round(s.sleep * 60)), s.sleep == null ? 'rien noté' : 'par nuit', dt(s.sleep, ps.sleep, 'sleep'))}
       ${tile('Humeur', s.mood == null ? '—' : `${fmtAvg(s.mood)}/5`, s.stress != null ? `stress ${fmtAvg(s.stress)}/5` : s.mood == null ? 'pas de check-in' : 'moyenne sur 5', dt(s.mood, ps.mood, 'mood'))}
@@ -5027,6 +5067,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const view = document.getElementById('view');
   const VIEWS = { jour: renderDay, calendrier: renderCalendar, sport: renderSport, sante: renderHealth, reglages: renderSettings };
   let pendingRender = false;
+  let toggling = null; // volet (<details>) touché dont l'événement « toggle » n'est pas encore arrivé
+  function noteToggle(t) {
+    const k = t.dataset.toggle;
+    if (k === 'labs') S.ui.labsOpen = t.open; else if (k === 'apptPast') S.ui.apptPast = t.open; else if (k === 'report') S.ui.ask.showReport = t.open;
+  }
   /* Le bouton qui a le focus est recréé à chaque rendu : on retrouve le même (mêmes data-*) pour garder la place au clavier. */
   const FOCUS_ATTRS = ['data-act', 'data-sid', 'data-date', 'data-id', 'data-scale', 'data-v', 'data-scope', 'data-key'];
   function focusedButton() {
@@ -5041,6 +5086,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     });
     if (!S.ready) { view.innerHTML = '<p class="loading">Chargement de tes données…</p>'; refreshWho(); return; }
     pendingRender = false;
+    if (toggling && view.contains(toggling)) noteToggle(toggling);
+    toggling = null;
     const explicit = S.ui.focus, keep = explicit || focusedButton();
     view.innerHTML = String((VIEWS[S.ui.view] || renderDay)());
     S.ui.just = null;
@@ -5062,12 +5109,33 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const a = document.activeElement;
     return !!(a && view.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'checkbox' && a.type !== 'file');
   }
-  function safeRender() { if (isEditing()) { pendingRender = true; return; } render(); }
+  /* Pendant la saisie, quand le doigt est posé, ou quand on vient de quitter un champ (en touchant le suivant,
+     le focus n'y est pas encore), le rendu attend : sinon il recréerait le champ touché (le clavier se
+     refermerait) ou avalerait le clic. */
+  let leaving = false;
+  const renderSoon = () => setTimeout(() => { if (pendingRender && !pressing && !isEditing()) render(); }, 30);
+  function safeRender() {
+    if (isEditing() || pressing || leaving) { pendingRender = true; patchLive(); if (leaving && !pressing && !isEditing()) renderSoon(); return; }
+    render();
+  }
+  /* En attendant le rendu, les zones d'affichage marquées data-patch (verdict de tension, pas restants, durée
+     de la nuit…) suivent tout de suite : on les reprend d'un rendu à blanc, sans toucher aux champs. */
+  function patchLive() {
+    const live = view.querySelectorAll('[data-patch]');
+    if (!S.ready || !live.length) return;
+    const tmp = document.createElement('div');
+    try { tmp.innerHTML = String((VIEWS[S.ui.view] || renderDay)()); } catch (e) { return; }
+    live.forEach((el) => {
+      const fresh = tmp.querySelector(`[data-patch="${CSS.escape(el.dataset.patch)}"]`);
+      if (fresh && fresh.innerHTML !== el.innerHTML) el.innerHTML = fresh.innerHTML;
+    });
+  }
   // Un rendu différé attend que le doigt ou la souris soit relâché : le clic en cours arrive d'abord à son bouton.
   let pressing = false;
   document.addEventListener('pointerdown', () => { pressing = true; if (S.live && S.live.sound !== false) unlockAudio(); }, true);
-  document.addEventListener('pointercancel', () => { pressing = false; }, true);
-  document.addEventListener('pointerup', () => { pressing = false; if (pendingRender) setTimeout(() => { if (pendingRender && !isEditing()) render(); }, 0); }, true);
+  const afterPress = () => { pressing = false; if (pendingRender) renderSoon(); };
+  document.addEventListener('pointercancel', afterPress, true);
+  document.addEventListener('pointerup', afterPress, true);
   document.addEventListener('focusout', () => {
     if (!pendingRender) return;
     setTimeout(() => { if (pendingRender && !pressing && !isEditing()) render(); }, 60);
@@ -5171,7 +5239,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   };
   function buildCSV() {
-    const rows = [['Date', 'Réveil', 'Coucher', 'Poids (kg)', 'Eau (L)', 'Pas', 'Sport (min)', 'Activités', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Ressenti', 'Repas', 'Calories', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Notes']];
+    const rows = [['Date', 'Réveil', 'Coucher', 'Poids (kg)', 'Tension (mmHg)', 'Pouls (bpm)', 'Prise de sang', 'Médecin', 'Eau (L)', 'Pas', 'Sport (min)', 'Activités', 'Compléments pris', 'Compléments prévus', 'Check-ins', 'Ressenti', 'Repas', 'Calories', 'Protéines (g)', 'Glucides (g)', 'Lipides (g)', 'Rendez-vous', 'Notes']];
     const dash = (v) => v ?? '-';
     Object.keys(S.months).sort().forEach((mk) => {
       Object.keys(S.months[mk].days || {}).sort().forEach((k) => {
@@ -5182,10 +5250,13 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         const ml = listOf(d.meals).sort(byTime).map((x) => `${str(x.time)} ${str(x.kind) || 'Repas'} : ${[str(x.text), mealItems(x).map((it) => `${it.name}${num(it.grams) ? ` ${it.grams} g` : ''}`).join(', ')].filter(Boolean).join(' — ')}`).join(' | ');
         const hasTaken = isObj(d.taken) && Object.values(d.taken).some(Boolean);
         const t = sumMacros(dayItems(d)), w = weightOf(d);
-        const acts = sportOf(d).sort(byTime).map((a) => `${str(a.time)} ${entryName(a)}${a.minutes ? ` ${a.minutes} min` : ''}${a.details ? ` (${a.details})` : ''}`).join(' | ');
-        if (!str(d.wake) && !str(d.bed) && !w && !waterOf(d) && !stepsOf(d) && !acts && !ci && !sy && !ml && !str(d.notes) && !hasTaken) return;
+        const acts = sportOf(d).sort(byTime).map((a) => `${str(a.time)} ${entryName(a)}${a.minutes ? ` ${a.minutes} min` : ''}${bpmText(a, true) ? `, ${bpmText(a, true)}` : ''}${a.details ? ` (${a.details})` : ''}`).join(' | ');
+        const vis = visitOf(d) || {}, sys = vitalOf(vis, 'sys'), dia = vitalOf(vis, 'dia'), pulse = vitalOf(vis, 'pulse');
+        const labs = LABS.filter(([key]) => str((vis.labs || {})[key]).trim()).map(([key, label]) => `${label} ${str(vis.labs[key]).trim()}`).concat(str(vis.labsText).trim() ? [str(vis.labsText).trim()] : []).join(' | ');
+        const ap = apptsOn(k).map(apptText).join(' | ');
+        if (!str(d.wake) && !str(d.bed) && !w && !waterOf(d) && !stepsOf(d) && !acts && !ci && !sy && !ml && !str(d.notes) && !hasTaken && !visitOf(d) && !ap) return;
         const st = stats(k);
-        rows.push([k, str(d.wake), str(d.bed), w ? fmtDec(w) : '', waterOf(d) ? fmtL(waterOf(d)) : '', stepsOf(d) || '', minutesOf(sportOf(d)) || '', acts, st.taken, st.total, ci, sy, ml, t.n ? Math.round(t.kcal) : '', t.n ? fmtDec(t.p) : '', t.n ? fmtDec(t.g) : '', t.n ? fmtDec(t.l) : '', str(d.notes)]);
+        rows.push([k, str(d.wake), str(d.bed), w ? fmtDec(w) : '', sys && dia ? `${sys}/${dia}` : '', pulse || '', labs, str(vis.notes).trim(), waterOf(d) ? fmtL(waterOf(d)) : '', stepsOf(d) || '', minutesOf(sportOf(d)) || '', acts, st.taken, st.total, ci, sy, ml, t.n ? Math.round(t.kcal) : '', t.n ? fmtDec(t.p) : '', t.n ? fmtDec(t.g) : '', t.n ? fmtDec(t.l) : '', ap, str(d.notes)]);
       });
     });
     return '﻿' + rows.map((r) => r.map(csvCell).join(';')).join('\r\n');
@@ -5279,7 +5350,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const where = PLATFORM.native ? 'cette tablette' : PLATFORM.electron ? 'ce PC' : 'ce navigateur';
     return html`<div class="banner backup" role="note"><span class="mico" aria-hidden="true">${ICON.save}</span><p class="btxt"><b>${age == null ? 'Fais une première sauvegarde' : `Dernière sauvegarde il y a ${age} jours`}</b><span>Ton journal n’est que sur ${where}. Garde une copie (Drive, e-mail…) au cas où.</span></p><div class="actions"><button type="button" class="primary" data-act="backup-file">Sauvegarder maintenant</button><button type="button" class="link" data-act="backup-later">Plus tard</button></div></div>`;
   }
-  function exportCSV() { offerFile(`mon-suivi-journal-${todayKey()}.csv`, buildCSV()); }
+  function exportCSV() { offerFile(`mon-suivi-${fileTag()}journal-${todayKey()}.csv`, buildCSV()); }
   function copyExport() {
     copyText(S.ui.exportText || '').then((ok) => {
       if (ok) { toast('Copié'); return; }
@@ -5409,6 +5480,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const te = S.ui.tplEdit;
       if (!te) return;
       if (!String(te.draft.name || '').trim()) { toast('Donne un nom à la séance.'); return; }
+      if (intIn(te.draft.minutes, 5, 300, null) == null) { toast('Durée : entre 5 et 300 minutes.'); return; }
       const tp = normalizeTemplate({ ...te.draft, id: te.id || newId() });
       mutateSettings((st) => {
         const i = st.sport.templates.findIndex((x) => x.id === tp.id);
@@ -5493,6 +5565,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       go(d.date);
       const el = document.getElementById('visit');
       if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    },
+    'bed-now': () => {
+      const t = nowTime(), late = new Date().getHours() < 5, k = late ? addDays(todayKey(), -1) : todayKey();
+      mutateDay(k, 'bed', (day) => { day.bed = t; });
+      toast(`Coucher noté à ${t}${late ? ', pour la nuit d’hier' : ''}. Bonne nuit !`);
     },
     'wake-now': (d) => {
       const t = nowTime();
@@ -5651,7 +5728,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         S.ui.exportText = data; S.ui.focus = '#export-text'; S.ui.select = true; render();
       });
     },
-    'day-file': (d) => offerFile(`mon-suivi-${d.date}.md`, claudeText(scopeFor(d.date), d.date, '', false)),
+    'day-file': (d) => offerFile(`mon-suivi-${fileTag()}${d.date}.md`, claudeText(scopeFor(d.date), d.date, '', false)),
     'day-copy': (d) => {
       copyText(claudeText(scopeFor(d.date), d.date, '', false)).then((ok) => toast(ok ? 'Journée copiée pour Claude' : 'Impossible de copier ici : utilise « Télécharger pour Claude ».'));
     },
@@ -5697,6 +5774,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     else if (f === 'name') s.name = String(v).trim() || 'Sans nom';
     else if (f === 'dose' || f === 'note') s[f] = String(v);
   }
+  // Un « change » alors que le champ n'a plus le focus : on vient de le quitter (voir safeRender).
+  app.addEventListener('change', (e) => { if (document.activeElement !== e.target) { leaving = true; setTimeout(() => { leaving = false; }, 0); } }, true);
   app.addEventListener('change', (e) => {
     const t = e.target, ds = t.dataset;
     if (!S.ready || !ds) return;
@@ -5708,15 +5787,22 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     } else if (ds.live) {
       onLiveInput(ds.live, t);
     } else if (ds.bind === 'steps') {
-      const n = Math.round(num(String(t.value).replace(/[\s.,]/g, '')) || 0);
-      if (String(t.value).trim() && (n < 0 || n > 100000)) { toast('Entre 0 et 100 000 pas.'); return; }
-      mutateDay(ds.date, 'steps', (d) => { d.steps = n; }, false);
+      const raw = String(t.value).trim(), n = raw ? num(raw.replace(/[\s.,]/g, '')) : 0;
+      if (raw && (n == null || n < 0 || n > 100000)) { toast('Entre 0 et 100 000 pas.'); t.value = stepsOf(peekDay(ds.date)) ? String(stepsOf(peekDay(ds.date))) : ''; return; }
+      mutateDay(ds.date, 'steps', (d) => { d.steps = Math.round(n); }, false);
+      t.value = n ? String(Math.round(n)) : '';
       safeRender();
     } else if (ds.spset) {
-      const key = ds.spset;
-      mutateSettings((st) => { st.sport = normalizeSport({ ...st.sport, [key]: t.value }); });
+      const key = ds.spset, lim = { perWeek: [1, 14, 'séances par semaine'], minMin: [5, 240, 'minutes'], maxMin: [5, 240, 'minutes'], steps: [1000, 50000, 'pas'] }[key];
+      const n = Math.round(num(String(t.value).replace(/\s/g, '')));
+      if (!lim || !Number.isFinite(n) || n < lim[0] || n > lim[1]) { toast(`Entre ${fmtInt(lim ? lim[0] : 0)} et ${fmtInt(lim ? lim[1] : 0)} ${lim ? lim[2] : ''}.`); t.value = S.settings.sport[key]; return; }
+      mutateSettings((st) => { st.sport = normalizeSport({ ...st.sport, [key]: n }); }, false);
+      t.value = S.settings.sport[key]; // valeur retenue (la durée max ne descend pas sous la durée min)
+      if (key === 'minMin') { const mx = document.getElementById('sp-maxMin'); if (mx) mx.value = S.settings.sport.maxMin; }
+      safeRender(); // le résumé suit quand on quitte le champ
     } else if (ds.plan) {
-      mutateSettings((st) => { st.sport.plan[Number(ds.plan)] = t.value || null; });
+      mutateSettings((st) => { st.sport.plan[Number(ds.plan)] = t.value || null; }, false);
+      safeRender();
     } else if (ds.tpl && S.ui.tplEdit) {
       S.ui.tplEdit.draft[ds.tpl] = t.value;
     } else if (ds.vm) {
@@ -5774,16 +5860,23 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     } else if (ds.goal === 'glass') {
       mutateSettings((st) => { st.goals.glass = Number(t.value) || 250; }, false);
     } else if (ds.goal) {
-      const n = posNum(t.value);
+      const n = posNum(t.value), old = S.settings.goals[ds.goal];
+      if (String(t.value).trim() && !n) { toast(ds.goal === 'kcal' ? 'Écris un nombre de calories, par exemple 2 000.' : 'Écris un nombre de grammes, par exemple 120.'); t.value = old ? fmtDec(old) : ''; return; }
       mutateSettings((st) => { st.goals[ds.goal] = n ? round1(n) : null; }, false);
       t.value = n ? fmtDec(round1(n)) : '';
     } else if (ds.hset && !['treatments', 'conditions', 'allergies'].includes(ds.hset)) {
-      const key = ds.hset, v = t.value.trim();
-      mutateSettings((st) => { st.health = normalizeHealth({ ...st.health, [key]: key === 'birth' || key === 'activity' ? v : num(v) }); }, false);
-      const n = S.settings.health[key];
-      if (v && (n == null || n === '')) toast(key === 'height' ? 'Taille en centimètres, par exemple 180.' : key === 'birth' ? 'Choisis ta date de naissance.' : 'Poids en kilos, par exemple 82,5.');
+      const key = ds.hset, v = t.value.trim(), old = S.settings.health[key];
+      let val = key === 'birth' || key === 'activity' ? v : num(v.replace(/\s*(cm|kg|m)$/i, ''));
+      if (key === 'height' && val != null && val >= 1 && val <= 2.5) val = val * 100; // « 1,80 » : des mètres
+      const next = normalizeHealth({ ...S.settings.health, [key]: val }), n = next[key];
+      if (v && (n == null || n === '')) {
+        toast(key === 'height' ? 'Taille en centimètres, par exemple 180 (ou 1,80 m).' : key === 'birth' ? 'Choisis ta date de naissance.' : 'Poids en kilos, par exemple 82,5.');
+        if (key !== 'birth' && key !== 'activity') t.value = old ? fmtDec(old) : '';
+        return;
+      }
+      mutateSettings((st) => { st.health = next; }, false);
       if (key !== 'birth' && key !== 'activity') t.value = n ? fmtDec(n) : '';
-      if (key === 'birth') render();
+      safeRender(); // âge, IMC…
     } else if (ds.dossier) {
       if (isKey(t.value)) { S.ui.dossier[ds.dossier] = t.value; render(); }
     } else if (ds.setting === 'cureNotify') {
@@ -5873,13 +5966,13 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   }
   app.addEventListener('toggle', (e) => {
     const t = e.target;
-    if (!t.dataset) return;
-    if (t.dataset.toggle === 'labs') { S.ui.labsOpen = t.open; return; }
-    if (t.dataset.toggle === 'apptPast') { S.ui.apptPast = t.open; return; }
-    if (t.dataset.toggle !== 'report') return;
-    S.ui.ask.showReport = t.open;
-    refreshReport();
+    if (!t.dataset || !t.dataset.toggle) return;
+    if (toggling === t) toggling = null;
+    noteToggle(t);
+    if (t.dataset.toggle === 'report') refreshReport();
   }, true); // « toggle » ne remonte pas : on l'écoute à la descente
+  // Un volet qu'on vient d'ouvrir : si un rendu passe avant son « toggle », il le retrouve ouvert.
+  app.addEventListener('click', (e) => { const sm = e.target.closest && e.target.closest('summary'); if (sm && sm.parentElement && sm.parentElement.dataset.toggle) toggling = sm.parentElement; }, true);
 
   /* Nouveau jour, retour sur la page, connexion retrouvée, fermeture */
   let lastToday = todayKey();
