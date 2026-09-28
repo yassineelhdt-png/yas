@@ -61,6 +61,9 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   créneau quand le plan se décale, synchro de l'artefact qui ne perd plus rien à la connexion, heures saisies
   au clavier enregistrées une fois finies, replanification pendant un trajet, contrastes et cibles tactiles,
   vue Semaine lisible sur téléphone.
+- **« C'est fait »** directement dans la carte « En ce moment » (la séance en cours, ou celle que tu viens de
+  finir pendant la pause) ; bilan **« Ta semaine »** (coché / prévu, jour par jour) dans la vue Semaine.
+- La **préparation de la séance du lendemain** passe avant les cours reportés ; si elle ne tient pas, une alerte le dit.
 - Carte **« En ce moment »** : le créneau en cours, le temps restant et ce qui suit.
 - Barre de navigation en bas sur téléphone, onglets en haut sur tablette / PC ; le bouton retour ramène à la vue Jour.
 - **Glisser** gauche / droite pour changer de jour ; raccourcis clavier sur PC (← →, T, 1‑4).

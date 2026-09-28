@@ -33,9 +33,14 @@
 .tot .b { height: 10px; border-radius: 99px; background: var(--line-2); overflow: hidden; }
 .tot .b span { display: block; height: 100%; background: var(--c); border-radius: 99px; }
 .tot em { font-style: normal; font-family: var(--mono); font-size: 12.5px; text-align: right; color: var(--ink-2); }
+/* bilan de la semaine : une ligne par jour, cliquable */
+.tot.day { all: unset; display: grid; grid-template-columns: 120px minmax(0, 1fr) 96px; gap: 10px; align-items: center; font-size: 13.5px; cursor: pointer; border-radius: 6px; padding: 2px 0; --c: var(--ok); }
+.tot.day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tot.day.today span:first-child { font-weight: 600; color: var(--accent); }
 
 @media (max-width: 520px) {
   .tot { grid-template-columns: 92px minmax(0, 1fr) 56px; }
+  .tot.day { grid-template-columns: 56px minmax(0, 1fr) 92px; }
   /* téléphone : les 7 jours d'un coup d'œil (couleurs seulement) ; toucher un jour pour l'ouvrir */
   .wscroll { padding-inline: 6px; }
   .wgrid { min-width: 0; grid-template-columns: 26px repeat(7, minmax(0, 1fr)); gap: 0 3px; }

@@ -370,6 +370,16 @@ function finish(res, S, queue, weekMin, goals) {
     it.key = seen[base] > 1 ? base + "#" + seen[base] : base;
   }
 
+  // (règles v2) préparation de demain qui n'a pas trouvé sa place : on le dit
+  if (grouped && v2(S)) {
+    const got = {};
+    for (const ch of chunks) for (const t of ch.tasks || []) got[t.title] = (got[t.title] || 0) + t.min;
+    for (const q of queue) {
+      if (q.kind !== "prep" || q.min < 30 || (got[q.title] || 0) >= q.min - 10) continue;
+      res.warnings.push(q.title + " : seulement " + (got[q.title] || 0) + " min sur " + q.min + " dans le plan. Garde-toi ce temps demain avant la séance.");
+    }
+  }
+
   // ce qui compte dans l'objectif net
   let net = 0;
   const byS = {};
@@ -420,7 +430,7 @@ function finish(res, S, queue, weekMin, goals) {
   if (fit?.mode === "late") res.warnings.push("Impossible de finir à " + hm(fit.endAt) + " : tes séances à l'unif (avec les trajets et le déjeuner) vont au-delà.");
   if (fit?.mode === "invalid") res.warnings.push("L'heure de fin (" + hm(fit.endAt) + ") tombe avant " + (res.mode === "concours" ? "la fin du concours blanc" : "le début") + " : elle est ignorée.");
   if (res.end > 23 * 60) res.warnings.push("La journée finit après 23h. Lève-toi plus tôt demain pour garder tes " + S.sleepH + "h de sommeil.");
-  for (const it of res.missed || []) res.warnings.push(evLabel(it) + " (" + hm(it.s0 || it.s) + ") est déjà passé : pas compté.");
+  for (const it of res.missed || []) res.warnings.push("Séance déjà passée : " + evLabel(it) + " (" + hm(it.s0 || it.s) + "), pas comptée.");
   for (const it of res.items) if (it.conflict) res.warnings.push(evLabel(it) + " chevauche une autre séance : vérifie tes présences.");
   return carry;
 }

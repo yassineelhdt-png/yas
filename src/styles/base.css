@@ -108,7 +108,7 @@ label.btn { cursor: pointer; }
 .seg button[aria-checked="true"] { background: var(--ink); color: var(--bg); }
 
 /* retour visuel au toucher (la surbrillance native est désactivée) */
-:is(.nowcard, .seg button, .tab, .btab, .whead button):active { filter: brightness(.95); }
+:is(.now-main, .seg button, .tab, .btab, .whead button):active { filter: brightness(.95); }
 
 /* écrans tactiles : cibles d'au moins 44 px, et champs à 16 px (sinon iOS zoome à chaque saisie) */
 @media (pointer: coarse) {

@@ -1,7 +1,8 @@
 // Vue « Semaine » : agenda des 7 jours, répartition par matière, séances suivies.
 import { html, nothing } from "lit-html";
 import * as E from "../engine/index.js";
-import { cv, shortDay, dayMonth, mainTask } from "./format.js";
+import { cv, shortDay, dayMonth, mainTask, isDone } from "./format.js";
+import { getDay } from "../store.js";
 import { icons } from "./icons.js";
 import { goalsCard } from "./goals.js";
 
@@ -55,6 +56,16 @@ export function weekView(week, nav) {
     for (const it of r.items) if (it.kind === "fixed" && it.counts) fixed += it.e - it.s;
   }
   const mx = Math.max(1, ...TOTAL_ORDER.map((k) => tot[k] || 0));
+  // bilan : prévu et coché, jour par jour
+  const days = week.map((r) => {
+    const done = (getDay(r.date) || {}).done || {};
+    let did = r.replanStudied || 0;
+    for (const it of r.items) if (it.counts && isDone(done, it)) did += it.e - it.s;
+    return { r, did };
+  });
+  const didAll = days.reduce((a, d) => a + d.did, 0);
+  const upTo = days.filter((d) => d.r.date <= today);
+  const dueAll = upTo.reduce((a, d) => a + d.r.net, 0);
   const seances = week.flatMap((r) => r.items.filter((it) => it.kind === "fixed").map((it) => html`
     <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}</div></div>`));
 
@@ -89,6 +100,18 @@ export function weekView(week, nav) {
       </div>
     </div>
     <div class="wcards">
+      <div class="card">
+        <h2>Ta semaine</h2>
+        <p class="sub">${E.hdur(didAll)} cochées${upTo.length ? " sur " + E.hdur(dueAll) + " prévues jusqu'à " + (upTo.length === 7 ? "dimanche" : "aujourd'hui") : ""} · ${E.hdur(net)} au programme sur la semaine.</p>
+        <div class="totals">
+          ${days.map(({ r, did }) => html`
+            <button class="tot day ${r.date === today ? "today" : ""}" @click=${() => nav.openDay(r.date)}>
+              <span>${shortDay(r.date)}</span>
+              <div class="b" role="progressbar" aria-valuemin="0" aria-valuemax=${r.net} aria-valuenow=${did} aria-label=${"Coché le " + shortDay(r.date)}><span style="width:${Math.min(100, (did / Math.max(1, r.net)) * 100).toFixed(1)}%"></span></div>
+              <em>${E.hdur(did)} / ${E.hdur(r.net)}</em>
+            </button>`)}
+        </div>
+      </div>
       ${goalsCard(week, { onEdit: nav.editGoals })}
       <div class="card">
         <h2>Répartition de la semaine</h2>

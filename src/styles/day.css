@@ -15,6 +15,11 @@
   position: relative; overflow: hidden;
 }
 .nowcard::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--c); }
+.now-main { all: unset; display: grid; gap: 4px; cursor: pointer; border-radius: 8px; }
+.now-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.now-done { justify-self: start; margin-top: 8px; max-width: 100%; }
+.now-done .ico-check { width: 16px; height: 16px; flex: none; color: var(--ok); }
+.now-done span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .now-l1 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .now-kicker { font-size: 11.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: color-mix(in srgb, var(--c) 60%, var(--ink)); }
 .now-left { font-size: 13px; color: var(--ink-2); }

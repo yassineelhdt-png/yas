@@ -176,7 +176,7 @@ function replanDefaults(res, at, done) {
 }
 
 // ---------- morceaux de la vue ----------
-function nowCard(res, st, nm) {
+function nowCard(res, st, nm, done) {
   const items = res.items.filter((it) => it.e > it.s && !it.past);
   if (!items.length) return nothing;
   const cur = items.find((it) => nm >= it.s && nm < it.e);
@@ -201,11 +201,17 @@ function nowCard(res, st, nm) {
       <div class="now-title">${E.hdur(res.net)} nettes au programme. Bravo.</div>`;
   }
   const c = cur ? itemColor(cur) : "var(--accent)";
+  // cocher sans chercher dans la frise : la séance en cours, ou celle qu'on vient de finir (pendant la pause)
+  const prev = items.filter((it) => MAJOR.has(it.kind) && !it.missed && it.e <= nm && nm - it.e <= 90).at(-1);
+  const target = cur && MAJOR.has(cur.kind) ? cur : prev;
+  const canCheck = target && !isDone(done, target);
+  const show = () => document.querySelector(".row.now, .row.next")?.scrollIntoView({ behavior: "smooth", block: "center" });
   return html`
-    <button class="card nowcard" style="--c:${c}" @click=${() => document.querySelector(".row.now, .row.next")?.scrollIntoView({ behavior: "smooth", block: "center" })}>
-      ${body}
+    <div class="card nowcard" style="--c:${c}">
+      <button class="now-main" @click=${show} aria-label="Voir dans le planning">${body}</button>
+      ${canCheck ? html`<button class="btn now-done" @click=${() => { act.toggleDone(target); toast("Coché : " + itemTitle(target, st, res)); }}>${icons.check()}<span>${target === cur ? "C'est fait" : "Fini : " + itemTitle(target, st, res)}</span></button>` : nothing}
       ${next && cur ? html`<div class="now-next"><span class="lbl">Ensuite</span> <b>${itemTitle(next, st, res)}</b> <span class="mono">${E.hm(next.s)}</span></div>` : nothing}
-    </button>`;
+    </div>`;
 }
 
 function header(res, st, ctx) {
@@ -227,7 +233,7 @@ function header(res, st, ctx) {
           <span class="chip mode-${res.mode}">${modeText(res)}</span>
         </div>
       </div>
-      ${isToday ? nowCard(res, st, ctx.nm) : nothing}
+      ${isToday ? nowCard(res, st, ctx.nm, ctx.done) : nothing}
       <div class="wake card">
         <div class="times">
           <label><span class="lbl">Levé à</span>${timeField("t-wake", E.hm(res.wake), act.wake)}</label>

@@ -195,7 +195,10 @@ export function assignGrouped(chunks, queue, weekMin, blocus, strict = false) {
       const sq = byKind((t) => t.kind === "prep" && t.min < 30);
       const ex = A > g.req && isRot(pick) ? [rotTask(pick, A - g.req, blocus)] : [];
       const thReady = !g.after || g.after <= now + 15;
-      const seq = thReady ? [...bl, ...th, ...pr, ...ex, ...sq] : [...bl, ...pr, ...ex, ...th, ...sq];
+      // (règles v2) la préparation de la séance de demain a une échéance : elle passe avant les reports
+      const seq = strict
+        ? (thReady ? [...pr, ...bl, ...th, ...ex, ...sq] : [...pr, ...bl, ...ex, ...th, ...sq])
+        : thReady ? [...bl, ...th, ...pr, ...ex, ...sq] : [...bl, ...pr, ...ex, ...th, ...sq];
       let left = A;
       for (const t0 of seq) {
         // (règles v2) un cours du jour n'est jamais placé avant la fin du cours : il passe à demain

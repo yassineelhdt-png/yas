@@ -77,9 +77,12 @@ function mergeTasks(tasks) {
 }
 const plain = (x) => JSON.parse(JSON.stringify(x, (k, v) =>
   NEW_KEYS.includes(k) ? undefined : k === "tasks" && Array.isArray(v) ? mergeTasks(v.map((t) => ({ ...t, title: once(t.title) }))) : once(v)));
-// la clé « type@HH:MM » de la v1 est devenue legacyKey en v2
+// la clé « type@HH:MM » de la v1 est devenue legacyKey en v2 ; le message « X (10:00) est déjà passé »
+// est devenu « Séance déjà passée : X (10:00), pas comptée. » (accord)
+const MISSED = /^(.*) \((\d\d:\d\d)\) est déjà passé : pas compté\.$/;
 const v1 = (x) => JSON.parse(JSON.stringify(x, (k, v) =>
-  v && typeof v === "object" && !Array.isArray(v) && typeof v.key === "string" && typeof v.kind === "string" ? { ...v, legacyKey: v.key } : v));
+  typeof v === "string" && MISSED.test(v) ? v.replace(MISSED, "Séance déjà passée : $1 ($2), pas comptée.")
+    : v && typeof v === "object" && !Array.isArray(v) && typeof v.key === "string" && typeof v.kind === "string" ? { ...v, legacyKey: v.key } : v));
 
 describe("parité avec la v1", () => {
   for (const [name, [profile, getDay]] of Object.entries(PROFILES)) {
