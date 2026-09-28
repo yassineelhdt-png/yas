@@ -31,9 +31,17 @@ export const DEFAULTS = Object.freeze({
   })
 });
 
-/** Réglages complets : valeurs de l'utilisateur par-dessus les valeurs par défaut. */
+// réglages qui peuvent être vides : « pas d'heure de fin », « dès que prêt »
+const MAY_BE_EMPTY = new Set(["endAt", "concoursStart"]);
+
+/**
+ * Réglages complets : valeurs de l'utilisateur par-dessus les valeurs par défaut.
+ * Une valeur vide (ex. heure effacée) garde la valeur par défaut ; la session minimale ne dépasse pas
+ * la session maximale.
+ */
 export function withDefaults(s) {
   const o = { ...DEFAULTS };
-  if (s) for (const k in s) if (s[k] !== undefined && s[k] !== null) o[k] = s[k];
+  if (s) for (const k in s) if (s[k] !== undefined && s[k] !== null && (s[k] !== "" || MAY_BE_EMPTY.has(k))) o[k] = s[k];
+  if (+o.minSession > +o.session) o.minSession = +o.session;
   return o;
 }

@@ -57,6 +57,10 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   deux par jour, jamais pendant les séances, avec une carte de progression (planifié / coché / ce qui manque)
   dans les vues Jour et Semaine.
 
+- **Relecture au peigne fin** (skill `analyse` et agents dans `.claude/`) : cases cochées qui restent sur le bon
+  créneau quand le plan se décale, synchro de l'artefact qui ne perd plus rien à la connexion, heures saisies
+  au clavier enregistrées une fois finies, replanification pendant un trajet, contrastes et cibles tactiles,
+  vue Semaine lisible sur téléphone.
 - Carte **« En ce moment »** : le créneau en cours, le temps restant et ce qui suit.
 - Barre de navigation en bas sur téléphone, onglets en haut sur tablette / PC ; le bouton retour ramène à la vue Jour.
 - **Glisser** gauche / droite pour changer de jour ; raccourcis clavier sur PC (← →, T, 1‑4).
@@ -105,6 +109,7 @@ src/
 electron/        app PC
 android/         projet Android (Capacitor)
 tests/           tests du moteur
+.claude/         skill « analyse » (relecture au peigne fin) et agents « annale » pour Claude Code
 legacy/          app d'origine (v1), référence pour les tests de parité
 ```
 

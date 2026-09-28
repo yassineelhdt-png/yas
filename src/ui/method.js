@@ -2,7 +2,9 @@
 import { html } from "lit-html";
 import * as E from "../engine/index.js";
 import { S, state } from "../store.js";
-import { MOISC } from "./format.js";
+import { MOISC, JOURS } from "./format.js";
+
+const JOURS_MIN = JOURS.map((j) => j.toLowerCase());
 
 export function methodView() {
   const st = S();
@@ -50,9 +52,10 @@ export function methodView() {
         <li>Trajets, repas, pauses, sport : non.</li>
       </ul>
 
-      <h2>Trois blocs</h2>
+      <h2>Des blocs</h2>
       <ul>
-        <li>Bloc 1 jusqu'au déjeuner (entre 12h et 13h15), bloc 2 jusqu'à une grande pause de ${st.bigPause} min, bloc 3 le soir.</li>
+        <li>Les blocs sont séparés par les repas et par une grande pause de ${st.bigPause} min : en général un bloc le matin, un l'après-midi, un le soir (parfois un de plus).</li>
+        <li>Déjeuner vers 12h–13h15 ; plus tôt ou plus tard quand une séance tombe à midi.</li>
         <li>Sessions de ${st.minSession} min minimum et ${st.session} min maximum (2h pour un bloc d'annale), ${st.pause} min de pause entre deux. Plutôt que de laisser un petit bout à la fin, deux sessions équilibrées (ex. 2 × 1h au lieu de 1h30 + 30 min).</li>
         <li>Le sport (${st.sport} min + douche) est toujours la dernière chose de la journée, après le programme.</li>
         <li>Tu peux choisir l'heure à laquelle tu commences : tout le programme se décale.</li>
@@ -60,16 +63,18 @@ export function methodView() {
 
       <h2>Une matière = un bloc</h2>
       <ul>
-        <li>En semaine, chaque matière est travaillée d'un seul tenant : cours du jour, préparation de séminaire et exercices de la même matière se suivent. Une fois que tu es passé à autre chose, la matière ne revient plus dans la journée.</li>
+        <li>En semaine, chaque matière est travaillée d'un seul tenant : cours du jour, préparation de séminaire et exercices de la même matière se suivent. Une fois que tu es passé à autre chose, la matière ne revient en principe plus dans la journée (sauf un bloc d'annale, ou un cours qui n'est disponible qu'après la séance).</li>
       </ul>
 
       <h2>Semaine de cours</h2>
       <ul>
         <li>Du lundi au vendredi (hors congés), tu travailles à : ${(E.PLACES[st.weekdayPlace] || E.PLACES.maison).name}${+st.homeTail > 0 && st.weekdayPlace !== "maison" ? ", et tu finis la journée à la maison" : ""}. Le week-end, à la maison. Tu peux changer pour un jour donné dans « Où tu travailles ».</li>
-        <li>Tu ne vas pas aux cours magistraux : le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l'heure du cours.</li>
+        <li>${st.attendTheory
+          ? "Tu vas aux cours magistraux (Réglages → Unif) : ils comptent dans tes heures."
+          : "Tu ne vas pas aux cours magistraux : le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l'heure du cours."}</li>
         <li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li>
         <li>La veille d'un séminaire : préparation de la série.</li>
-        <li>Guidance chimie 1×/semaine : jeudi par défaut, avant le séminaire de maths (un seul trajet). Permanence physique 1×/semaine : mercredi 10h–12h, avant les séminaires de chimie et physique.</li>
+        <li>Guidance chimie 1×/semaine : le ${JOURS_MIN[st.guidChimDay]} (${E.hdur(+st.guidChimDur)}). Permanence physique 1×/semaine : le ${JOURS_MIN[st.permPhysDay]} à ${st.permPhysStart} (${E.hdur(+st.permPhysDur)}). Réglables dans Réglages → Unif.</li>
         <li>Appuis : maths le mardi 12h–14h, bio le vendredi 12h–14h. Les créneaux partagés avec VETE sont désactivés par défaut.</li>
         <li>Le reste du temps tourne entre chimie, physique, maths et bio pour équilibrer la semaine.</li>
       </ul>

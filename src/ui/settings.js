@@ -1,5 +1,5 @@
 // Vue « Réglages » : paramètres du planning, apparence, sauvegarde.
-import { html, nothing } from "lit-html";
+import { html, nothing, noChange } from "lit-html";
 import { live } from "lit-html/directives/live.js";
 import { state, S, notify, saveSettings, resetSettings, setTheme, toast, exportData, parseBackup, importData } from "../store.js";
 import { platform } from "../platform.js";
@@ -19,7 +19,7 @@ const FORM = [
     ["sleepH", "Sommeil visé", "h", { min: 4, max: 12 }]
   ]],
   ["Rythme", [
-    ["session", "Session de concentration max", "min", { min: 15 }],
+    ["session", "Session de concentration max", "min", { min: 30, max: 180 }],
     ["minSession", "Session minimale (jamais moins)", "min", { min: 30, max: 90 }],
     ["pause", "Micro-pause", "min"],
     ["bigPause", "Grande pause", "min"],
@@ -60,26 +60,33 @@ const FORM = [
     ["concoursPause", "Pause entre les deux parties", "min"],
     ["raisonnement", "Raisonnement", "min"],
     ["ethique", "Éthique & empathie", "min"],
-    ["ethiqueEvery", "Éthique : toutes les", "sem", { min: 1 }],
+    ["ethiqueEvery", "Éthique : toutes les", "sem", { min: 1, max: 12, int: true }],
     ["ethiqueAnchor", "Éthique : premier dimanche", "date"]
   ]]
 ];
 
+// Champ en cours de saisie : un nouveau rendu (message qui s'efface, synchro) ne remplace pas ce qui est tapé
+const keep = (id, v) => (document.activeElement?.id === id ? noChange : live(v));
+
 function saveNumber(key, raw, opt = {}) {
-  if (raw === "") return saveSettings({ [key]: "" }); // champ vidé → valeur par défaut
-  let v = +raw;
-  if (!Number.isFinite(v)) return;
-  v = Math.max(opt.min ?? 0, v);
+  if (raw === "") { // champ vidé → valeur par défaut
+    saveSettings({ [key]: "" });
+    return toast("Valeur par défaut rétablie");
+  }
+  const x = +String(raw).replace(",", ".");
+  if (!Number.isFinite(x)) return toast("Nombre non reconnu : réglage inchangé");
+  let v = Math.max(opt.min ?? 0, x);
   if (opt.max !== undefined) v = Math.min(opt.max, v);
+  if (opt.int) v = Math.round(v);
   saveSettings({ [key]: v });
-  toast("Réglage enregistré");
+  toast(v !== x ? "Ramené à " + v + " (valeur possible)" : "Réglage enregistré");
 }
 
 function field([key, label, type, opt = {}], st) {
   const id = "set-" + key, v = st[key];
   let input;
   if (type === "time" || type === "date") {
-    input = html`<input type=${type} id=${id} .value=${live(v || "")} @change=${(e) => { saveSettings({ [key]: e.target.value }); toast("Réglage enregistré"); }}>`;
+    input = html`<input type=${type} id=${id} .value=${keep(id, v || "")} @change=${(e) => { saveSettings({ [key]: e.target.value }); toast("Réglage enregistré"); }}>`;
   } else if (type === "bool") {
     input = html`<button class="sw" role="switch" id=${id} aria-checked=${v ? "true" : "false"} aria-label=${label} @click=${() => saveSettings({ [key]: !v })}></button>`;
   } else if (type === "sel") {
@@ -90,7 +97,7 @@ function field([key, label, type, opt = {}], st) {
       ${opt.choices.map(([val, name]) => html`<option value=${val} ?selected=${cast(v) === val}>${name}</option>`)}</select>`;
   } else {
     input = html`<input type="number" id=${id} inputmode="decimal" min=${opt.min ?? 0} max=${opt.max ?? nothing} step=${type === "h" ? "0.5" : type === "sem" ? "1" : "5"}
-      .value=${live(String(v))} @change=${(e) => saveNumber(key, e.target.value, opt)}><span class="u">${type === "sem" ? "sem." : type}</span>`;
+      .value=${keep(id, String(v))} @change=${(e) => saveNumber(key, e.target.value, opt)}><span class="u">${type === "sem" ? "sem." : type}</span>`;
   }
   return html`<div class="fr"><label for=${id}>${label}</label><div class="in">${input}</div></div>`;
 }
@@ -114,7 +121,7 @@ function downloadBackup() {
   const blob = new Blob([backupText()], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "horaire-9h-sauvegarde-" + new Date().toISOString().slice(0, 10) + ".json";
+  a.download = "horaire-9h-sauvegarde-" + E.todayStr() + ".json";
   document.body.append(a);
   a.click();
   a.remove();
@@ -165,6 +172,8 @@ function importControls() {
     </div>`;
 }
 
+let confirmReset = false;
+
 // ---------- objectifs de la semaine ----------
 let goalWeek = "base"; // « base » = objectifs habituels, sinon le lundi de la semaine modifiée
 
@@ -173,12 +182,16 @@ export function openGoals(mon) {
   goalWeek = mon;
 }
 
+function weekName(mon) {
+  const a = E.pd(mon), b = E.pd(E.addDays(mon, 6)), wn = E.weekNo(mon);
+  return (wn >= 1 && wn <= 20 ? "S" + wn + " · " : "") + a.getDate() + " " + MOISC[a.getMonth()] + " → " + b.getDate() + " " + MOISC[b.getMonth()];
+}
+
 function weekOptions() {
   const out = [];
-  for (let mon = E.addDays(E.H.semesterStart, 7), i = 0; i < 16; mon = E.addDays(mon, 7), i++) {
-    const a = E.pd(mon), b = E.pd(E.addDays(mon, 6));
-    out.push([mon, "S" + E.weekNo(mon) + " · " + a.getDate() + " " + MOISC[a.getMonth()] + " → " + b.getDate() + " " + MOISC[b.getMonth()]]);
-  }
+  for (let mon = E.addDays(E.H.semesterStart, 7), i = 0; i < 16; mon = E.addDays(mon, 7), i++) out.push([mon, weekName(mon)]);
+  // semaine ouverte depuis les vues Jour / Semaine, hors de la liste (ex. après le quadrimestre)
+  if (goalWeek !== "base" && !out.some(([m]) => m === goalWeek)) out.push([goalWeek, weekName(goalWeek)]);
   return out;
 }
 
@@ -192,15 +205,17 @@ function saveGoals(G, msg) {
   if (msg) toast(msg);
 }
 
-function editList(st, fn, msg) {
-  const G = goalsState(st);
+function editList(fn, msg) {
+  // réglages actuels, pas ceux du dernier rendu (au toucher, change puis click arrivent avant le rendu suivant)
+  const G = goalsState(S());
   const list = goalWeek === "base" ? G.base : G.weeks[goalWeek] || [];
   const next = fn(list.map((g) => ({ ...g })));
   saveGoals(goalWeek === "base" ? { ...G, base: next } : { ...G, weeks: { ...G.weeks, [goalWeek]: next } }, msg);
 }
 
 function goalRow(g, i, st) {
-  const set = (patch, msg) => editList(st, (l) => { l[i] = { ...l[i], ...patch }; return l; }, msg);
+  const set = (patch, msg) => editList((l) => { l[i] = { ...l[i], ...patch }; return l; }, msg);
+  const id = (f) => "goal-" + i + "-" + f;
   const kinds = Object.entries(E.GOAL_KINDS);
   return html`
     <div class="goalrow" style="--c:var(${"--c-" + (g.subj || "rev").toLowerCase()})">
@@ -211,12 +226,12 @@ function goalRow(g, i, st) {
         <select aria-label="Matière" .value=${live(g.subj)} @change=${(e) => set({ subj: e.target.value })}>
           ${E.GOAL_SUBJECTS.map((k) => html`<option value=${k} ?selected=${g.subj === k}>${E.SUBJ[k]}</option>`)}
         </select>
-        <button class="linkbtn danger" @click=${() => editList(st, (l) => l.filter((_, j) => j !== i), "Objectif retiré")}>Retirer</button>
+        <button class="linkbtn danger" @click=${() => editList((l) => l.filter((_, j) => j !== i), "Objectif retiré")}>Retirer</button>
       </div>
       <div class="gr2">
-        <label>Nombre <input type="number" min="1" max="20" step="1" inputmode="numeric" .value=${live(String(g.count ?? 1))} @change=${(e) => set({ count: Math.max(1, Math.round(+e.target.value || 1)) })}></label>
-        <label>× <input type="number" min="0.5" max="20" step="0.5" inputmode="decimal" .value=${live(String(g.hours ?? 1))} @change=${(e) => set({ hours: Math.max(0.5, +e.target.value || 1) })}> h</label>
-        <input type="text" class="glabel" placeholder="Précision (chapitre, année…)" .value=${live(g.label || "")} @change=${(e) => set({ label: e.target.value.trim() })}>
+        <label>Nombre <input type="number" id=${id("count")} min="1" max="20" step="1" inputmode="numeric" .value=${keep(id("count"), String(g.count ?? 1))} @change=${(e) => set({ count: Math.min(20, Math.max(1, Math.round(+e.target.value || 1))) })}></label>
+        <label>× <input type="number" id=${id("hours")} min="0.5" max="20" step="0.5" inputmode="decimal" .value=${keep(id("hours"), String(g.hours ?? 1))} @change=${(e) => set({ hours: Math.min(20, Math.max(0.5, Math.round((+String(e.target.value).replace(",", ".") || 1) * 2) / 2)) })}> h</label>
+        <input type="text" id=${id("label")} class="glabel" placeholder="Précision (chapitre, année…)" .value=${keep(id("label"), g.label || "")} @change=${(e) => set({ label: e.target.value.trim() })}>
       </div>
       <small>${goalName(g)}</small>
     </div>`;
@@ -246,7 +261,7 @@ function goalsFieldset(st) {
       <div class="goallist ${editable ? "" : "readonly"}">
         ${list.length ? list.map((g, i) => (editable ? goalRow(g, i, st) : html`<div class="goalrow ro"><small>${goalName(g)}</small></div>`)) : html`<p class="sub">Aucun objectif.</p>`}
       </div>
-      ${editable ? html`<div class="btnrow"><button class="btn primary" @click=${() => editList(st, (l) => [...l, { id: "g" + Date.now().toString(36), kind: "annale", subj: "CHIM", count: 1, hours: 4, label: "" }], "Objectif ajouté")}>Ajouter un objectif</button></div>` : nothing}
+      ${editable ? html`<div class="btnrow"><button class="btn primary" @click=${() => editList((l) => [...l, { id: "g" + Date.now().toString(36), kind: "annale", subj: "CHIM", count: 1, hours: 4, label: "" }], "Objectif ajouté")}>Ajouter un objectif</button></div>` : nothing}
       <p class="sub">Total : ${E.dur(Math.round(total * 60))} par semaine.</p>
     </fieldset>`;
 }
@@ -277,14 +292,18 @@ export function settingsView() {
         <div class="btnrow">
           <button class="btn" @click=${copyBackup}>${icons.copy()} Copier la sauvegarde</button>
           ${platform.canDownload ? html`<button class="btn" @click=${downloadBackup}>${icons.download()} Télécharger le fichier</button>` : nothing}
-          <label class="btn">${icons.upload()} Ouvrir un fichier<input type="file" accept="application/json,.json" hidden @change=${importFile}></label>
+          <button class="btn" @click=${() => document.getElementById("backup-file").click()}>${icons.upload()} Ouvrir un fichier</button>
+          <input type="file" id="backup-file" accept="application/json,.json" hidden @change=${importFile}>
         </div>
         <textarea id="backup-in" rows="3" placeholder="Colle ici une sauvegarde copiée depuis un autre appareil…" spellcheck="false"></textarea>
         ${importControls()}
       </fieldset>
 
       <div class="setfoot">
-        <button class="btn" @click=${() => { resetSettings(); toast("Réglages de base rétablis"); }}>Revenir aux réglages de base</button>
+        ${confirmReset
+          ? html`<div class="confirmbox" role="alert"><span>Tous tes réglages reviennent aux valeurs de base (tes objectifs et tes journées sont gardés).</span>
+              <div class="btnrow"><button class="btn primary" @click=${() => { confirmReset = false; resetSettings(); toast("Réglages de base rétablis"); }}>Rétablir les réglages de base</button><button class="btn ghost" @click=${() => { confirmReset = false; notify(); }}>Annuler</button></div></div>`
+          : html`<button class="btn" @click=${() => { confirmReset = true; notify(); }}>Revenir aux réglages de base</button>`}
         <span class="sub">${state.sync === "cloud" ? "Enregistré et synchronisé sur tes appareils." : "Enregistré sur cet appareil."} · v${__APP_VERSION__} · ${platform.label}</span>
       </div>
     </section>`;

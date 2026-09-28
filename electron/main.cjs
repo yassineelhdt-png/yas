@@ -36,7 +36,11 @@ function createWindow() {
     return { action: "deny" };
   });
   win.webContents.on("will-navigate", (e, url) => {
-    if (!url.startsWith(ORIGIN)) {
+    // même origine exacte (« app://horaire.autre » est une autre origine)
+    let same = false;
+    // (URL.origin vaut « null » pour un schéma personnalisé : on compare protocole et hôte)
+    try { const u = new URL(url), o = new URL(ORIGIN); same = u.protocol === o.protocol && u.host === o.host; } catch { /* URL invalide */ }
+    if (!same) {
       e.preventDefault();
       if (/^https?:/.test(url)) shell.openExternal(url);
     }

@@ -15,7 +15,9 @@ const MAX_GOAL_BLOCKS = 2;
 const minSession = (S) => +(S.minSession || 0) || 50;
 const byStart = (a, b) => a.s - b.s;
 // heure arrondie aux 5 minutes suivantes (les horaires calculés restent ronds)
-const ceil5 = (t) => Math.ceil(t / 5) * 5;
+const ceil5Of = (t) => Math.ceil(t / 5) * 5;
+// règles de la v2 (heures rondes, sessions minimales…) ; minSession = 0 : exactement comme la v1
+const v2 = (S) => +S.minSession > 0;
 
 /** Lieu du jour : choix du jour, sinon lun–ven hors congés = lieu des réglages, sinon la maison. */
 function placeOfDay(ds, w, S, day) {
@@ -31,7 +33,7 @@ function placeOfDay(ds, w, S, day) {
  * Retourne { start, pre, walls, at } — at : lieu où l'on est au début de l'étude.
  */
 function morning(res, S, day, P, hard) {
-  const W = res.wake, prep = +S.prep;
+  const W = res.wake, prep = +S.prep, ceil5 = v2(S) ? ceil5Of : (t) => t;
   const prepItem = (e) => (e > W ? [{ kind: "prep", s: W, e, long: e - W > prep + 10 }] : []);
   const ready = day.start ? m(day.start) : ceil5(W + prep); // prêt à étudier chez soi
   if (!P) return { start: ready, pre: prepItem(ready), walls: [], at: "maison" };
@@ -101,8 +103,11 @@ const freshWeekMin = () => ({ CHIM: 0, PHYS: 0, MATH: 0, BIO: 0 });
 /** Partie éthique ce dimanche ? (réglage manuel du jour, sinon 1 dimanche sur N) */
 export function isEthique(ds, S, day) {
   if (day && typeof day.ethique === "boolean") return day.ethique;
-  const n = daysBetween(S.ethiqueAnchor, ds);
-  return n >= 0 && (n / 7) % +S.ethiqueEvery === 0;
+  // premier dimanche du cycle : l'ancre, ou le dimanche qui la suit ; cycle en semaines entières
+  const every = Math.max(1, Math.round(+S.ethiqueEvery) || 1);
+  const anchor = addDays(S.ethiqueAnchor, (7 - dow(S.ethiqueAnchor)) % 7);
+  const n = daysBetween(anchor, ds);
+  return n >= 0 && n % (7 * every) === 0;
 }
 
 // ---------- dimanche : concours blanc ----------
@@ -260,7 +265,7 @@ function planOne(ds, S, getDay, backlog, weekMin, goals) {
   else queue = weekdayQueue(res, S, getDay, backlog);
   hard = [...hard, ...mo.walls].sort(byStart);
   // commencer l'après-midi : déjeuner déjà pris
-  const init = { at: mo.at, lunch: start >= 810 };
+  const init = { at: mo.at, lunch: v2(S) && start >= 810 };
   // objectifs de la semaine (annales…) : en gros blocs, sur le temps qui reste après la file du jour
   const blocks = res.mode === "semaine" || res.mode === "conge" ? dayBlocks(goals, S, queue, hard, start) : [];
   init.blocks = blocks;
@@ -276,13 +281,25 @@ function planOne(ds, S, getDay, backlog, weekMin, goals) {
       if (c.e > rp.at) c.e = rp.at;
       before.push(c);
     }
+    // trajet vers / depuis un lieu pas encore fini à la reprise (celui du matin, ou le retour à la
+    // maison) : il continue, et on n'étudie pas « sur place » avant d'être arrivé
+    const all = [...pre, ...full.items];
+    const trips = all.filter((it) => it.kind === "travel" && it.at && it.e > rp.at && (pre.includes(it) || (it.leave && it.s < rp.at)));
+    const pre2 = trips.length ? pre.filter((it) => it.s < rp.at).map((it) => (it.e > rp.at ? { ...it, e: rp.at } : it)) : pre;
+    const hard2 = [
+      ...hard.filter((h) => h.e > rp.at).map((h) => (h.wall && h.s < rp.at ? { ...h, s: rp.at } : h)),
+      ...trips.map((it) => ({ kind: "travel", dir: it.dir, at: it.at, leave: it.leave, wall: true, s: Math.max(it.s, rp.at), e: it.e }))
+    ].sort(byStart);
+    // bloc d'objectif coupé par la reprise : sa fin reste à faire, en premier
     const pastBlocks = before.filter((it) => it.kind === "study" && it.goal != null).length;
-    const r = runDay(res, S, rp.at, hard.filter((h) => h.e > rp.at), {
-      replan: true, blocks: blocks.slice(pastBlocks), studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0,
-      at: whereAt(full.items, rp.at, mo.at)
+    const cut = full.items.find((it) => it.kind === "study" && it.goal != null && it.s < rp.at && it.e > rp.at);
+    const left = cut ? [Math.max(minSession(S), Math.ceil((cut.e - rp.at) / 5) * 5)] : [];
+    const r = runDay(res, S, rp.at, hard2, {
+      replan: true, blocks: [...left, ...blocks.slice(pastBlocks)], studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0,
+      at: trips.length ? whereAt(all, rp.at, "maison") : whereAt(full.items, rp.at, mo.at)
     });
     res.missed = r.missed;
-    res.items = [...pre, ...before, { kind: "replan", s: rp.at, e: rp.at, studied: rp.studied || 0 }, ...r.items];
+    res.items = [...pre2, ...before, { kind: "replan", s: rp.at, e: rp.at, studied: rp.studied || 0 }, ...r.items];
     res.end = r.end;
     res.workEnd = r.workEnd;
     res.fit = r.fit;
@@ -300,6 +317,13 @@ function planOne(ds, S, getDay, backlog, weekMin, goals) {
   }
   res.backlogOut = finish(res, S, queue, weekMin, goals);
   return res;
+}
+
+/** Titre de la tâche la plus longue d'une session (la première en cas d'égalité). */
+function mainTitle(it) {
+  let best = null;
+  for (const t of it.tasks || []) if (!best || t.min > best.min) best = t;
+  return best ? best.title : "";
 }
 
 /** Bloc d'objectif : prochain objectif de la semaine qui reste à faire (false s'il n'y en a plus). */
@@ -327,15 +351,29 @@ function finish(res, S, queue, weekMin, goals) {
   const all = res.items.filter((it) => it.kind === "study");
   const chunks = all.filter((it) => it.goal == null || !placeGoal(it, goals, weekMin, S));
   const grouped = res.mode === "semaine" || res.mode === "conge";
-  const carry = grouped ? assignGrouped(chunks, queue, weekMin, res.blocus) : assign(chunks, queue, weekMin, res.blocus);
+  const carry = grouped ? assignGrouped(chunks, queue, weekMin, res.blocus, v2(S)) : assign(chunks, queue, weekMin, res.blocus);
   // (pas au début d'une annale : conditions d'examen)
   if (chunks.length && res.mode !== "concours") chunks[0].note = "Commence par 10 min d'Anki : rappel actif d'hier";
+
+  // clé d'un créneau pour les cases cochées : son contenu (séance, tâche principale), pas son heure,
+  // pour qu'une coche reste sur le bon créneau quand le plan se décale (lever, lieu, présences).
+  // legacyKey : ancienne clé « type@HH:MM », pour relire les coches faites avant.
+  const seen = {};
+  for (const it of res.items) {
+    it.legacyKey = it.kind + "@" + hm(it.s) + (it.id ? "#" + it.id : "");
+    const base = it.kind === "fixed" ? "fixed#" + it.id
+      : it.kind === "exam" ? "exam#" + it.title
+      : it.kind === "study" ? "study#" + (mainTitle(it) || "")
+      : null;
+    if (!base) { it.key = it.legacyKey; continue; }
+    seen[base] = (seen[base] || 0) + 1;
+    it.key = seen[base] > 1 ? base + "#" + seen[base] : base;
+  }
 
   // ce qui compte dans l'objectif net
   let net = 0;
   const byS = {};
   for (const it of res.items) {
-    it.key = it.kind + "@" + hm(it.s) + (it.id ? "#" + it.id : "");
     it.counts = !it.past && (it.kind === "study" || it.kind === "exam" || (it.kind === "fixed" && !it.missed));
     if (!it.counts) continue;
     net += it.e - it.s;
@@ -371,15 +409,16 @@ function finish(res, S, queue, weekMin, goals) {
   if (fit?.mode === "squeeze") {
     // seulement ce qui existe dans la journée
     const b = fit.breaks, parts = [], has = (k) => res.items.some((it) => it.kind === k && !it.past);
-    if ((has("lunch") && b.lunch < +S.lunch) || (has("dinner") && b.dinner < +S.dinner)) parts.push("repas de " + Math.min(b.lunch, b.dinner) + " min");
+    const meals = [has("lunch") && b.lunch < +S.lunch && b.lunch, has("dinner") && b.dinner < +S.dinner && b.dinner].filter(Boolean);
+    if (meals.length) parts.push("repas de " + Math.min(...meals) + " min");
     if (has("bigpause") && b.bigPause < +S.bigPause) parts.push("grande pause de " + b.bigPause + " min");
     if (has("pause") && b.pause < +S.pause) parts.push("pauses de " + b.pause + " min");
     if (!parts.length) parts.push("pauses raccourcies");
     res.warnings.push("Pour faire tes " + S.targetH + "h avant " + hm(fit.endAt) + " : " + parts.join(", ") + ".");
   }
   if (fit?.mode === "cut") res.warnings.push("Pour finir à " + hm(fit.endAt) + ", tu fais " + hdur(net) + " nettes au lieu de " + S.targetH + "h. Commence plus tôt ou recule l'heure de fin.");
-  if (fit?.mode === "late") res.warnings.push("Tes séances à l'unif finissent après " + hm(fit.endAt) + " : impossible de finir à cette heure-là.");
-  if (fit?.mode === "invalid") res.warnings.push("L'heure de fin (" + hm(fit.endAt) + ") est avant le début : elle est ignorée.");
+  if (fit?.mode === "late") res.warnings.push("Impossible de finir à " + hm(fit.endAt) + " : tes séances à l'unif (avec les trajets et le déjeuner) vont au-delà.");
+  if (fit?.mode === "invalid") res.warnings.push("L'heure de fin (" + hm(fit.endAt) + ") tombe avant " + (res.mode === "concours" ? "la fin du concours blanc" : "le début") + " : elle est ignorée.");
   if (res.end > 23 * 60) res.warnings.push("La journée finit après 23h. Lève-toi plus tôt demain pour garder tes " + S.sleepH + "h de sommeil.");
   for (const it of res.missed || []) res.warnings.push(evLabel(it) + " (" + hm(it.s0 || it.s) + ") est déjà passé : pas compté.");
   for (const it of res.items) if (it.conflict) res.warnings.push(evLabel(it) + " chevauche une autre séance : vérifie tes présences.");

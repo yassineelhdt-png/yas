@@ -380,3 +380,68 @@ describe("objectifs de la semaine", () => {
     expect(Object.keys(goalMin(E.planWeek("2026-10-05", { goals: { base: [], weeks: {} } })))).toEqual([]);
   });
 });
+
+describe("corrections de l'analyse au peigne fin", () => {
+  it("une coche reste sur le même créneau quand le plan se décale (clé = contenu, pas heure)", () => {
+    const a = E.planDay("2026-10-06", {}), b = E.planDay("2026-10-06", {}, () => ({ wake: "07:35" }));
+    const keys = (p) => p.items.filter((it) => it.kind === "study" || it.kind === "fixed").map((it) => it.key);
+    expect(b.items.find((it) => it.kind === "fixed").key).toBe(a.items.find((it) => it.kind === "fixed").key);
+    expect(new Set(keys(a)).size).toBe(keys(a).length); // uniques dans la journée
+    expect(a.items.find((it) => it.kind === "study").legacyKey).toMatch(/^study@\d\d:\d\d$/);
+  });
+
+  it("replanifier pendant un trajet : on n'étudie pas sur place avant d'être arrivé", () => {
+    for (const [d, at] of [["2026-10-02", 480], ["2026-10-07", 1090], ["2026-10-06", 1095]]) {
+      const p = E.planDay(d, {}, () => ({ replan: { at, studied: 300, lunch: true } }));
+      const it = p.items;
+      for (let i = 1; i < it.length; i++) expect(it[i].s, d + " #" + i).toBeGreaterThanOrEqual(it[i - 1].e);
+      const trip = it.find((x) => x.kind === "travel" && x.s === at);
+      if (trip) expect(it.filter((x) => x.kind === "study" && x.s >= at && x.s < trip.e).length, d).toBe(0);
+    }
+  });
+
+  it("replanifier au milieu d'une annale : la suite est reprise, pas une 1re partie en plus", () => {
+    const p = E.planDay("2026-09-28", {}, () => ({ replan: { at: 600, studied: 105 } }));
+    const titles = p.items.flatMap((it) => (it.tasks || []).filter((t) => t.kind === "goal").map((t) => t.title));
+    expect(titles.filter((t) => t.endsWith("2e partie")).length).toBeGreaterThan(0);
+    const week = E.planWeek("2026-09-28", {}, (d) => (d === "2026-09-28" ? { replan: { at: 600, studied: 105 } } : null));
+    const min = {};
+    for (const r of week) for (const it of r.items) for (const t of it.tasks || []) if (t.kind === "goal") min[t.title.split(" · ")[0]] = (min[t.title.split(" · ")[0]] || 0) + t.min;
+    for (const v of Object.values(min)) expect(v).toBeLessThanOrEqual(240 + 50);
+  });
+
+  it("réglage d'heure effacé : valeur par défaut, pas de NaN", () => {
+    const p = E.planDay("2026-10-06", { wake: "", p4pOpen: "", erasmeClose: "" });
+    expect(p.net).toBeGreaterThanOrEqual(9 * 60);
+    for (const it of p.items) expect(Number.isFinite(it.s) && Number.isFinite(it.e)).toBe(true);
+  });
+
+  it("session max plus courte que la session minimale : l'objectif est quand même atteint", () => {
+    for (const session of [30, 45]) expect(E.planDay("2026-10-06", { session }).net, String(session)).toBeGreaterThanOrEqual(9 * 60);
+  });
+
+  it("un cours du jour n'est jamais placé avant la fin du cours", () => {
+    for (const d of days) {
+      const p = E.planDay(d, {});
+      const ends = {};
+      for (const ev of p.events) if (ev.type === "TH" && !ev.attend) ends[ev.subj] = Math.max(ends[ev.subj] || 0, ev.e);
+      for (const it of p.items) {
+        let t = it.s;
+        for (const tk of it.tasks || []) {
+          if (tk.kind === "th" && ends[tk.subj]) expect(t, d + " " + tk.title).toBeGreaterThanOrEqual(ends[tk.subj] - 15);
+          t += tk.min;
+        }
+      }
+    }
+  });
+
+  it("éthique : ancre un samedi → le dimanche qui suit ; cycle en semaines entières", () => {
+    expect(E.isEthique("2026-10-04", E.withDefaults({ ethiqueAnchor: "2026-10-03" }))).toBe(true);
+    expect(E.isEthique("2026-10-18", E.withDefaults({ ethiqueEvery: 1.5 }))).toBe(true); // 1,5 → 2 semaines
+  });
+
+  it("noms des objectifs : sigles gardés", () => {
+    expect(E.goalTitle({ kind: "annale", subj: "CHQ2" })).toBe("Annale de chimie Q2");
+    expect(E.goalTitle({ kind: "theorie", subj: "MEDIG" })).toBe("Théorie de MEDIG");
+  });
+});

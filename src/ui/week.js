@@ -6,7 +6,6 @@ import { icons } from "./icons.js";
 import { goalsCard } from "./goals.js";
 
 const HR = 38; // hauteur d'une heure (px)
-const LEGEND = [["CHIM", "Chimie"], ["PHYS", "Physique"], ["MATH", "Maths"], ["BIO", "Bio"], ["CHQ2", "Chimie Q2"], ["CONC", "Concours"], ["REV", "Révision"]];
 const TOTAL_ORDER = ["CHIM", "PHYS", "MATH", "BIO", "CHQ2", "CONC", "RAIS", "ETH", "REV", "MEDIG"];
 const NAMES = { CHIM: "Chimie", PHYS: "Physique", MATH: "Maths", BIO: "Bio", CHQ2: "Chimie Q2", CONC: "Concours", RAIS: "Raisonnement", ETH: "Éthique", REV: "Révision", MEDIG: "MEDIG" };
 
@@ -56,6 +55,8 @@ export function weekView(week, nav) {
     for (const it of r.items) if (it.kind === "fixed" && it.counts) fixed += it.e - it.s;
   }
   const mx = Math.max(1, ...TOTAL_ORDER.map((k) => tot[k] || 0));
+  const seances = week.flatMap((r) => r.items.filter((it) => it.kind === "fixed").map((it) => html`
+    <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}</div></div>`));
 
   return html`
     <div class="weekhead">
@@ -82,7 +83,7 @@ export function weekView(week, nav) {
           </div>`)}
       </div>
       <div class="legend">
-        ${LEGEND.map(([k, n]) => html`<span style="--c:${cv(k)}"><i></i>${n}</span>`)}
+        ${TOTAL_ORDER.filter((k) => tot[k]).map((k) => html`<span style="--c:${cv(k)}"><i></i>${NAMES[k]}</span>`)}
         <span style="--c:var(--c-sport)"><i></i>Sport</span>
         <span>Bloc plein = séance à l'unif</span>
       </div>
@@ -99,9 +100,9 @@ export function weekView(week, nav) {
       </div>
       <div class="card">
         <h2>Séances de la semaine</h2>
-        <p class="sub">Celles que tu as activées.</p>
-        ${week.flatMap((r) => r.items.filter((it) => it.kind === "fixed").map((it) => html`
-          <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}</div></div>`))}
+        ${seances.length
+          ? html`<p class="sub">Celles que tu as activées.</p>${seances}`
+          : html`<p class="sub">Aucune séance à l'unif cette semaine : tout le temps est pour l'étude perso.</p>`}
       </div>
     </div>`;
 }

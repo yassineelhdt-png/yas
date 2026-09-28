@@ -72,7 +72,9 @@ function goView(view) {
     if (history.state?.tab) return history.back(); // popstate s'occupe du reste
     safeHistory("replaceState", null, location.pathname + location.search);
   } else if (state.view === "jour") safeHistory("pushState", { tab: true }, "#" + view);
-  else safeHistory("replaceState", { tab: true }, "#" + view);
+  // d'un onglet à l'autre : on garde l'état de l'entrée actuelle (ouverte directement sur #semaine,
+  // elle n'a pas de Jour avant elle : « retour » ne doit pas quitter l'app)
+  else safeHistory("replaceState", history.state, "#" + view);
   applyView(view);
 }
 
@@ -169,8 +171,13 @@ let lastToday = E.todayStr();
 function tick() {
   const t = E.todayStr();
   if (t !== lastToday) {
-    if (state.date === lastToday) state.date = t;
-    lastToday = t;
+    // programme de la veille qui continue après minuit : on reste dessus jusqu'à sa fin
+    const nm = E.nowMin();
+    const still = state.date === lastToday && nm < 360 && E.planDay(lastToday, state.settings, getDay).end > 1440 + nm;
+    if (!still) {
+      if (state.date === lastToday) state.date = t;
+      lastToday = t;
+    }
   }
   if (document.visibilityState !== "visible") return;
   // ne pas écraser un champ en cours de saisie

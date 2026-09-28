@@ -1,10 +1,12 @@
 // Génère toutes les icônes (web, iPhone, Android, Windows) à partir de assets/*.svg.
 // Usage : npm run icons   (les fichiers générés sont versionnés : inutile de relancer à chaque build)
 import { readFileSync, writeFileSync, copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = new URL("../", import.meta.url);
-const p = (rel) => new URL(rel, root).pathname;
+// (fileURLToPath : chemins avec espaces ou sous Windows)
+const p = (rel) => fileURLToPath(new URL(rel, root));
 const rounded = readFileSync(p("assets/icon.svg"));
 const fullbleed = readFileSync(p("assets/icon-fullbleed.svg"));
 const BLUE = "#1A47D6", BG = "#EDF0F3";

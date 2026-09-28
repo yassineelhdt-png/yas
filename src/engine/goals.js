@@ -10,7 +10,11 @@ export const GOAL_KINDS = {
 // matières proposées pour un objectif
 export const GOAL_SUBJECTS = ["CHIM", "PHYS", "MATH", "BIO", "CHQ2", "MEDIG"];
 
-const lower = (subj) => (SUBJ[subj] || subj).toLowerCase();
+// « chimie », « chimie Q2 », « MEDIG » : minuscule initiale, sigles gardés
+const lower = (subj) => {
+  const n = SUBJ[subj] || subj;
+  return /^[A-Z]{2}/.test(n) ? n : n.charAt(0).toLowerCase() + n.slice(1);
+};
 
 /** Intitulé d'un objectif (n / count pour les objectifs répétés). */
 export function goalTitle(g, n = 1) {
@@ -39,7 +43,7 @@ export function goalsOfWeek(mon, S) {
 export function goalUnits(mon, S) {
   const lists = [];
   for (const g of goalsOfWeek(mon, S)) {
-    const count = Math.max(1, Math.round(+g.count || 1)), min = Math.round((+g.hours || 0) * 60);
+    const count = Math.max(1, Math.round(+g.count || 1)), min = Math.round((+g.hours || 0) * 12) * 5; // multiple de 5 min
     if (min <= 0 || !SUBJ[g.subj]) continue;
     const detail = (GOAL_KINDS[g.kind] || GOAL_KINDS.autre).detail, list = [];
     for (let n = 1; n <= count; n++) list.push({ gid: g.id, subj: g.subj, left: min, total: min, title: goalTitle(g, n), detail });

@@ -79,7 +79,7 @@ export function assign(chunks, queue, weekMin, blocus) {
  * Les « segments » sont les suites de sessions d'étude non coupées par une séance à l'unif.
  * Retourne ce qui doit être reporté au lendemain.
  */
-export function assignGrouped(chunks, queue, weekMin, blocus) {
+export function assignGrouped(chunks, queue, weekMin, blocus, strict = false) {
   const groups = {}, order = [];
   for (const q0 of queue) {
     const q = { ...q0 };
@@ -198,6 +198,11 @@ export function assignGrouped(chunks, queue, weekMin, blocus) {
       const seq = thReady ? [...bl, ...th, ...pr, ...ex, ...sq] : [...bl, ...pr, ...ex, ...th, ...sq];
       let left = A;
       for (const t0 of seq) {
+        // (règles v2) un cours du jour n'est jamais placé avant la fin du cours : il passe à demain
+        if (strict && t0.kind === "th" && t0.after && nowT() < t0.after - 15) {
+          if (t0.min >= 20) carry.push({ ...t0 });
+          continue;
+        }
         const take = Math.min(t0.min, left);
         if (take > 0) { lay(t0, take); left -= take; }
         if (t0.min - take >= 20 && (t0.kind === "th" || t0.kind === "backlog")) carry.push({ ...t0, min: t0.min - take });

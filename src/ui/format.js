@@ -4,10 +4,12 @@ export const JOURS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendre
 export const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 export const MOISC = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
 
-/** "Lundi 28 septembre" */
+const dayNum = (d) => (d.getDate() === 1 ? "1er" : String(d.getDate()));
+
+/** "Lundi 28 septembre", "Jeudi 1er octobre" */
 export function longDate(ds) {
   const d = pd(ds);
-  return JOURS[d.getDay()] + " " + d.getDate() + " " + MOIS[d.getMonth()];
+  return JOURS[d.getDay()] + " " + dayNum(d) + " " + MOIS[d.getMonth()];
 }
 
 /** "Lun 28" */
@@ -16,11 +18,14 @@ export function shortDay(ds) {
   return JOURS[d.getDay()].slice(0, 3) + " " + d.getDate();
 }
 
-/** "28 sept." */
+/** "28 sept.", "1er oct." */
 export function dayMonth(ds) {
   const d = pd(ds);
-  return d.getDate() + " " + MOISC[d.getMonth()];
+  return dayNum(d) + " " + MOISC[d.getMonth()];
 }
+
+/** Créneau coché ? (clé actuelle, ou ancienne clé « type@HH:MM » des coches faites avant) */
+export const isDone = (done, it) => !!(done && (done[it.key] || (it.legacyKey && done[it.legacyKey])));
 
 const COLORS = {
   CHIM: "--c-chim", PHYS: "--c-phys", MATH: "--c-math", BIO: "--c-bio", BIO2: "--c-bio", MEDIG: "--c-medig",

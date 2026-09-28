@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { viteSingleFile } from "vite-plugin-singlefile";
@@ -51,7 +52,7 @@ export default defineConfig(({ mode }) => {
       __APP_VERSION__: JSON.stringify(process.env.APP_VERSION || pkg.version),
       __ARTIFACT__: JSON.stringify(artifact)
     },
-    resolve: artifact ? { alias: { "virtual:pwa-register": new URL("./src/pwa-stub.js", import.meta.url).pathname } } : {},
+    resolve: artifact ? { alias: { "virtual:pwa-register": fileURLToPath(new URL("./src/pwa-stub.js", import.meta.url)) } } : {},
     build: artifact
       ? { target: "es2020", outDir: "dist-artifact", assetsInlineLimit: Infinity, copyPublicDir: false }
       : { target: "es2020" },
