@@ -14,7 +14,9 @@ export const DEFAULTS = Object.freeze({
   // Unif · Erasme
   guidChimDay: 4, guidChimDur: 120,
   permPhysDay: 3, permPhysStart: "10:00", permPhysDur: 120,
-  appuiMath: true, appuiBio: true, attendTheory: false,
+  // attendTh : cours théoriques suivis, par matière ({ MATH: true } ; sinon attendTheory) ; tutoBio : tutorat du mercredi
+  // extraSessions : séances ajoutées en v2 (tutorat, guidance bio du jeudi 1/10, séances des VETE en rechange)
+  appuiMath: true, appuiBio: true, attendTheory: false, attendTh: Object.freeze({}), tutoBio: true, extraSessions: true,
   // Week-end
   concoursStart: "", ethiqueAnchor: "2026-10-04", ethiqueEvery: 4,
   raisonnement: 60, ethique: 60, concoursPause: 90,

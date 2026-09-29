@@ -5,7 +5,8 @@ export const SUBJ = {
 
 export const TYPE = {
   TH: "Cours théorique", SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui pédagogique",
-  TEST: "Interrogation", INFO: "Infos examen", VISITE: "Visite de copies", GUID: "Guidance", PERM: "Permanence"
+  TEST: "Interrogation", INFO: "Infos examen", VISITE: "Visite de copies", GUID: "Guidance", PERM: "Permanence",
+  TUT: "Tutorat"
 };
 
 /** Libellé lisible d'une séance à l'unif. */
@@ -18,6 +19,7 @@ export function evLabel(ev) {
     case "EX": return "Séminaire de " + n + " (exercices)";
     case "TP": return "TP de " + n;
     case "APPUI": return "Appui " + n;
+    case "TUT": return "Tutorat de " + n;
     case "TEST": return "Interro de " + n;
     case "INFO": return "Infos examen " + n;
     case "VISITE": return "Visite de copies " + n;

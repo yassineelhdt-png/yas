@@ -35,7 +35,8 @@ function minorLabel(it, st, res = {}) {
     case "settle": return ["Te poser à la maison", "Douche rapide, bureau prêt, puis tu reprends"];
     case "free":
       if (it.slack) return ["Temps libre", "De la marge pour finir à l'heure : repos, marche, appel…"];
-      return [it.done ? "Libre" : "Transition", it.note || (it.done ? "Ton quota du jour est atteint" : "Range, prépare tes affaires")];
+      if (it.done) return ["Libre", it.note || (res.items.some((x) => x.kind === "fixed" && x.s >= it.e) ? "Ton étude perso du jour est faite : place aux séances" : "Ton quota du jour est atteint")];
+      return ["Transition", it.note || "Range, prépare tes affaires"];
   }
   return [it.kind, ""];
 }
@@ -135,6 +136,7 @@ const act = {
     const ov = { ...(getDay(state.date) || {}).ov };
     ov[ev.id] = !ev.attend;
     saveDay(state.date, { ov });
+    toast(E.evLabel(ev) + (ev.attend ? " : tu n'y vas pas" : " : tu y vas"));
   },
   toggleEthique(on) { saveDay(state.date, { ethique: !on }); },
   setPlace(key) {
@@ -289,10 +291,12 @@ function row(it, res, st, ctx, flags) {
       pill = html`<span class="pill">${PILL[it.type] || it.type}</span>`;
       const sub = E.H.subjects[it.subj];
       if (sub) meta.push(html`<span class="mono">${sub.code}</span>`);
+      if (it.theme) meta.push(html`<span class="theme">${it.theme}</span>`);
       if (it.note && it.type !== "TH") meta.push(it.note);
       if (it.moved) meta.push("déplacé : jour habituel fermé");
       if (it.late) meta.push("tu arrives en cours de séance");
       if (it.missed) meta.push("manqué");
+      else if (!it.past) meta.push(html`<button class="linkbtn" @click=${() => act.toggleEvent({ ...it, attend: true })}>Je n'y vais pas</button>`);
     }
     const metaHtml = meta.map((x) => html`<span>${x}</span>`);
     body = html`
@@ -326,6 +330,26 @@ function row(it, res, st, ctx, flags) {
     </div>`;
 }
 
+/**
+ * Séances du jour où tu ne vas pas, à montrer dans la frise : les cours, séminaires, TP, appuis, tutorats…
+ * (pas les créneaux secondaires : autres jours de guidance / permanence, appuis partagés avec VETE).
+ */
+function skippedEvents(res) {
+  return res.events.filter((ev) => !ev.attend && !ev.vete && (ev.def || !["GUID", "PERM"].includes(ev.type)));
+}
+
+function skipRow(ev, ctx) {
+  const why = ev.type === "TH" ? "Tu n'y vas pas : le cours est rattrapé dans ta journée (slides ou podcast)." : "Tu n'y vas pas.";
+  return html`
+    <div class="row minor skip" style="--c:${cv(ev.subj)}">
+      <div class="tm"><span>${E.hm(ev.s)}</span></div>
+      <div class="rail" style="--h:14px"></div>
+      <div class="body"><b>${E.evLabel(ev)}</b><span class="mono dur">${E.hm(ev.s)}–${E.hm(ev.e)}</span>
+        <button class="linkbtn" @click=${() => act.toggleEvent(ev)}>J'y vais</button>
+        <small>${ev.theme ? ev.theme + " · " : ""}${why}</small></div>
+    </div>`;
+}
+
 /** « , puis retour à la maison et sport jusqu'à 21:45 » : seulement ce qui vient vraiment après le programme. */
 function endText(res) {
   const after = res.items.filter((it) => it.s >= res.workEnd && it.e > it.s);
@@ -340,7 +364,14 @@ function timeline(res, st, ctx) {
   let curBloc = -1;
   // prochain créneau à venir (pour la carte « Maintenant » quand rien n'est en cours)
   const nextIdx = ctx.isToday && !res.items.some((it) => ctx.nm >= it.s && ctx.nm < it.e && !it.past) ? res.items.findIndex((it) => it.s > ctx.nm && !it.past) : -1;
+  // séances où tu ne vas pas : une ligne discrète à leur heure, pour pouvoir changer d'avis
+  const skipped = skippedEvents(res);
+  let si = 0;
+  const flushSkipped = (upTo) => {
+    while (si < skipped.length && skipped[si].s < upTo) out.push(skipRow(skipped[si++], ctx));
+  };
   res.items.forEach((it, i) => {
+    if (it.e > it.s) flushSkipped(it.s + 1);
     if (it.kind === "replan") {
       out.push(html`<div class="replan-line">Replanifié à ${E.hm(it.s)} · ${E.hdur(it.studied)} déjà faites</div>`);
       curBloc = -1;
@@ -352,6 +383,7 @@ function timeline(res, st, ctx) {
     }
     out.push(row(it, res, st, ctx, { next: i === nextIdx }));
   });
+  flushSkipped(Infinity);
   return html`
     <div class="tl">
       ${out}
@@ -415,7 +447,8 @@ function aside(res, st, ctx) {
         ${res.events.map((ev) => {
           let desc = E.hm(ev.s) + "–" + E.hm(ev.e) + (ev.room ? " · " + ev.room : "");
           if (ev.type === "TH") desc += " · facultatif";
-          if (ev.vete) desc += " · créneau partagé VETE";
+          if (ev.vete) desc += ev.note ? " · " + ev.note : " · créneau partagé VETE";
+          if (ev.theme) desc += " · " + ev.theme;
           if (ev.assumed) desc += " · horaire supposé";
           if ((ev.type === "GUID" || ev.type === "PERM") && !ev.def) desc += " · autre créneau possible";
           return html`<div class="ev ${ev.attend ? "" : "off"}" style="--c:${cv(ev.subj)}"><div class="t"><i></i>${E.evLabel(ev)}</div><div class="d">${desc}</div>

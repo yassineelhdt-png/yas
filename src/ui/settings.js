@@ -48,8 +48,13 @@ const FORM = [
     ["permPhysStart", "Permanence physique : arrivée", "time"],
     ["permPhysDur", "Permanence physique : durée", "min", { min: 15 }],
     ["appuiMath", "Appui maths du mardi", "bool"],
-    ["appuiBio", "Appui bio du vendredi", "bool"],
-    ["attendTheory", "Aller aux cours théoriques", "bool"]
+    ["appuiBio", "Appui bio du vendredi (guidances QCM à thèmes)", "bool"],
+    ["tutoBio", "Tutorat de bio du mercredi (12:00–13:50)", "bool"]
+  ]],
+  // cours théoriques : par matière (attendTh), repli sur l'ancien choix général attendTheory
+  ["Cours théoriques (par défaut)", [
+    ["CHIM", "Chimie", "th"], ["PHYS", "Physique", "th"], ["MATH", "Maths", "th"],
+    ["BIO", "Bio", "th"], ["BIO2", "Bio · diversité du vivant", "th"], ["MEDIG", "MEDIG (IA, ERSB, durabilité)", "th"]
   ]],
   ["Week-end", [
     ["chimOrga", "Samedi : chimie organique (Q2)", "min"],
@@ -87,6 +92,10 @@ function field([key, label, type, opt = {}], st) {
   let input;
   if (type === "time" || type === "date") {
     input = html`<input type=${type} id=${id} .value=${keep(id, v || "")} @change=${(e) => { saveSettings({ [key]: e.target.value }); toast("Réglage enregistré"); }}>`;
+  } else if (type === "th") {
+    // cours théoriques d'une matière : j'y vais par défaut ? (chaque cours reste modifiable dans le planning)
+    const th = st.attendTh || {}, on = typeof th[key] === "boolean" ? th[key] : !!st.attendTheory;
+    input = html`<button class="sw" role="switch" id=${id} aria-checked=${on ? "true" : "false"} aria-label=${"Cours de " + label.toLowerCase()} @click=${() => { saveSettings({ attendTh: { ...th, [key]: !on } }); toast(on ? "Cours de " + label.toLowerCase() + " : rattrapés à la maison" : "Cours de " + label.toLowerCase() + " : tu y vas"); }}></button>`;
   } else if (type === "bool") {
     input = html`<button class="sw" role="switch" id=${id} aria-checked=${v ? "true" : "false"} aria-label=${label} @click=${() => saveSettings({ [key]: !v })}></button>`;
   } else if (type === "sel") {

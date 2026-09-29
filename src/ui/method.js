@@ -75,7 +75,8 @@ export function methodView() {
         <li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li>
         <li>La veille d'un séminaire : préparation de la série.</li>
         <li>Guidance chimie 1×/semaine : le ${JOURS_MIN[st.guidChimDay]} (${E.hdur(+st.guidChimDur)}). Permanence physique 1×/semaine : le ${JOURS_MIN[st.permPhysDay]} à ${st.permPhysStart} (${E.hdur(+st.permPhysDur)}). Réglables dans Réglages → Unif.</li>
-        <li>Appuis : maths le mardi 12h–14h, bio le vendredi 12h–14h. Les créneaux partagés avec VETE sont désactivés par défaut.</li>
+        <li>Appuis : maths le mardi 12h–14h ; bio le vendredi 12h–14h (guidances QCM à thèmes : le thème est indiqué sur la séance ; la séance des VETE, le mercredi en général, est proposée comme rechange). Tutorat de bio le mercredi 12h–13h50 (G1-2-302).</li>
+        <li>Tu choisis chaque séance : « Je n'y vais pas » sur la séance dans le planning, « J'y vais » sur la ligne barrée d'une séance où tu ne vas pas. Les cours théoriques se règlent aussi par matière dans Réglages.</li>
         <li>Le reste du temps tourne entre chimie, physique, maths et bio pour équilibrer la semaine.</li>
       </ul>
 

@@ -320,6 +320,34 @@ describe("sessions", () => {
     for (const d of days) expect(E.planDay(d, {}).net, d).toBeLessThanOrEqual(9 * 60 + 15);
   });
 
+  it("tutorat de bio : tous les mercredis 12:00–13:50 en G1-2-302, au choix", () => {
+    const ev = (d, day) => E.planDay(d, {}, () => day).events.find((e) => e.type === "TUT");
+    const t = ev("2026-10-07");
+    expect([E.hm(t.s), E.hm(t.e), t.room, E.evLabel(t), t.attend]).toEqual(["12:00", "13:50", "G1-2-302", "Tutorat de bio", true]);
+    expect(ev("2026-10-06")).toBeUndefined(); // mardi
+    expect(ev("2026-10-07", { ov: { [t.id]: false } }).attend).toBe(false); // décoché ce jour-là
+    expect(E.planDay("2026-10-07", { tutoBio: false }).events.find((e) => e.type === "TUT").attend).toBe(false);
+    // pas de déjeuner possible entre les séances : l'app le dit
+    expect(E.planDay("2026-10-07", {}).notes.some((n) => n.startsWith("Pas de pause déjeuner"))).toBe(true);
+  });
+
+  it("guidances de bio (PDF du 22/09) : thème, guidance 1 du jeudi 1/10, séance des VETE en rechange", () => {
+    const g = (d) => E.planDay(d, {}).events.filter((e) => e.subj === "BIO" && e.type === "APPUI" && E.hm(e.s) === "12:00");
+    const [g1] = g("2026-10-01");
+    expect([g1.theme.startsWith("Guidance 1 · Unicité du monde vivant"), g1.attend]).toEqual([true, true]);
+    expect(g("2026-10-09")[0].theme).toMatch(/^Guidance 3 · Génétique des procaryotes/);
+    const vete = g("2026-10-07").find((e) => e.vete);
+    expect([vete.attend, vete.theme.startsWith("Guidance 2")]).toEqual([false, true]);
+    // horaire de la v1 : pas d'ajout
+    expect(E.planDay("2026-10-01", { extraSessions: false }).events.some((e) => e.type === "APPUI")).toBe(false);
+  });
+
+  it("cours théoriques : choix par matière, sinon le choix général", () => {
+    const th = (d, S) => Object.fromEntries(E.planDay(d, S).events.filter((e) => e.type === "TH").map((e) => [e.subj, e.attend]));
+    expect(th("2026-10-06", { attendTh: { MATH: true } })).toEqual({ BIO: false, MATH: true });
+    expect(th("2026-10-06", { attendTheory: true, attendTh: { BIO: false } })).toEqual({ BIO: false, MATH: true });
+  });
+
   it("« reporté » une seule fois dans les titres", () => {
     for (const d of days) {
       for (const it of E.planDay(d, {}).items) for (const t of it.tasks || []) expect(t.title, d).not.toMatch(/reporté · reporté/);
@@ -337,9 +365,9 @@ describe("objectifs de la semaine", () => {
   it("les annales habituelles sont placées dans la semaine, sans dépasser l'objectif", () => {
     for (const mon of ["2026-10-05", "2026-11-09", "2026-12-07"]) {
       const g = goalMin(E.planWeek(mon, {}));
-      // semaine de cours : au moins une annale de chimie et une de physique, en entier
+      // semaine de cours (avec le tutorat du mercredi) : une annale de chimie entière, et de la physique
       expect(g["annale-chim"], mon).toBeGreaterThanOrEqual(240);
-      expect(g["annale-phys"], mon).toBeGreaterThanOrEqual(240);
+      expect(g["annale-phys"], mon).toBeGreaterThanOrEqual(120);
       expect(g["annale-chim"], mon).toBeLessThanOrEqual(480);
       expect(g["annale-math"] || 0, mon).toBeLessThanOrEqual(240);
     }

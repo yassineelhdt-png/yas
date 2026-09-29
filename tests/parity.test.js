@@ -59,9 +59,9 @@ const PROFILES = {
 
 // La v1 n'a ni heure de fin, ni lieux, ni durée minimale de session, ni objectifs de la semaine :
 // on les désactive pour comparer (et on garde le trajet de la v1, 30 min).
-const V1 = { endAt: "", weekdayPlace: "maison", minSession: 0, goals: { base: [], weeks: {} } };
+const V1 = { endAt: "", weekdayPlace: "maison", minSession: 0, goals: { base: [], weeks: {} }, extraSessions: false };
 // (key : la v2 identifie un créneau par son contenu ; legacyKey reprend la clé de la v1, comparée à sa place)
-const NEW_KEYS = ["endAt", "endSet", "workEnd", "fit", "place", "placeSet", "placeInfo", "at0", "walls", "notes", "closedAt", "key"];
+const NEW_KEYS = ["endAt", "endSet", "workEnd", "fit", "place", "placeSet", "placeInfo", "at0", "walls", "notes", "closedAt", "key", "theme"];
 // retire les clés à valeur undefined (JSON) et les champs ajoutés en v2, pour comparer les données
 // v1 : « · reporté » s'accumulait quand une tâche était reportée plusieurs fois (corrigé en v2) ;
 // deux tâches qui ne différaient que par là sont maintenant une seule tâche

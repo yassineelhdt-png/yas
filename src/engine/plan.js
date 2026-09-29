@@ -414,6 +414,18 @@ function finish(res, S, queue, weekMin, goals) {
   const fit = res.fit;
   // informations (pas des problèmes)
   res.notes = [];
+  // séances sans interruption à midi : pas de vrai déjeuner possible, on prévient
+  if (v2(S) && res.mode !== "concours" && res.start < 810 && res.workEnd > 840 && !res.items.some((it) => it.kind === "lunch")) {
+    // suite de séances (moins de 30 min entre deux) qui couvre midi
+    const fx = res.items.filter((it) => it.kind === "fixed").sort(byStart);
+    const k = fx.findIndex((it) => it.s < 840 && it.e > 720);
+    if (k >= 0) {
+      let a = k, b = k;
+      while (a > 0 && fx[a].s - fx[a - 1].e < 30) a--;
+      while (b < fx.length - 1 && fx[b + 1].s - fx[b].e < 30) b++;
+      res.notes.push("Pas de pause déjeuner : séances de " + hm(fx[a].s) + " à " + hm(fx[b].e) + " presque sans interruption. Prends un repas à emporter.");
+    }
+  }
   if (res.closedAt != null && res.placeInfo) res.notes.push(res.placeInfo.short + " ferme à " + hm(res.closedAt) + " : fin du programme à " + hm(res.workEnd) + ".");
   if (fit?.mode === "stretch" && fit.early) res.notes.push("Objectif atteint à " + hm(res.workEnd) + " : pas besoin de continuer jusqu'à " + hm(fit.endAt) + ".");
   if (fit?.mode === "squeeze") {

@@ -67,7 +67,7 @@ export function weekView(week, nav) {
   const upTo = days.filter((d) => d.r.date <= today);
   const dueAll = upTo.reduce((a, d) => a + d.r.net, 0);
   const seances = week.flatMap((r) => r.items.filter((it) => it.kind === "fixed").map((it) => html`
-    <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}</div></div>`));
+    <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}${it.theme ? " · " + it.theme : ""}</div></div>`));
 
   return html`
     <div class="weekhead">

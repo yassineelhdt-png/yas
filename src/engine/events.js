@@ -9,7 +9,12 @@ export const weekNo = (ds) => Math.round((pd(monday(ds)) - pd(H.semesterStart)) 
 export const isBlocus = (ds) => ds >= H.blocusFrom;
 
 function defaultAttend(type, subj, vete, S) {
-  if (type === "TH") return !!S.attendTheory;
+  // cours théoriques : choix par matière (Réglages), sinon le choix général
+  if (type === "TH") {
+    const th = S.attendTh || {};
+    return typeof th[subj] === "boolean" ? th[subj] : !!S.attendTheory;
+  }
+  if (type === "TUT") return !!S.tutoBio;
   if (type === "VISITE") return false;
   if (type === "APPUI") {
     if (vete) return false;
@@ -69,6 +74,30 @@ export function dayEvents(ds, S, ov) {
       s: m(r[1]), e: m(r[2]), subj: r[3], type: r[4],
       room: H.rooms[r[5]] || r[5] || "Local non indiqué sur TimeEdit",
       note: r[6] || "", vete: !!r[7], def: defaultAttend(r[4], r[3], r[7], S)
+    });
+  }
+  // ajouts de la v2 (extraSessions = false : horaire de la v1, pour le test de parité)
+  const extra = S.extraSessions !== false;
+  // guidances de bio : thème du jour ; guidance 1 (jeudi) absente de TimeEdit ; séance des VETE en rechange
+  for (const [n, theme, vete, bime] of H.bioGuid || []) {
+    if (ds !== vete && ds !== bime) continue;
+    const label = "Guidance " + n + " · " + theme;
+    const own = out.find((ev) => ev.subj === "BIO" && ev.type === "APPUI" && !ev.vete && ev.s === m("12:00"));
+    if (ds === bime && own) own.theme = label;
+    else if (extra) {
+      out.push({
+        id: ds + "_1200_BIO_APPUI" + (ds === vete ? "_G" : ""), s: m("12:00"), e: m("14:00"), subj: "BIO", type: "APPUI",
+        room: H.rooms.AUD, note: ds === vete ? "Séance des VETE : même guidance, sans inscription" : "", vete: ds === vete,
+        theme: label, def: defaultAttend("APPUI", "BIO", ds === vete, S)
+      });
+    }
+  }
+  // séances de chaque semaine (ex. tutorat de bio du mercredi)
+  for (const [subj, type, wd, s, e, room, from, until] of extra ? H.weekly || [] : []) {
+    if (dow(ds) !== wd || ds < from || ds > until || H.closed[ds]) continue;
+    out.push({
+      id: ds + "_" + s.replace(":", "") + "_" + subj + "_" + type, s: m(s), e: m(e), subj, type,
+      room: H.rooms[room] || room, note: "", vete: false, def: defaultAttend(type, subj, false, S)
     });
   }
   const picks = weekPicks(ds, S);

@@ -2,7 +2,7 @@
 // Source : export TimeEdit B1-BIME-B1 du 26/09/2026 + affiche SAA « Guidance en chimie – Erasme » (sept/oct 2026)
 // + page « Horaires Q1 » des permanences de physique.
 // Types : TH théorie · SEM séminaire · EX exercices · TP travaux pratiques · APPUI appui pédagogique
-//         TEST interrogation · INFO infos examen · VISITE visite de copies
+//         TEST interrogation · INFO infos examen · VISITE visite de copies · TUT tutorat
 // Pour le Q2 : copier ce fichier, remplacer les séances, puis l'importer dans src/data/index.js.
 // vete:true = appui partagé avec B1-VETE (créneau secondaire, désactivé par défaut)
 const HORAIRE = {
@@ -20,7 +20,7 @@ const HORAIRE = {
     WP: "E.F2.104A/B · Auditoire Willy Peers", LP: "E.W.1.306 · Auditoire Louise Popelin", AB: "E.B1.003/003A · Auditoire B",
     BRE: "Auditoire Bremer", BOR: "Auditoire Bordet (F2.304A/B)", TPB: "E.G2.3.306 · labo TP", INF: "E.E1.2.314 · Salle InforMel (pédagogie active)",
     F3307: "E.F3.307", GE: "GE.3.310 · bâtiment GE (monter d'un niveau après l'entrée principale, à gauche en sortant des escaliers)",
-    F3: "Erasme F3.307", A3: "Erasme A3.155"
+    F3: "Erasme F3.307", A3: "Erasme A3.155", G1: "G1-2-302", AUD: "Auditoire (à confirmer sur TimeEdit)"
   },
   // [date, début, fin, matière, type, local, note, vete]
   events: [
@@ -109,6 +109,27 @@ const HORAIRE = {
   // Après octobre : créneaux supposés identiques (à confirmer avec l'affiche de novembre)
   guidChimAssumed: { 2: ["10:30","14:30"], 3: ["10:00","14:00"], 4: ["11:00","15:00"] },
   guidChimKnownUntil: "2026-10-31",
+  // Guidances de biologie BIOLG1106 (QCM à thèmes, 12h–14h en auditoire, sans inscription) — PDF du 22/09/2026.
+  // [n°, thème, date VETE1 (autre créneau possible), date BIME1]. Les séances BIME du vendredi sont les
+  // « Appui bio » de TimeEdit ci-dessus ; la guidance 1 (jeudi 1/10) n'y est pas : elle est ajoutée ici.
+  bioGuid: [
+    [1, "Unicité du monde vivant, molécules de la vie, origine de la vie", "2026-10-05", "2026-10-01"],
+    [2, "Notion de cellule, les deux types d'organisation cellulaire ; introduction à la cellule procaryote", "2026-10-07", "2026-10-02"],
+    [3, "Génétique des procaryotes (1re partie) : croissance bactérienne, les 3 recombinaisons génétiques", "2026-10-13", "2026-10-09"],
+    [4, "Génétique des procaryotes (2e partie) : les opérons", "2026-10-14", "2026-10-16"],
+    [5, "Cellule eucaryote (1re partie) : structure, trafic intracellulaire, hétéro- et autophagie, transports membranaires", "2026-10-21", "2026-10-23"],
+    [6, "Mitochondrie : structure et respiration cellulaire", "2026-11-04", "2026-11-06"],
+    [7, "Chloroplaste : structure et photosynthèse", "2026-11-10", "2026-11-13"],
+    [8, "ADN et synthèse des protéines", "2026-11-18", "2026-11-19"],
+    [9, "Réplication", "2026-11-25", "2026-11-27"],
+    [10, "Cellule eucaryote (3e partie) : divisions cellulaires, mitose, méiose, cycle cellulaire", "2026-12-02", "2026-12-04"],
+    [11, "Génétique de Mendel", "2026-12-09", "2026-12-11"],
+    [12, "Révisions globales : exercices sur la matière théorique du Q1", "2026-12-16", "2026-12-18"]
+  ],
+  // Séances hebdomadaires : [matière, type, jour (1 = lundi), début, fin, local, du, au] — hors jours fermés
+  weekly: [
+    ["BIO", "TUT", 3, "12:00", "13:50", "G1", "2026-09-30", "2026-12-16"] // tutorat de biologie, tous les mercredis
+  ],
   // Permanences de physique – Erasme GE.3.310, lun→ven 10h-14h, dès la semaine 3
   permPhys: { from: "2026-09-28", until: "2026-12-18", start: "10:00", end: "14:00", room: "GE" },
   semesterStart: "2026-09-21", // lundi de la semaine 2

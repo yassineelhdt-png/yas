@@ -35,6 +35,7 @@ export function prepFor(ev) {
     case "TP": return { subj: ev.subj, kind: "prep", title: "Préparer le TP de " + n, detail: "Lire le protocole, répondre aux questions préalables", min: 30 };
     case "TEST": return { subj: ev.subj, kind: "prep", title: "Réviser l'interro de " + n, detail: "Exercices types, formules, anciens tests", min: 120 };
     case "APPUI":
+    case "TUT":
     case "GUID":
     case "PERM": return { subj: ev.subj, kind: "prep", title: "Questions pour " + evLabel(ev).toLowerCase(), detail: "Lister précisément ce que tu veux demander", min: 15 };
     default: return null;
