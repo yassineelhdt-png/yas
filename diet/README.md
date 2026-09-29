@@ -18,6 +18,11 @@ de chaque moment des compléments), **Calendrier** (semaine, mois, année, et l'
 IMC (avec les repères d'adulte à partir de 18 ans seulement), courbe du poids, prochaine visite, tension et pouls, prises de sang visite par visite) et **Réglages** (profils,
 profil santé, objectifs du jour, visite médicale, sport, compléments, mes aliments, Claude, sauvegarde et données).
 
+**Recherche** (en haut du Calendrier) : « mal de tête », « poulet », « dentiste »… cherche dans tout le journal
+(notes, ressentis, check-ins, repas et aliments, séances, visites et prises de sang, rendez-vous), sans tenir compte
+des accents, des majuscules ni des petits mots (« mal à la tête » trouve « mal de tête »). Les résultats vont du plus
+récent au plus ancien, mots surlignés ; en toucher un ouvre la journée au bon onglet.
+
 **Agenda** (Calendrier → « + Rendez-vous ») : rendez-vous (médecin, dentiste, prise de sang, kiné, spécialiste…) avec
 jour, heure, lieu et note, ou dates à retenir (anniversaire, examen…) pour toute la journée. Le jour se choisit d'un
 appui (aujourd'hui, demain, jeu 1…) ou dans le calendrier. Ils sont marqués dans le mois (le nom écrit dans la case sur
@@ -28,7 +33,9 @@ journée, et le dossier complet les liste.
 **Confort** : « Annuler » quelques secondes après chaque suppression (check-in, repas, ressenti, séance, complément,
 aliment, séance type, séance en direct abandonnée) ; « Premiers pas » pour un profil qui démarre vide ; dans l'app
 sans compte, rappel de sauvegarde tous les 14 jours (le journal n'existe que sur l'appareil) et date de la dernière
-dans *Données* ; deux colonnes dès 760 px (tablette). On passe d'un champ à l'autre sans que le clavier se
+dans *Données* ; deux colonnes dès 760 px (tablette). Nouveau repas : « Refaire un repas » propose les repas des 30
+derniers jours (ceux du même type d'abord) et recopie aliments et description en un appui. Textes lisibles dans les
+deux thèmes (contraste WCAG AA vérifié écran par écran) et chaque bouton ou champ nommé pour les lecteurs d'écran. On passe d'un champ à l'autre sans que le clavier se
 referme, et ce qui en dépend suit tout de suite (verdict de tension, pas restants, durée de la nuit). Les saisies
 acceptent les écritures courantes (« 6 500 » pas, « 2 000 » kcal, taille « 1,80 » ou « 180 cm ») ; une valeur
 impossible est refusée avec un message et l'ancienne revient.

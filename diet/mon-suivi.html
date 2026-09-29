@@ -127,7 +127,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .lid .bar i{ display:block; height:100%; background:var(--fill); border-radius:2px; }
 .lid[aria-current="date"]{ background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
 .lid[aria-current="date"] .bar i{ background:var(--on-accent); }
-.lid[aria-current="date"] .wd{ color:inherit; opacity:.7; }
+.lid[aria-current="date"] .wd{ color:inherit; }
 .lid[aria-current="date"] .bar{ background:rgba(127,127,127,.4); }
 .lid.today .dn{ text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; }
 .banner{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin:-8px 0 24px; padding:12px 14px; border:1.5px dashed var(--matin); background:var(--surface); border-radius:14px; }
@@ -248,8 +248,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .dot.emoji[aria-pressed="true"]{ background:var(--matin-tint); border-color:var(--matin); box-shadow:inset 0 0 0 2px var(--matin); color:inherit; }
 .ends{ display:flex; justify-content:space-between; width:262px; max-width:100%; margin-top:5px; font-size:12px; font-weight:600; color:var(--muted); }
 .seg{ display:inline-flex; max-width:100%; padding:3px; gap:3px; background:var(--surface-2); border:1px solid var(--line); border-radius:999px; }
-.field > .seg{ display:flex; width:max-content; }
-.field > .seg button{ flex:1 1 auto; min-width:0; }
+.field > .seg{ display:flex; flex-wrap:wrap; width:max-content; border-radius:22px; }
+.field > .seg button{ flex:1 1 auto; min-width:0; white-space:nowrap; }
 .seg button{ border:0; background:transparent; border-radius:999px; padding:8px 14px; font-weight:700; color:var(--muted); min-height:38px; }
 .seg button[aria-pressed="true"]{ background:var(--ink); color:var(--bg); }
 .notes{ min-height:110px; }
@@ -508,6 +508,25 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .now .moment{ margin-bottom:10px; }
 .now-done{ display:flex; align-items:center; gap:10px; margin:0 0 12px; padding:12px 14px; border-radius:14px; background:color-mix(in srgb, var(--fill) 10%, var(--surface)); font-weight:700; }
 .now-done svg{ flex:none; width:22px; height:22px; color:var(--fill); }
+.search{ position:relative; margin:0 0 14px; }
+.search input{ width:100%; min-height:48px; padding:10px 14px 10px 44px; border-radius:14px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font:inherit; font-size:16px; }
+.search input:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:transparent; }
+.s-ico{ position:absolute; left:14px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--muted); pointer-events:none; }
+.s-ico svg{ width:20px; height:20px; display:block; }
+.s-results{ margin:0 0 16px; }
+.s-count{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 8px; font-size:14px; font-weight:800; color:var(--muted); }
+.s-list{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.s-row{ width:100%; text-align:left; display:flex; flex-direction:column; gap:3px; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); }
+.s-row:hover{ border-color:var(--accent); }
+.s-when{ font-size:13px; font-weight:700; color:var(--muted); }
+.s-when b{ color:var(--ink); font-weight:800; }
+.s-txt{ font-size:15px; line-height:1.4; overflow-wrap:anywhere; }
+.s-txt mark{ background:color-mix(in srgb, var(--accent) 22%, transparent); color:inherit; border-radius:3px; padding:0 1px; }
+.s-none{ margin:0 0 16px; color:var(--muted); font-weight:600; }
+.redo{ display:flex; flex-direction:column; gap:8px; margin:0 0 16px; padding:12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--line); }
+.redo-btn{ text-align:left; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-weight:700; font-size:14px; line-height:1.3; }
+.redo-btn:hover{ border-color:var(--accent); }
+.redo .chips-lbl{ font-size:13px; font-weight:800; color:var(--muted); }
 .streak{ display:flex; align-items:center; gap:8px; margin:4px 0 12px; font-size:14px; font-weight:700; color:var(--muted); }
 .streak svg,.streak-txt svg{ flex:none; width:17px; height:17px; color:var(--c-kcal); }
 .streak-txt{ display:inline-flex; align-items:center; gap:3px; white-space:nowrap; color:var(--ink); }
@@ -575,7 +594,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .mday .marks{ display:flex; gap:3px; min-height:7px; }
 .mday .marks i{ width:7px; height:7px; border-radius:50%; }
 .mday .mk-s{ background:var(--sport); } .mday .mk-v{ background:var(--soir); } .mday .mk-j{ background:var(--aprem); } .mday .mk-w{ background:var(--soir-2); border:1.5px solid var(--soir); }
-.mday.future{ opacity:.5; }
+.mday.future{ opacity:.64; }
 .mday .mk-r{ background:var(--ink); }
 .mday.has-appt{ border-color:color-mix(in srgb, var(--ink) 35%, var(--line)); }
 .mday.has-appt.future{ opacity:.85; }
@@ -1136,6 +1155,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     check: trusted('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12.5l4.5 4.5L19.5 6.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
     ...Object.fromEntries(Object.entries({
       visit: '<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
+      search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/>',
       sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
       moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
       grid: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
@@ -1376,7 +1396,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     ui: {
       view: 'jour', date: todayKey(), weekOf: startOfWeek(todayKey()), year: new Date().getFullYear(),
       form: null, confirm: null, exportText: null, just: null, focus: null, select: false, openSup: null, appt: null, apptPast: false,
-      restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
+      q: '', restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null, labsOpen: false,
       dayTab: 'apercu', calMode: 'mois', monthOf: todayKey().slice(0, 7), settingsPage: null, tplEdit: null, profileEdit: null, profileNew: '', profileAdd: false, switching: false,
       bilan: { kind: 'semaine', anchor: todayKey() }, dossier: { range: 'all', from: '', to: '' },
       foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
@@ -1670,6 +1690,30 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     }
     return out;
   }
+
+  /* Repas notés ces 30 derniers jours, sans doublon (mêmes aliments, même description) : « Refaire un repas ».
+     Ceux du même type (déjeuner…) d'abord. */
+  function recentMeals(k, kind) {
+    const seen = new Set(), out = [];
+    for (let i = 0; i < 30 && out.length < 12; i++) {
+      const dk = addDays(k, -i), d = peekDay(dk);
+      if (!d) continue;
+      listOf(d.meals).slice().sort(byTime).reverse().forEach((m) => {
+        const items = mealItems(m);
+        if (!items.length && !str(m.text).trim()) return;
+        const sig = items.map((it) => norm(it.name)).sort().join('|') + '#' + norm(m.text);
+        if (seen.has(sig)) return;
+        seen.add(sig);
+        out.push({ ref: `${dk}|${m.id}`, m, items });
+      });
+    }
+    return out.sort((a, b) => (b.m.kind === kind) - (a.m.kind === kind)).slice(0, 4);
+  }
+  const mealLabel = (r) => {
+    const names = r.items.map((it) => it.name), t = sumMacros(r.items);
+    const what = names.length ? names.slice(0, 3).join(', ') + (names.length > 3 ? '…' : '') : str(r.m.text).slice(0, 40);
+    return `${str(r.m.kind) || 'Repas'} · ${what}${t.n ? ` · ${fmtInt(t.kcal)} kcal` : ''}`;
+  };
 
   /* ---------- Enregistrement ----------
      Mode « local » : pas de compte Claude, tout reste dans ce navigateur (LS_KEY).
@@ -2579,7 +2623,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const kinds = MEAL_KINDS.includes(dr.kind) ? MEAL_KINDS : [...MEAL_KINDS, dr.kind];
     const recents = recentFoods(f.date).filter((r) => !dr.items.some((x) => norm(x.name) === norm(r.name))).slice(0, 6);
     const food = findFood(it.name);
+    const again = !f.id && !dr.items.length && !str(dr.text).trim() ? recentMeals(f.date, dr.kind) : [];
     return html`<div class="form" role="group" aria-label="Repas">
+      ${again.length ? html`<div class="redo" role="group" aria-labelledby="redo-l"><span class="chips-lbl" id="redo-l">Refaire un repas</span>${again.map((r) => html`<button type="button" class="redo-btn" data-act="meal-redo" data-v="${r.ref}">${mealLabel(r)}</button>`)}</div>` : ''}
       <div class="form-row">
         <label class="field field-time"><span>Heure</span><input type="time" id="draft-time" data-draft="time" value="${str(dr.time)}"></label>
         <div class="field"><span id="kind-lbl">Type</span><div class="seg" role="group" aria-labelledby="kind-lbl">${kinds.map((v) => html`<button type="button" data-act="meal-kind" data-v="${v}" aria-pressed="${bool(dr.kind === v)}">${v}</button>`)}</div></div>
@@ -2715,7 +2761,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         ${store.sample && store.sampleImages ? html`<label class="ghost filebtn">${a.photo ? `Photo : ${a.photo.name}` : 'Joindre une photo (prise de sang, ordonnance…)'}<input type="file" id="ask-photo" data-ask="photo" accept="${store.sampleImages.mediaTypes ? store.sampleImages.mediaTypes.join(',') : 'image/jpeg,image/png,image/webp,image/gif'}" class="sr-only"></label>${a.photo ? html`<button type="button" class="link" data-act="ask-photo-clear">Retirer la photo</button>` : ''}` : ''}
       </div>
       ${askArea(scope, key)}
-      <details class="report-box" data-toggle="report"${a.showReport ? html` open` : ''}><summary>Voir le texte pour Claude</summary><textarea readonly id="report-text" class="export" rows="12">${claudeText(scope, key)}</textarea></details>
+      <details class="report-box" data-toggle="report"${a.showReport ? html` open` : ''}><summary>Voir le texte pour Claude</summary><textarea readonly id="report-text" class="export" rows="12" aria-label="Texte pour Claude">${claudeText(scope, key)}</textarea></details>
     </section>`;
   }
   function askArea(scope, key) {
@@ -3353,7 +3399,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
           <div class="actions"><button type="button" class="ghost" data-act="export-csv">${fileVerb} le tableau (.csv)</button></div>
         </div>
       </div>
-      ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">Copie ce texte et garde-le (notes, e-mail, Drive…) ; sur l’autre appareil, colle-le dans « Restaurer → Coller le texte ».</p><textarea readonly class="export" id="export-text" rows="8">${S.ui.exportText}</textarea>
+      ${S.ui.exportText != null ? html`<div class="exportbox"><p class="hint">Copie ce texte et garde-le (notes, e-mail, Drive…) ; sur l’autre appareil, colle-le dans « Restaurer → Coller le texte ».</p><textarea readonly class="export" id="export-text" rows="8" aria-label="Texte de la sauvegarde">${S.ui.exportText}</textarea>
         <div class="actions"><button type="button" class="ghost" data-act="copy-export">Copier</button>${canShare() ? html`<button type="button" class="ghost" data-act="share-export">Partager</button>` : ''}<button type="button" class="link" data-act="close-export">Fermer</button></div></div>` : ''}
     </section>`;
   }
@@ -3422,9 +3468,75 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   function renderCalendar() {
     const mode = S.ui.calMode;
     return html`<div class="title-row"><h1 class="page-title">Calendrier</h1>${S.ui.appt ? '' : html`<button type="button" class="primary" data-act="appt-new" data-where="cal">+ Rendez-vous</button>`}</div>
+      <div class="search"><span class="s-ico" aria-hidden="true">${ICON.search}</span><input type="search" id="cal-q" data-search="q" value="${S.ui.q}" placeholder="Chercher : mal de tête, poulet, dentiste…" aria-label="Chercher dans mon journal" autocomplete="off" enterkeyhint="search"></div>
+      <div data-patch="search">${searchResults(S.ui.q)}</div>
       <div class="seg-nav" role="group" aria-label="Affichage">${[['semaine', 'Semaine'], ['mois', 'Mois'], ['annee', 'Année']].map(([v, l]) => html`<button type="button" data-act="cal-mode" data-v="${v}" aria-pressed="${bool(mode === v)}">${l}</button>`)}</div>
       <div class="cal-layout"><div class="cal-main">${mode === 'semaine' ? renderWeek() : mode === 'annee' ? renderYear() : renderMonth()}</div><div class="cal-side">${apptCard()}</div></div>`;
   }
+  /* ---------- Recherche dans le journal ----------
+     Tous les mots doivent se trouver dans la même entrée ; accents et majuscules ne comptent pas. */
+  const SEARCH_MAX = 60;
+  // « mal à la tête » trouve aussi « mal de tête » : les petits mots ne comptent pas (sauf s'il n'y a qu'eux).
+  const STOP_WORDS = new Set(['de', 'du', 'des', 'd', 'la', 'le', 'les', 'l', 'a', 'au', 'aux', 'et', 'un', 'une', 'en', 'ma', 'mon', 'mes']);
+  function searchWords(q) {
+    const all = norm(q).replace(/[’']/g, ' ').split(' ').filter(Boolean), kept = all.filter((w) => !STOP_WORDS.has(w));
+    return kept.length ? kept : all;
+  }
+  function searchJournal(q) {
+    const words = searchWords(q), out = [];
+    if (!words.length) return out;
+    const hit = (txt) => { const n = norm(txt); return !!n && words.every((w) => n.includes(w)); };
+    const add = (k, label, text, go) => { if (hit(text)) out.push({ k, label, text: String(text), ...go }); };
+    const days = Object.keys(S.months).sort().reverse().flatMap((mk) => Object.keys(S.months[mk].days || {}).sort().reverse());
+    const t = todayKey();
+    S.settings.appts.filter((a) => a.date >= t).sort(byWhen).forEach((a) => add(a.date, `Rendez-vous${a.time ? ` · ${a.time}` : ''}`, [a.title, a.place, a.note].filter(Boolean).join(' · '), { tab: 'apercu' }));
+    days.forEach((k) => {
+      const d = peekDay(k);
+      if (!d) return;
+      const vis = visitOf(d);
+      if (vis) add(k, 'Visite médicale', [str(vis.notes), str(vis.labsText), ...LABS.filter(([key]) => str((vis.labs || {})[key]).trim()).map(([key, lbl]) => `${lbl} ${str(vis.labs[key]).trim()}`)].filter(Boolean).join(' · '), { tab: 'visite' });
+      listOf(d.symptoms).slice().sort(byTime).forEach((x) => add(k, `Ressenti · ${str(x.time)}`, x.text, { tab: 'journal' }));
+      listOf(d.checkins).slice().sort(byTime).forEach((x) => add(k, `Check-in · ${str(x.time)}`, x.note, { tab: 'journal' }));
+      listOf(d.meals).slice().sort(byTime).forEach((m) => add(k, `${str(m.kind) || 'Repas'} · ${str(m.time)}`, [str(m.text), mealItems(m).map((it) => it.name).join(', ')].filter(Boolean).join(' — '), { tab: 'repas' }));
+      sportOf(d).slice().sort(byTime).forEach((a) => add(k, `${entryName(a)} · ${str(a.time)}`, [entryName(a), str(a.details), str(a.note)].filter(Boolean).join(' — '), { view: 'sport' }));
+      add(k, 'Notes du jour', d.notes, { tab: 'journal' });
+      S.settings.appts.filter((a) => a.date === k && a.date < t).forEach((a) => add(k, `Rendez-vous${a.time ? ` · ${a.time}` : ''}`, [a.title, a.place, a.note].filter(Boolean).join(' · '), { tab: 'apercu' }));
+    });
+    return out;
+  }
+  // Le texte d'une entrée, raccourci autour du premier mot trouvé, les mots surlignés.
+  function highlight(text, words) {
+    const chars = [...String(text || '').replace(/\s+/g, ' ').trim()];
+    let f = '';
+    const map = [];
+    chars.forEach((c, i) => { for (const ch of c.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, "'")) { f += ch; map.push(i); } });
+    const marks = chars.map(() => false);
+    let first = chars.length;
+    words.forEach((w) => { for (let p = f.indexOf(w); p >= 0; p = f.indexOf(w, p + w.length)) { for (let j = p; j < p + w.length; j++) marks[map[j]] = true; first = Math.min(first, map[p]); } });
+    const a = chars.length > 150 ? Math.max(0, Math.min(first - 40, chars.length - 150)) : 0, b = Math.min(chars.length, a + 150);
+    const segs = [];
+    for (let i = a; i < b; i++) { const last = segs[segs.length - 1]; if (last && last.m === marks[i]) last.t += chars[i]; else segs.push({ m: marks[i], t: chars[i] }); }
+    return html`${a > 0 ? '…' : ''}${segs.map((x) => (x.m ? html`<mark>${x.t}</mark>` : x.t))}${b < chars.length ? '…' : ''}`;
+  }
+  function searchResults(q) {
+    if (norm(q).length < 2) return '';
+    const res = searchJournal(q), words = searchWords(q);
+    if (!res.length) return html`<p class="s-none">Rien trouvé pour « ${q.trim()} ». Essaie un autre mot, sans faute de frappe.</p>`;
+    return html`<section class="card s-results" aria-label="Résultats de la recherche">
+      <p class="s-count">${res.length > SEARCH_MAX ? `${SEARCH_MAX} premiers résultats sur ${res.length}` : plural(res.length, 'résultat')}<button type="button" class="link" data-act="search-clear">Effacer</button></p>
+      <ul class="s-list">${res.slice(0, SEARCH_MAX).map((r) => html`<li><button type="button" class="s-row" data-act="search-go" data-date="${r.k}"${r.view ? html` data-view="${r.view}"` : html` data-tab="${r.tab}"`}><span class="s-when"><b>${longDate(r.k)}</b> · ${r.label}</span><span class="s-txt">${highlight(r.text, words)}</span></button></li>`)}</ul>
+    </section>`;
+  }
+  const SEARCH_ACTIONS = {
+    'search-go': (d) => {
+      if (!isKey(d.date)) return;
+      Object.assign(S.ui, { form: null, confirm: null, date: d.date });
+      if (d.view === 'sport') S.ui.view = 'sport';
+      else { S.ui.view = 'jour'; if (d.tab) S.ui.dayTab = d.tab; }
+      render(); toTop();
+    },
+    'search-clear': () => { S.ui.q = ''; S.ui.focus = '#cal-q'; render(); }
+  };
   function renderMonth() {
     const mk = S.ui.monthOf, [y, m] = mk.split('-').map(Number), t = todayKey();
     const first = `${mk}-01`, nDays = new Date(y, m, 0).getDate(), goal = Math.round(S.settings.goals.water * 1000);
@@ -4482,7 +4594,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     S.settings = null; S.months = {}; S.ready = false;
     const t = todayKey();
     Object.assign(S.ui, { view: 'jour', dayTab: 'apercu', date: t, weekOf: startOfWeek(t), monthOf: t.slice(0, 7), year: new Date().getFullYear(),
-      form: null, confirm: null, exportText: null, openSup: null, appt: null, apptPast: false, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
+      q: '', form: null, confirm: null, exportText: null, openSup: null, appt: null, apptPast: false, restoreOpen: false, restoreText: '', pendingRestore: null, dataDate: null,
       settingsPage: null, tplEdit: null, profileEdit: null, profileAdd: false, foodDraft: { name: '', kcal: '', p: '', g: '', l: '' },
       bilan: { kind: 'semaine', anchor: t }, dossier: { range: 'all', from: '', to: '' },
       ask: { q: '', withWeek: false, photo: null, showReport: false, scope: null, key: null, status: 'idle', text: '', error: '', ctl: null } });
@@ -5508,7 +5620,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   };
   const mealDraft = () => (S.ui.form && S.ui.form.type === 'meal' ? S.ui.form.draft : null);
   const actions = {
-    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...APPT_ACTIONS, ...HOME_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
+    ...actForm('checkin'), ...actForm('meal'), ...actForm('symptom'), ...actForm('sport'), ...LIVE_ACTIONS, ...CHRONO_ACTIONS, ...APPT_ACTIONS, ...HOME_ACTIONS, ...SEARCH_ACTIONS, ...PROFILE_ACTIONS, ...BILAN_ACTIONS, ...DOSSIER_ACTIONS,
     'sport-day': (d) => { S.ui.date = d.date; S.ui.form = null; render(); },
     'spt-kind': (d) => {
       const dr = S.ui.form && S.ui.form.draft;
@@ -5687,6 +5799,16 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       if (!dr) return;
       dr.items = dr.items.filter((i) => i.id !== d.id);
       if (dr.editItem === d.id) { dr.editItem = null; dr.item = blankItem(); }
+      render();
+    },
+    'meal-redo': (d) => {
+      const dr = mealDraft();
+      const r = dr && recentMeals(S.ui.form.date, dr.kind).find((x) => x.ref === d.v);
+      if (!r) return;
+      dr.kind = str(r.m.kind) || dr.kind;
+      dr.text = str(r.m.text);
+      dr.items = r.items.map((x) => ({ id: newId(), name: x.name, grams: posNum(x.grams), kcal: posNum(x.kcal) ?? 0, p: posNum(x.p) ?? 0, g: posNum(x.g) ?? 0, l: posNum(x.l) ?? 0 }));
+      toast('Repas recopié : ajuste les quantités si besoin, puis enregistre');
       render();
     },
     'item-recent': (d) => {
@@ -5981,7 +6103,10 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   app.addEventListener('input', (e) => {
     const t = e.target, ds = t.dataset;
     if (!S.ready || !ds) return;
-    if (ds.bind === 'notes') {
+    if (ds.search) {
+      S.ui.q = t.value.slice(0, 80);
+      safeRender(); // les résultats suivent la frappe, le champ garde le curseur
+    } else if (ds.bind === 'notes') {
       mutateDay(ds.date, 'notes', (d) => { d.notes = t.value; }, false);
     } else if (ds.draft && S.ui.form) {
       S.ui.form.draft[ds.draft] = t.value;
