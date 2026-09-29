@@ -15,7 +15,7 @@ Réglages → *Affichage* : « Tout sur une page » pour retrouver l'accueil d'a
 Navigation en bas (sur le côté sur grand écran) : **Accueil** (la journée, avec six anneaux de résumé, « Bonjour » ou
 « Bonsoir » et une petite scène du moment : lever du soleil, plein midi, fin d'après-midi, nuit étoilée, reprises en tête
 de chaque moment des compléments), **Calendrier** (semaine, mois, année, et l'agenda), **Sport**, **Santé** (profil,
-IMC, courbe du poids, prochaine visite, tension et pouls, prises de sang visite par visite) et **Réglages** (profils,
+IMC (avec les repères d'adulte à partir de 18 ans seulement), courbe du poids, prochaine visite, tension et pouls, prises de sang visite par visite) et **Réglages** (profils,
 profil santé, objectifs du jour, visite médicale, sport, compléments, mes aliments, Claude, sauvegarde et données).
 
 **Agenda** (Calendrier → « + Rendez-vous ») : rendez-vous (médecin, dentiste, prise de sang, kiné, spécialiste…) avec
@@ -40,7 +40,8 @@ est rangé sur la nuit de la veille.
 **Mes moyennes** (Santé) : semaine, mois ou année, d'une période à l'autre ; huit moyennes avec l'écart à la période
 d'avant (compléments, eau, calories, sport, pas, sommeil, humeur, poids), un graphique par mesure (une colonne par
 jour, ou par mois pour l'année, avec l'objectif) et la régularité de chaque complément. Les jours où l'app n'a pas
-servi ne comptent pas dans les moyennes. La période en cours se compare aux mêmes premiers jours de la période
+servi ne comptent pas dans les moyennes. Au doigt, toucher une colonne affiche sa valeur ; sur la courbe du poids,
+la bulle reste après le toucher et glisser de côté parcourt les pesées. La période en cours se compare aux mêmes premiers jours de la période
 d'avant (lundi → mardi contre lundi → mardi), et le nombre de séances par semaine part du premier jour noté.
 
 **Dossier complet** (Réglages → *Données*, ou « Dossier de cette période » dans Mes moyennes) : un fichier Markdown
@@ -76,6 +77,13 @@ activités du quotidien qui comptent aussi (marche, ménage, déménagement…) 
 moyen (lus sur la machine ou la montre, avec le pourcentage de la FC max théorique 208 − 0,7 × âge) et dépense
 estimée (MET × poids × durée), et un graphique des séances sur 8 semaines. Réglages → *Sport* : objectifs, séances
 types (cardio doux, renfo maison, marche rapide, corde à sauter, mobilité) et programme lundi → dimanche.
+
+**Rappels des compléments** (app Android, Réglages → *Compléments*) : une notification à l'heure de chaque moment
+(08:00, 12:30, 16:00, 21:00 par défaut, réglables), avec ce qu'il reste à prendre ; ce qui est déjà coché ne sonne
+pas. Les rappels sont prévus 14 jours à l'avance, et ouvrir l'app les prolonge. Toucher la notification ouvre la
+journée, onglet *Compléments*. **Série** : les jours d'affilée où tout ce qui était prévu a été pris s'affichent sur
+l'aperçu et dans *Compléments* (« 6 jours d'affilée ») ; tant qu'aujourd'hui n'est pas complet, l'aperçu rappelle de
+tout cocher pour continuer la série.
 
 **Cures** : un complément peut se prendre en cure, avec des semaines de prise puis des semaines de pause, en boucle
 (Réglages → *Compléments* → « Prendre en cure »). Pendant la pause, il sort de la liste du jour et une ligne

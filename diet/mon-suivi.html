@@ -172,7 +172,7 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .moment-head{ display:flex; align-items:center; gap:10px; padding:2px 2px 10px 4px; }
 .mtitle{ flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; }
 .mtitle h3{ font-family:var(--font-display); font-weight:600; font-size:16px; letter-spacing:-.01em; }
-.mtitle span{ font-size:13px; color:var(--muted); font-weight:600; }
+.mtitle span{ font-size:13px; color:var(--muted); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .mcount{ font-size:13px; font-weight:800; color:var(--muted); font-variant-numeric:tabular-nums; }
 .mall{ flex:none; border:1px solid var(--ml); background:var(--surface); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:13px; font-weight:800; min-height:36px; }
 .mdone{ flex:none; display:inline-flex; align-items:center; gap:5px; padding:6px 11px; border-radius:999px; background:var(--m); color:var(--mo); font-size:13px; font-weight:800; }
@@ -329,6 +329,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .srow-line select{ min-width:130px; }
 .srow-foot{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
 .switch{ display:inline-flex; align-items:center; gap:8px; font-weight:700; }
+.snotify{ margin-top:18px; padding:14px; border-radius:16px; background:var(--surface-2); border:1px solid var(--line); }
+.sn-times{ display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; margin:12px 0 4px; }
 .switch input{ width:22px; height:22px; accent-color:var(--accent); margin:0; }
 .filebtn{ display:inline-flex; align-items:center; cursor:pointer; position:relative; }
 .filebtn:focus-within{ outline:3px solid var(--focus); outline-offset:2px; }
@@ -447,7 +449,8 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .scene{ flex:none; display:block; width:40px; height:40px; border-radius:12px; overflow:hidden; box-shadow:0 1px 2px rgb(0 0 0 / .08); }
 .scene svg{ display:block; width:100%; height:100%; }
 .hero-scene{ width:56px; height:56px; border-radius:17px; }
-@media (max-width:480px){ .hero-scene{ width:46px; height:46px; border-radius:14px; } .hero-top{ gap:10px; } }
+@media (max-width:480px){ .hero-scene{ width:46px; height:46px; border-radius:14px; } .hero-top{ gap:10px; } .eb-rel{ display:none; } }
+@media (max-width:420px){ .mcount{ display:none; } }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .scene{ filter:brightness(.9) saturate(.92); } }
 :root[data-theme="dark"] .scene{ filter:brightness(.9) saturate(.92); }
 .eyebrow{ margin:0 0 2px; font-size:13px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-2); }
@@ -505,6 +508,10 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .now .moment{ margin-bottom:10px; }
 .now-done{ display:flex; align-items:center; gap:10px; margin:0 0 12px; padding:12px 14px; border-radius:14px; background:color-mix(in srgb, var(--fill) 10%, var(--surface)); font-weight:700; }
 .now-done svg{ flex:none; width:22px; height:22px; color:var(--fill); }
+.streak{ display:flex; align-items:center; gap:8px; margin:4px 0 12px; font-size:14px; font-weight:700; color:var(--muted); }
+.streak svg,.streak-txt svg{ flex:none; width:17px; height:17px; color:var(--c-kcal); }
+.streak-txt{ display:inline-flex; align-items:center; gap:3px; white-space:nowrap; color:var(--ink); }
+.streak-txt svg{ width:15px; height:15px; }
 .see-all{ display:block; margin:-2px 0 12px; }
 .quick{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
 @media (min-width:640px) and (max-width:899px){ .quick{ grid-template-columns:repeat(4, minmax(0,1fr)); } }
@@ -878,7 +885,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
 .bfig figcaption{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:2px 10px; margin-bottom:6px; }
 .bfig figcaption b{ font-weight:800; font-size:16px; }
 .bfig figcaption span{ font-size:13.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
-.bchart{ min-height:140px; }
+.bchart{ min-height:140px; position:relative; }
 .bchart svg{ display:block; }
 .adh{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
 @media (min-width:720px){ .adh{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:26px; } }
@@ -1333,9 +1340,18 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         cure: 'cure' in s ? normalizeCure(s.cure) : hintCure(s.name, isKey(s.since) ? s.since : created)
       })),
       cureNotify: !(raw && raw.cureNotify === false),
+      suppNotify: normalizeSuppNotify(raw && raw.suppNotify),
       onboardDone: !!(raw && raw.onboardDone),
       onboard: raw && isObj(raw.onboard) ? Object.fromEntries(Object.entries(raw.onboard).filter(([k2, v]) => /^[a-z]{2,20}$/.test(k2) && v === true)) : {}
     };
+  }
+  /* Rappels des compléments (app Android) : une heure par moment ; coupés par défaut. */
+  const SUPP_TIMES = { matin: '08:00', midi: '12:30', aprem: '16:00', soir: '21:00' };
+  const validTime = (t) => { const m = toMin(t); return m != null && m < 24 * 60 && Number(String(t).split(':')[1]) < 60; };
+  function normalizeSuppNotify(v) {
+    const times = {};
+    MOMENT_KEYS.forEach((m) => { const t = isObj(v) && isObj(v.times) ? v.times[m] : null; times[m] = validTime(t) ? String(t).padStart(5, '0') : SUPP_TIMES[m]; });
+    return { on: !!(isObj(v) && v.on), times };
   }
   function normalizeCure(c) {
     if (!isObj(c) || !isKey(c.start)) return null;
@@ -1434,6 +1450,20 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   }
   function isTaken(sid, k) { const d = peekDay(k); return !!(d && isObj(d.taken) && d.taken[sid]); }
   const scheduledFor = (k) => S.settings.supplements.filter((s) => isScheduled(s, k));
+  /* Série : jours d'affilée où tout ce qui était prévu a été pris. Aujourd'hui compte dès qu'il est complet ;
+     sinon la série court encore jusqu'à ce soir. Un jour sans rien de prévu ne la casse pas. */
+  function suppStreak() {
+    const t = todayKey(), st = stats(t), created = S.settings.created;
+    const today = st.total > 0 && st.taken === st.total;
+    let n = 0;
+    for (let i = 0, k = today ? t : addDays(t, -1); i < 1000 && k >= created; i++, k = addDays(k, -1)) {
+      const s = stats(k);
+      if (!s.total) continue;
+      if (s.taken < s.total) break;
+      n++;
+    }
+    return { n, today };
+  }
   const itemsForDay = (k) => S.settings.supplements.filter((s) => isScheduled(s, k) || isTaken(s.id, k));
   function stats(k) {
     const sch = scheduledFor(k);
@@ -1540,7 +1570,9 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const currentWeight = () => { const w = weighIns(); return w.length ? w[w.length - 1] : null; };
   const weightNow = () => { const c = currentWeight(); return c ? c.w : S.settings.health.startWeight; };
   function bmi() { const h = S.settings.health.height, w = weightNow(); return h && w ? round1(w / (h / 100) ** 2) : null; }
-  const bmiLabel = (b) => (b < 18.5 ? 'Maigreur' : b < 25 ? 'Corpulence normale' : b < 30 ? 'Surpoids' : 'Obésité');
+  // Les seuils 18,5 / 25 / 30 sont ceux de l'adulte : avant 18 ans, l'IMC se lit sur les courbes de corpulence.
+  const isMinor = () => { const a = ageOf(S.settings.health.birth); return a != null && a < 18; };
+  const bmiLabel = (b) => (isMinor() ? 'À lire sur les courbes de l’enfant' : b < 18.5 ? 'Maigreur' : b < 25 ? 'Corpulence normale' : b < 30 ? 'Surpoids' : 'Obésité');
   const INTENSITIES = [[1, 'Légère'], [2, 'Modérée'], [3, 'Intense']];
   /* Types d'activité : [clé, nom, MET léger, modéré, intense] (valeurs arrondies du Compendium des activités physiques). */
   const SPORT_TYPES = {
@@ -2124,14 +2156,15 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   function nowCard(k, d, isToday) {
     const st = stats(k), m = focusMoment(k), ml = waterOf(d), goal = Math.round(S.settings.goals.water * 1000), glass = S.settings.goals.glass;
     const cis = listOf(d.checkins).sort(byTime), last = cis[cis.length - 1];
-    const mm = m && MOMENTS.find((x) => x.key === m);
+    const mm = m && MOMENTS.find((x) => x.key === m), streak = isToday ? suppStreak() : { n: 0 };
     const quick = (act, icon, label, sub, extra = {}) => html`<button type="button" class="qa" data-act="${act}" data-date="${k}"${extra.v != null ? html` data-v="${extra.v}"` : ''}><span class="qa-ico" aria-hidden="true">${ICON[icon]}</span><span class="qa-txt"><b>${label}</b><small>${sub}</small></span></button>`;
     return html`<section class="card now" id="sec-now" aria-labelledby="now-title">
       <div class="card-head"><h2 id="now-title">${isToday ? 'Maintenant' : 'Ce jour-là'}</h2>${st.total ? html`<span class="pill${st.taken === st.total ? ' ok' : ''}">${st.taken === st.total ? 'Compléments : tout est pris' : `${st.taken} sur ${st.total} pris`}</span>` : ''}</div>
       ${mm ? momentGroup(mm, k, itemsForDay(k).filter((s) => s.moment === mm.key))
-        : st.total ? html`<p class="now-done">${ICON.check}<span>Tous les compléments ${isToday ? 'du jour' : 'de ce jour'} sont cochés.</span></p>`
+        : st.total ? html`<p class="now-done">${ICON.check}<span>Tous les compléments ${isToday ? 'du jour' : 'de ce jour'} sont cochés.${streak.n >= 2 ? ` ${streak.n} jours d’affilée !` : ''}</span></p>`
         : html`<p class="hint" style="margin:0 0 4px">${S.settings.supplements.length ? 'Pas de complément prévu ce jour-là.' : 'Ajoute tes compléments dans Réglages : ils s’affichent ici au bon moment.'}</p>`}
       ${mm && st.total > st.taken ? html`<button type="button" class="link see-all" data-act="day-tab" data-v="supps">Voir tous les compléments</button>` : ''}
+      ${isToday && !streak.today && streak.n >= 2 && st.total > st.taken ? html`<p class="streak">${ICON.flame}<span>Série de ${streak.n} jours : coche tout aujourd’hui pour la continuer.</span></p>` : ''}
       <div class="quick">
         ${quick('water-add', 'drop', `+ 1 verre`, `${fmtL(ml)} / ${fmtL(goal)} L`, { v: glass })}
         ${quick('ci-new', 'smile', 'Check-in', last ? `dernier à ${str(last.time)}` : 'humeur, énergie…')}
@@ -2208,7 +2241,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const visit = hasVisit(k), gap = daysBetween(t, k);
     const rel = isToday ? 'Aujourd’hui' : gap === -1 ? 'Hier' : gap === 1 ? 'Demain' : gap < 0 ? `Il y a ${-gap} jours` : `Dans ${gap} jours`;
     const greet = { matin: 'Bonjour', midi: 'Bon appétit', aprem: 'Bon après-midi', soir: 'Bonsoir' }[momentNow()];
-    const hero = html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? `${rel} · ${greet}${activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
+    const hero = html`<section class="hero"><div class="hero-top">${isToday ? html`<span class="scene hero-scene" aria-hidden="true">${SCENE[momentNow()]}</span>` : ''}<div class="hero-txt"><p class="eyebrow">${isToday ? html`<span class="eb-rel">${rel} · </span>${greet}${activeProfile().name !== 'Moi' ? ` ${activeProfile().name}` : ''}` : rel}</p><h1 class="date">${longDate(k)}</h1></div>
         <div class="daynav">
           ${isToday ? '' : html`<button type="button" class="ghost" data-act="day-today">Aujourd’hui</button>`}
           <button type="button" class="icon" data-act="day-prev" aria-label="Jour précédent">${ICON.left}</button>
@@ -2412,7 +2445,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   function supplementBlock(k) {
     const items = itemsForDay(k), st = stats(k);
     const pct = st.total ? st.taken / st.total : 0, all = st.total > 0 && st.taken === st.total;
-    const head = html`<div class="supps-head"><div><h2>Compléments</h2><p class="sub${all ? ' done' : ''}">${!st.total ? 'Rien de prévu ce jour-là' : all ? 'Tout est pris' : `${st.taken} sur ${st.total} pris`}</p></div>${st.total ? html`<div class="ring" style="--p:${pct.toFixed(3)}" role="img" aria-label="${st.taken} sur ${st.total} compléments pris"><span>${Math.round(pct * 100)} %</span></div>` : ''}</div>`;
+    const streak = k === todayKey() ? suppStreak() : { n: 0 };
+    const head = html`<div class="supps-head"><div><h2>Compléments</h2><p class="sub${all ? ' done' : ''}">${!st.total ? 'Rien de prévu ce jour-là' : all ? 'Tout est pris' : `${st.taken} sur ${st.total} pris`}${streak.n >= 2 ? html` · <span class="streak-txt">${ICON.flame}${streak.n} jours d’affilée</span>` : ''}</p></div>${st.total ? html`<div class="ring" style="--p:${pct.toFixed(3)}" role="img" aria-label="${st.taken} sur ${st.total} compléments pris"><span>${Math.round(pct * 100)} %</span></div>` : ''}</div>`;
     if (!items.length) return html`<section class="card supps" id="sec-supps">${head}${S.settings.supplements.length ? '' : html`<p class="empty">Ajoute tes compléments dans Réglages.</p>`}${cureNotes(k)}</section>`;
     return html`<section class="card supps" id="sec-supps">${head}<div class="moments">${MOMENTS.map((m) => {
       const list = items.filter((s) => s.moment === m.key);
@@ -2882,7 +2916,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const L = [];
     if (PROFILES.active !== MAIN) L.push(`Profil : ${activeProfile().name}`);
     const who = [h.sex ? cap1(h.sex) : '', age != null ? `${age} ans` : '', h.height ? `${fmtHeight(h.height)}` : '',
-      w ? `${fmtDec(w)} kg${cw ? ` (pesée du ${shortDate(cw.k)})` : ' (poids de départ)'}` : '', b ? `IMC ${fmtDec(b)}` : ''].filter(Boolean);
+      w ? `${fmtDec(w)} kg${cw ? ` (pesée du ${shortDate(cw.k)})` : ' (poids de départ)'}` : '', b ? `IMC ${fmtDec(b)}${isMinor() ? ' (moins de 18 ans : à lire sur les courbes de corpulence, pas avec les seuils adultes)' : ''}` : ''].filter(Boolean);
     if (who.length) L.push(`Mon profil : ${who.join(', ')}`);
     if (h.targetWeight) L.push(`Objectif de poids : ${fmtDec(h.targetWeight)} kg${h.startWeight ? ` (départ ${fmtDec(h.startWeight)} kg)` : ''}`);
     if (h.activity) L.push(`Activité physique : ${ACTIVITY[h.activity].toLowerCase()}`);
@@ -3244,9 +3278,21 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       ${PROFILES.active !== MAIN ? '' : html`<div class="reset">${S.ui.confirm === 'reset'
         ? html`<p>Ta liste actuelle sera remplacée par la liste de départ. Ton journal ne bouge pas.</p><div class="actions"><button type="button" class="danger" data-act="reset-yes">Remplacer ma liste</button><button type="button" class="ghost" data-act="confirm-cancel">Annuler</button></div>`
         : html`<button type="button" class="link" data-act="reset-ask">Remettre la liste de départ</button>`}</div>`}
+      ${suppNotifySettings()}
       ${PLATFORM.native && sups.some((x) => x.cure) ? html`<label class="switch" style="margin-top:14px"><input type="checkbox" id="cure-notify" data-setting="cureNotify"${S.settings.cureNotify ? html` checked` : ''}> Notification la veille d’un début, d’une pause ou d’une reprise de cure (19:00)</label>
         ${store.notifyDenied ? html`<p class="hint">Les notifications sont bloquées : autorise-les pour Mon suivi dans les réglages Android.</p>` : ''}` : ''}
     </section>`;
+  }
+  function suppNotifySettings() {
+    if (!S.settings.supplements.some((x) => x.active)) return '';
+    if (!PLATFORM.native) return html`<p class="hint" style="margin-top:16px">Dans l’app Android, Mon suivi peut te rappeler tes compléments à l’heure de chaque moment.</p>`;
+    const sn = S.settings.suppNotify;
+    return html`<div class="snotify">
+      <label class="switch"><input type="checkbox" id="supp-notify" data-sn="on"${sn.on ? html` checked` : ''}> Me rappeler mes compléments à l’heure de chaque moment</label>
+      ${sn.on ? html`<div class="sn-times">${MOMENTS.filter((m) => S.settings.supplements.some((x) => x.active && x.moment === m.key)).map((m) => html`<label class="field"><span>${m.label}</span><input type="time" id="sn-${m.key}" data-sn="${m.key}" value="${sn.times[m.key]}"></label>`)}</div>
+        <p class="hint">Seulement s’il reste quelque chose à prendre à ce moment-là : ce qui est déjà coché ne sonne pas. Les rappels sont prévus 14 jours à l’avance ; ouvrir l’app les prolonge.</p>` : ''}
+      ${sn.on && store.notifyDenied ? html`<p class="hint">Les notifications sont bloquées : autorise-les pour Mon suivi dans les réglages Android.</p>` : ''}
+    </div>`;
   }
   function foodSettings() {
     const fd = S.ui.foodDraft;
@@ -4608,15 +4654,15 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
   const shiftPeriod = (p, dir) => (dir < 0 ? addDays(p.start, -1) : addDays(p.end, 1));
   /* Les graphiques : une colonne par jour (par mois pour l'année). Couleurs de graphique vérifiées (clair et sombre). */
   const BILAN_CHARTS = [
-    { id: 'supp', title: 'Compléments', color: 'var(--c-supp)', big: true, top: 100, val: (m) => (m.supp == null ? null : m.supp * 100), fmt: (v) => `${Math.round(v)} %`,
+    { id: 'supp', title: 'Compléments', color: 'var(--c-supp)', top: 100, val: (m) => (m.supp == null ? null : m.supp * 100), fmt: (v) => `${Math.round(v)} %`,
       head: (s) => (s.supp == null ? 'rien de coché' : `${Math.round(s.supp * 100)} % pris · ${s.suppTook} sur ${s.suppSch}`) },
-    { id: 'water', title: 'Eau', color: 'var(--c-water)', big: true, val: (m) => m.water, goal: () => S.settings.goals.water, goalFmt: (v) => `${fmtDec(v)} L`, fmt: (v) => `${fmtL(v * 1000)} L`,
-      head: (s) => (s.water == null ? 'rien noté' : `${fmtL(s.water * 1000)} L par jour · objectif atteint ${plural(s.waterHit, 'jour')}`) },
-    { id: 'kcal', title: 'Calories', color: 'var(--c-kcal)', big: true, val: (m) => m.kcal, goal: () => S.settings.goals.kcal, goalFmt: (v) => `${fmtInt(v)} kcal`, fmt: (v) => `${fmtInt(v)} kcal`,
+    { id: 'water', title: 'Eau', color: 'var(--c-water)', val: (m) => m.water, goal: () => S.settings.goals.water, goalFmt: (v) => `${fmtDec(v)} L`, fmt: (v) => `${fmtL(v * 1000)} L`,
+      head: (s) => (s.water == null ? 'rien noté' : `${fmtL(s.water * 1000)} L par jour · ${s.waterHit ? `objectif atteint ${plural(s.waterHit, 'jour')}` : 'objectif pas encore atteint'}`) },
+    { id: 'kcal', title: 'Calories', color: 'var(--c-kcal)', val: (m) => m.kcal, goal: () => S.settings.goals.kcal, goalFmt: (v) => `${fmtInt(v)} kcal`, fmt: (v) => `${fmtInt(v)} kcal`,
       head: (s) => (s.kcal == null ? 'rien noté' : `${fmtInt(s.kcal)} kcal par jour · protéines ${fmtG(s.p)} g`) },
     { id: 'prot', title: 'Protéines', color: 'var(--c-kcal)', val: (m) => m.p, goal: () => S.settings.goals.p, goalFmt: (v) => `${fmtG(v)} g`, fmt: (v) => `${fmtG(v)} g`,
       head: (s) => (s.p == null ? 'rien noté' : `${fmtG(s.p)} g par jour`) },
-    { id: 'sport', title: 'Sport', color: 'var(--c-sport)', big: true, val: (m) => m.sport, yearVal: (s) => s.sportMin || null, fmt: (v) => `${fmtInt(v)} min`,
+    { id: 'sport', title: 'Sport', color: 'var(--c-sport)', val: (m) => m.sport, yearVal: (s) => s.sportMin || null, fmt: (v) => `${fmtInt(v)} min`,
       head: (s, p) => `${plural(s.sessions, 'séance')} · ${fmtInt(s.sportMin)} min${p.kind !== 'semaine' && s.span >= 7 ? ` · ${fmtDec(s.sessions / (s.span / 7))} séance${s.sessions / (s.span / 7) >= 2 ? 's' : ''} par semaine` : ''}` },
     { id: 'steps', title: 'Pas', color: 'var(--c-sport)', val: (m) => m.steps, goal: () => S.settings.sport.steps, goalFmt: (v) => fmtInt(v), fmt: (v) => `${fmtInt(v)} pas`,
       head: (s) => (s.steps == null ? 'rien noté' : `${fmtInt(s.steps)} par jour`) },
@@ -4692,7 +4738,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         labels: points.map((pt) => pt.label), tips: points.map((pt, i) => `${pt.tip} : ${vals[i] == null ? 'rien de noté' : c.fmt(vals[i])}`), now: points.findIndex((pt) => pt.now),
         maxI, maxLabel: maxI >= 0 ? c.fmt(vals[maxI]) : '' };
       const aria = `${c.title}, ${p.label.toLowerCase()} : ${c.head(s, p)}`;
-      return html`<figure class="bfig${c.big ? ' big' : ''}"><figcaption><b>${c.title}</b><span>${c.head(s, p)}</span></figcaption><div class="bchart" data-bchart="${JSON.stringify(spec)}" role="img" aria-label="${aria}"></div></figure>`;
+      return html`<figure class="bfig"><figcaption><b>${c.title}</b><span>${c.head(s, p)}</span></figcaption><div class="bchart" data-bchart="${JSON.stringify(spec)}" role="img" aria-label="${aria}"></div></figure>`;
     });
     // régularité de chaque complément sur la période (jours où l'app a servi)
     const usedDays = past.filter((k) => dayMetrics(k).used);
@@ -4746,10 +4792,23 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
           if (i === sp.maxI) out.push(`<text x="${Math.min(W - 2, Math.max(2, cx)).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="${cx < 30 ? 'start' : cx > W - 30 ? 'end' : 'middle'}" font-size="11.5" font-weight="800" fill="var(--ink)">${esc(sp.maxLabel)}</text>`);
         }
         if (sp.labels[i]) out.push(`<text x="${cx.toFixed(1)}" y="${H - 5}" text-anchor="middle" font-size="11" font-weight="${i === sp.now ? 800 : 600}" fill="${i === sp.now ? 'var(--ink)' : 'var(--muted)'}">${esc(sp.labels[i])}</text>`);
-        out.push(`<rect x="${(i * slot).toFixed(1)}" y="0" width="${slot.toFixed(1)}" height="${H}" fill="transparent"><title>${esc(sp.tips[i])}</title></rect>`);
       });
+      out.push(`<rect class="bc-hi" x="0" y="0" width="${slot.toFixed(1)}" height="${base}" rx="6" fill="var(--ink)" fill-opacity=".07" style="display:none"/>`);
       out.push('</svg>');
-      el.innerHTML = out.join('');
+      el.innerHTML = out.join('') + '<div class="chart-tip" hidden></div>';
+      // toucher (ou survoler) une colonne affiche sa valeur
+      const svg = el.querySelector('svg'), tip = el.querySelector('.chart-tip'), hi = svg.querySelector('.bc-hi');
+      svg.style.touchAction = 'pan-y';
+      const pick = (e) => {
+        const r = svg.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.floor(((e.clientX - r.left) / r.width) * n)));
+        tip.textContent = sp.tips[i]; tip.hidden = false;
+        hi.setAttribute('x', (i * slot).toFixed(1)); hi.style.display = '';
+        const half = tip.offsetWidth / 2, x = ((i + 0.5) * r.width) / n;
+        tip.style.left = `${Math.max(half, Math.min(el.clientWidth - half, x))}px`; tip.style.top = `${tip.offsetHeight + 16}px`; // dans le graphique, sous le titre
+      };
+      svg.addEventListener('pointerdown', pick);
+      svg.addEventListener('pointermove', pick);
+      svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { tip.hidden = true; hi.style.display = 'none'; } });
     });
   }
   const BILAN_ACTIONS = {
@@ -4985,10 +5044,17 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const half = tip.offsetWidth / 2, maxX = wrap.clientWidth - half; // la bulle reste dans la carte
       tip.style.left = `${Math.max(half, Math.min(maxX, p.x * k))}px`; tip.style.top = `${p.y * k}px`;
     };
+    svg.style.touchAction = 'pan-y'; // au doigt : glisser de côté parcourt la courbe, la page défile toujours
     svg.addEventListener('pointermove', show);
     svg.addEventListener('pointerdown', show);
-    svg.addEventListener('pointerleave', () => { tip.hidden = true; cross.style.display = 'none'; });
+    // à la souris, la bulle suit le pointeur ; au doigt, elle reste après le toucher (un appui ailleurs la ferme)
+    svg.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hideTips(); });
   }
+  function hideTips() {
+    document.querySelectorAll('#view .chart-tip').forEach((t) => { t.hidden = true; });
+    document.querySelectorAll('#view .cross, #view .bc-hi').forEach((c) => { c.style.display = 'none'; });
+  }
+  document.addEventListener('pointerdown', (e) => { if (!e.target.closest || !e.target.closest('#wchart, .bchart')) hideTips(); }, true);
   function renderHealth() {
     const h = S.settings.health, t = todayKey();
     const age = ageOf(h.birth), cw = currentWeight(), wNow = weightNow(), b = bmi();
@@ -5535,6 +5601,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     toggle: (d) => {
       S.ui.just = `${d.sid}|${d.date}`;
       mutateDay(d.date, 'taken:' + d.sid, (day) => { day.taken[d.sid] = !day.taken[d.sid]; });
+      remindSoon();
     },
     'moment-all': (d) => {
       const sids = scheduledFor(d.date).filter((sp) => sp.moment === d.v && !isTaken(sp.id, d.date)).map((sp) => sp.id);
@@ -5542,6 +5609,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       sids.forEach((sid) => touchDay(d.date, 'taken:' + sid));
       mutateDay(d.date, 'taken:' + sids[0], (day) => { sids.forEach((sid) => { day.taken[sid] = true; }); });
       toast(`${MOMENTS.find((m) => m.key === d.v).label} : tout est coché`);
+      remindSoon();
     },
     'visit-move': (d) => {
       if (!isKey(d.v) || !isKey(d.from) || d.v <= d.from) return;
@@ -5879,6 +5947,13 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       safeRender(); // âge, IMC…
     } else if (ds.dossier) {
       if (isKey(t.value)) { S.ui.dossier[ds.dossier] = t.value; render(); }
+    } else if (ds.sn) {
+      if (ds.sn === 'on') { mutateSettings((st) => { st.suppNotify.on = t.checked; }); if (t.checked) toast('Rappels des compléments activés'); }
+      else if (MOMENT_KEYS.includes(ds.sn)) {
+        if (!validTime(t.value)) { t.value = S.settings.suppNotify.times[ds.sn]; return; }
+        mutateSettings((st) => { st.suppNotify.times[ds.sn] = t.value; }, false);
+      }
+      scheduleReminders();
     } else if (ds.setting === 'cureNotify') {
       mutateSettings((st) => { st.cureNotify = t.checked; }, false);
       scheduleReminders();
@@ -6015,10 +6090,11 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const v = S.settings.visit, cures = S.settings.cureNotify ? S.settings.supplements.filter((s) => s.active && s.cure) : [];
     try {
       const pending = await LN.getPending();
-      const ours = ((pending && pending.notifications) || []).filter((n) => n.id >= 7000 && n.id < 7300);
+      const ours = ((pending && pending.notifications) || []).filter((n) => (n.id >= 7000 && n.id < 7300) || (n.id >= 7400 && n.id < 7500)); // 7300 : fin du repos
       if (ours.length) await LN.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
       const appts = S.settings.appts.filter((a) => a.remind && a.date >= todayKey()).sort(byWhen).slice(0, 50);
-      if (!v.notify && !cures.length && !appts.length) return;
+      const sn = S.settings.suppNotify, suppOn = sn.on && S.settings.supplements.some((x) => x.active);
+      if (!v.notify && !cures.length && !appts.length && !suppOn) return;
       let perm = await LN.checkPermissions();
       if (perm.display !== 'granted' && perm.display !== 'denied') perm = await LN.requestPermissions();
       const denied = perm.display !== 'granted';
@@ -6031,7 +6107,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         const morning = fromKey(k); morning.setHours(7, 30, 0, 0);
         const common = { isExactNotification: false, smallIcon: 'ic_stat_monsuivi' };
         if (eve.getTime() > now) list.push({ ...common, id: 7000 + i * 2, title: 'Demain : visite médicale', body: 'Prise de sang (souvent à jeun, vérifie avec le labo), pesée, tension et médecin. Note tes questions.', schedule: { at: eve, allowWhileIdle: true } });
-        if (morning.getTime() > now) list.push({ ...common, id: 7001 + i * 2, title: 'Aujourd’hui : visite médicale', body: 'Prise de sang, pesée, tension, médecin. Note tout dans Mon suivi pour ton bilan du mois avec Claude.', schedule: { at: morning, allowWhileIdle: true } });
+        if (morning.getTime() > now) list.push({ ...common, id: 7001 + i * 2, title: 'Aujourd’hui : visite médicale', body: 'Prise de sang, pesée, tension, médecin. Note tout dans Mon suivi pour ton bilan du mois avec Claude.', extra: { date: k, tab: 'visite' }, schedule: { at: morning, allowWhileIdle: true } });
       }
       // Cures : la veille de chacun des 4 prochains changements (début, pause, reprise), à 19:00 ; ids 7100 à 7199.
       let id = 7100;
@@ -6056,9 +6132,35 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         if (eve.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7200 + i * 2, title: `Demain : ${what}`, body, schedule: { at: eve, allowWhileIdle: true } });
         if (soon.getTime() > now) list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7201 + i * 2, title: a.time ? `Dans 1 h : ${what}` : `Aujourd’hui : ${what}`, body, schedule: { at: soon, allowWhileIdle: true } });
       });
+      // Compléments : à l'heure de chaque moment, 14 jours d'avance, s'il reste quelque chose à prendre ; ids 7400 à 7455.
+      for (let d = 0; suppOn && d < 14; d++) {
+        const k = addDays(todayKey(), d);
+        MOMENTS.forEach((m, mi) => {
+          const left = scheduledFor(k).filter((x) => x.moment === m.key && !isTaken(x.id, k));
+          if (!left.length) return;
+          const at = fromKey(k); at.setHours(0, toMin(sn.times[m.key]), 0, 0);
+          if (at.getTime() <= now) return;
+          list.push({ isExactNotification: false, smallIcon: 'ic_stat_monsuivi', id: 7400 + d * 4 + mi, title: `${m.label} : ${left.map((x) => x.name).join(', ')}`.slice(0, 120),
+            body: `${left.map((x) => `${x.name}${x.dose ? ' ' + x.dose : ''}`).join(' · ')}. Coche-les dans Mon suivi une fois pris.`.slice(0, 240), extra: { date: k, tab: 'supps' }, schedule: { at, allowWhileIdle: true } });
+        });
+      }
       if (list.length) await LN.schedule({ notifications: list });
     } catch (e) { /* notifications indisponibles : les rappels restent dans l'app */ }
   }
+
+  // Toucher un rappel (compléments, visite) ouvre la bonne journée, au bon onglet.
+  const capLN = capPlugin('LocalNotifications');
+  if (capLN && typeof capLN.addListener === 'function') {
+    capLN.addListener('localNotificationActionPerformed', (ev) => {
+      const x = ev && ev.notification && ev.notification.extra;
+      if (!x || !isKey(x.date) || !S.ready) return;
+      Object.assign(S.ui, { view: 'jour', form: null, dayTab: DAY_TABS.some((t) => t[0] === x.tab) ? x.tab : S.ui.dayTab });
+      go(x.date); toTop();
+    });
+  }
+  // Un complément coché : ses rappels du jour sont revus (sans rien faire si l'app n'a pas de notifications).
+  let remindTimer = null;
+  const remindSoon = () => { if (!capPlugin('LocalNotifications')) return; clearTimeout(remindTimer); remindTimer = setTimeout(scheduleReminders, 1500); };
 
   /* App Android : le bouton retour ferme le formulaire ouvert, revient à la vue Jour, puis met l'app en arrière-plan. */
   const capApp = capPlugin('App');
