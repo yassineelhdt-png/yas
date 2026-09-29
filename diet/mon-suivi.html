@@ -523,6 +523,17 @@ main{ max-width:1120px; margin:0 auto; padding:18px 16px calc(100px + env(safe-a
 .s-txt{ font-size:15px; line-height:1.4; overflow-wrap:anywhere; }
 .s-txt mark{ background:color-mix(in srgb, var(--accent) 22%, transparent); color:inherit; border-radius:3px; padding:0 1px; }
 .s-none{ margin:0 0 16px; color:var(--muted); font-weight:600; }
+.ins-list{ list-style:none; margin:0 0 10px; padding:0; display:grid; gap:14px; }
+.ins-list li{ padding:0 0 14px; border-bottom:1px solid var(--line); }
+.ins-list li:last-child{ border-bottom:0; padding-bottom:0; }
+.ins-list p{ margin:0 0 10px; line-height:1.45; }
+.ins-cmp{ display:grid; grid-template-columns:minmax(0,1fr) minmax(60px,1.2fr) 2.4em; align-items:center; gap:6px 10px; font-size:13px; }
+.ins-l{ color:var(--muted); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ins-cmp b{ text-align:right; font-variant-numeric:tabular-nums; }
+.ins-bar{ height:6px; border-radius:3px; background:var(--bub); overflow:hidden; }
+.ins-bar i{ display:block; height:100%; border-radius:3px; background:var(--muted); }
+.ins-bar.good i{ background:var(--fill); }
+.ins-bar.bad i{ background:var(--accent); }
 .redo{ display:flex; flex-direction:column; gap:8px; margin:0 0 16px; padding:12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--line); }
 .redo-btn{ text-align:left; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-weight:700; font-size:14px; line-height:1.3; }
 .redo-btn:hover{ border-color:var(--accent); }
@@ -1158,6 +1169,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/>',
       sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
       moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+      sunrise: '<path d="M6.5 17a5.5 5.5 0 0 1 11 0"/><path d="M12 5v4M4.2 10.2l1.6 1.6M19.8 10.2l-1.6 1.6M2.5 17h19M8.5 20.5h7"/>',
+      sunset: '<path d="M6.5 15a5.5 5.5 0 0 1 11 0"/><path d="M2.5 15h19M5 18.5h14M8.5 21.5h7M12 3.5v3.5M4.2 8.2l1.6 1.6M19.8 8.2l-1.6 1.6"/>',
       grid: '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/>',
       bowl: '<path d="M3.5 11.5h17a8.5 8.5 0 0 1-17 0z"/><path d="M8 7.5c0-1.2 1-1.6 1-2.8M12 7.5c0-1.2 1-1.6 1-2.8M16 7.5c0-1.2 1-1.6 1-2.8"/>',
       calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
@@ -1423,9 +1436,18 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     markDirty(monthDocId(k));
     if (rerender) render();
   }
-  function mutateSettings(fn, rerender = true) {
-    fn(S.settings);
+  /* Réglages : on note quelles parties ont changé (compléments, objectifs…) ; seules celles-là partent en ligne,
+     pour ne pas effacer ce qu'un autre appareil vient de changer ailleurs dans les réglages. */
+  const settingsSigs = () => Object.fromEntries(Object.keys(S.settings).map((key) => [key, stable(S.settings[key])]));
+  function markSettings(keys) {
+    if (!keys.length) return;
+    if (store.mode === 'cloud') keys.forEach((key) => store.setKeys.add(key));
     markDirty('settings');
+  }
+  function mutateSettings(fn, rerender = true) {
+    const before = settingsSigs();
+    fn(S.settings);
+    markSettings(Object.keys(S.settings).filter((key) => stable(S.settings[key]) !== before[key]));
     if (rerender) render();
   }
 
@@ -1730,6 +1752,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {},
     dirtyDays: {},        // { 'm2026-09': { '2026-09-26': { 'taken:abc': true, notes: true } } }
     writingDays: {},      // la même chose, pour les écritures en cours
+    setKeys: new Set(),   // réglages : clés modifiées ici (« supplements », « goals »… ou « * » pour tout)
+    writingKeys: new Set(),
     connectTry: 0, connectTimer: null, retryTry: 0, retryTimer: null, lsTimer: null, status: null,
     gen: 0, db: null, uid0: null // gen change à chaque changement de profil ; db et uid0 : le compte, gardés d'un profil à l'autre
   };
@@ -1761,7 +1785,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const m = addFields(addFields({}, store.dirtyDays[id]), store.writingDays[id]);
       if (Object.keys(m).length) days[id] = m;
     });
-    return { settings: store.dirty.has('settings') || store.inflight.has('settings'), days };
+    const keys = [...new Set([...store.setKeys, ...store.writingKeys])];
+    return { settings: store.dirty.has('settings') || store.inflight.has('settings') ? (keys.length ? keys : ['*']) : false, days };
   }
 
   function persistNow() {
@@ -1820,6 +1845,14 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const month = S.months[docId.slice(1)];
     return clone({ days: (month && isObj(month.days) && month.days) || {} });
   }
+  /* Réglages : seulement les parties modifiées ; en entier la première fois (ou après une restauration). */
+  async function writeSettings(ref, full, keys) {
+    if (!keys || !keys.size || keys.has('*') || store.last.settings == null) return ref.set(full);
+    const part = {};
+    keys.forEach((key) => { if (key in full) part[key] = full[key]; });
+    if (!Object.keys(part).length) return undefined;
+    try { return await ref.update(part); } catch (e) { if (e && e.code === 'invalid_argument') return ref.set(full); throw e; }
+  }
   /* Seuls les champs modifiés partent ; si le mois n'existe pas encore en ligne, on l'écrit en entier. */
   async function writeMonth(ref, full, writing) {
     const days = {};
@@ -1877,10 +1910,12 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const isMonth = docId !== 'settings';
     const writing = store.dirtyDays[docId] || {};
     delete store.dirtyDays[docId];
+    const keys = isMonth ? null : new Set(store.setKeys);
+    if (keys) { store.setKeys.clear(); store.writingKeys = keys; }
     if (isMonth && !Object.keys(writing).length) { refreshSync(); return; }
     store.writingDays[docId] = writing;
     const full = docData(docId), sig = stable(full);
-    const restore = () => { addFields(store.dirtyDays[docId] || (store.dirtyDays[docId] = {}), writing); store.dirty.add(docId); };
+    const restore = () => { addFields(store.dirtyDays[docId] || (store.dirtyDays[docId] = {}), writing); if (keys) keys.forEach((key) => store.setKeys.add(key)); store.dirty.add(docId); };
     if (bytes(sig) > MAX_DOC_BYTES) {
       delete store.writingDays[docId];
       restore();
@@ -1894,11 +1929,12 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     const ref = store.col.doc(docId);
     let error = null;
     try {
-      await withOneRetry(() => (isMonth ? writeMonth(ref, full, writing) : ref.set(full)));
+      await withOneRetry(() => (isMonth ? writeMonth(ref, full, writing) : writeSettings(ref, full, keys)));
     } catch (e) { error = e || { code: 'unavailable' }; }
     if (gen !== store.gen) return; // profil quitté entre-temps
     store.inflight.delete(docId);
     delete store.writingDays[docId];
+    if (keys) store.writingKeys = new Set();
     if (error) { restore(); onWriteError(error); }
     else { store.last[docId] = sig; store.failed = false; store.retryTry = 0; }
     persistSoon();
@@ -1946,6 +1982,19 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     });
     return changed;
   }
+  /* Réglages modifiés ici pendant qu'un autre appareil en change d'autres : on prend les siens, sauf nos parties en cours. */
+  function mergeBusySettings(data) {
+    const pend = new Set([...store.setKeys, ...store.writingKeys]);
+    if (!pend.size || pend.has('*')) return false;
+    const merged = clone(S.settings);
+    let changed = false;
+    Object.keys(data).forEach((key) => {
+      if (pend.has(key) || stable(data[key]) === stable(merged[key])) return;
+      merged[key] = data[key]; changed = true;
+    });
+    if (changed) S.settings = normalizeSettings(merged);
+    return changed;
+  }
   function onRemote(snap) {
     let changed = false;
     snap.docs.forEach((ds) => {
@@ -1963,6 +2012,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         changed = true;
       } else if (MONTH_DOC.test(id) && isObj(data.days)) {
         changed = mergeBusyMonth(id, data.days) || changed;
+      } else if (id === 'settings') {
+        changed = mergeBusySettings(data) || changed;
       }
     });
     if (changed) { persistSoon(); safeRender(); }
@@ -2017,14 +2068,20 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
         : localData && localData.settings ? { settings: normalizeSettings(localData.settings), months: sanitizeMonths(localData.months) }
         : { settings: freshSettings(), months: {} };
       S.settings = src.settings;
-      store.dirty.add('settings');
+      store.dirty.add('settings'); store.setKeys.add('*');
       Object.keys(src.months).forEach((mk) => {
         if (S.months[mk]) return;
         S.months[mk] = src.months[mk];
         Object.keys(src.months[mk].days || {}).forEach((dk) => touchDay(dk));
       });
     } else if (before.settings && before.trusted && store.dirty.has('settings')) {
-      S.settings = before.settings;
+      // modifié ici hors ligne : nos parties modifiées, celles du compte pour le reste
+      if (!store.setKeys.size || store.setKeys.has('*')) S.settings = before.settings;
+      else {
+        const merged = clone(S.settings);
+        store.setKeys.forEach((key) => { if (key in before.settings) merged[key] = clone(before.settings[key]); });
+        S.settings = normalizeSettings(merged);
+      }
     } else {
       store.dirty.delete('settings');
     }
@@ -2084,7 +2141,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     S.months = sanitizeMonths(cache.months);
     store.trusted = cache.trusted !== false;
     const p = isObj(cache.pending) ? cache.pending : {};
-    if (p.settings) store.dirty.add('settings');
+    if (p.settings) { store.dirty.add('settings'); (Array.isArray(p.settings) && p.settings.length ? p.settings : ['*']).forEach((key) => store.setKeys.add(String(key))); }
     if (isObj(p.days)) Object.keys(p.days).forEach((docId) => {
       if (!MONTH_DOC.test(docId)) return;
       const days = addFields({}, p.days[docId]);
@@ -4584,7 +4641,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     clearTimeout(store.retryTimer); clearTimeout(store.connectTimer); clearTimeout(store.lsTimer);
     Object.values(store.timers).forEach(clearTimeout);
     Object.assign(store, { online: false, connecting: false, stopped: false, failed: false, col: null, unsub: null, trusted: true,
-      dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {}, dirtyDays: {}, writingDays: {},
+      dirty: new Set(), inflight: new Set(), again: new Set(), timers: {}, last: {}, refs: {}, dirtyDays: {}, writingDays: {}, setKeys: new Set(), writingKeys: new Set(),
       connectTry: 0, connectTimer: null, retryTry: 0, retryTimer: null, lsTimer: null, status: null });
   }
   function resetForProfile() {
@@ -4740,6 +4797,51 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     };
     metricsCache.set(k, m);
     return m;
+  }
+  /* ---------- Ce que disent tes données ----------
+     Deux groupes de jours comparés sur les 90 derniers jours notés (nuits de 7 h ou plus / plus courtes, sport ou
+     pas…). Affiché seulement si chaque groupe a au moins 5 jours et si l'écart est net (0,4 point sur 5) :
+     des observations sur tes propres jours, pas des preuves. */
+  const INSIGHT_DAYS = 90, INSIGHT_MIN = 5, INSIGHT_GAP = 0.4;
+  const INSIGHT_MEASURES = [['mood', 'ton humeur', 1], ['energy', 'ton énergie', 1], ['stress', 'ton stress', -1], ['pain', 'ta douleur', -1]];
+  function insights() {
+    const t = todayKey(), goalW = S.settings.goals.water, goalS = S.settings.sport.steps;
+    const days = daysIn(addDays(t, -(INSIGHT_DAYS - 1)), t).map(dayMetrics).filter((m) => m.used);
+    const tests = [
+      { id: 'sleep', a: (m) => m.sleep != null && m.sleep >= 7, b: (m) => m.sleep != null && m.sleep < 7, aTxt: 'après une nuit d’au moins 7 h', bTxt: 'après une nuit plus courte' },
+      { id: 'sport', a: (m) => m.sessions > 0, b: (m) => m.sessions === 0, aTxt: 'les jours avec une séance de sport', bTxt: 'les jours sans' },
+      { id: 'steps', a: (m) => m.steps != null && m.steps >= goalS, b: (m) => m.steps != null && m.steps < goalS, aTxt: `les jours à ${fmtInt(goalS)} pas ou plus`, bTxt: 'les jours en dessous' },
+      { id: 'water', a: (m) => m.water != null && m.water >= goalW, b: (m) => m.water != null && m.water < goalW, aTxt: `les jours à ${fmtDec(goalW)} L d’eau ou plus`, bTxt: 'les autres jours' }
+    ];
+    const out = [];
+    tests.forEach((ts) => {
+      const A = days.filter(ts.a), B = days.filter(ts.b);
+      let best = null;
+      INSIGHT_MEASURES.forEach(([f, who, dir]) => {
+        const va = A.map((m) => m[f]).filter((v) => v != null), vb = B.map((m) => m[f]).filter((v) => v != null);
+        if (va.length < INSIGHT_MIN || vb.length < INSIGHT_MIN) return;
+        const ma = mean(va), mb = mean(vb);
+        if (Math.abs(ma - mb) < INSIGHT_GAP || (best && Math.abs(ma - mb) <= Math.abs(best.ma - best.mb))) return;
+        best = { f, who, better: (ma - mb) * dir > 0, ma, mb, na: va.length, nb: vb.length };
+      });
+      if (best) out.push({ id: ts.id, aTxt: ts.aTxt, bTxt: ts.bTxt, ...best });
+    });
+    return { list: out, used: days.length };
+  }
+  const insightText = (x) => `${cap1(x.aTxt)}, ${x.who} est en moyenne à ${fmtAvg(x.ma)}/5, contre ${fmtAvg(x.mb)}/5 ${x.bTxt} (${x.na} et ${x.nb} jours).`;
+  function insightsCard() {
+    const r = insights();
+    const bar = (v, cls) => html`<span class="ins-bar ${cls}" aria-hidden="true"><i style="width:${Math.round((v / 5) * 100)}%"></i></span>`;
+    return html`<section class="card wide insights" aria-labelledby="h-ins">
+      <div class="card-head"><span class="mico m-sport" aria-hidden="true">${ICON.spark}</span><h2 id="h-ins">Ce que disent tes données</h2><span class="pill">${INSIGHT_DAYS} derniers jours</span></div>
+      ${r.list.length ? html`<ul class="ins-list">${r.list.map((x) => html`<li>
+          <p>${insightText(x)}</p>
+          <div class="ins-cmp"><span class="ins-l">${cap1(x.aTxt)}</span>${bar(x.ma, x.better ? 'good' : 'bad')}<b>${fmtAvg(x.ma)}</b>
+            <span class="ins-l">${cap1(x.bTxt)}</span>${bar(x.mb, 'base')}<b>${fmtAvg(x.mb)}</b></div>
+        </li>`)}</ul>
+        <p class="hint">Des observations sur tes propres jours, pas des preuves : d’autres choses jouent aussi. Parles-en à ton médecin si quelque chose t’inquiète.</p>`
+      : html`<p class="hint" style="margin:0">${r.used < 20 ? `Encore quelques jours : avec au moins 5 jours notés de chaque côté (nuits, sport, pas, eau, et des check-ins d’humeur), l’app te montrera ce qui va avec tes meilleurs jours. ${plural(r.used, 'jour noté')} pour l’instant.` : 'Pas d’écart net pour l’instant entre tes nuits, ton sport, tes pas ou ton eau et ton humeur, ton énergie, ton stress ou tes douleurs.'}</p>`}
+    </section>`;
   }
   function summarize(keys) {
     const ms = keys.map(dayMetrics), pick = (f) => ms.map((m) => m[f]);
@@ -5022,6 +5124,8 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       weekRows.push(avgRow(`Sem. du ${shortDate(k)}`, keys));
     }
     L.push('## 5. Moyennes semaine par semaine', '', ...mdTable(AVG_HEAD, weekRows), '');
+    const ins = insights().list;
+    if (ins.length) L.push(`Observations de l’app sur les ${INSIGHT_DAYS} derniers jours (écart d’au moins ${fmtDec(INSIGHT_GAP)} point, au moins ${INSIGHT_MIN} jours de chaque côté ; des observations, pas des preuves) :`, ...ins.map((x) => `- ${insightText(x)}`), '');
 
     // 6. Visites, poids, prises de sang
     L.push('## 6. Visites médicales, rendez-vous, poids, tension et prises de sang', '');
@@ -5203,6 +5307,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
           ${goal}
         </section>
         ${bilanCard()}
+        ${insightsCard()}
         <section class="card wide" aria-labelledby="h-weight">
           <div class="card-head"><span class="mico m-soir" aria-hidden="true">${ICON.scale}</span><h2 id="h-weight">Poids aux pesées</h2></div>
           ${weightChart()}
@@ -5578,7 +5683,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
     if (pr.kind === 'full') {
       S.settings = normalizeSettings(pr.settings);
       store.trusted = true;
-      markDirty('settings');
+      markSettings(['*']);
     }
     const keys = Object.keys(pr.days);
     keys.forEach((dk) => {
@@ -6149,7 +6254,7 @@ button.pf-tile:hover{ background:color-mix(in srgb, var(--ink) 5%, transparent);
       const s = row && S.settings.supplements.find((x) => x.id === row.dataset.sid);
       if (!s) return;
       s[ds.sset] = t.value;
-      markDirty('settings');
+      markSettings(['supplements']);
     }
   });
   // Entrée dans le champ « Exercice » de la séance en direct : l'ajoute.
