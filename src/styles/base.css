@@ -21,21 +21,21 @@ button { cursor: pointer; touch-action: manipulation; }
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  padding: 14px 16px;
+  padding: 16px;
   box-shadow: var(--shadow);
 }
-.card h2 { font-family: var(--display); font-size: 17px; font-weight: 650; margin: 0 0 4px; letter-spacing: -.005em; }
-.sub, .card p.sub { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
-.lbl { font-size: 11.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.card h2 { font-family: var(--display); font-size: var(--fs-5); font-weight: 650; margin: 0 0 4px; letter-spacing: -.005em; }
+.sub, .card p.sub { margin: 0 0 10px; color: var(--muted); font-size: var(--fs-3); }
+.lbl { font-size: var(--fs-1); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 
 .btn {
-  display: inline-flex; align-items: center; gap: 7px;
+  display: inline-flex; align-items: center; gap: 8px;
   border: 1px solid var(--line);
   background: var(--surface);
   padding: 8px 14px;
   min-height: 38px;
   border-radius: 999px;
-  font-size: 14px; font-weight: 500;
+  font-size: var(--fs-3); font-weight: 500;
   transition: background-color .15s, border-color .15s, transform .1s;
 }
 .btn:hover { border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); }
@@ -47,7 +47,7 @@ button { cursor: pointer; touch-action: manipulation; }
 .btn .ico { width: 17px; height: 17px; }
 label.btn { cursor: pointer; }
 .btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
-.linkbtn { border: 0; background: none; color: var(--accent); padding: 0; font-size: 12.5px; text-decoration: underline; text-underline-offset: 2px; }
+.linkbtn { border: 0; background: none; color: var(--accent); padding: 0; font-size: var(--fs-2); text-decoration: underline; text-underline-offset: 2px; }
 
 .nb {
   width: 40px; height: 40px;
@@ -63,8 +63,8 @@ label.btn { cursor: pointer; }
 
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-  padding: 4px 10px;
+  font-size: var(--fs-2); font-weight: 500;
+  padding: 3px 10px;
   border-radius: 999px;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -76,8 +76,8 @@ label.btn { cursor: pointer; }
 .chip.mode-conge { background: var(--warn-soft); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, var(--line)); }
 
 .pill {
-  font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-  padding: 2px 7px; border-radius: 5px;
+  font-size: var(--fs-1); font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: var(--r-sm);
   background: color-mix(in srgb, var(--c) 15%, var(--surface));
   /* texte un peu plus foncé que la couleur de la matière : lisible en petit (4,5:1) */
   color: color-mix(in srgb, var(--c) 75%, var(--ink));
@@ -100,15 +100,18 @@ label.btn { cursor: pointer; }
   transition: transform .2s var(--ease);
 }
 .sw[aria-checked="true"] { background: var(--accent); }
-.sw[aria-checked="true"]::after { transform: translateX(18px); }
+.sw[aria-checked="true"]::after { transform: translateX(18px); background: var(--accent-ink); } /* lisible sur l'accent clair du thème sombre */
 
 /* contrôle segmenté */
 .seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
-.seg button { border: 0; background: none; padding: 5px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
+.seg button { border: 0; background: none; padding: 5px 12px; border-radius: 999px; font-size: var(--fs-3); font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
 .seg button[aria-checked="true"] { background: var(--ink); color: var(--bg); }
 
 /* retour visuel au toucher (la surbrillance native est désactivée) */
 :is(.now-main, .seg button, .tab, .btab, .whead button):active { filter: brightness(.95); }
+@media (hover: hover) {
+  .seg button:not([aria-checked="true"]):hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
+}
 
 /* écrans tactiles : cibles d'au moins 44 px, et champs à 16 px (sinon iOS zoome à chaque saisie) */
 @media (pointer: coarse) {
@@ -120,7 +123,7 @@ label.btn { cursor: pointer; }
   .backup textarea { font-size: 16px; }
 }
 
-.warnbox { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 14px; display: grid; gap: 4px; }
+.warnbox { background: var(--warn-soft); color: var(--warn); border-radius: var(--r); padding: 12px 16px; font-size: var(--fs-3); display: grid; gap: 4px; }
 
 /* notification éphémère */
 .toast {
@@ -131,8 +134,8 @@ label.btn { cursor: pointer; }
   width: max-content;
   max-width: min(calc(100vw - 32px), 480px);
   background: var(--ink); color: var(--bg);
-  padding: 9px 16px; border-radius: 20px;
-  font-size: 13.5px; text-align: center;
+  padding: 10px 16px; border-radius: var(--r-lg);
+  font-size: var(--fs-3); text-align: center;
   box-shadow: var(--shadow-lg);
   opacity: 0; pointer-events: none;
   transition: opacity .2s, transform .25s var(--ease);

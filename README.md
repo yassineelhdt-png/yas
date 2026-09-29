@@ -63,6 +63,9 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   vue Semaine lisible sur téléphone.
 - **« C'est fait »** directement dans la carte « En ce moment » (la séance en cours, ou celle que tu viens de
   finir pendant la pause) ; bilan **« Ta semaine »** (coché / prévu, jour par jour) dans la vue Semaine.
+- **Finitions visuelles** (audit de l'agent analyste-exhaustif) : échelle de texte à 7 tailles, espacements et rayons
+  sur une échelle, carte « En ce moment » teintée, frise plus légère, créneaux faits / passés lisibles, Réglages
+  plus nets, grille de la semaine contrastée, interrupteurs lisibles en sombre.
 - **Présences au choix, séance par séance**, directement dans le planning (« Je n'y vais pas » / « J'y vais ») ;
   cours théoriques par défaut par matière (Réglages). **Tutorat de bio** le mercredi 12:00–13:50 (G1-2-302) ;
   **guidances de bio** avec leur thème (PDF du 22/09), guidance 1 du jeudi 1/10, séance des VETE en rechange.

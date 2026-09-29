@@ -10,16 +10,16 @@
 /* artefact Claude : :root est déjà décalé par la zone sûre ; l'en-tête collant se cale dessous */
 .in-artifact .top { top: env(safe-area-inset-top, 0px); padding-top: 10px; }
 .top-in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
-.brand { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; margin-right: auto; white-space: nowrap; }
-.brand b { font-family: var(--mono); font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: .02em; }
+.brand { font-family: var(--display); font-weight: 700; font-size: var(--fs-5); letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; margin-right: auto; white-space: nowrap; }
+.brand b { font-family: var(--mono); font-weight: 500; font-size: var(--fs-2); color: var(--muted); letter-spacing: .02em; }
 
 .tabs { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
-.tab { display: flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
+.tab { display: flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 13px; border-radius: 999px; font-size: var(--fs-3); font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
 .tab .ico { width: 16px; height: 16px; }
 .tab:hover { color: var(--ink); }
 .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
 
-.sync { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.sync { font-size: var(--fs-2); color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .sync i { width: 7px; height: 7px; border-radius: 50%; background: var(--c-break); display: inline-block; }
 .sync[data-s="cloud"] i { background: var(--ok); }
 .sync[data-s="error"] i { background: var(--warn); }
@@ -42,6 +42,7 @@
   :root { --bottomnav-h: 62px; }
   .tabs { display: none; }
   .brand b { display: none; }
+  .sync[data-s="local"] { display: none; } /* point gris sans libellé ni survol sur téléphone : du bruit */
   .bottomnav {
     display: grid; grid-template-columns: repeat(4, 1fr);
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
@@ -56,7 +57,7 @@
   .btab {
     display: grid; justify-items: center; align-content: center; gap: 3px;
     border: 0; background: none; padding: 6px 0 4px;
-    font-size: 11px; font-weight: 600; letter-spacing: .01em;
+    font-size: var(--fs-1); font-weight: 600; letter-spacing: .01em;
     color: var(--muted);
     transition: color .15s;
   }

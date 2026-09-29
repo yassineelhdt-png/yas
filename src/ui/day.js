@@ -246,7 +246,7 @@ function header(res, st, ctx) {
             <span>Fin ${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
           </span>
         </div>
-        ${isToday ? html`<div class="wbtns"><button class="btn primary" @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}>Je commence<span class="wide"> maintenant</span></button></div>` : nothing}
+        ${isToday ? html`<div class="wbtns"><button class=${ctx.nm < res.start ? "btn primary" : "btn"} @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}><span>Je commence<span class="wide"> maintenant</span></span></button></div>` : nothing}
         <div class="facts">
           <div class="fact wide"><span class="lbl">Début</span><b>${res.studyStart < 1e9 ? E.hm(res.studyStart) : "—"}</b></div>
           <div class="fact wide"><span class="lbl">Fin</span><b>${E.hm(res.workEnd)}</b></div>
@@ -258,7 +258,7 @@ function header(res, st, ctx) {
           <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax=${target} aria-valuenow=${doneMin}><span style="width:${pct.toFixed(1)}%"></span></div>
         </div>
       </div>
-      ${blocs.length ? html`<div class="blocsum">${blocs.map((k) => html`<span>Bloc ${k} <b>${E.hdur(res.blocs[k])}</b></span>`)}</div>` : nothing}
+      ${blocs.length > 1 ? html`<div class="blocsum">${blocs.map((k) => html`<span>Bloc ${k} <b>${E.hdur(res.blocs[k])}</b></span>`)}</div>` : nothing}
       ${res.warnings.length ? html`<div class="warnbox" role="alert">${res.warnings.map((w) => html`<span>${w}</span>`)}</div>` : nothing}
       ${res.notes?.length ? html`<div class="notebox">${res.notes.map((n) => html`<span>${n}</span>`)}</div>` : nothing}
     </section>`;

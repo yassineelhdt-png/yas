@@ -58,6 +58,16 @@
   --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* échelle de texte (7 tailles ; les champs restent à 16 px au toucher, sinon iOS zoome) */
+  --fs-1: 11px;                       /* capitales, pastilles, grille de la semaine */
+  --fs-2: 12.5px;                     /* méta, durées, légendes */
+  --fs-3: 13.5px;                     /* sous-titres, boutons, listes */
+  --fs-4: 15px;                       /* texte courant, titre de créneau */
+  --fs-5: 17px;                       /* titres de carte et de bloc */
+  --fs-6: 21px;                       /* « En ce moment », heures saisies, fin de programme */
+  --fs-7: clamp(26px, 5.4vw, 34px);   /* titre de page */
+  /* rayons : 3 (repères) · 6 · 10 · 16 · 999 (pilules) */
+  --r-sm: 6px;
   --r: 10px;
   --r-lg: 16px;
   --ease: cubic-bezier(.2, .7, .2, 1);

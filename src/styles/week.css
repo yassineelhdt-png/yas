@@ -1,42 +1,44 @@
 .weekhead { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-block: 18px 12px; }
-.weekhead h1 { font-family: var(--display); font-size: clamp(26px, 5.4vw, 32px); line-height: 1.1; font-weight: 700; margin: 0 auto 0 0; letter-spacing: -.02em; }
+.weekhead h1 { font-family: var(--display); font-size: var(--fs-7); line-height: 1.1; font-weight: 700; margin: 0 auto 0 0; letter-spacing: -.02em; }
 
-.wscroll { overflow-x: auto; padding: 10px 10px 12px; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.wscroll { overflow-x: auto; padding: 12px; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 .wgrid { display: grid; grid-template-columns: 40px repeat(7, minmax(92px, 1fr)); gap: 0 6px; min-width: 720px; }
 .corner, .hours { position: sticky; left: 0; z-index: 2; background: var(--surface); }
-.whead { font-size: 12.5px; font-weight: 600; padding: 2px 2px 8px; display: grid; gap: 1px; }
+.whead { font-size: var(--fs-2); font-weight: 600; padding: 2px 2px 8px; display: grid; gap: 1px; }
 .whead button { all: unset; cursor: pointer; display: grid; gap: 1px; padding: 5px 7px; border-radius: 8px; transition: background-color .15s; }
 .whead button:hover { background: var(--surface-2); }
 .whead button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.whead small { font-weight: 400; color: var(--muted); font-family: var(--mono); font-size: 11px; }
+.whead small { font-weight: 400; color: var(--muted); font-family: var(--mono); font-size: var(--fs-1); }
 .whead.today button { background: var(--accent-soft); color: var(--accent); }
-.hours span { position: absolute; right: 4px; font-family: var(--mono); font-size: 10.5px; color: var(--muted); transform: translateY(-50%); }
+.hours span { position: absolute; right: 4px; font-family: var(--mono); font-size: var(--fs-1); color: var(--muted); transform: translateY(-50%); }
 .track { position: relative; border-left: 1px solid var(--line-2); background-image: linear-gradient(to bottom, var(--line-2) 1px, transparent 1px); background-size: 100% var(--hr); }
 .track.today { background-color: color-mix(in srgb, var(--accent) 4%, transparent); }
 .nowline { position: absolute; left: -4px; right: 0; height: 2px; background: var(--accent); z-index: 1; pointer-events: none; }
 .nowline::before { content: ""; position: absolute; left: 0; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 
 /* --l : nombre de lignes qui tiennent dans le bloc (calculé par week.js) : pas de ligne coupée en deux */
-.blk { position: absolute; left: 3px; right: 2px; border-radius: 4px; background: color-mix(in srgb, var(--c) 22%, var(--surface)); border-left: 3px solid var(--c); font-size: 10.5px; line-height: 1.2; padding: 2px 4px; overflow: hidden; color: var(--ink); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--l, 3); line-clamp: var(--l, 3); }
-.blk small { display: block; opacity: .85; font-family: var(--mono); font-size: 9.5px; }
-.blk.fx { background: var(--c); color: var(--surface); border-left-color: var(--c); }
+.blk { position: absolute; left: 3px; right: 2px; border-radius: 4px; background: color-mix(in srgb, var(--c) 22%, var(--surface)); border-left: 3px solid var(--c); font-size: var(--fs-1); line-height: 12.6px; padding: 2px 4px; overflow: hidden; color: var(--ink); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--l, 3); line-clamp: var(--l, 3); }
+.blk small { display: block; font-family: var(--mono); font-size: var(--fs-1); }
+/* séance : couleur de la matière assombrie, texte blanc à 5:1 au moins */
+.blk.fx { background: color-mix(in srgb, var(--c) 88%, var(--ink)); color: var(--surface); border-left-color: color-mix(in srgb, var(--c) 88%, var(--ink)); }
 .blk.brk { background: var(--surface-2); border-left: 2px solid var(--line); color: var(--muted); }
 .blk.sp { background: color-mix(in srgb, var(--c-sport) 25%, var(--surface)); border-left-color: var(--c-sport); }
 
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--ink-2); padding: 10px 2px 0; position: sticky; left: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--fs-2); color: var(--ink-2); padding: 10px 2px 0; position: sticky; left: 0; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 5px; transform: translateY(1px); }
 
-.wcards { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); margin-top: 16px; }
+.wcards { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; margin-top: 16px; }
 @media (min-width: 820px) { .wcards { grid-template-columns: 1fr 1fr; } }
 .totals { display: grid; gap: 8px; }
-.tot { display: grid; grid-template-columns: 120px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 13.5px; }
+.tot { display: grid; grid-template-columns: 120px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: var(--fs-3); }
 .tot .b { height: 10px; border-radius: 99px; background: var(--line-2); overflow: hidden; }
 .tot .b span { display: block; height: 100%; background: var(--c); border-radius: 99px; }
-.tot em { font-style: normal; font-family: var(--mono); font-size: 12.5px; text-align: right; color: var(--ink-2); }
+.tot em { font-style: normal; font-family: var(--mono); font-size: var(--fs-2); text-align: right; color: var(--ink-2); }
 /* bilan de la semaine : une ligne par jour, cliquable */
-.tot.day { all: unset; display: grid; grid-template-columns: 120px minmax(0, 1fr) 96px; gap: 10px; align-items: center; font-size: 13.5px; cursor: pointer; border-radius: 6px; padding: 2px 0; --c: var(--ok); }
+.tot.day { all: unset; display: grid; grid-template-columns: 120px minmax(0, 1fr) 96px; gap: 10px; align-items: center; font-size: var(--fs-3); cursor: pointer; border-radius: 6px; padding: 2px 0; --c: var(--ok); }
 .tot.day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tot.day.today span:first-child { font-weight: 600; color: var(--accent); }
+@media (hover: hover) { .tot.day:hover > span:first-child { color: var(--accent); } }
 
 @media (max-width: 520px) {
   .tot { grid-template-columns: 92px minmax(0, 1fr) 56px; }
@@ -44,10 +46,11 @@
   /* téléphone : les 7 jours d'un coup d'œil (couleurs seulement) ; toucher un jour pour l'ouvrir */
   .wscroll { padding-inline: 6px; }
   .wgrid { min-width: 0; grid-template-columns: 26px repeat(7, minmax(0, 1fr)); gap: 0 3px; }
-  .whead { font-size: 11.5px; padding-inline: 0; }
-  .whead button { padding: 5px 2px; justify-items: center; }
+  .whead { font-size: var(--fs-1); padding-inline: 0; }
+  /* « Sam 10 » comme « Lun 5 » : tous les jours sur deux lignes, centrés */
+  .whead button { padding: 5px 2px; justify-items: center; grid-template-columns: min-content; justify-content: center; text-align: center; line-height: 1.2; }
   .whead small { display: none; }
-  .hours span { font-size: 9.5px; right: 2px; }
+  .hours span { right: 2px; }
   .blk { font-size: 0; border-left-width: 2px; left: 1px; right: 1px; padding: 0; }
   .blk small { display: none; }
 }
