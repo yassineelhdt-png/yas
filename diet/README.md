@@ -4,6 +4,13 @@ Journal santé quotidien : compléments (matin, midi, 16h, soir), eau (verres, o
 check-ins (humeur, énergie, concentration, stress, douleur, faim), ce que je ressens (douleurs, sensations, effets
 secondaires), repas avec aliments et macros (protéines, glucides, lipides, calories) et notes.
 
+**Interface** : sobre et professionnelle (revue par des agents « analyste-exhaustif » sur 39 captures et toute la
+feuille de style) : police Inter partout (embarquée dans les apps), titres en 600, textes en 400–500 ; cartes plates à
+filet, rayons de 6 à 12 px ; icônes au trait, sans illustration ni emoji (l'humeur se note de 1 à 5) ; la couleur
+porte un sens : rouge pour la marque, l'action principale, aujourd'hui et les alertes, vert pour un objectif atteint,
+ambre pour ce qui est à surveiller, données en gris avec la barre du jour en rouge. Onglets et sélecteurs en contrôles
+segmentés. Contraste WCAG AA vérifié dans les deux thèmes, contours des champs à 3:1.
+
 **Accueil en onglets** : la journée tient sur un écran. *Aperçu* : les six anneaux sur une rangée, « Maintenant »
 (les compléments du moment à cocher, et en un appui : un verre d'eau, un check-in, un repas, un ressenti), « À faire »
 (les rappels du jour regroupés : visite, cures, envoi à Claude, sauvegarde, premiers pas) et les rendez-vous ; puis un
@@ -50,6 +57,12 @@ jour, ou par mois pour l'année, avec l'objectif) et la régularité de chaque c
 servi ne comptent pas dans les moyennes. Au doigt, toucher une colonne affiche sa valeur ; sur la courbe du poids,
 la bulle reste après le toucher et glisser de côté parcourt les pesées. La période en cours se compare aux mêmes premiers jours de la période
 d'avant (lundi → mardi contre lundi → mardi), et le nombre de séances par semaine part du premier jour noté.
+
+**Ce que disent tes données** (Santé) : sur les 90 derniers jours, l'app compare tes jours deux à deux (nuits de 7 h
+ou plus contre plus courtes, avec ou sans séance, pas et eau à l'objectif ou non) sur l'humeur, l'énergie, le stress
+et les douleurs, par exemple « Après une nuit d'au moins 7 h, ton humeur est en moyenne à 4/5, contre 3/5 après une
+nuit plus courte ». Seulement avec au moins 5 jours de chaque côté et un écart net (0,4 point) ; présenté comme une
+observation, pas une preuve, et repris dans le dossier pour le médecin.
 
 **Dossier complet** (Réglages → *Données*, ou « Dossier de cette période » dans Mes moyennes) : un fichier Markdown
 pour Claude, une autre IA ou un médecin, sur tout le journal, 12 mois, 3 mois, 30 jours ou les dates choisies :
@@ -112,7 +125,7 @@ où l'app tourne :
 
 | Où | Envoyer à Claude | Données |
 |---|---|---|
-| Artefact Claude (iPhone, tablette, PC via claude.ai) | « Demander à Claude » répond dans la page (photo de prise de sang possible), la réponse est gardée avec la journée | synchronisées avec le compte Claude |
+| Artefact Claude (iPhone, tablette, PC via claude.ai) | « Demander à Claude » répond dans la page (photo de prise de sang possible), la réponse est gardée avec la journée | synchronisées avec le compte Claude, partie par partie : deux appareils qui changent des réglages différents (objectifs ici, compléments là-bas) gardent les deux changements, même après une coupure de réseau |
 | App Android (APK) | « Envoyer à Claude » ouvre le menu de partage : choisir l'app Claude | sur la tablette |
 | App Windows | « Copier pour Claude », puis « Ouvrir mon projet Claude » | sur le PC |
 
