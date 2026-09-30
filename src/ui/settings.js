@@ -171,7 +171,7 @@ async function importFile(e) {
 
 function importControls() {
   if (!pending) {
-    return html`<div class="btnrow"><button class="btn primary" @click=${() => prepareImport(document.getElementById("backup-in").value)}>Restaurer cette sauvegarde</button></div>`;
+    return html`<div class="btnrow"><button class="btn" @click=${() => prepareImport(document.getElementById("backup-in").value)}>Restaurer cette sauvegarde</button></div>`;
   }
   const n = Object.keys(pending.days).length;
   return html`
@@ -313,7 +313,7 @@ export function settingsView() {
           ? html`<div class="confirmbox" role="alert"><span>Tous tes réglages reviennent aux valeurs de base (tes objectifs et tes journées sont gardés).</span>
               <div class="btnrow"><button class="btn primary" @click=${() => { confirmReset = false; resetSettings(); toast("Réglages de base rétablis"); }}>Rétablir les réglages de base</button><button class="btn ghost" @click=${() => { confirmReset = false; notify(); }}>Annuler</button></div></div>`
           : html`<button class="btn" @click=${() => { confirmReset = true; notify(); }}>Revenir aux réglages de base</button>`}
-        <span class="sub">${state.sync === "cloud" ? "Enregistré et synchronisé sur tes appareils." : "Enregistré sur cet appareil."} · v${__APP_VERSION__} · ${platform.label}</span>
+        <span class="sub">${state.sync === "cloud" ? "Enregistré et synchronisé sur tes appareils" : "Enregistré sur cet appareil"} · v${__APP_VERSION__} · ${platform.label}</span>
       </div>
     </section>`;
 }

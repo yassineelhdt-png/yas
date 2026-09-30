@@ -17,7 +17,7 @@ const TABS = [
   ["methode", "Méthode", icons.method]
 ];
 const SYNC_TXT = { cloud: "Synchronisé", error: "Synchro en pause", connecting: "Connexion…", local: "Sur cet appareil" };
-const THEME_COLOR = { light: "#EDF0F3", dark: "#0D1218" };
+const THEME_COLOR = { light: "#F4F5F7", dark: "#0C0F13" }; // = --bg (tokens.css)
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 

@@ -7,7 +7,7 @@ import { longDate, cv, mainTask, shownTasks, isDone } from "./format.js";
 import { icons } from "./icons.js";
 import { goalsCard } from "./goals.js";
 
-const PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie" };
+const PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TUT: "Tutorat", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie" };
 const MAJOR = new Set(["study", "fixed", "exam"]);
 
 // ---------- libellés ----------
@@ -178,7 +178,7 @@ function replanDefaults(res, at, done) {
 }
 
 // ---------- morceaux de la vue ----------
-function nowCard(res, st, nm, done) {
+function nowCard(res, st, nm, done, doneMin) {
   const items = res.items.filter((it) => it.e > it.s && !it.past);
   if (!items.length) return nothing;
   const cur = items.find((it) => nm >= it.s && nm < it.e);
@@ -200,7 +200,7 @@ function nowCard(res, st, nm, done) {
   } else {
     body = html`
       <div class="now-l1"><span class="now-kicker">Journée terminée</span></div>
-      <div class="now-title">${E.hdur(res.net)} nettes au programme. Bravo.</div>`;
+      <div class="now-title">${doneMin > 0 ? E.hdur(doneMin) + " cochées sur " + E.hdur(res.net) + " au programme" : E.hdur(res.net) + " au programme aujourd'hui"}</div>`;
   }
   const c = cur ? itemColor(cur) : "var(--accent)";
   // cocher sans chercher dans la frise : la séance en cours, ou celle qu'on vient de finir (pendant la pause)
@@ -235,18 +235,18 @@ function header(res, st, ctx) {
           <span class="chip mode-${res.mode}">${modeText(res)}</span>
         </div>
       </div>
-      ${isToday ? nowCard(res, st, ctx.nm, ctx.done) : nothing}
+      ${isToday ? nowCard(res, st, ctx.nm, ctx.done, ctx.doneMin) : nothing}
       <div class="wake card">
         <div class="times">
           <label><span class="lbl">Levé à</span>${timeField("t-wake", E.hm(res.wake), act.wake)}</label>
           <label><span class="lbl">Je commence à</span>${timeField("t-start", E.hm(res.start), act.start)}</label>
           <label><span class="lbl">Je finis à</span>${timeField("t-end", E.hm(res.endAt ?? res.workEnd), act.end)}</label>
           <span class="auto">
-            <span>Début ${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min" + (res.place !== "maison" ? " + trajet" : "")}</span>
-            <span>Fin ${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
+            <span>Début${res.startSet ? " : " : " "}${res.startSet ? html`<button class="linkbtn" @click=${act.startAuto}>remettre en auto</button>` : "auto : lever + " + st.prep + " min" + (res.place !== "maison" ? " + trajet" : "")}</span>
+            <span>Fin${res.endSet ? " : " : " "}${res.endSet ? html`<button class="linkbtn" @click=${act.endAuto}>remettre en auto</button>` : st.endAt ? "auto : " + st.endAt + " (réglages)" : "auto : objectif atteint"}</span>
           </span>
         </div>
-        ${isToday ? html`<div class="wbtns"><button class=${ctx.nm < res.start ? "btn primary" : "btn"} @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}><span>Je commence<span class="wide"> maintenant</span></span></button></div>` : nothing}
+        ${isToday && ctx.nm < res.start + 120 ? html`<div class="wbtns"><button class=${ctx.nm < res.start ? "btn primary" : "btn"} @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}><span>Je commence<span class="wide"> maintenant</span></span></button></div>` : nothing}
         <div class="facts">
           <div class="fact wide"><span class="lbl">Début</span><b>${res.studyStart < 1e9 ? E.hm(res.studyStart) : "—"}</b></div>
           <div class="fact wide"><span class="lbl">Fin</span><b>${E.hm(res.workEnd)}</b></div>
@@ -479,7 +479,8 @@ export function dayView(res, nav, week) {
   for (const it of res.items) if (it.counts && isDone(done, it)) doneMin += it.e - it.s;
   const nextWake = E.m((getDay(E.addDays(ds, 1)) || {}).wake || st.wake);
   const ctx = {
-    ds, day, done, isToday, nm, doneMin, target: st.targetH * 60, nextWake, bed: nextWake - st.sleepH * 60,
+    // objectif du jour : 9h, ou moins si le plan est réduit (fin trop tôt)
+    ds, day, done, isToday, nm, doneMin, target: Math.min(st.targetH * 60, res.net || st.targetH * 60), nextWake, bed: nextWake - st.sleepH * 60,
     go: nav.go, setReplanOpen: nav.setReplanOpen, week, editGoals: nav.editGoals
   };
   return html`
