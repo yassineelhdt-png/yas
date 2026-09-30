@@ -20,7 +20,7 @@ const HORAIRE = {
     WP: "E.F2.104A/B · Auditoire Willy Peers", LP: "E.W.1.306 · Auditoire Louise Popelin", AB: "E.B1.003/003A · Auditoire B",
     BRE: "Auditoire Bremer", BOR: "Auditoire Bordet (F2.304A/B)", TPB: "E.G2.3.306 · labo TP", INF: "E.E1.2.314 · Salle InforMel (pédagogie active)",
     F3307: "E.F3.307", GE: "GE.3.310 · bâtiment GE (monter d'un niveau après l'entrée principale, à gauche en sortant des escaliers)",
-    F3: "Erasme F3.307", A3: "Erasme A3.155", G1: "G1-2-302", AUD: "Auditoire (à confirmer sur TimeEdit)"
+    F3: "Erasme F3.307", A3: "Erasme A3.155", G1: "G1-2-302", AUD: "Auditoire (à confirmer sur TimeEdit)", TBC: "Local à confirmer"
   },
   // [date, début, fin, matière, type, local, note, vete]
   events: [
@@ -128,7 +128,8 @@ const HORAIRE = {
   ],
   // Séances hebdomadaires : [matière, type, jour (1 = lundi), début, fin, local, du, au] — hors jours fermés
   weekly: [
-    ["BIO", "TUT", 3, "12:00", "13:50", "G1", "2026-09-30", "2026-12-16"] // tutorat de biologie, tous les mercredis
+    ["BIO", "TUT", 3, "12:00", "13:50", "G1", "2026-09-30", "2026-12-16"], // tutorat de biologie, tous les mercredis
+    ["MATH", "PERM", 1, "12:00", "14:00", "TBC", "2026-10-05", "2026-12-14"] // permanence de maths, tous les lundis
   ],
   // Permanences de physique – Erasme GE.3.310, lun→ven 10h-14h, dès la semaine 3
   permPhys: { from: "2026-09-28", until: "2026-12-18", start: "10:00", end: "14:00", room: "GE" },

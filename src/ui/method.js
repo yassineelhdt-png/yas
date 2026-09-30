@@ -75,7 +75,7 @@ export function methodView() {
         <li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li>
         <li>La veille d'un séminaire : préparation de la série.</li>
         <li>Guidance chimie 1×/semaine : le ${JOURS_MIN[st.guidChimDay]} (${E.hdur(+st.guidChimDur)}). Permanence physique 1×/semaine : le ${JOURS_MIN[st.permPhysDay]} à ${st.permPhysStart} (${E.hdur(+st.permPhysDur)}). Réglables dans Réglages → Unif.</li>
-        <li>Appuis : maths le mardi 12h–14h ; bio le vendredi 12h–14h (guidances QCM à thèmes : le thème est indiqué sur la séance ; la séance des VETE, le mercredi en général, est proposée comme rechange). Tutorat de bio le mercredi 12h–13h50 (G1-2-302).</li>
+        <li>Appuis : maths le mardi 12h–14h ; bio le vendredi 12h–14h (guidances QCM à thèmes : le thème est indiqué sur la séance ; la séance des VETE, le mercredi en général, est proposée comme rechange). Tutorat de bio le mercredi 12h–13h50 (G1-2-302). Permanence de maths le lundi 12h–14h.</li>
         <li>Tu choisis chaque séance : « Je n'y vais pas » sur la séance dans le planning, « J'y vais » sur la ligne barrée d'une séance où tu ne vas pas. Les cours théoriques se règlent aussi par matière dans Réglages.</li>
         <li>Le reste du temps tourne entre chimie, physique, maths et bio pour équilibrer la semaine.</li>
       </ul>
@@ -98,6 +98,7 @@ export function methodView() {
       <ul>
         <li>Guidance chimie à partir de novembre : créneaux supposés identiques à octobre (mar 10h30, mer 10h, jeu 11h).</li>
         <li>Séminaire de maths du 22/10 : local non indiqué dans TimeEdit.</li>
+        <li>Permanence de maths du lundi et appuis de bio (jeudi 1/10, puis le vendredi) : auditoire / local à confirmer sur TimeEdit.</li>
         <li>Cours MEDIG (IA, ERSB, durabilité) : vérifie si la présence est obligatoire, puis active-les dans « Séances à l'unif ».</li>
       </ul>
 

@@ -71,7 +71,7 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   sur une échelle, carte « En ce moment » teintée, frise plus légère, créneaux faits / passés lisibles, Réglages
   plus nets, grille de la semaine contrastée, interrupteurs lisibles en sombre.
 - **Présences au choix, séance par séance**, directement dans le planning (« Je n'y vais pas » / « J'y vais ») ;
-  cours théoriques par défaut par matière (Réglages). **Tutorat de bio** le mercredi 12:00–13:50 (G1-2-302) ;
+  cours théoriques par défaut par matière (Réglages). **Tutorat de bio** le mercredi 12:00–13:50 (G1-2-302) ; **permanence de maths** le lundi 12:00–14:00 (local à confirmer) ;
   **guidances de bio** avec leur thème (PDF du 22/09), guidance 1 du jeudi 1/10, séance des VETE en rechange.
 - La **préparation de la séance du lendemain** passe avant les cours reportés ; si elle ne tient pas, une alerte le dit.
 - Carte **« En ce moment »** : le créneau en cours, le temps restant et ce qui suit.

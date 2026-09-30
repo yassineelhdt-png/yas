@@ -15,6 +15,7 @@ function defaultAttend(type, subj, vete, S) {
     return typeof th[subj] === "boolean" ? th[subj] : !!S.attendTheory;
   }
   if (type === "TUT") return !!S.tutoBio;
+  if (type === "PERM" && subj === "MATH") return !!S.permMath;
   if (type === "VISITE") return false;
   if (type === "APPUI") {
     if (vete) return false;

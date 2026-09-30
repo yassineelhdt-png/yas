@@ -331,6 +331,20 @@ describe("sessions", () => {
     expect(E.planDay("2026-10-07", {}).notes.some((n) => n.startsWith("Pas de pause déjeuner"))).toBe(true);
   });
 
+  it("permanence de maths : tous les lundis 12:00–14:00, au choix", () => {
+    const ev = (d, s = {}, day) => E.planDay(d, s, () => day).events.find((e) => e.type === "PERM" && e.subj === "MATH");
+    const p = ev("2026-10-05");
+    expect([E.hm(p.s), E.hm(p.e), p.room, E.evLabel(p), p.attend]).toEqual(["12:00", "14:00", "Local à confirmer", "Permanence maths", true]);
+    for (const d of ["2026-10-12", "2026-11-16", "2026-12-14"]) expect(ev(d), d).toBeDefined();
+    expect(ev("2026-10-06")).toBeUndefined(); // mardi
+    expect(ev("2026-11-02")).toBeUndefined(); // jour de fermeture
+    expect(ev("2026-10-05", {}, { ov: { [p.id]: false } }).attend).toBe(false); // décochée ce jour-là
+    expect(ev("2026-10-05", { permMath: false }).attend).toBe(false);
+    expect(ev("2026-10-05", { extraSessions: false })).toBeUndefined();
+    // le lundi à l'unif, la permanence est bien dans la journée
+    expect(E.planDay("2026-10-05", {}).items.some((it) => it.kind === "fixed" && it.type === "PERM" && it.subj === "MATH")).toBe(true);
+  });
+
   it("guidances de bio (PDF du 22/09) : thème, guidance 1 du jeudi 1/10, séance des VETE en rechange", () => {
     const g = (d) => E.planDay(d, {}).events.filter((e) => e.subj === "BIO" && e.type === "APPUI" && E.hm(e.s) === "12:00");
     const [g1] = g("2026-10-01");
@@ -363,13 +377,17 @@ describe("objectifs de la semaine", () => {
   };
 
   it("les annales habituelles sont placées dans la semaine, sans dépasser l'objectif", () => {
+    const total = (g) => Object.values(g).reduce((a, b) => a + b, 0);
     for (const mon of ["2026-10-05", "2026-11-09", "2026-12-07"]) {
+      // semaine de cours (tutorat du mercredi, permanence de maths du lundi) : une annale de chimie entière
       const g = goalMin(E.planWeek(mon, {}));
-      // semaine de cours (avec le tutorat du mercredi) : une annale de chimie entière, et de la physique
       expect(g["annale-chim"], mon).toBeGreaterThanOrEqual(240);
-      expect(g["annale-phys"], mon).toBeGreaterThanOrEqual(120);
       expect(g["annale-chim"], mon).toBeLessThanOrEqual(480);
       expect(g["annale-math"] || 0, mon).toBeLessThanOrEqual(240);
+      // sans la permanence de maths : un bloc de 2h en plus, et de la physique
+      const sans = goalMin(E.planWeek(mon, { permMath: false }));
+      expect(sans["annale-phys"], mon).toBeGreaterThanOrEqual(120);
+      expect(total(sans), mon).toBe(total(g) + 120);
     }
     // vacances : toutes les annales de la semaine
     expect(goalMin(E.planWeek("2026-12-21", {}))).toEqual({ "annale-chim": 480, "annale-phys": 480, "annale-math": 240 });

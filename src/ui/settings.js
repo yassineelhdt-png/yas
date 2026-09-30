@@ -49,7 +49,8 @@ const FORM = [
     ["permPhysDur", "Permanence physique : durée", "min", { min: 15 }],
     ["appuiMath", "Appui maths du mardi", "bool"],
     ["appuiBio", "Appui bio du vendredi (guidances QCM à thèmes)", "bool"],
-    ["tutoBio", "Tutorat de bio du mercredi (12:00–13:50)", "bool"]
+    ["tutoBio", "Tutorat de bio du mercredi (12:00–13:50)", "bool"],
+    ["permMath", "Permanence de maths du lundi (12:00–14:00)", "bool"]
   ]],
   // cours théoriques : par matière (attendTh), repli sur l'ancien choix général attendTheory
   ["Cours théoriques (par défaut)", [

@@ -14,7 +14,7 @@ export function evLabel(ev) {
   const n = (SUBJ[ev.subj] || ev.subj).toLowerCase();
   switch (ev.type) {
     case "GUID": return "Guidance chimie";
-    case "PERM": return "Permanence physique";
+    case "PERM": return "Permanence " + (ev.subj === "PHYS" ? "physique" : n);
     case "SEM": return "Séminaire de " + n;
     case "EX": return "Séminaire de " + n + " (exercices)";
     case "TP": return "TP de " + n;

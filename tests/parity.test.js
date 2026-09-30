@@ -37,7 +37,7 @@ function randomDays(seed, { anyMinute = false } = {}) {
     if (r() < (anyMinute ? 0.5 : 0.25)) d.start = E.hm(E.m(d.wake) + 20 + (anyMinute ? Math.floor(r() * 240) : Math.floor(r() * 12) * 5));
     if (r() < 0.3) {
       const ov = {};
-      for (const ev of E.dayEvents(ds, E.withDefaults({}), null)) if (r() < 0.4) ov[ev.id] = r() < 0.5;
+      for (const ev of E.dayEvents(ds, E.withDefaults({ extraSessions: false }), null)) if (r() < 0.4) ov[ev.id] = r() < 0.5;
       d.ov = ov;
     }
     if (r() < 0.2) d.replan = { at: 600 + Math.floor(r() * 100) * 5, studied: Math.floor(r() * 50) * 5, lunch: r() < 0.5, dinner: r() < 0.2, sport: r() < 0.1 };
