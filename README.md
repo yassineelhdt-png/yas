@@ -63,6 +63,10 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   vue Semaine lisible sur téléphone.
 - **« C'est fait »** directement dans la carte « En ce moment » (la séance en cours, ou celle que tu viens de
   finir pendant la pause) ; bilan **« Ta semaine »** (coché / prévu, jour par jour) dans la vue Semaine.
+- **Interface d'outil de travail** (refonte, auditée par deux agents analyste-exhaustif : iPhone, tablette / PC) :
+  une seule famille de caractères (IBM Plex), angles francs, couleurs de matières sourdes, un seul bouton bleu
+  par écran, étiquettes neutres, créneaux écoulés en retrait, mise en page grand écran plus dense (Réglages
+  en deux colonnes, panneau en deux colonnes sur tablette en portrait), cibles tactiles à 44 px partout.
 - **Finitions visuelles** (audit de l'agent analyste-exhaustif) : échelle de texte à 7 tailles, espacements et rayons
   sur une échelle, carte « En ce moment » teintée, frise plus légère, créneaux faits / passés lisibles, Réglages
   plus nets, grille de la semaine contrastée, interrupteurs lisibles en sombre.

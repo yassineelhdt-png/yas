@@ -1,7 +1,7 @@
 /* ---------- réglages ---------- */
 .settings { display: grid; gap: 16px; padding-top: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
 @media (min-width: 820px) { .settings { grid-template-columns: 1fr 1fr; } }
-.settings h1 { grid-column: 1 / -1; font-family: var(--display); font-size: var(--fs-7); line-height: 1.1; margin: 0; letter-spacing: -.02em; }
+.settings h1 { grid-column: 1 / -1; font-family: var(--display); font-weight: 600; letter-spacing: -.015em; line-height: 1.15; font-size: var(--fs-7); line-height: 1.1; margin: 0; letter-spacing: -.02em; }
 fieldset { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); padding: 14px 16px 6px; margin: 0; min-width: 0; box-shadow: var(--shadow); }
 /* titre de section DANS la carte (pas posé sur la bordure) */
 legend { float: left; width: 100%; font-family: var(--display); font-weight: 600; font-size: var(--fs-5); padding: 0; margin: 0 0 4px; }
@@ -21,8 +21,8 @@ legend + * { clear: both; }
 .backup .sub { margin: 4px 0 0; }
 .backup textarea {
   width: 100%; resize: vertical; min-height: 70px;
-  border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2);
-  padding: 8px 10px; font-family: var(--mono); font-size: var(--fs-2);
+  border: 1px solid var(--line); background: var(--surface-2);
+  padding: 8px 10px; font-family: var(--mono); font-size: var(--fs-2); border-radius: var(--r);
 }
 .confirmbox { display: grid; gap: 10px; background: var(--warn-soft); color: var(--warn); border-radius: var(--r); padding: 12px 16px; font-size: var(--fs-3); }
 .setfoot { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
@@ -30,7 +30,7 @@ legend + * { clear: both; }
 
 /* ---------- méthode ---------- */
 .method { max-width: 720px; padding-top: 18px; }
-.method h1 { font-family: var(--display); font-size: var(--fs-7); line-height: 1.1; margin: 0 0 6px; letter-spacing: -.02em; }
+.method h1 { font-family: var(--display); font-weight: 600; letter-spacing: -.015em; line-height: 1.15; font-size: var(--fs-7); line-height: 1.1; margin: 0 0 6px; letter-spacing: -.02em; }
 .method h2 { font-family: var(--display); font-size: var(--fs-6); font-weight: 600; margin: 26px 0 6px; }
 .method p, .method li { color: var(--ink-2); max-width: 65ch; }
 .method ul { padding-left: 18px; display: grid; gap: 4px; }
@@ -43,7 +43,7 @@ fieldset.goals > .sub { margin: 4px 0 0; }
 .goallist { display: grid; gap: 8px; }
 /* objectif : pastille de la couleur de la matière (plutôt qu'une barre sur le bord de la carte) */
 .goalrow { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface-2); }
-.goalrow .gr1::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.goalrow .gr1::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
 .goalrow small { color: var(--muted); font-size: var(--fs-2); }
 .goalrow .gr1, .goalrow .gr2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .goalrow select, .goalrow input { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 6px 8px; font-size: 16px; }
@@ -53,3 +53,38 @@ fieldset.goals > .sub { margin: 4px 0 0; }
 .linkbtn.danger { color: var(--warn); margin-left: auto; }
 fieldset.goals .fr { grid-template-columns: auto minmax(0, 1fr); }
 fieldset.goals .fr select { max-width: 100%; width: 100%; }
+
+/* ---------- Réglages ---------- */
+/* éditeur d'objectifs sur téléphone : type et matière l'un sous l'autre, « Retirer » en haut à droite */
+@media (max-width: 719px) {
+  .goalrow .gr1 { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+  .goalrow .gr1 select { width: 100%; min-width: 0; }
+  .goalrow .gr1 select + select { grid-column: 2; grid-row: 2; }
+  .goalrow .gr1 .linkbtn.danger { grid-column: 3; grid-row: 1; margin-left: 0; }
+}
+.goalrow .gr2, .goalrow:not(.ro) > small { padding-left: 16px; }
+.method .cyc { margin-left: 18px; }
+/* téléphone : un seul bord droit pour tous les champs (les champs sans unité réservent sa place) */
+@media (max-width: 719px) {
+  fieldset:not(.goals) .fr .in:has(input[type=time], input[type=date], select)::after { content: ""; flex: none; width: 26px; }
+}
+@media (max-width: 520px) {
+  .settings, .method { padding-top: 12px; }
+  legend { font-size: var(--fs-4); }
+  .method h2 { font-size: var(--fs-5); }
+}
+/* grand écran : deux colonnes équilibrées, contrôles sur une même arête */
+@media (min-width: 720px) {
+  .fr .u { width: 28px; min-width: 0; }
+  .fr .in:not(:has(.u)) { padding-right: 34px; }
+  .fr > .seg { margin-right: 34px; }
+  .fr :is(input[type=number], input[type=time]) { width: 6.5em; }
+  fieldset.goals .fr select { width: auto; }
+}
+@media (min-width: 820px) {
+  .settings { display: block; columns: 2; column-gap: 16px; }
+  .settings > * { break-inside: avoid; margin-bottom: 16px; }
+  .settings > :is(h1, fieldset.goals, .setfoot) { column-span: all; }
+  .settings > h1 { margin-bottom: 16px; }
+  .settings > .setfoot { margin: 16px 0 0; }
+}

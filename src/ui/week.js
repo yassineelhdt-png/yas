@@ -84,7 +84,7 @@ export function weekView(week, nav) {
         <div class="corner"></div>
         ${week.map((r) => html`
           <div class="whead ${r.date === today ? "today" : ""}">
-            <button @click=${() => nav.openDay(r.date)}>${shortDay(r.date)}<small>${E.hm(r.studyStart < 1e9 ? r.studyStart : r.start)} → ${E.hm(r.workEnd)}</small></button>
+            <button @click=${() => nav.openDay(r.date)}>${shortDay(r.date)}<small>${E.hm(r.studyStart < 1e9 ? r.studyStart : r.start)}–${E.hm(r.workEnd)}</small></button>
           </div>`)}
         <div class="hours" style="height:${H}px">${hours}</div>
         ${week.map((r) => html`
@@ -96,7 +96,7 @@ export function weekView(week, nav) {
       <div class="legend">
         ${TOTAL_ORDER.filter((k) => tot[k]).map((k) => html`<span style="--c:${cv(k)}"><i></i>${NAMES[k]}</span>`)}
         <span style="--c:var(--c-sport)"><i></i>Sport</span>
-        <span>Bloc plein = séance à l'unif</span>
+        <span>Teinte soutenue = séance à l'unif</span>
       </div>
     </div>
     <div class="wcards">

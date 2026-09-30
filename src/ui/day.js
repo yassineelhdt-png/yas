@@ -23,7 +23,7 @@ function minorLabel(it, st, res = {}) {
     case "bigpause": return ["Grande pause", "Marche dehors ou collation"];
     case "lunch": return ["Déjeuner" + (it.loc === "campus" ? " · campus" : ""), it.note || ""];
     case "dinner": return ["Dîner", ""];
-    case "sport": return ["Sport + douche", st.sport + " min de sport, puis la douche · dernier truc de la journée"];
+    case "sport": return ["Sport + douche", st.sport + " min de sport, puis la douche, en fin de journée"];
     case "travel":
       if (it.dir === "home" && it.closing) return ["Départ : " + placeShort(res.place) + " ferme", "Retour à la maison, tu continues là-bas"];
       if (it.dir === "home" && it.leave) return ["Retour à la maison", "Le trajet te sert de pause : tu finis la journée à la maison"];
@@ -276,6 +276,7 @@ function row(it, res, st, ctx, flags) {
   const isNow = ctx.isToday && ctx.nm >= it.s && ctx.nm < it.e && !it.past;
   const cls = ["row", "k-" + it.kind, major ? "major" : "minor"];
   if (it.past) cls.push("past");
+  else if (ctx.isToday && it.e <= ctx.nm) cls.push("elapsed");
   if (isNow) cls.push("now");
   if (flags.next) cls.push("next");
   if (major && done) cls.push("done");
@@ -397,7 +398,8 @@ function timeline(res, st, ctx) {
 function aside(res, st, ctx) {
   const { day, isToday, nm } = ctx;
   const cards = [];
-  if (isToday || day.replan) {
+  // (plus proposé une fois le programme terminé, sauf pour revenir sur une replanification)
+  if ((isToday && nm < res.end) || day.replan) {
     let inner;
     if (state.replanOpen) {
       const at = Math.max(res.start, isToday ? Math.floor(nm / 5) * 5 : day.replan ? day.replan.at : res.studyStart);
@@ -416,9 +418,9 @@ function aside(res, st, ctx) {
           <div class="f"><button class="btn primary" type="submit">Replanifier</button><button class="btn ghost" type="button" @click=${() => ctx.setReplanOpen(false)}>Fermer</button></div>
         </form>`;
     } else {
-      inner = html`<div class="btnrow"><button class="btn primary" @click=${() => ctx.setReplanOpen(true)}>Replanifier depuis maintenant</button>${day.replan ? html`<button class="btn ghost" @click=${act.replanClear}>Revenir au plan initial</button>` : nothing}</div>`;
+      inner = html`<div class="btnrow"><button class="btn" @click=${() => ctx.setReplanOpen(true)}>Replanifier depuis maintenant</button>${day.replan ? html`<button class="btn ghost" @click=${act.replanClear}>Revenir au plan initial</button>` : nothing}</div>`;
     }
-    cards.push(html`<div class="card"><h2>Pris du retard ?</h2><p class="sub">Recalcule la suite de la journée à partir de maintenant, sans perdre ce qui est déjà fait.</p>${inner}</div>`);
+    cards.push(html`<div class="card"><h2>Replanifier la journée</h2><p class="sub">En retard ou en avance : la suite est recalculée à partir de maintenant, ce qui est fait est gardé.</p>${inner}</div>`);
   }
   const P = res.placeInfo;
   cards.push(html`

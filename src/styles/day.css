@@ -12,14 +12,14 @@
   background: var(--surface);
   position: relative; overflow: hidden;
 }
-.now-main { all: unset; display: grid; gap: 4px; cursor: pointer; border-radius: 8px; }
+.now-main { all: unset; display: grid; gap: 4px; cursor: pointer; border-radius: var(--r); }
 .now-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .now-done { justify-self: start; margin-top: 8px; max-width: 100%; }
 .now-done .ico-check { width: 16px; height: 16px; flex: none; color: var(--ok); }
 .now-done span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .now-l1 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .now-kicker { font-size: var(--fs-1); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: color-mix(in srgb, var(--c) 60%, var(--ink)); }
-.now-left { font-size: var(--fs-2); color: var(--ink-2); }
+.now-left { font-family: var(--sans); font-size: var(--fs-2); color: var(--ink-2); }
 .now-title { font-family: var(--display); font-size: var(--fs-6); font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
 .now-sub { font-size: var(--fs-3); color: var(--muted); }
 .now-bar { height: 4px; border-radius: 2px; background: var(--line-2); overflow: hidden; margin-top: 8px; }
@@ -65,7 +65,7 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 /* ---------- frise ---------- */
 .tl { display: grid; }
 .bloc-h { display: flex; align-items: baseline; gap: 8px; padding: 20px 0 6px 79px; font-size: var(--fs-1); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.bloc-h small { font-family: var(--mono); font-size: var(--fs-1); font-weight: 500; letter-spacing: 0; text-transform: none; }
+.bloc-h small { font-family: var(--sans); font-size: var(--fs-1); font-weight: 500; letter-spacing: 0; text-transform: none; }
 .row { display: grid; grid-template-columns: 52px 3px minmax(0, 1fr); gap: 0 12px; position: relative; transition: opacity .25s; }
 .row .tm { font-family: var(--mono); font-size: var(--fs-2); color: var(--ink-2); padding-top: 10px; text-align: right; font-variant-numeric: tabular-nums; display: grid; align-content: start; gap: 2px; }
 .row .tm .te { color: var(--muted); font-size: var(--fs-1); }
@@ -73,13 +73,14 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 .row .body { padding: 8px 0 10px; min-width: 0; }
 /* créneaux : bordure seule (l'ombre est réservée aux cartes de premier niveau) */
 .row.major .body { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; margin-block: 3px; transition: border-color .2s, box-shadow .2s, background-color .2s; }
+.row.major .tm { padding-top: 17px; } /* heure sur la ligne du titre du créneau */
 .row.minor .tm { padding-top: 4px; font-size: var(--fs-2); }
 .row.minor .rail { background: repeating-linear-gradient(to bottom, var(--c-break) 0 3px, transparent 3px 6px); width: 1px; margin-inline: 1px; }
 .row.minor.k-sport .rail, .row.minor.k-lunch .rail, .row.minor.k-dinner .rail { background: var(--c); width: 3px; margin-inline: 0; }
 .row.minor .body { padding: 3px 0 5px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: var(--fs-3); color: var(--ink-2); }
 .row.minor .body b { font-weight: 600; color: var(--ink); }
 .row.minor .body small { color: var(--muted); font-size: var(--fs-2); flex-basis: 100%; }
-.row.minor .body .dur { font-size: var(--fs-2); }
+.row.minor .body .dur { font-size: var(--fs-2); font-family: var(--sans); }
 .row.k-sport .body b { color: color-mix(in srgb, var(--c-sport) 75%, var(--ink)); }
 
 .l1 { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 10px; }
@@ -91,7 +92,7 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 .meta.detail { margin-top: 6px; }
 .where { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 6px; }
 .where .lbl { font-size: var(--fs-1); }
-.where b { font-size: var(--fs-3); font-weight: 600; line-height: 1.3; }
+.where b { font-size: var(--fs-3); font-weight: 500; line-height: 1.3; }
 .len { font-family: var(--mono); font-size: var(--fs-2); color: var(--muted); white-space: nowrap; padding-top: 2px; }
 
 /* case « fait » */
@@ -105,15 +106,14 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 .chk:hover { border-color: var(--ok); }
 .chk:active { transform: scale(.88); }
 .chk .ico-check { width: 14px; height: 14px; opacity: 0; transform: scale(.4); transition: opacity .15s, transform .25s var(--ease); }
-.chk[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); animation: pop .3s var(--ease); }
+.chk[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); }
 .chk[aria-pressed="true"] .ico-check { opacity: 1; transform: none; }
-@keyframes pop { 50% { transform: scale(1.1); } }
 
 .tasks { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
 .tasks li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 0 9px; align-items: baseline; }
 .tasks li i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); transform: translateY(1px); }
 .tasks li span { font-size: var(--fs-3); }
-.tasks li em { font-style: normal; font-family: var(--mono); font-size: var(--fs-2); color: var(--muted); }
+.tasks li em { font-style: normal; font-family: var(--sans); font-variant-numeric: tabular-nums; font-size: var(--fs-2); color: var(--muted); }
 .tasks li small { grid-column: 2 / -1; color: var(--muted); font-size: var(--fs-2); line-height: 1.35; }
 .note { font-size: var(--fs-2); color: var(--ink-2); background: var(--surface-2); border-radius: var(--r-sm); padding: 4px 8px; margin-top: 8px; display: inline-block; }
 
@@ -128,7 +128,7 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 /* progression dans le créneau en cours */
 .row.now .rail { background: linear-gradient(to bottom, var(--c) var(--p), color-mix(in srgb, var(--c) 28%, transparent) var(--p)); }
 .row.next.major .body { border-style: dashed; border-color: var(--accent); }
-.nowtag { font-size: var(--fs-1); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent); border-radius: var(--r-sm); padding: 2px 6px; white-space: nowrap; }
+.nowtag { font-size: var(--fs-2); font-weight: 500; color: var(--accent); background: var(--accent-soft); border-radius: var(--r-sm); padding: 2px 6px; white-space: nowrap; }
 .replan-line { display: flex; align-items: center; gap: 10px; padding: 14px 0 6px 79px; font-size: var(--fs-3); color: var(--accent); font-weight: 500; }
 .replan-line::after { content: ""; flex: 1; height: 1px; background: var(--accent); opacity: .4; }
 .endrow { padding: 16px 0 0 79px; display: grid; gap: 4px; }
@@ -178,7 +178,7 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 .notebox { background: var(--accent-soft); color: var(--ink-2); border-radius: var(--r); padding: 12px 16px; font-size: var(--fs-3); display: grid; gap: 4px; }
 
 /* ---------- objectifs ---------- */
-.gpill { font-size: var(--fs-1); font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 1px 6px; border-radius: var(--r-sm); background: color-mix(in srgb, var(--c) 15%, var(--surface)); color: color-mix(in srgb, var(--c) 75%, var(--ink)); vertical-align: 1px; white-space: nowrap; }
+.gpill { font-size: var(--fs-2); font-weight: 500; padding: 1px 6px; border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line); vertical-align: 1px; white-space: nowrap; }
 .goal-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .goal { display: grid; gap: 4px; padding: 9px 0; border-top: 1px solid var(--line-2); }
 .goalcard .sub + .goal { border-top: 0; }
@@ -197,3 +197,34 @@ input:is(:hover, :focus-visible)::-webkit-calendar-picker-indicator { opacity: 1
 .row.skip .rail { background: repeating-linear-gradient(to bottom, var(--c) 0 3px, transparent 3px 6px); width: 1px; margin-inline: 1px; opacity: .7; }
 .row.skip .body b { font-weight: 500; color: var(--ink-2); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--ink-2) 45%, transparent); }
 .row.skip .linkbtn, .meta .linkbtn { font-size: var(--fs-2); }
+/* actions de la frise en gris : elles ne concurrencent pas l'accent */
+.row .body .linkbtn { color: var(--ink-2); text-decoration-color: var(--control); }
+
+/* ---------- créneaux déjà écoulés aujourd'hui : en retrait ---------- */
+.row.elapsed.major .body { background: var(--surface-2); }
+.row.elapsed .ttl { color: var(--ink-2); }
+.row.elapsed .rail { opacity: .45; }
+
+/* ---------- grand écran (≥ 920 px) : en-tête compact, le planning remonte ---------- */
+@media (min-width: 920px) {
+  /* « C'est fait » à droite du créneau en cours */
+  .nowcard:has(> .now-done) { grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; }
+  .nowcard > .now-main { grid-column: 1; grid-row: 1; }
+  .nowcard > .now-done { grid-column: 2; grid-row: 1; align-self: start; margin-top: 0; max-width: 380px; }
+  .nowcard > .now-next { grid-column: 1 / -1; }
+  /* carte « lever » sur deux lignes : heures + boutons, puis chiffres + jauge */
+  .wake .times { flex: 0 1 auto; }
+  .wake .meter { flex: 1 1 320px; width: auto; }
+}
+@media (min-width: 720px) {
+  .wake label { justify-items: start; }
+}
+/* tablette en portrait : panneau en deux colonnes sous la frise */
+@media (min-width: 720px) and (max-width: 919px) {
+  .aside { display: block; columns: 2; column-gap: 16px; }
+  .aside > .card { break-inside: avoid; margin-bottom: 16px; }
+}
+/* écran peu haut (tablette paysage) : le panneau défile avec la page, rien n'est caché en bas */
+@media (min-width: 920px) and (max-height: 860px) {
+  .aside { position: static; }
+}
