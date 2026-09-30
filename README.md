@@ -55,7 +55,8 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - **Objectifs de la semaine** (Réglages) : annales, théorie à rattraper, exercices… pour chaque semaine
   ou pour une semaine précise. En gros blocs de 2h d'un seul tenant (une annale de 4h = 2 × 2h), au plus
   deux par jour, jamais pendant les séances, avec une carte de progression (planifié / coché / ce qui manque)
-  dans les vues Jour et Semaine.
+  dans les vues Jour et Semaine. Ce qui manque le vendredi soir passe le **samedi matin** (une annale de 4h
+  avant le déjeuner, réglable ; le reste du samedi est réduit d'autant).
 
 - **Relecture au peigne fin** (skill `analyse` et agents dans `.claude/`) : cases cochées qui restent sur le bon
   créneau quand le plan se décale, synchro de l'artefact qui ne perd plus rien à la connexion, heures saisies

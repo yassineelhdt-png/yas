@@ -1,5 +1,5 @@
 // Vue « Méthode » : comment le plan est construit.
-import { html } from "lit-html";
+import { html, nothing } from "lit-html";
 import * as E from "../engine/index.js";
 import { S, state } from "../store.js";
 import { MOISC, JOURS } from "./format.js";
@@ -42,7 +42,7 @@ export function methodView() {
       <ul>
         <li>Annales, théorie à rattraper, exercices… (Réglages → Objectifs de la semaine), pour chaque semaine ou pour une semaine précise.</li>
         <li>Ils se font en gros blocs de 2h d'un seul tenant, sans pause au milieu : une annale de 4h = deux blocs de 2h (1re partie, 2e partie). Jamais pendant les séances, la guidance ou la permanence.</li>
-        <li>Au plus deux blocs par jour. Le premier passe dès qu'il te reste au moins 2h d'étude perso à côté ; le second seulement si les préparations et les cours à rattraper du jour tiennent encore. Les matières alternent (chimie, physique, maths, chimie…).</li>
+        <li>Au plus deux blocs par jour, et ce qui manque passe le samedi matin (voir Samedi). Le premier passe dès qu'il te reste au moins 2h d'étude perso à côté ; le second seulement si les préparations et les cours à rattraper du jour tiennent encore. Les matières alternent (chimie, physique, maths, chimie…).</li>
         <li>La carte « Objectifs de la semaine » montre ce qui est planifié et ce que tu as coché ; s'il manque du temps, elle le dit.</li>
       </ul>
 
@@ -82,8 +82,9 @@ export function methodView() {
 
       <h2>Samedi</h2>
       <ul>
-        <li>Matin : chimie Q2, ${E.hdur(st.chimOrga)} d'organique puis ${E.hdur(st.chimMin)} de minérale (redox, acide-base).</li>
-        <li>Après-midi : prépa concours ${E.hdur(st.concoursSat)} (physique puis maths), puis révision de la semaine ${E.hdur(st.revSat)}, qui commence par ce qui a été reporté.</li>
+        ${+st.annaleSat > 0 ? html`<li>Si la semaine n'a pas placé toutes ses annales : une annale le matin (jusqu'à ${E.hdur(+st.annaleSat)}, en blocs de 2h avant le déjeuner). Le reste du samedi est alors réduit d'autant, en proportion.</li>` : nothing}
+        <li>Chimie Q2 : ${E.hdur(st.chimOrga)} d'organique puis ${E.hdur(st.chimMin)} de minérale (redox, acide-base).</li>
+        <li>Prépa concours ${E.hdur(st.concoursSat)} (physique puis maths), puis révision de la semaine ${E.hdur(st.revSat)}, qui commence par ce qui a été reporté.</li>
       </ul>
 
       <h2>Dimanche concours</h2>

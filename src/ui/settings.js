@@ -58,6 +58,7 @@ const FORM = [
     ["BIO", "Bio", "th"], ["BIO2", "Bio · diversité du vivant", "th"], ["MEDIG", "MEDIG (IA, ERSB, durabilité)", "th"]
   ]],
   ["Week-end", [
+    ["annaleSat", "Samedi matin : annale si la semaine n'en a pas fait assez (0 = jamais)", "min", { min: 0, max: 240 }],
     ["chimOrga", "Samedi : chimie organique (Q2)", "min"],
     ["chimMin", "Samedi : chimie minérale (Q2)", "min"],
     ["concoursSat", "Samedi : prépa concours physique + maths", "min"],

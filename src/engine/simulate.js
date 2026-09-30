@@ -187,8 +187,10 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
     const toDinner = !dinner && isFinite(da) && da > t ? da - t : Infinity;
     len = Math.min(len, toLunch, toDinner);
     const room = Math.min(gap, toLunch, toDinner); // jusqu'à la prochaine séance ou le prochain repas
-    // bloc d'objectif (annale…) : d'un seul tenant, au début d'une session, s'il tient avant la suite
-    if (blocks.length && streak === 0 && room >= blocks[0] && (selfLeft === blocks[0] || selfLeft - blocks[0] >= MIN)) {
+    // bloc d'objectif (annale…) : d'un seul tenant, au début d'une session, s'il tient avant la suite ;
+    // il peut repousser le déjeuner jusqu'à 13:15 (on mange juste après)
+    const roomGoal = blocks.length && !lunch && t + blocks[0] <= LUNCH_LATE ? Math.min(gap, toDinner) : room;
+    if (blocks.length && streak === 0 && roomGoal >= blocks[0] && (selfLeft === blocks[0] || selfLeft - blocks[0] >= MIN)) {
       const b = blocks.shift();
       push({ kind: "study", s: t, e: t + b, loc: loc(), goal: goalN++ });
       t += b; studied += b; streak += b; sinceBig += b;

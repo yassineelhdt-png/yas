@@ -58,7 +58,7 @@ function itemColor(it) {
 
 function modeText(res) {
   if (res.mode === "concours") return "Concours blanc" + (res.ethique ? " + éthique" : "");
-  if (res.mode === "samedi") return "Chimie Q2 + rattrapage";
+  if (res.mode === "samedi") return res.items.some((it) => it.kind === "study" && it.goal != null) ? "Annale + chimie Q2" : "Chimie Q2 + rattrapage";
   if (res.mode === "conge") return res.closed || "Congé";
   return res.blocus ? "Blocus" : "Semaine de cours";
 }

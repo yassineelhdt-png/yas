@@ -21,7 +21,9 @@ export const DEFAULTS = Object.freeze({
   // Week-end
   concoursStart: "", ethiqueAnchor: "2026-10-04", ethiqueEvery: 4,
   raisonnement: 60, ethique: 60, concoursPause: 90,
-  chimOrga: 150, chimMin: 90, concoursSat: 180, revSat: 120,
+  // annaleSat : annale du samedi matin (min), seulement si la semaine n'a pas placé toutes ses annales ;
+  // le reste du samedi est réduit d'autant (0 = pas d'annale le samedi)
+  chimOrga: 150, chimMin: 90, concoursSat: 180, revSat: 120, annaleSat: 240,
   // Objectifs de la semaine — base : chaque semaine ; weeks : semaines personnalisées (clé = lundi)
   // objectif : { id, kind: annale | theorie | exos | autre, subj, count, hours, label }
   goals: Object.freeze({

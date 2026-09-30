@@ -393,6 +393,35 @@ describe("objectifs de la semaine", () => {
     expect(goalMin(E.planWeek("2026-12-21", {}))).toEqual({ "annale-chim": 480, "annale-phys": 480, "annale-math": 240 });
   });
 
+  it("samedi : une annale le matin si la semaine n'a pas tout placé, le reste du samedi réduit d'autant", () => {
+    const goalItems = (r) => r.items.filter((it) => (it.tasks || []).some((t) => t.kind === "goal"));
+    for (const mon of ["2026-10-05", "2026-11-09", "2026-12-07"]) {
+      const sat = E.planWeek(mon, {})[5], sd = sat.date;
+      expect(sat.mode, sd).toBe("samedi");
+      const g = goalItems(sat);
+      // une annale entière : 1re partie en début de journée, 2e partie juste après la pause, avant le déjeuner
+      expect(g.map((it) => it.e - it.s), sd).toEqual([120, 120]);
+      expect(g[0].s, sd).toBe(sat.start);
+      expect(g[0].tasks[0].title, sd).toMatch(/1re partie$/);
+      expect(g[1].tasks[0].title, sd).toBe(g[0].tasks[0].title.replace("1re", "2e"));
+      const lunch = sat.items.find((it) => it.kind === "lunch");
+      expect(g[1].e, sd).toBeLessThanOrEqual(lunch.s);
+      expect(g[1].s - g[0].e, sd).toBeLessThanOrEqual(40);
+      // toujours 9h, avec la chimie Q2, la prépa concours et la révision (réduites)
+      expect(sat.net, sd).toBe(540);
+      const titles = sat.items.flatMap((it) => (it.tasks || []).map((t) => t.title));
+      for (const t of ["Chimie Q2 · organique", "Chimie Q2 · minérale", "Prépa concours · physique", "Prépa concours · maths", "Révision de la semaine"]) expect(titles, sd).toContain(t);
+    }
+    // réglable : 0 = pas d'annale le samedi, le samedi habituel
+    const off = E.planWeek("2026-10-05", { annaleSat: 0 })[5];
+    expect(goalItems(off)).toEqual([]);
+    const orga = (r) => r.items.flatMap((it) => it.tasks || []).filter((t) => t.title === "Chimie Q2 · organique").reduce((a, t) => a + t.min, 0);
+    expect(orga(off)).toBeGreaterThanOrEqual(140);
+    expect(orga(E.planWeek("2026-10-05", {})[5])).toBeLessThan(orga(off));
+    // semaine de vacances : tout est déjà placé du lundi au vendredi, samedi habituel
+    expect(goalItems(E.planWeek("2026-12-21", {})[5])).toEqual([]);
+  });
+
   it("une annale de 4h = deux blocs de 2h d'un seul tenant", () => {
     for (const mon of ["2026-10-05", "2026-11-09", "2026-12-21"]) {
       const blocks = E.planWeek(mon, {}).flatMap((r) => r.items.filter((it) => (it.tasks || []).some((t) => t.kind === "goal")));

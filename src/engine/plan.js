@@ -149,9 +149,31 @@ function planSunday(res, S, day, pre, weekMin) {
 }
 
 // ---------- samedi : chimie Q2 + prépa concours + rattrapage ----------
-function saturdayQueue(res, S, getDay, backlog) {
+/**
+ * Annale du samedi : ce qui reste des objectifs de la semaine, jusqu'à `annaleSat` minutes
+ * (en blocs de 2h, posés le matin). Rien si la semaine a déjà tout placé.
+ */
+function saturdayBlocks(goals, S) {
+  const cap = Math.max(0, +S.annaleSat || 0), floor = minSession(S), out = [];
+  let used = 0;
+  for (const u of goals || []) {
+    if (u.left <= 0) continue;
+    for (const b of goalBlocks(u.left, floor)) {
+      if (out.length >= MAX_GOAL_BLOCKS || used + b > cap) return out;
+      out.push(b);
+      used += b;
+    }
+  }
+  return out;
+}
+
+function saturdayQueue(res, S, getDay, backlog, goalMin = 0) {
   res.mode = "samedi";
-  const cs = +S.concoursSat, cp = Math.round(cs / 2 / 5) * 5;
+  // avec l'annale du samedi, le reste de la journée (chimie Q2, prépa concours, révision) est réduit d'autant
+  const full = +S.chimOrga + +S.chimMin + +S.concoursSat + +S.revSat;
+  const k = goalMin > 0 && full > 0 ? Math.max(0, full - goalMin) / full : 1;
+  const cut = (x) => (k === 1 ? +x : Math.round((+x * k) / 5) * 5);
+  const cs = cut(S.concoursSat), cp = Math.round(cs / 2 / 5) * 5;
   const extra = backlog.map((x) => x.title.replace(" · reporté", "").replace(" du jour", "").replace(/^Cours/, "cours") + " (" + x.min + " min)");
   const mon = addDays(res.date, 2);
   for (const e of dayEvents(mon, S, (getDay(mon) || {}).ov)) {
@@ -161,12 +183,12 @@ function saturdayQueue(res, S, getDay, backlog) {
   }
   res.satExtra = extra;
   return [
-    { subj: "CHQ2", kind: "q2", title: "Chimie Q2 · organique", detail: "Nouvelle matière puis exercices, sans regarder la solution (avec ton artefact)", min: +S.chimOrga },
-    { subj: "CHQ2", kind: "q2", title: "Chimie Q2 · minérale", detail: "Oxydoréduction et acide-base : équilibrer des redox, pH, tampons", min: +S.chimMin },
+    { subj: "CHQ2", kind: "q2", title: "Chimie Q2 · organique", detail: "Nouvelle matière puis exercices, sans regarder la solution (avec ton artefact)", min: cut(S.chimOrga) },
+    { subj: "CHQ2", kind: "q2", title: "Chimie Q2 · minérale", detail: "Oxydoréduction et acide-base : équilibrer des redox, pH, tampons", min: cut(S.chimMin) },
     { subj: "PHYS", kind: "conc", title: "Prépa concours · physique", detail: "Questions type concours, chrono en main", min: cp },
     { subj: "MATH", kind: "conc", title: "Prépa concours · maths", detail: "Questions type concours, chrono en main", min: cs - cp },
-    { subj: "REV", kind: "rev", title: "Révision de la semaine", detail: "Anki + fiches de la semaine (bio, chimie, physique, maths)" + (extra.length ? ". D'abord : " + extra.join(", ") : ""), min: +S.revSat }
-  ];
+    { subj: "REV", kind: "rev", title: "Révision de la semaine", detail: "Anki + fiches de la semaine (bio, chimie, physique, maths)" + (extra.length ? ". D'abord : " + extra.join(", ") : ""), min: cut(S.revSat) }
+  ].filter((q) => q.min > 0);
 }
 
 // ---------- lundi → vendredi (et jours de congé) ----------
@@ -261,13 +283,15 @@ function planOne(ds, S, getDay, backlog, weekMin, goals) {
   const pre = mo.pre;
   if (w === 0) return planSunday(res, S, day, pre, weekMin);
 
-  if (w === 6) queue = saturdayQueue(res, S, getDay, backlog);
+  const satBlocks = w === 6 ? saturdayBlocks(goals, S) : [];
+  if (w === 6) queue = saturdayQueue(res, S, getDay, backlog, satBlocks.reduce((a, b) => a + b, 0));
   else queue = weekdayQueue(res, S, getDay, backlog);
   hard = [...hard, ...mo.walls].sort(byStart);
   // commencer l'après-midi : déjeuner déjà pris
   const init = { at: mo.at, lunch: v2(S) && start >= 810 };
-  // objectifs de la semaine (annales…) : en gros blocs, sur le temps qui reste après la file du jour
-  const blocks = res.mode === "semaine" || res.mode === "conge" ? dayBlocks(goals, S, queue, hard, start) : [];
+  // objectifs de la semaine (annales…) : en gros blocs, sur le temps qui reste après la file du jour ;
+  // le samedi, ce qui reste de la semaine (annaleSat)
+  const blocks = res.mode === "semaine" || res.mode === "conge" ? dayBlocks(goals, S, queue, hard, start) : satBlocks;
   init.blocks = blocks;
 
   const rp = day.replan;
