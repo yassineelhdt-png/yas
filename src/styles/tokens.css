@@ -1,12 +1,5 @@
 /* Polices embarquées (fonctionnent hors ligne) — sous-ensemble latin, suffisant pour le français */
 @font-face {
-  font-family: "Bricolage Grotesque";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 200 800;
-  src: url("@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-opsz-normal.woff2") format("woff2-variations");
-}
-@font-face {
   font-family: "IBM Plex Sans";
   font-style: normal;
   font-display: swap;
@@ -42,20 +35,23 @@
   src: url("@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
 }
 
+/* Direction : un planning d'étude comme un outil de travail. Une seule famille de caractères (IBM Plex),
+   neutres légèrement froids, angles francs (4 à 10 px), couleur réservée aux matières et à l'état « en cours ». */
 :root {
   color-scheme: light;
-  --bg: #EDF0F3; --surface: #FFFFFF; --surface-2: #F5F7F9; --ink: #111922; --ink-2: #3A4652; --muted: #5C6874; --line: #D8DEE4; --line-2: #E6EAEE;
+  --bg: #F4F5F7; --surface: #FFFFFF; --surface-2: #F7F8FA; --ink: #0F1720; --ink-2: #3B4552; --muted: #5A6472; --line: #DDE1E6; --line-2: #E9ECEF;
   /* bord / piste des contrôles vides (case « fait », interrupteur) : 3:1 au moins contre la carte */
   --control: #8A94A0;
-  --accent: #1A47D6; --accent-ink: #FFFFFF; --accent-soft: #E3E9FB;
-  --ok: #17804A; --warn: #8F5600; --warn-soft: #FBF0DE;
-  --c-chim: #0A8581; --c-phys: #5543D1; --c-math: #B86200; --c-bio: #2C8538; --c-medig: #7A6955;
-  --c-chq2: #03668A; --c-conc: #BF2F4E; --c-rais: #B0407A; --c-eth: #84559B; --c-rev: #3B6897;
-  --c-sport: #D35E28; --c-break: #A3ADB8;
-  --shadow: 0 1px 2px rgb(17 25 34 / .05), 0 2px 8px rgb(17 25 34 / .04);
-  --shadow-lg: 0 8px 28px rgb(17 25 34 / .16);
+  --accent: #2554C7; --accent-ink: #FFFFFF; --accent-soft: #E8EEFA;
+  --ok: #1E7A4C; --warn: #8F5600; --warn-soft: #FBF1E2;
+  /* matières : teintes sourdes, lisibles en petit */
+  --c-chim: #0E7C74; --c-phys: #4F4FB8; --c-math: #A65A0B; --c-bio: #2F7D3B; --c-medig: #6F665C;
+  --c-chq2: #1B6A93; --c-conc: #B03A55; --c-rais: #9A3F79; --c-eth: #75569A; --c-rev: #4A6583;
+  --c-sport: #B85427; --c-break: #A0A9B4;
+  --shadow: 0 1px 2px rgb(15 23 32 / .04);
+  --shadow-lg: 0 8px 24px rgb(15 23 32 / .14);
 
-  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif; /* titres : même famille, demi-gras */
   --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   /* échelle de texte (7 tailles ; les champs restent à 16 px au toucher, sinon iOS zoome) */
@@ -64,12 +60,12 @@
   --fs-3: 13.5px;                     /* sous-titres, boutons, listes */
   --fs-4: 15px;                       /* texte courant, titre de créneau */
   --fs-5: 17px;                       /* titres de carte et de bloc */
-  --fs-6: 21px;                       /* « En ce moment », heures saisies, fin de programme */
-  --fs-7: clamp(26px, 5.4vw, 34px);   /* titre de page */
-  /* rayons : 3 (repères) · 6 · 10 · 16 · 999 (pilules) */
-  --r-sm: 6px;
-  --r: 10px;
-  --r-lg: 16px;
+  --fs-6: 19px;                       /* « En ce moment », heures saisies, fin de programme */
+  --fs-7: clamp(22px, 4.2vw, 28px);   /* titre de page */
+  /* rayons : angles francs, pas de pilules */
+  --r-sm: 4px;
+  --r: 6px;
+  --r-lg: 10px;
   --ease: cubic-bezier(.2, .7, .2, 1);
 
   --safe-t: env(safe-area-inset-top, 0px);
@@ -82,24 +78,24 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0D1218; --surface: #151C24; --surface-2: #1A232D; --ink: #E7ECF1; --ink-2: #B9C3CD; --muted: #8793A0; --line: #2A3440; --line-2: #222C37; --control: #66727F;
-    --accent: #7B9BFF; --accent-ink: #0D1218; --accent-soft: #1E2A4A;
-    --ok: #4CC27F; --warn: #E3A64B; --warn-soft: #33281A;
-    --c-chim: #2FBFB9; --c-phys: #9486FF; --c-math: #EEA23F; --c-bio: #5DC36B; --c-medig: #B9A68F;
-    --c-chq2: #3AB3E0; --c-conc: #F2657F; --c-rais: #E27BB0; --c-eth: #C28FE0; --c-rev: #80A7D8;
-    --c-sport: #FF9460; --c-break: #5C6875;
+    --bg: #0C0F13; --surface: #12161C; --surface-2: #171C23; --ink: #E6EAEF; --ink-2: #B4BDC7; --muted: #8791A0; --line: #262D36; --line-2: #1D232B; --control: #5E6875;
+    --accent: #86A6F0; --accent-ink: #0C0F13; --accent-soft: #1A2440;
+    --ok: #57B883; --warn: #E0A552; --warn-soft: #2E2517;
+    --c-chim: #3DB8AE; --c-phys: #8F90EC; --c-math: #E3A150; --c-bio: #6BBF78; --c-medig: #B5AA9C;
+    --c-chq2: #57AED8; --c-conc: #EB7C93; --c-rais: #D986B8; --c-eth: #B89BDD; --c-rev: #8FA9C8;
+    --c-sport: #F0976A; --c-break: #5B6573;
     --shadow: 0 1px 2px rgb(0 0 0 / .3);
-    --shadow-lg: 0 8px 28px rgb(0 0 0 / .5);
+    --shadow-lg: 0 8px 24px rgb(0 0 0 / .5);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0D1218; --surface: #151C24; --surface-2: #1A232D; --ink: #E7ECF1; --ink-2: #B9C3CD; --muted: #8793A0; --line: #2A3440; --line-2: #222C37; --control: #66727F;
-  --accent: #7B9BFF; --accent-ink: #0D1218; --accent-soft: #1E2A4A;
-  --ok: #4CC27F; --warn: #E3A64B; --warn-soft: #33281A;
-  --c-chim: #2FBFB9; --c-phys: #9486FF; --c-math: #EEA23F; --c-bio: #5DC36B; --c-medig: #B9A68F;
-  --c-chq2: #3AB3E0; --c-conc: #F2657F; --c-rais: #E27BB0; --c-eth: #C28FE0; --c-rev: #80A7D8;
-  --c-sport: #FF9460; --c-break: #5C6875;
+  --bg: #0C0F13; --surface: #12161C; --surface-2: #171C23; --ink: #E6EAEF; --ink-2: #B4BDC7; --muted: #8791A0; --line: #262D36; --line-2: #1D232B; --control: #5E6875;
+  --accent: #86A6F0; --accent-ink: #0C0F13; --accent-soft: #1A2440;
+  --ok: #57B883; --warn: #E0A552; --warn-soft: #2E2517;
+  --c-chim: #3DB8AE; --c-phys: #8F90EC; --c-math: #E3A150; --c-bio: #6BBF78; --c-medig: #B5AA9C;
+  --c-chq2: #57AED8; --c-conc: #EB7C93; --c-rais: #D986B8; --c-eth: #B89BDD; --c-rev: #8FA9C8;
+  --c-sport: #F0976A; --c-break: #5B6573;
   --shadow: 0 1px 2px rgb(0 0 0 / .3);
-  --shadow-lg: 0 8px 28px rgb(0 0 0 / .5);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / .5);
 }

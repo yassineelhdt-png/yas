@@ -10,14 +10,14 @@
 /* artefact Claude : :root est déjà décalé par la zone sûre ; l'en-tête collant se cale dessous */
 .in-artifact .top { top: env(safe-area-inset-top, 0px); padding-top: 10px; }
 .top-in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
-.brand { font-family: var(--display); font-weight: 700; font-size: var(--fs-5); letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; margin-right: auto; white-space: nowrap; }
+.brand { font-family: var(--display); font-weight: 600; font-size: var(--fs-4); letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; margin-right: auto; white-space: nowrap; }
 .brand b { font-family: var(--mono); font-weight: 500; font-size: var(--fs-2); color: var(--muted); letter-spacing: .02em; }
 
-.tabs { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
-.tab { display: flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 13px; border-radius: 999px; font-size: var(--fs-3); font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
+.tabs { display: flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 2px; gap: 2px; }
+.tab { display: flex; align-items: center; gap: 6px; border: 0; background: none; padding: 5px 12px; border-radius: var(--r-sm); font-size: var(--fs-3); font-weight: 500; color: var(--ink-2); transition: background-color .15s, color .15s; }
 .tab .ico { width: 16px; height: 16px; }
 .tab:hover { color: var(--ink); }
-.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgb(15 23 32 / .08); }
 
 .sync { font-size: var(--fs-2); color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .sync i { width: 7px; height: 7px; border-radius: 50%; background: var(--c-break); display: inline-block; }
@@ -61,9 +61,8 @@
     color: var(--muted);
     transition: color .15s;
   }
-  .btab .ico { width: 24px; height: 24px; padding: 2px 14px; box-sizing: content-box; border-radius: 999px; transition: background-color .2s var(--ease); }
-  .btab[aria-selected="true"] { color: var(--ink); }
-  .btab[aria-selected="true"] .ico { background: var(--accent-soft); color: var(--accent); }
+  .btab .ico { width: 22px; height: 22px; }
+  .btab[aria-selected="true"] { color: var(--accent); }
 }
 
 /* ---------- transitions entre vues ---------- */

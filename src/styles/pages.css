@@ -4,7 +4,7 @@
 .settings h1 { grid-column: 1 / -1; font-family: var(--display); font-size: var(--fs-7); line-height: 1.1; margin: 0; letter-spacing: -.02em; }
 fieldset { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); padding: 14px 16px 6px; margin: 0; min-width: 0; box-shadow: var(--shadow); }
 /* titre de section DANS la carte (pas posé sur la bordure) */
-legend { float: left; width: 100%; font-family: var(--display); font-weight: 650; font-size: var(--fs-5); padding: 0; margin: 0 0 4px; }
+legend { float: left; width: 100%; font-family: var(--display); font-weight: 600; font-size: var(--fs-5); padding: 0; margin: 0 0 4px; }
 legend + * { clear: both; }
 .fr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line-2); min-height: 48px; }
 .fr:first-of-type { border-top: 0; }
@@ -31,7 +31,7 @@ legend + * { clear: both; }
 /* ---------- méthode ---------- */
 .method { max-width: 720px; padding-top: 18px; }
 .method h1 { font-family: var(--display); font-size: var(--fs-7); line-height: 1.1; margin: 0 0 6px; letter-spacing: -.02em; }
-.method h2 { font-family: var(--display); font-size: var(--fs-6); font-weight: 650; margin: 26px 0 6px; }
+.method h2 { font-family: var(--display); font-size: var(--fs-6); font-weight: 600; margin: 26px 0 6px; }
 .method p, .method li { color: var(--ink-2); max-width: 65ch; }
 .method ul { padding-left: 18px; display: grid; gap: 4px; }
 .cyc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
