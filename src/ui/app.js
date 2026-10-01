@@ -26,15 +26,32 @@ let root;
 // module Android chargé uniquement dans l'APK
 const native = platform.native ? import("../native.js") : null;
 
-// ---------- planning (recalculé seulement si les données ou la date changent) ----------
-const memo = { day: {}, week: {} };
-function plan(kind, ds) {
-  const key = ds + "|" + dataRev(), slot = memo[kind];
-  if (slot.key !== key) {
-    slot.key = key;
-    slot.value = kind === "day" ? E.planDay(ds, state.settings, getDay) : E.planWeek(ds, state.settings, getDay);
+// ---------- planning (recalculé seulement si les données changent) ----------
+// Une semaine = un seul calcul : le jour affiché est pris dans sa semaine (même résultat que planDay),
+// changer de jour dans la même semaine ne recalcule rien, et les semaines déjà vues restent en mémoire.
+const memo = new Map();
+let memoRev = -1;
+function weekPlan(ds) {
+  if (memoRev !== dataRev()) {
+    memo.clear();
+    memoRev = dataRev();
   }
-  return slot.value;
+  const mon = E.monday(ds);
+  if (!memo.has(mon)) {
+    if (memo.size >= 8) memo.clear();
+    memo.set(mon, E.planWeek(mon, state.settings, getDay));
+  }
+  return memo.get(mon);
+}
+const dayPlan = (ds) => weekPlan(ds)[(E.dow(ds) + 6) % 7];
+function plan(kind, ds) {
+  return kind === "day" ? dayPlan(ds) : weekPlan(ds);
+}
+
+/** « Aujourd'hui » : après minuit, la veille tant que son programme continue (app ouverte ou rouverte). */
+function currentDay() {
+  const t = firstDay(), y = E.addDays(t, -1), nm = E.nowMin();
+  return nm < 360 && y >= E.H.firstDay && dayPlan(y).end > 1440 + nm ? y : t;
 }
 
 // ---------- transitions ----------
@@ -88,7 +105,7 @@ const nav = {
   /** ±n jours ; 0 = aujourd'hui */
   go(delta) {
     if (delta === 0) {
-      const t = firstDay();
+      const t = currentDay();
       return setDate(t, t > state.date ? 1 : -1);
     }
     setDate(E.addDays(state.date, delta), delta);
@@ -124,18 +141,23 @@ const tabButtons = (cls) => TABS.map(([v, label, icon]) => html`
     ${icon()}<span>${label}</span>
   </button>`);
 
+let sheetOpen = false;
 function shell() {
+  const sheet = state.sheet && state.view === "jour" ? editSheet(plan("day", state.date)) : nothing;
+  // créneau disparu pendant que la fiche était ouverte (autre onglet, synchronisation) : on la ferme
+  if (sheet === nothing) state.sheet = null;
+  sheetOpen = sheet !== nothing;
   return html`
-    <header class="top">
+    <header class="top" ?inert=${sheetOpen}>
       <div class="top-in">
         <div class="brand">Horaire 9h <b>B1-BIME · Q1</b></div>
         <nav class="tabs" role="tablist" aria-label="Vues">${tabButtons("tab")}</nav>
         <div class="sync" data-s=${state.sync} title=${SYNC_TXT[state.sync]}><i></i><span>${SYNC_TXT[state.sync]}</span></div>
       </div>
     </header>
-    <main id="main" class="wrap view-${state.view}">${currentView()}</main>
-    <nav class="bottomnav" role="tablist" aria-label="Vues">${tabButtons("btab")}</nav>
-    ${state.sheet && state.view === "jour" ? editSheet(plan("day", state.date)) : nothing}
+    <main id="main" class="wrap view-${state.view}" ?inert=${sheetOpen}>${currentView()}</main>
+    <nav class="bottomnav" role="tablist" aria-label="Vues" ?inert=${sheetOpen}>${tabButtons("btab")}</nav>
+    ${sheet}
     <div class="toast ${state.toast ? "show" : ""}" role="status" aria-live="polite">${state.toast || ""}</div>`;
 }
 
@@ -155,18 +177,44 @@ function applyTheme() {
   native?.then((n) => n.setBarsDark(dark));
 }
 
-let sheetWas = false;
+// typographie française : espace insécable avant « : ; ? ! » et à l'intérieur des guillemets
+// (sinon la ponctuation peut se retrouver seule en début de ligne sur téléphone)
+const NBSP = / ([:»])|(«) | ([;?!])/g;
+function frenchSpaces(el) {
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  for (let n; (n = w.nextNode()); ) {
+    if (!/ [:;?!»]|« /.test(n.data) || n.parentElement?.closest("textarea, input, script, style")) continue;
+    n.data = n.data.replace(NBSP, (_, a, b, c) => (a ? "\u00a0" + a : b ? b + "\u00a0" : "\u202f" + c));
+  }
+}
+
+let sheetWas = false, opener = null, topRO = null;
 function renderNow() {
   scheduled = false;
   applyTheme();
-  const open = !!(state.sheet && state.view === "jour");
-  document.documentElement.classList.toggle("sheet-open", open);
+  const before = document.activeElement;
   render(shell(), root);
-  // bas de l'en-tête collant : la barre « Modifier » se cale juste dessous
-  const topEnd = document.querySelector(".top")?.getBoundingClientRect().bottom;
-  if (topEnd > 0) document.documentElement.style.setProperty("--top-end", Math.round(topEnd) + "px");
+  frenchSpaces(root);
+  const open = sheetOpen;
+  document.documentElement.classList.toggle("sheet-open", open);
+  // bas de l'en-tête collant : la barre « Modifier » se cale juste dessous. Mesuré quand l'en-tête change
+  // de taille, pas à chaque rendu (la mesure forçait une mise en page complète à chaque rendu)
+  if (!topRO && window.ResizeObserver) {
+    const top = document.querySelector(".top");
+    if (top) {
+      topRO = new ResizeObserver(() => document.documentElement.style.setProperty("--top-end", Math.round(top.getBoundingClientRect().bottom) + "px"));
+      topRO.observe(top);
+    }
+  }
   // fiche qui s'ouvre : le focus y va (clavier, lecteur d'écran), sans ouvrir de clavier sur mobile
-  if (open && !sheetWas) document.querySelector(".sheet")?.focus({ preventScroll: true });
+  if (open && !sheetWas) {
+    opener = before && before !== document.body ? before : null;
+    document.querySelector(".sheet")?.focus({ preventScroll: true });
+  } else if (!open && sheetWas) {
+    // fiche fermée : le focus revient au bouton qui l'a ouverte (clavier, lecteur d'écran)
+    if (opener?.isConnected) opener.focus({ preventScroll: true });
+    opener = null;
+  }
   sheetWas = open;
 }
 
@@ -243,5 +291,6 @@ export function mountApp(el) {
   setInterval(tick, 30000);
   bindSwipe(el);
   native?.then((n) => n.setupNative());
+  state.date = currentDay();
   renderNow();
 }

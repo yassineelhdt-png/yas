@@ -190,6 +190,9 @@ export function simulateDay(start, hard, S, init = {}, tune = {}) {
     // bloc d'objectif (annale…) : d'un seul tenant, au début d'une session, s'il tient avant la suite ;
     // il peut repousser le déjeuner jusqu'à 13:15 (on mange juste après)
     const roomGoal = blocks.length && !lunch && t + blocks[0] <= LUNCH_LATE ? Math.min(gap, toDinner) : room;
+    // (samedi) la partie suivante ne tient plus avant 13:15 : déjeuner d'abord, elle suit juste après
+    // (pas une autre matière entre deux parties d'une annale)
+    if (init.goalLunch && goalN > 0 && blocks.length && streak === 0 && !lunch && t >= LUNCH_MIN && t + blocks[0] > LUNCH_LATE && gap >= L + blocks[0]) { meal("lunch", L); continue; }
     if (blocks.length && streak === 0 && roomGoal >= blocks[0] && (selfLeft === blocks[0] || selfLeft - blocks[0] >= MIN)) {
       const b = blocks.shift();
       push({ kind: "study", s: t, e: t + b, loc: loc(), goal: goalN++ });

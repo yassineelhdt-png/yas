@@ -29,6 +29,7 @@
 .now-next .lbl { font-size: var(--fs-1); }
 .now-next b { font-weight: 600; } /* IBM Plex Sans n'est embarquée qu'en 400 / 500 / 600 */
 .now-next .mono { margin-left: auto; color: var(--muted); font-size: var(--fs-2); }
+.now-next .room { color: var(--ink-2); font-size: var(--fs-2); }
 
 /* lever / début / chiffres */
 .wake { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }

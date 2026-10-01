@@ -55,8 +55,8 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - **Objectifs de la semaine** (Réglages) : annales, théorie à rattraper, exercices… pour chaque semaine
   ou pour une semaine précise. En gros blocs de 2h d'un seul tenant (une annale de 4h = 2 × 2h), au plus
   deux par jour, jamais pendant les séances, avec une carte de progression (planifié / coché / ce qui manque)
-  dans les vues Jour et Semaine. Ce qui manque le vendredi soir passe le **samedi matin** (une annale de 4h
-  avant le déjeuner, réglable ; le reste du samedi est réduit d'autant).
+  dans les vues Jour et Semaine. Ce qui manque le vendredi soir passe le **samedi matin** (jusqu'à 4h en blocs de 2h,
+  avant le déjeuner si la journée commence tôt, réglable ; le reste du samedi est réduit d'autant).
 
 - **Relecture au peigne fin** (skill `analyse` et agents dans `.claude/`) : cases cochées qui restent sur le bon
   créneau quand le plan se décale, synchro de l'artefact qui ne perd plus rien à la connexion, heures saisies
@@ -72,7 +72,7 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   sur une échelle, carte « En ce moment » teintée, frise plus légère, créneaux faits / passés lisibles, Réglages
   plus nets, grille de la semaine contrastée, interrupteurs lisibles en sombre.
 - **Journée modifiable** (« Modifier la journée ») : supprimer un créneau, changer sa matière (ou un nom libre,
-  ex. Médecine), ses heures ou sa durée, ajouter une étude / une séance / une pause. Ce qui est supprimé ne compte
+  ex. Médecine), ses heures ou sa durée, ajouter une étude / une séance / une pause / un repas. Ce qui est supprimé ne compte
   plus, ni dans le jour ni dans la répartition de la semaine ; « Revenir au plan automatique » pour tout effacer.
 - **Présences au choix, séance par séance**, directement dans le planning (« Je n'y vais pas » / « J'y vais ») ;
   cours théoriques par défaut par matière (Réglages). **Tutorat de bio** le mercredi 12:00–13:50 (G1-2-302) ; **permanence de maths** le lundi 12:00–14:00 (local à confirmer) ;
@@ -87,7 +87,8 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - Sauvegarde / restauration des données.
 - Réglages protégés : un champ vidé revient à la valeur par défaut au lieu de casser le planning.
 
-Sans les ajouts de la v2 (heure de fin, lieux, sessions minimales, objectifs, horaires ronds), le moteur est **identique à la v1** : un test compare, jour par jour
+Sans les ajouts de la v2 (heure de fin, lieux, sessions minimales, objectifs, horaires ronds, séances ajoutées :
+tutorat, permanence de maths, guidance de bio du jeudi, séances des VETE), le moteur est **identique à la v1** : un test compare, jour par jour
 et sur tout le quadrimestre, les plannings produits par la v2 et par l'app d'origine (`legacy/horaire-9h-v1.html`).
 
 ## Développement

@@ -8,7 +8,7 @@ import { icons } from "./icons.js";
 import { goalsCard } from "./goals.js";
 import { edit, itemName } from "./edit.js";
 
-const PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TUT: "Tutorat", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie" };
+const PILL = { SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui", TUT: "Tutorat", TEST: "Interro", INFO: "Infos", VISITE: "Copies", GUID: "Guidance", PERM: "Permanence", TH: "Théorie", PERSO: "Perso" };
 const MAJOR = new Set(["study", "fixed", "exam"]);
 
 // ---------- libellés ----------
@@ -59,7 +59,7 @@ function itemColor(it) {
 }
 
 function modeText(res) {
-  if (res.mode === "concours") return "Concours blanc" + (res.ethique ? " + éthique" : "");
+  if (res.mode === "concours") return "Concours blanc" + ((res.custom ? res.items.some((it) => it.kind === "exam" && it.subj === "ETH") : res.ethique) ? " + éthique" : "");
   if (res.mode === "samedi") return res.items.some((it) => it.kind === "study" && it.goal != null) ? "Annale + chimie Q2" : "Chimie Q2 + rattrapage";
   if (res.mode === "conge") return res.closed || "Congé";
   return res.blocus ? "Blocus" : "Semaine de cours";
@@ -187,7 +187,10 @@ function nowCard(res, st, nm, done, doneMin) {
   const items = res.items.filter((it) => it.e > it.s && !it.past);
   if (!items.length) return nothing;
   const cur = items.find((it) => nm >= it.s && nm < it.e);
-  const next = items.find((it) => it.s >= (cur ? cur.e : nm) && it !== cur);
+  let next = items.find((it) => it.s >= (cur ? cur.e : nm) && it !== cur);
+  // « Ensuite » : la prochaine vraie étape, pas les 10 min de temps libre ou de pause juste avant
+  const after = next && items[items.indexOf(next) + 1];
+  if (next && !MAJOR.has(next.kind) && next.kind !== "travel" && next.e - next.s <= 15 && after && MAJOR.has(after.kind)) next = after;
   let body;
   if (cur) {
     const left = cur.e - nm, pct = ((nm - cur.s) / (cur.e - cur.s)) * 100;
@@ -202,6 +205,10 @@ function nowCard(res, st, nm, done, doneMin) {
     body = html`
       <div class="now-l1"><span class="now-kicker">Pas encore commencé</span><span class="now-left mono">dans ${E.dur(items[0].s - nm)}</span></div>
       <div class="now-title">${itemTitle(items[0], st, res)} à ${E.hm(items[0].s)}</div>`;
+  } else if (next) {
+    body = html`
+      <div class="now-l1"><span class="now-kicker">Temps libre</span><span class="now-left mono">dans ${E.dur(next.s - nm)}</span></div>
+      <div class="now-title">${itemTitle(next, st, res)} à ${E.hm(next.s)}</div>`;
   } else {
     body = html`
       <div class="now-l1"><span class="now-kicker">Journée terminée</span></div>
@@ -217,7 +224,7 @@ function nowCard(res, st, nm, done, doneMin) {
     <div class="card nowcard" style="--c:${c}">
       <button class="now-main" @click=${show} aria-label="Voir dans le planning">${body}</button>
       ${canCheck ? html`<button class="btn now-done" @click=${() => { act.toggleDone(target); toast("Coché : " + itemTitle(target, st, res)); }}>${icons.check()}<span>${target === cur ? "C'est fait" : "Fini : " + itemTitle(target, st, res)}</span></button>` : nothing}
-      ${next && cur ? html`<div class="now-next"><span class="lbl">Ensuite</span> <b>${itemTitle(next, st, res)}</b> <span class="mono">${E.hm(next.s)}</span></div>` : nothing}
+      ${next && cur ? html`<div class="now-next"><span class="lbl">Ensuite</span> <b>${itemTitle(next, st, res)}</b>${next.kind === "fixed" && next.room ? html`<span class="room">${next.room.split(" (")[0]}</span>` : nothing} <span class="mono">${E.hm(next.s)}</span></div>` : nothing}
     </div>`;
 }
 
@@ -242,7 +249,7 @@ function header(res, st, ctx) {
       </div>
       ${isToday ? nowCard(res, st, ctx.nm, ctx.done, ctx.doneMin) : nothing}
       <div class="wake card">
-        ${res.custom ? html`<div class="custom-note"><span class="lbl">Modifiée à la main</span><span>Les heures se changent créneau par créneau${edit.on ? "" : " (bouton « Modifier »)"}.</span></div>` : html`
+        ${res.custom ? html`<div class="custom-note"><span class="lbl">Modifiée à la main</span><span>Les heures se changent créneau par créneau${edit.on ? "" : " (bouton « Modifier la journée »)"}.</span></div>` : html`
         <div class="times">
           <label><span class="lbl">Levé à</span>${timeField("t-wake", E.hm(res.wake), act.wake)}</label>
           <label><span class="lbl">Je commence à</span>${timeField("t-start", E.hm(res.start), act.start)}</label>
@@ -253,11 +260,11 @@ function header(res, st, ctx) {
           </span>
         </div>
         `}
-        ${!res.custom && isToday && ctx.nm < res.start + 120 ? html`<div class="wbtns"><button class=${ctx.nm < res.start ? "btn primary" : "btn"} @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}><span>Je commence<span class="wide"> maintenant</span></span></button></div>` : nothing}
+        ${!res.custom && isToday && ctx.nm >= 240 && ctx.nm < res.start + 120 ? html`<div class="wbtns"><button class=${ctx.nm < res.start ? "btn primary" : "btn"} @click=${act.wakeNow}>Je viens de me lever</button><button class="btn" @click=${act.startNow}><span>Je commence<span class="wide"> maintenant</span></span></button></div>` : nothing}
         <div class="facts">
           <div class="fact wide"><span class="lbl">Début</span><b>${res.studyStart < 1e9 ? E.hm(res.studyStart) : "—"}</b></div>
           <div class="fact wide"><span class="lbl">Fin</span><b>${E.hm(res.workEnd)}</b></div>
-          <div class="fact"><span class="lbl">Net</span><b>${E.hdur(res.net)}</b></div>
+          ${res.net !== target ? html`<div class="fact"><span class="lbl">Net</span><b>${E.hdur(res.net)}</b></div>` : nothing}
           <div class="fact"><span class="lbl">Coucher</span><b>${E.hm(bed)}</b></div>
         </div>
         <div class="meter">
@@ -278,13 +285,14 @@ function taskDetail(t) {
 }
 
 /** Mode « Modifier » : changer ou supprimer le créneau ; sur un temps libre, en ajouter un. */
-function edActions(it, res) {
+function edActions(it, res, st) {
+  const name = itemTitle(it, st, res) + ", " + E.hm(it.s);
   if (it.kind === "free") {
     return html`<button class="btn ghost add-here" @click=${(e) => { e.stopPropagation(); edit.add(it.s, Math.min(it.e, it.s + 60)); }}>${icons.plus()}<span>Ajouter ici</span></button>`;
   }
   return html`<span class="ed">
-    <button class="ib" @click=${(e) => { e.stopPropagation(); edit.open(it); }} aria-label=${"Modifier : " + itemName(it)} title="Modifier">${icons.edit()}</button>
-    <button class="ib" @click=${(e) => { e.stopPropagation(); edit.remove(res, it); }} aria-label=${"Supprimer : " + itemName(it)} title="Supprimer">${icons.trash()}</button>
+    <button class="ib" @click=${(e) => { e.stopPropagation(); edit.open(it, itemTitle(it, st, res)); }} aria-label=${"Modifier : " + name} title="Modifier">${icons.edit()}</button>
+    <button class="ib" @click=${(e) => { e.stopPropagation(); edit.remove(res, it); }} aria-label=${"Supprimer : " + name} title="Supprimer">${icons.trash()}</button>
   </span>`;
 }
 
@@ -311,7 +319,7 @@ function row(it, res, st, ctx, flags) {
     else if (it.kind === "fixed") {
       pill = html`<span class="pill">${PILL[it.type] || it.type}</span>`;
       const sub = E.H.subjects[it.subj];
-      if (sub) meta.push(html`<span class="mono">${sub.code}</span>`);
+      if (sub && it.type !== "PERSO") meta.push(html`<span class="mono">${sub.code}</span>`);
       if (it.theme) meta.push(html`<span class="theme">${it.theme}</span>`);
       if (it.note && it.type !== "TH") meta.push(it.note);
       if (it.moved) meta.push("déplacé : jour habituel fermé");
@@ -325,14 +333,16 @@ function row(it, res, st, ctx, flags) {
         <div class="ttl">${itemTitle(it, st, res)}</div>
         ${isNow ? html`<span class="nowtag">En cours</span>` : nothing}
         <span class="len">${E.dur(d)}</span>
-        ${ctx.editing ? edActions(it, res)
+        ${ctx.editing ? edActions(it, res, st)
           : !it.past && !it.missed ? html`<button class="chk" aria-pressed=${done ? "true" : "false"} aria-label=${"Fait : " + itemTitle(it, st, res)} @click=${() => act.toggleDone(it)}>${icons.check()}</button>` : nothing}
       </div>
-      ${it.kind === "fixed"
+      ${it.kind === "fixed" && it.type === "PERSO" && !it.room
+        ? html`<div class="meta">${pill}${metaHtml}</div>`
+        : it.kind === "fixed"
         ? html`<div class="where">${pill}<span class="lbl">Local</span><b>${it.room || "non indiqué"}</b></div>${meta.length ? html`<div class="meta">${metaHtml}</div>` : nothing}`
         : pill !== nothing || meta.length ? html`<div class="meta">${pill}${metaHtml}</div>` : nothing}
       ${it.kind === "study" && it.tasks && shownTasks(it).length === 1
-        ? html`${taskDetail(shownTasks(it)[0])}${it.note ? html`<div class="note">${it.note}</div>` : nothing}
+        ? html`${taskDetail(shownTasks(it)[0])}${it.note && shownTasks(it)[0].title !== "Rappel actif · Anki" ? html`<div class="note">${it.note}</div>` : nothing}
           ${it.loc === "campus" ? html`<div class="note">Sur le campus : bibliothèque ou salle d'étude</div>` : nothing}`
         : it.kind === "study" && it.tasks
         ? html`<ul class="tasks">${shownTasks(it).map((t) => html`<li style="--c:${cv(t.subj)}" class=${t.kind === "goal" ? "goal-task" : ""}><i></i><span>${t.title}${t.kind === "goal" ? html` <b class="gpill">Objectif</b>` : nothing}</span><em>${t.min} min</em>${t.detail ? html`<small>${t.detail}</small>` : nothing}</li>`)}</ul>
@@ -342,13 +352,13 @@ function row(it, res, st, ctx, flags) {
       ${it.kind === "exam" && it.detail ? html`<div class="meta detail"><span>${it.detail}</span></div>` : nothing}`;
   } else {
     const [title, sub] = minorLabel(it, st, res);
-    body = html`<b>${title}</b><span class="mono dur">${E.dur(d)}</span>${isNow ? html`<span class="nowtag">Maintenant</span>` : nothing}${ctx.editing ? edActions(it, res) : nothing}${sub ? html`<small>${sub}</small>` : nothing}`;
+    body = html`<b>${title}</b><span class="mono dur">${E.dur(d)}</span>${isNow ? html`<span class="nowtag">Maintenant</span>` : nothing}${ctx.editing ? edActions(it, res, st) : nothing}${sub ? html`<small>${sub}</small>` : nothing}`;
   }
   return html`
     <div class=${cls.join(" ")} style="--c:${itemColor(it)};--p:${progress}">
       <div class="tm"><span>${E.hm(it.s)}</span>${major ? html`<span class="te">${E.hm(it.e)}</span>` : nothing}</div>
       <div class="rail" style="--h:${railH}px"></div>
-      <div class="body" @click=${ctx.editing && it.kind !== "free" ? () => edit.open(it) : null}>${body}</div>
+      <div class="body" @click=${ctx.editing && it.kind !== "free" ? () => edit.open(it, itemTitle(it, st, res)) : null}>${body}</div>
     </div>`;
 }
 
@@ -386,16 +396,23 @@ function editBar(res, ctx) {
   if (!edit.on) {
     return html`<div class="edbar">
       <button class="btn" @click=${edit.toggle}>${icons.edit()}<span>Modifier la journée</span></button>
-      <span class="edhint">${res.custom ? "Modifiée à la main : ce que tu as supprimé ne compte pas." : "Supprimer, changer de matière, raccourcir, ajouter…"}</span>
+      ${!res.custom && !state.replanOpen && ctx.isToday && ctx.nm >= res.start && ctx.nm < res.end ? html`<button class="btn" @click=${() => openReplan(ctx)}>Replanifier</button>` : nothing}
+      ${res.custom ? nothing : html`<span class="edhint">Supprimer, changer de matière, raccourcir, ajouter…</span>`}
     </div>`;
   }
   return html`<div class="edbar on" role="toolbar" aria-label="Modifier la journée">
     <span class="edhint">Touche un créneau pour le changer.</span>
     <span class="sp"></span>
-    ${edit.canUndo() ? html`<button class="btn ghost" @click=${edit.undo}>${icons.undo()}<span>Annuler</span></button>` : nothing}
+    ${edit.canUndo() ? html`<button class="btn ghost" @click=${edit.undo} aria-label="Annuler la dernière modification" title="Annuler la dernière modification">${icons.undo()}<span>Annuler</span></button>` : nothing}
     <button class="btn" @click=${() => edit.add(...addSlot(res, ctx))}>${icons.plus()}<span>Ajouter</span></button>
     <button class="btn primary" @click=${edit.toggle}>Terminer</button>
   </div>`;
+}
+
+/** « Replanifier » au-dessus de la frise : ouvre le formulaire du panneau et l'amène à l'écran. */
+function openReplan(ctx) {
+  ctx.setReplanOpen(true);
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelector("form.rp")?.scrollIntoView({ behavior: "smooth", block: "center" })));
 }
 
 /** Heures proposées pour un nouveau créneau : maintenant (aujourd'hui), sinon après le dernier créneau compté. */
@@ -458,7 +475,7 @@ function aside(res, st, ctx) {
       <div class="card"><h2>Journée modifiée à la main</h2>
         <p class="sub">Ce que tu as supprimé ne compte ni aujourd'hui ni dans la semaine. Le plan ne se recalcule plus tout seul (lever, lieu, replanification).</p>
         ${edit.askReset
-          ? html`<div class="confirmbox" role="alert"><span>Tes modifications de ce jour seront effacées et le plan recalculé.</span>
+          ? html`<div class="confirmbox" role="alert"><span>Tes modifications de ce jour seront effacées et le plan recalculé (tes choix de présence aux séances sont gardés).</span>
               <div class="btnrow"><button class="btn primary" @click=${edit.reset}>Revenir au plan automatique</button><button class="btn ghost" @click=${() => edit.askResetOn(false)}>Garder mes modifications</button></div></div>`
           : html`<div class="btnrow"><button class="btn" @click=${() => edit.askResetOn(true)}>Revenir au plan automatique</button></div>`}
       </div>`);
@@ -504,8 +521,9 @@ function aside(res, st, ctx) {
     cards.push(html`
       <div class="card"><h2>Dimanche concours</h2><p class="sub">Éthique & empathie : un dimanche sur ${st.ethiqueEvery}. Le raisonnement, tous les dimanches.</p>
         <div class="ev" style="--c:var(--c-eth)"><div class="t"><i></i>Partie éthique & empathie</div>
-          <div class="d">${st.ethique} min après le raisonnement${typeof day.ethique === "boolean" ? " · réglé à la main" : " · selon le cycle"}</div>
-          <button class="sw" role="switch" aria-checked=${res.ethique ? "true" : "false"} aria-label="Partie éthique ce dimanche" @click=${() => act.toggleEthique(res.ethique)}></button></div>
+          <div class="d">${st.ethique} min après le raisonnement${res.custom ? "" : typeof day.ethique === "boolean" ? " · réglé à la main" : " · selon le cycle"}</div>
+          ${res.custom ? nothing : html`<button class="sw" role="switch" aria-checked=${res.ethique ? "true" : "false"} aria-label="Partie éthique ce dimanche" @click=${() => act.toggleEthique(res.ethique)}></button>`}</div>
+        ${res.custom ? html`<p class="sub">Journée modifiée à la main : pour changer la partie éthique, reviens au plan automatique.</p>` : nothing}
       </div>`);
   }
   if (res.events.length) {

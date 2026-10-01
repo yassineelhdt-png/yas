@@ -69,6 +69,26 @@ export function goalBlocks(min, floor = 0) {
   return out;
 }
 
+/**
+ * Ce qui reste d'un objectif, en blocs alignés sur ses parties : la fin de la partie entamée, puis les
+ * parties suivantes entières. La fin d'une partie raccourcie (journée modifiée) plus courte qu'une session
+ * (`floor`) ne revient pas : elle est retirée de `u.left` (sinon elle reviendrait en bloc d'une session
+ * entière, au-delà de l'objectif).
+ */
+export function blocksLeft(u, floor = 0) {
+  const done = u.total - u.left, out = [];
+  let acc = 0;
+  for (const b of goalBlocks(u.total, floor)) {
+    const from = acc;
+    acc += b;
+    if (acc <= done) continue;
+    const rest = acc - Math.max(from, done);
+    if (rest < b && rest < floor) u.left = Math.max(0, u.left - rest);
+    else out.push(rest);
+  }
+  return out;
+}
+
 /** Intitulé d'un bloc : « Annale de chimie 1/2 · 1re partie » si l'objectif se fait en plusieurs blocs. */
 export function blockTitle(u, done, floor = 0) {
   const lens = goalBlocks(u.total, floor);

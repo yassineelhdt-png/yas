@@ -658,3 +658,86 @@ describe("journée modifiée à la main", () => {
     expect([add.s, add.e]).toEqual([900, 960]);
   });
 });
+
+const mk3 = (base = {}) => { const store = { ...base }; return { store, get: (d) => store[d] || null }; };
+const goalPer = (week) => { const o = {}; for (const r of week) for (const it of r.items) for (const t of it.tasks || []) if (t.kind === "goal") o[t.title.split(" · ")[0]] = (o[t.title.split(" · ")[0]] || 0) + t.min; return o; };
+
+describe("journée modifiable : cas limites (revue v3)", () => {
+  it("journée replanifiée puis figée : même net, mêmes matières ; le « déjà étudié » compte", () => {
+    const ds = "2026-10-06", { store, get } = mk3({ "2026-10-06": { replan: { at: 840, studied: 120, lunch: true } } });
+    const before = E.planDay(ds, {}, get);
+    store[ds] = { ...store[ds], custom: { items: JSON.parse(JSON.stringify(E.freezeDay(before))) } };
+    const after = E.planDay(ds, {}, get);
+    expect(after.net).toBe(before.net);
+    expect(after.bySubject).toEqual(before.bySubject);
+  });
+
+  it("la veille ne prépare pas une séance sortie de la journée modifiée du lendemain (même recouverte par un ajout)", () => {
+    const { store, get } = mk3();
+    let items = E.freezeDay(E.planDay("2026-10-07", {}, get));
+    items = E.editDay(items, { type: "add", kind: "study", subj: "BIO", s: 840, e: 960 }); // par-dessus le séminaire de chimie
+    store["2026-10-07"] = { custom: { items } };
+    const tue = E.planDay("2026-10-06", {}, get);
+    const titles = tue.items.flatMap((it) => (it.tasks || []).map((t) => t.title));
+    expect(titles).not.toContain("Préparer le séminaire de chimie de demain");
+    expect(titles).toContain("Préparer le séminaire de physique de demain");
+  });
+
+  it("annale raccourcie : la miette ne revient pas en bloc entier, l'objectif n'est pas dépassé", () => {
+    const { store, get } = mk3(), ds = "2026-10-09";
+    let items = E.freezeDay(E.planDay(ds, {}, get));
+    const b = items.find((it) => (it.tasks || []).some((t) => t.kind === "goal" && /2e partie/.test(t.title)));
+    items = E.editDay(items, { type: "update", cid: b.cid, s: b.s, e: b.e - 25 });
+    store[ds] = { custom: { items } };
+    const g = goalPer(E.planWeek(ds, {}, get));
+    expect(g["Annale de chimie 1/2"]).toBe(215);
+    expect(g["Annale de physique 1/2"]).toBe(240); // le samedi garde ses deux parties
+  });
+
+  it("tâches d'une session raccourcie : la somme fait toujours la durée", () => {
+    const items = [{ cid: "c1", key: "k", kind: "study", s: 600, e: 620, tasks: [5, 5, 5, 5].map((m, i) => ({ subj: "CHIM", kind: "rot", title: "T" + i, min: m })) }];
+    const out = E.editDay(items, { type: "update", cid: "c1", s: 600, e: 610 })[0];
+    expect(out.tasks.reduce((a, t) => a + t.min, 0)).toBe(10);
+  });
+
+  it("« j'y vais » sur une séance déjà présente (déplacée) : pas de doublon", () => {
+    const { get } = mk3();
+    let items = E.freezeDay(E.planDay("2026-10-07", {}, get));
+    const sem = items.find((it) => it.kind === "fixed" && it.type === "SEM");
+    items = E.editDay(items, { type: "update", cid: sem.cid, s: sem.s - 30, e: sem.e - 60 }); // séminaire avancé : 13:30–15:00
+    items = E.editDay(items, { type: "put", item: { kind: "fixed", id: sem.id, subj: sem.subj, type: sem.type, s: sem.s, e: sem.e, key: "fixed#" + sem.id } });
+    expect(items.filter((it) => it.id === sem.id).length).toBe(1);
+    expect(new Set(items.map((it) => it.key)).size).toBe(items.length);
+  });
+
+  it("annaleSat sous 2h : un bloc raccourci, pas rien", () => {
+    const sat = E.planWeek("2026-10-05", { annaleSat: 90 })[5];
+    const g = sat.items.filter((it) => (it.tasks || []).some((t) => t.kind === "goal"));
+    expect(g.map((it) => it.e - it.s)).toEqual([90]);
+    expect(sat.net).toBe(540);
+  });
+});
+
+describe("journée modifiable : pas de miettes", () => {
+  it("un créneau posé presque sur toute une session ne laisse pas d'étude de 5 min autour", () => {
+    const items = [{ cid: "c1", key: "k1", kind: "study", s: 600, e: 690, tasks: [{ subj: "CHIM", kind: "rot", title: "Chimie", min: 90 }] }];
+    const out = E.editDay(items, { type: "add", kind: "pause", s: 605, e: 685 });
+    expect(out.map((it) => [it.kind, it.s, it.e])).toEqual([["pause", 605, 685]]);
+    // un vrai morceau (≥ 15 min) reste
+    const out2 = E.editDay(items, { type: "add", kind: "pause", s: 620, e: 690 });
+    expect(out2.map((it) => [it.kind, it.s, it.e])).toEqual([["study", 600, 620], ["pause", 620, 690]]);
+  });
+});
+
+describe("samedi, lever tardif", () => {
+  it("les deux parties de l'annale encadrent le déjeuner, sans autre matière entre les deux", () => {
+    for (const wake of ["08:45", "09:00", "09:30"]) {
+      const sat = E.planWeek("2026-10-05", { wake })[5];
+      const seq = sat.items.filter((it) => it.kind === "study" || it.kind === "lunch");
+      const i = seq.findIndex((it) => it.goal != null);
+      expect(seq[i + 1].kind, wake).toBe("lunch");
+      expect(seq[i + 2].goal, wake).not.toBeUndefined();
+      expect(sat.net, wake).toBe(540);
+    }
+  });
+});

@@ -30,10 +30,8 @@ export function goalProgress(week, day = E.todayStr()) {
 /** Nom lisible d'un objectif : « 2 × Annale de chimie · 4h » */
 export function goalName(g) {
   const count = Math.max(1, Math.round(+g.count || 1));
-  const kind = E.GOAL_KINDS[g.kind] || E.GOAL_KINDS.autre;
-  const subj = String(E.SUBJ[g.subj] || g.subj || "").toLowerCase();
-  const what = g.kind === "autre" ? g.label || "Objectif · " + subj : kind.name + " · " + subj + (g.label ? " · " + g.label : "");
-  return (count > 1 ? count + " × " : "") + what + " · " + E.dur(Math.round((+g.hours || 0) * 60));
+  // même intitulé que les blocs du planning (« Annale de chimie », « Exercices de chimie Q2 »)
+  return (count > 1 ? count + " × " : "") + E.goalTitle({ ...g, count: 1 }) + " · " + E.dur(Math.round((+g.hours || 0) * 60));
 }
 
 /** Carte « Objectifs de la semaine ». */
@@ -45,7 +43,7 @@ export function goalsCard(week, { onEdit, compact = false, day } = {}) {
   return html`
     <div class="card goalcard">
       <div class="goal-h"><h2>Objectifs de la semaine</h2>${onEdit ? html`<button class="linkbtn" @click=${onEdit}>Modifier</button>` : nothing}</div>
-      <p class="sub">${wn >= 3 && wn <= 16 ? "S" + wn + " · " : ""}${own ? "objectifs propres à cette semaine" : "objectifs habituels"}. Placés sur ton temps libre, jamais pendant les séances.</p>
+      <p class="sub">${wn >= 3 && wn <= 16 ? "S" + wn + " · o" : "O"}bjectifs ${own ? "propres à cette semaine" : "habituels"}. Placés sur ton temps libre, jamais pendant les séances.</p>
       ${prog.length ? prog.map((p) => {
         const miss = p.target - p.planned;
         return html`

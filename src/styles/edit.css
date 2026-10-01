@@ -13,12 +13,13 @@
   .edbar.on .sp { display: none; }
 }
 .addrow { padding: 12px 0 0 79px; }
+@media (max-width: 520px) { .addrow { padding-left: 65px; } } /* = colonne des créneaux sur téléphone */
 
 /* créneaux en mode « Modifier » : la carte entière ouvre la fiche */
 .row.editing .body { cursor: pointer; }
 .row.editing.major .body:hover { border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); }
 .ed { display: inline-flex; gap: 4px; margin-left: auto; }
-.row.minor .ed { margin-left: 4px; }
+.row.minor .ed { margin-left: auto; margin-right: 13px; } /* même colonne que les boutons des cartes */
 .ib {
   width: 32px; height: 32px; padding: 0; display: grid; place-items: center; position: relative;
   border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink-2);
@@ -59,6 +60,11 @@
     padding: 20px; animation: sh-pop .2s var(--ease);
   }
 }
+:root[data-theme="dark"] .sheet-bg { background: rgb(0 0 0 / .6); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .sheet-bg { background: rgb(0 0 0 / .6); } }
+/* messages (« Choisis une matière »…) au-dessus de la fiche ; sur téléphone, en haut (la fiche occupe le bas) */
+.sheet-open .toast { z-index: 42; }
+@media (max-width: 719px) { .sheet-open .toast { bottom: auto; top: calc(var(--safe-t) + 12px); } }
 @keyframes sh-fade { from { opacity: 0; } }
 @keyframes sh-up { from { transform: translateY(24px); opacity: 0; } }
 @keyframes sh-pop { from { transform: translate(-50%, -48%); opacity: 0; } }
@@ -71,7 +77,7 @@
 .sheet .kinds { width: 100%; }
 .sheet .kinds button { flex: 1; }
 .sh-why { margin: -8px 0 0; }
-.sh-f { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.sh-f { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; min-width: 0; background: none; box-shadow: none; border-radius: 0; } /* (pas le style de carte des réglages) */
 .sh-f legend { padding: 0; margin-bottom: 8px; }
 .sh-f input[type=text] {
   width: 100%; box-sizing: border-box; font-size: 16px; padding: 9px 10px; border-radius: var(--r);
@@ -98,16 +104,16 @@
 .durs { display: flex; flex-wrap: wrap; gap: 6px; }
 .durs .chip { cursor: pointer; font-family: var(--sans); }
 .durs .chip:hover { border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); color: var(--ink); }
-.sh-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 4px; border-top: 1px solid var(--line-2); padding-top: 14px; }
+.sh-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid var(--line-2); padding-top: 14px; }
 .sh-foot .sp { flex: 1; }
 
 @media (pointer: coarse) {
   .ib, .row.minor .ib { width: 40px; height: 40px; }
   .ib::before { content: ""; position: absolute; inset: -2px; }
   .sj { min-height: 44px; }
-  .durs .chip { min-height: 40px; display: inline-flex; align-items: center; padding-inline: 12px; }
+  .durs .chip { min-height: 44px; display: inline-flex; align-items: center; padding-inline: 12px; }
   .sh-times input, .sh-f input[type=text] { min-height: 44px; box-sizing: border-box; }
-  .add-here { min-height: 40px; }
+  .add-here { min-height: 44px; }
 }
 @media (hover: none) {
   .ib:hover { background: var(--surface); color: var(--ink-2); }

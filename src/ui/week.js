@@ -40,7 +40,8 @@ export function weekView(week, nav) {
   const mon = week[0].date, sun = week[6].date, today = E.todayStr(), nm = E.nowMin();
   let minS = 1440, maxE = 0;
   for (const r of week) for (const it of r.items) { minS = Math.min(minS, it.s); maxE = Math.max(maxE, it.e); }
-  const h0 = Math.floor(minS / 60), h1 = Math.ceil(maxE / 60), H = (h1 - h0) * HR;
+  // (heures bornées à 0h–48h : un créneau aberrant d'une sauvegarde ne doit pas créer des milliers de lignes)
+  const h0 = Math.max(0, Math.floor(minS / 60)), h1 = Math.min(48, Math.max(h0 + 1, Math.ceil(maxE / 60))), H = (h1 - h0) * HR;
   const y = (x) => ((x - h0 * 60) / 60) * HR;
   const wn = E.weekNo(mon);
 
@@ -49,14 +50,19 @@ export function weekView(week, nav) {
 
   // totaux
   const tot = {};
-  let net = 0, fixed = 0;
+  let net = 0, fixed = 0, before = 0;
   for (const r of week) {
     net += r.net;
+    before += r.replanStudied || 0;
     for (const [k, v] of Object.entries(r.bySubject)) tot[k] = (tot[k] || 0) + v;
-    for (const it of r.items) if (it.kind === "fixed" && it.counts) fixed += it.e - it.s;
+    // (séance ajoutée à la main = pas une séance à l'unif)
+    for (const it of r.items) if (it.kind === "fixed" && it.counts && it.type !== "PERSO") fixed += it.e - it.s;
   }
+
   // matières de la semaine : les habituelles, puis celles ajoutées à la main (« ~Médecine »)
-  const keys = [...TOTAL_ORDER.filter((k) => tot[k]), ...Object.keys(tot).filter((k) => !TOTAL_ORDER.includes(k) && tot[k]).sort()];
+  const keys = [...TOTAL_ORDER.filter((k) => tot[k]), ...Object.keys(tot).filter((k) => !TOTAL_ORDER.includes(k) && tot[k]).sort((a, b) => a.localeCompare(b, "fr"))];
+  // heures déclarées à la replanification (« déjà faites ») : comptées dans le total, sans matière, en dernier
+  if (before) { tot["~Avant la replanification"] = before; keys.push("~Avant la replanification"); }
   const name = (k) => (k.startsWith("~") ? k.slice(1) : NAMES[k] || E.SUBJ[k] || k);
   const mx = Math.max(1, ...keys.map((k) => tot[k]));
   const edited = week.filter((r) => r.custom).length;
@@ -71,7 +77,7 @@ export function weekView(week, nav) {
   const upTo = days.filter((d) => d.r.date <= today);
   const dueAll = upTo.reduce((a, d) => a + d.r.net, 0);
   const seances = week.flatMap((r) => r.items.filter((it) => it.kind === "fixed").map((it) => html`
-    <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}${it.theme ? " · " + it.theme : ""}</div></div>`));
+    <div class="ev" style="--c:${cv(it.subj)}"><div class="t"><i></i>${E.evLabel(it)}</div><div class="d">${shortDay(r.date)} · ${E.hm(it.s)}–${E.hm(it.e)}${it.room ? " · " + it.room : ""}${it.theme ? " · " + it.theme : ""}${it.type === "PERSO" ? " · ajoutée à la main" : ""}</div></div>`));
 
   return html`
     <div class="weekhead">
@@ -92,7 +98,7 @@ export function weekView(week, nav) {
           </div>`)}
         <div class="hours" style="height:${H}px">${hours}</div>
         ${week.map((r) => html`
-          <div class="track ${r.date === today ? "today" : ""}" style="height:${H}px">
+          <div class="track ${r.date === today ? "today" : ""}" style="height:${H}px" @click=${() => nav.openDay(r.date)}>
             ${r.items.map((it) => block(it, y))}
             ${r.date === today && nm >= h0 * 60 && nm <= h1 * 60 ? html`<div class="nowline" style="top:${y(nm).toFixed(1)}px"></div>` : nothing}
           </div>`)}

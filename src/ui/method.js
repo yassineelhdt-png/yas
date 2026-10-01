@@ -6,10 +6,16 @@ import { MOISC, JOURS } from "./format.js";
 
 const JOURS_MIN = JOURS.map((j) => j.toLowerCase());
 
+// cours théoriques réglables par matière (Réglages → Cours théoriques)
+const TH = [["CHIM", "chimie"], ["PHYS", "physique"], ["MATH", "maths"], ["BIO", "bio"], ["BIO2", "bio · diversité du vivant"], ["MEDIG", "MEDIG"]];
+
 export function methodView() {
   const st = S();
   const cyc = [];
-  for (let i = 0, d = st.ethiqueAnchor; i < 8; i++, d = E.addDays(d, 7 * st.ethiqueEvery)) {
+  // comme le moteur (isEthique) : premier dimanche à partir de la date choisie, cycle en semaines entières
+  const every = Math.max(1, Math.round(+st.ethiqueEvery) || 1);
+  const th = TH.filter(([k]) => (typeof (st.attendTh || {})[k] === "boolean" ? st.attendTh[k] : !!st.attendTheory)).map(([, n]) => n);
+  for (let i = 0, d = E.addDays(st.ethiqueAnchor, (7 - E.dow(st.ethiqueAnchor)) % 7); i < 8; i++, d = E.addDays(d, 7 * every)) {
     const x = E.pd(d);
     cyc.push(x.getDate() + " " + MOISC[x.getMonth()]);
   }
@@ -22,7 +28,7 @@ export function methodView() {
       <ul>
         <li>Le programme se termine à ${st.endAt || "l'heure où l'objectif est atteint"}${st.endAt ? " (Réglages → Journée), ou à l'heure que tu écris dans « Je finis à » pour un jour donné" : ""}.</li>
         <li>S'il y a de la marge, les pauses et les repas s'allongent par pas de 5 min (pause jusqu'à 30 min, grande pause jusqu'à 1h, repas jusqu'à 1h15) : les heures restent rondes. Au-delà, un créneau « Temps libre » s'ajoute, en général autour du dîner.</li>
-        <li>S'il manque du temps (tu commences tard), l'objectif net baisse pour finir à l'heure, et l'app te dit combien d'heures tu fais.</li>
+        <li>S'il manque du temps (tu commences tard), les repas puis les pauses raccourcissent (repas 30 min, pause 5 min au minimum) ; en dernier recours, l'objectif net baisse pour finir à l'heure, et l'app te dit combien d'heures tu fais.</li>
         <li>Quand le programme finit après 20h, le dîner a lieu pendant le programme.</li>
         <li>Le sport se fait à la maison, juste après la fin du programme.</li>
       </ul>
@@ -41,7 +47,7 @@ export function methodView() {
       <h2>Modifier ta journée</h2>
       <ul>
         <li>Bouton « Modifier la journée » au-dessus du planning : touche un créneau pour changer sa matière (chimie, physique… ou « Autre » avec un nom libre, ex. Médecine), son intitulé ou ses heures (30 min, 1h, 1h30, 2h), ou le supprimer. « Ajouter » crée une étude, une séance, une pause ou un repas, aussi dans un temps libre.</li>
-        <li>Ce que tu supprimes ne compte plus : ni dans les heures du jour, ni dans la répartition de la semaine (4h de maths supprimées sur 16h → 12h de maths). Une annale supprimée revient plus tard dans la semaine.</li>
+        <li>Ce que tu supprimes ne compte plus : ni dans les heures du jour, ni dans la répartition de la semaine (4h de maths supprimées sur 16h → 12h de maths). Une annale supprimée est replacée plus tard dans la semaine (ou le samedi matin) s'il reste du temps libre ; sinon, la carte « Objectifs de la semaine » indique ce qui manque.</li>
         <li>Une journée modifiée ne se recalcule plus toute seule (lever, lieu, replanification) ; « Revenir au plan automatique » efface tes changements de ce jour. « Annuler » défait la dernière modification.</li>
       </ul>
 
@@ -55,7 +61,7 @@ export function methodView() {
 
       <h2>Ce qui compte dans les ${st.targetH}h</h2>
       <ul>
-        <li>Étude perso, séminaires, exercices, TP, guidance, permanence, appuis : oui.</li>
+        <li>Étude perso, cours suivis, séminaires, exercices, TP, guidance, permanences, appuis, tutorat : oui.</li>
         <li>Trajets, repas, pauses, sport : non.</li>
       </ul>
 
@@ -76,20 +82,21 @@ export function methodView() {
       <h2>Semaine de cours</h2>
       <ul>
         <li>Du lundi au vendredi (hors congés), tu travailles à : ${(E.PLACES[st.weekdayPlace] || E.PLACES.maison).name}${+st.homeTail > 0 && st.weekdayPlace !== "maison" ? ", et tu finis la journée à la maison" : ""}. Le week-end, à la maison. Tu peux changer pour un jour donné dans « Où tu travailles ».</li>
-        <li>${st.attendTheory
-          ? "Tu vas aux cours magistraux (Réglages → Unif) : ils comptent dans tes heures."
-          : "Tu ne vas pas aux cours magistraux : le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l'heure du cours."}</li>
+        <li>${th.length === TH.length
+          ? "Tu vas aux cours théoriques (Réglages → Cours théoriques) : ils comptent dans tes heures."
+          : (th.length ? "Cours théoriques suivis : " + th.join(", ") + " (ils comptent dans tes heures). Les autres : " : "Tu ne vas pas aux cours théoriques (Réglages → Cours théoriques) : ")
+            + "le jour même, un créneau « Cours de … du jour » (slides ou podcast ×1,5 → fiche → Anki) est placé après l'heure du cours."}</li>
         <li>Ce qui ne tient pas passe en tête du lendemain, puis au samedi.</li>
         <li>La veille d'un séminaire : préparation de la série.</li>
         <li>Guidance chimie 1×/semaine : le ${JOURS_MIN[st.guidChimDay]} (${E.hdur(+st.guidChimDur)}). Permanence physique 1×/semaine : le ${JOURS_MIN[st.permPhysDay]} à ${st.permPhysStart} (${E.hdur(+st.permPhysDur)}). Réglables dans Réglages → Unif.</li>
-        <li>Appuis : maths le mardi 12h–14h ; bio le vendredi 12h–14h (guidances QCM à thèmes : le thème est indiqué sur la séance ; la séance des VETE, le mercredi en général, est proposée comme rechange). Tutorat de bio le mercredi 12h–13h50 (G1-2-302). Permanence de maths le lundi 12h–14h.</li>
+        <li>Appuis : maths le mardi 12h–14h ; bio le vendredi 12h–14h, le jeudi 1/10 et le jeudi 19/11 (guidances QCM à thèmes : le thème est indiqué sur la séance ; la séance des VETE, le mercredi en général, est proposée comme rechange). Tutorat de bio le mercredi 12h–13h50 (G1-2-302). Permanence de maths le lundi 12h–14h.</li>
         <li>Tu choisis chaque séance : « Je n'y vais pas » sur la séance dans le planning, « J'y vais » sur la ligne barrée d'une séance où tu ne vas pas. Les cours théoriques se règlent aussi par matière dans Réglages.</li>
         <li>Le reste du temps tourne entre chimie, physique, maths et bio pour équilibrer la semaine.</li>
       </ul>
 
       <h2>Samedi</h2>
       <ul>
-        ${+st.annaleSat > 0 ? html`<li>Si la semaine n'a pas placé toutes ses annales : une annale le matin (jusqu'à ${E.hdur(+st.annaleSat)}, en blocs de 2h avant le déjeuner). Le reste du samedi est alors réduit d'autant, en proportion.</li>` : nothing}
+        ${+st.annaleSat > 0 ? html`<li>Si la semaine n'a pas placé tous ses objectifs (annales…) : ce qui reste, le matin (jusqu'à ${E.hdur(+st.annaleSat)}, en blocs de 2h au plus, avant le déjeuner si tu commences tôt). Le reste du samedi est alors réduit d'autant, en proportion.</li>` : nothing}
         <li>Chimie Q2 : ${E.hdur(st.chimOrga)} d'organique puis ${E.hdur(st.chimMin)} de minérale (redox, acide-base).</li>
         <li>Prépa concours ${E.hdur(st.concoursSat)} (physique puis maths), puis révision de la semaine ${E.hdur(st.revSat)}, qui commence par ce qui a été reporté.</li>
       </ul>
@@ -97,7 +104,7 @@ export function methodView() {
       <h2>Dimanche concours</h2>
       <ul>
         <li>Concours blanc 3h en sciences dès que tu es prêt${st.concoursStart ? " (ou à " + st.concoursStart + ")" : ""}, pause ${st.concoursPause} min, raisonnement ${st.raisonnement} min.</li>
-        <li>Éthique & empathie un dimanche sur ${st.ethiqueEvery} :</li>
+        <li>Éthique & empathie un dimanche sur ${every} :</li>
       </ul>
       <div class="cyc">${cyc.map((c) => html`<span>${c}</span>`)}</div>
       <ul><li>Ensuite : correction complète (fiche d'erreurs), puis remédiation sur les notions ratées.</li></ul>
@@ -106,7 +113,7 @@ export function methodView() {
       <ul>
         <li>Guidance chimie à partir de novembre : créneaux supposés identiques à octobre (mar 10h30, mer 10h, jeu 11h).</li>
         <li>Séminaire de maths du 22/10 : local non indiqué dans TimeEdit.</li>
-        <li>Permanence de maths du lundi et appuis de bio (jeudi 1/10, puis le vendredi) : auditoire / local à confirmer sur TimeEdit.</li>
+        <li>Permanence de maths du lundi, guidance de bio du jeudi 1/10 et séances des VETE : auditoire / local à confirmer sur TimeEdit.</li>
         <li>Cours MEDIG (IA, ERSB, durabilité) : vérifie si la présence est obligatoire, puis active-les dans « Séances à l'unif ».</li>
       </ul>
 

@@ -48,7 +48,7 @@ const FORM = [
     ["permPhysStart", "Permanence physique : arrivée", "time"],
     ["permPhysDur", "Permanence physique : durée", "min", { min: 15 }],
     ["appuiMath", "Appui maths du mardi", "bool"],
-    ["appuiBio", "Appui bio du vendredi (guidances QCM à thèmes)", "bool"],
+    ["appuiBio", "Appui bio (guidances QCM à thèmes, le vendredi en général)", "bool"],
     ["tutoBio", "Tutorat de bio du mercredi (12:00–13:50)", "bool"],
     ["permMath", "Permanence de maths du lundi (12:00–14:00)", "bool"]
   ]],
@@ -97,7 +97,8 @@ function field([key, label, type, opt = {}], st) {
   } else if (type === "th") {
     // cours théoriques d'une matière : j'y vais par défaut ? (chaque cours reste modifiable dans le planning)
     const th = st.attendTh || {}, on = typeof th[key] === "boolean" ? th[key] : !!st.attendTheory;
-    input = html`<button class="sw" role="switch" id=${id} aria-checked=${on ? "true" : "false"} aria-label=${"Cours de " + label.toLowerCase()} @click=${() => { saveSettings({ attendTh: { ...th, [key]: !on } }); toast(on ? "Cours de " + label.toLowerCase() + " : rattrapés à la maison" : "Cours de " + label.toLowerCase() + " : tu y vas"); }}></button>`;
+    const nm = "Cours de " + (/^[A-Z]{2}/.test(label) ? label : label.toLowerCase()); // sigles gardés (MEDIG)
+    input = html`<button class="sw" role="switch" id=${id} aria-checked=${on ? "true" : "false"} aria-label=${nm} @click=${() => { saveSettings({ attendTh: { ...th, [key]: !on } }); toast(on ? nm + " : rattrapés en étude perso" : nm + " : tu y vas"); }}></button>`;
   } else if (type === "bool") {
     input = html`<button class="sw" role="switch" id=${id} aria-checked=${v ? "true" : "false"} aria-label=${label} @click=${() => saveSettings({ [key]: !v })}></button>`;
   } else if (type === "sel") {

@@ -7,7 +7,7 @@ import { weekNo, isBlocus, dayEvents, buildHard } from "./events.js";
 import { fitDay, goHome } from "./fit.js";
 import { rotKey, prepFor, assign, assignGrouped } from "./tasks.js";
 import { PLACES, placeInfo } from "./places.js";
-import { goalUnits, goalBlocks, blockTitle, GOAL_BLOCK } from "./goals.js";
+import { goalUnits, blocksLeft, blockTitle, GOAL_BLOCK } from "./goals.js";
 
 const noDay = () => null;
 // au plus deux blocs d'objectif (2 × 2h) par jour
@@ -16,7 +16,8 @@ const minSession = (S) => +(S.minSession || 0) || 50;
 const byStart = (a, b) => a.s - b.s;
 // heure arrondie aux 5 minutes suivantes (les horaires calculés restent ronds)
 const ceil5Of = (t) => Math.ceil(t / 5) * 5;
-// règles de la v2 (heures rondes, sessions minimales…) ; minSession = 0 : exactement comme la v1
+// règles de la v2 (heures rondes, sessions minimales…) ; minSession = 0 : règles de déroulé de la v1
+// (le test de parité désactive aussi les objectifs et les séances ajoutées)
 const v2 = (S) => +S.minSession > 0;
 
 /** Lieu du jour : choix du jour, sinon lun–ven hors congés = lieu des réglages, sinon la maison. */
@@ -100,6 +101,15 @@ function whereAt(items, time, first) {
 }
 const freshWeekMin = () => ({ CHIM: 0, PHYS: 0, MATH: 0, BIO: 0 });
 
+/** Séances suivies un jour donné : journée modifiée à la main = celles qui y sont, sinon les présences. */
+function attendedEvents(ds, S, getDay) {
+  const d = getDay(ds) || {};
+  const evs = dayEvents(ds, S, d.ov);
+  if (!d.custom || !Array.isArray(d.custom.items)) return evs.filter((e) => e.attend);
+  const ids = new Set(d.custom.items.filter((it) => it && it.kind === "fixed").map((it) => it.id));
+  return evs.filter((e) => ids.has(e.id));
+}
+
 /** Partie éthique ce dimanche ? (réglage manuel du jour, sinon 1 dimanche sur N) */
 export function isEthique(ds, S, day) {
   if (day && typeof day.ethique === "boolean") return day.ethique;
@@ -150,16 +160,18 @@ function planSunday(res, S, day, pre, weekMin) {
 
 // ---------- samedi : chimie Q2 + prépa concours + rattrapage ----------
 /**
- * Annale du samedi : ce qui reste des objectifs de la semaine, jusqu'à `annaleSat` minutes
- * (en blocs de 2h, posés le matin). Rien si la semaine a déjà tout placé.
+ * Objectifs du samedi (annale…) : ce qui reste des objectifs de la semaine, jusqu'à `annaleSat` minutes
+ * (en blocs de 2h au plus, posés dès le début de la journée). Rien si la semaine a déjà tout placé.
  */
 function saturdayBlocks(goals, S) {
   const cap = Math.max(0, +S.annaleSat || 0), floor = minSession(S), out = [];
   let used = 0;
   for (const u of goals || []) {
     if (u.left <= 0) continue;
-    for (const b of goalBlocks(u.left, floor)) {
-      if (out.length >= MAX_GOAL_BLOCKS || used + b > cap) return out;
+    for (const b0 of blocksLeft(u, floor)) {
+      // (dernier bloc raccourci à ce qui reste de annaleSat, s'il vaut une session)
+      const b = Math.min(b0, Math.floor((cap - used) / 5) * 5);
+      if (out.length >= MAX_GOAL_BLOCKS || b < Math.min(b0, floor)) return out;
       out.push(b);
       used += b;
     }
@@ -176,8 +188,7 @@ function saturdayQueue(res, S, getDay, backlog, goalMin = 0) {
   const cs = cut(S.concoursSat), cp = Math.round(cs / 2 / 5) * 5;
   const extra = backlog.map((x) => x.title.replace(" · reporté", "").replace(" du jour", "").replace(/^Cours/, "cours") + " (" + x.min + " min)");
   const mon = addDays(res.date, 2);
-  for (const e of dayEvents(mon, S, (getDay(mon) || {}).ov)) {
-    if (!e.attend) continue;
+  for (const e of attendedEvents(mon, S, getDay)) {
     const p = prepFor(e);
     if (p && p.min >= 30) extra.push(p.title.toLowerCase() + " de lundi");
   }
@@ -198,8 +209,7 @@ function weekdayQueue(res, S, getDay, backlog) {
   // préparer les séances de demain
   const tm = addDays(res.date, 1);
   if (dow(tm) >= 1 && dow(tm) <= 5) {
-    for (const e of dayEvents(tm, S, (getDay(tm) || {}).ov)) {
-      if (!e.attend) continue;
+    for (const e of attendedEvents(tm, S, getDay)) {
       const p = prepFor(e);
       if (!p) continue;
       p.title += " de demain";
@@ -243,7 +253,7 @@ function dayBlocks(goals, S, queue, hard, start) {
   let used = 0;
   for (const u of goals) {
     if (u.left <= 0) continue;
-    for (const b of goalBlocks(u.left, floor)) {
+    for (const b of blocksLeft(u, floor)) {
       const ok = out.length === 0 ? self - b >= GOAL_BLOCK : used + b <= self - need;
       if (out.length >= MAX_GOAL_BLOCKS || !ok) return out;
       out.push(b);
@@ -294,6 +304,8 @@ function planOne(ds, S, getDay, backlog, weekMin, goals) {
   // le samedi, ce qui reste de la semaine (annaleSat)
   const blocks = res.mode === "semaine" || res.mode === "conge" ? dayBlocks(goals, S, queue, hard, start) : satBlocks;
   init.blocks = blocks;
+  // le samedi, les deux parties d'une annale encadrent le déjeuner plutôt qu'une autre matière
+  init.goalLunch = res.mode === "samedi";
 
   const rp = day.replan;
   if (rp && typeof rp.at === "number") {
@@ -320,7 +332,7 @@ function planOne(ds, S, getDay, backlog, weekMin, goals) {
     const cut = full.items.find((it) => it.kind === "study" && it.goal != null && it.s < rp.at && it.e > rp.at);
     const left = cut ? [Math.max(minSession(S), Math.ceil((cut.e - rp.at) / 5) * 5)] : [];
     const r = runDay(res, S, rp.at, hard2, {
-      replan: true, blocks: [...left, ...blocks.slice(pastBlocks)], studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0,
+      replan: true, goalLunch: init.goalLunch, blocks: [...left, ...blocks.slice(pastBlocks)], studied: rp.studied || 0, lunch: !!rp.lunch, dinner: !!rp.dinner, sport: !!rp.sport, streak: 0, sinceBig: rp.sinceBig || 0,
       at: trips.length ? whereAt(all, rp.at, "maison") : whereAt(full.items, rp.at, mo.at)
     });
     res.missed = r.missed;
@@ -413,13 +425,18 @@ function planCustom(ds, S, getDay, backlog, weekMin, goals, day) {
   res.missed = [];
   res.fit = null;
   res.closedAt = undefined;
-  res.replanAt = undefined;
-  res.replanStudied = 0;
+  // journée replanifiée puis modifiée : ce qui précède la reprise reste passé, le « déjà étudié » compte
+  const rp = day.replan && typeof day.replan.at === "number" ? day.replan : null;
+  res.replanAt = rp ? rp.at : undefined;
+  res.replanStudied = rp ? +rp.studied || 0 : 0;
+  if (rp) res.items = [...res.items.filter((it) => it.s < rp.at), { kind: "replan", s: rp.at, e: rp.at, studied: res.replanStudied, key: "replan@" + hm(rp.at) }, ...res.items.filter((it) => it.s >= rp.at)];
   res.warnings = [];
   res.notes = [];
   // séances : j'y vais = la séance est dans la journée
   const inDay = new Set(res.items.filter((it) => it.kind === "fixed").map((it) => it.id));
   res.events = res.events.map((ev) => ({ ...ev, attend: inDay.has(ev.id) }));
+  // dimanche : la partie éthique est celle de la journée (supprimée = pas d'éthique)
+  if (res.mode === "concours") res.ethique = res.items.some((it) => it.kind === "exam" && it.subj === "ETH");
   for (const it of res.items) {
     for (const t of it.tasks || []) {
       if (t.kind === "goal") {

@@ -1,7 +1,7 @@
 // État de l'application + sauvegarde.
 // - Toujours : localStorage (clé compatible avec la v1).
 // - Dans un artefact Claude : synchronisation entre appareils via la base `db` (comme la v1).
-import { H, DEFAULTS, withDefaults, todayStr } from "./engine/index.js";
+import { H, DEFAULTS, withDefaults, todayStr, PLACE_KEYS } from "./engine/index.js";
 
 const LS_KEY = "horaire9h.v1";
 const UI_KEY = "horaire9h.ui"; // préférences propres à l'appareil (thème)
@@ -145,7 +145,8 @@ export function connectSync() {
       if (!d) return setSync("local");
       db = d;
       listen(db.doc("app/settings"), (snap) => {
-        const s = snap.exists ? migrate({ ...snap.data() }) : {};
+        // (base vide : on part des réglages de cet appareil, pas de rien)
+        const s = snap.exists ? migrate({ ...snap.data() }) : { ...state.settings };
         if (snap.exists || dirtyKeys.size) {
           // ce qui a été changé ici avant la connexion l'emporte, puis part dans la base
           for (const k of dirtyKeys) {
@@ -166,13 +167,14 @@ export function connectSync() {
       listen(db.collection("days"), (qs) => {
         const days = {}, fresh = !qs.metadata?.fromCache;
         qs.docs.forEach((doc) => { days[doc.id] = { ...doc.data() }; });
-        // jour par jour, la version la plus récente gagne : un jour modifié ici (hors ligne, pendant
-        // la connexion, ou en cours d'envoi) n'est pas écrasé par une version plus ancienne de la base
+        // champ par champ (coches, journée modifiée, lever…), la modification la plus récente gagne :
+        // un jour modifié ici (hors ligne, pendant la connexion, en cours d'envoi) garde ses changements,
+        // et ceux faits ailleurs sur le même jour ne sont pas perdus
         for (const [k, loc] of Object.entries(state.days)) {
           const cl = days[k];
-          if (!loc || (cl && (cl.updated || "") >= (loc.updated || ""))) continue;
-          days[k] = loc;
-          if (fresh) writeDoc("days/" + k, loc);
+          if (!loc || (cl && !hasNewer(loc, cl))) continue;
+          days[k] = cl ? mergeDay(loc, cl) : loc;
+          if (fresh) writeDoc("days/" + k, days[k]);
         }
         state.days = days;
         cache();
@@ -183,9 +185,33 @@ export function connectSync() {
     .catch(() => setSync("local"));
 }
 
+// ---------- fusion de deux versions d'un jour ----------
+// ts : heure de la dernière modification de chaque champ (un champ effacé garde son heure)
+const DAY_FIELDS = ["wake", "start", "end", "place", "lib", "ov", "done", "replan", "custom", "ethique"];
+const stampOf = (d, f) => (d.ts ? d.ts[f] || "" : d.updated || "");
+const fieldsOf = (d) => Object.keys({ ...d, ...d.ts }).filter((f) => f !== "updated" && f !== "ts");
+/** Un champ de `a` est-il plus récent que dans `b` ? */
+const hasNewer = (a, b) => fieldsOf(a).some((f) => stampOf(a, f) > stampOf(b, f));
+/** Fusion champ par champ : pour chaque champ, la version modifiée le plus récemment. */
+export function mergeDay(a, b) {
+  const out = {}, ts = {};
+  for (const f of new Set([...fieldsOf(a), ...fieldsOf(b)])) {
+    const ta = stampOf(a, f), tb = stampOf(b, f), src = ta > tb ? a : b;
+    if (src[f] !== undefined) out[f] = src[f];
+    ts[f] = ta > tb ? ta : tb;
+  }
+  out.ts = ts;
+  out.updated = (a.updated || "") > (b.updated || "") ? a.updated : b.updated;
+  return out;
+}
+
 // ---------- modifications ----------
 export function saveDay(ds, patch) {
-  const d = { ...state.days[ds], ...patch, updated: new Date().toISOString() };
+  const now = new Date().toISOString(), prev = state.days[ds] || {};
+  // (jour enregistré par une version précédente : ses champs datent de son « updated »)
+  const ts = prev.ts ? { ...prev.ts } : Object.fromEntries(fieldsOf(prev).map((f) => [f, prev.updated || ""]));
+  for (const k of Object.keys(patch)) ts[k] = now;
+  const d = { ...prev, ...patch, updated: now, ts };
   for (const k of Object.keys(d)) if (d[k] === undefined) delete d[k];
   state.days[ds] = d;
   cache();
@@ -251,7 +277,7 @@ export function parseBackup(text) {
     throw new Error("Ce texte n'est pas une sauvegarde d'Horaire 9h.");
   }
   // réglages : même type que la valeur par défaut, sinon ignorés (une valeur fausse bloquerait le planning)
-  const TIME = /^\d{2}:\d{2}$/, DATE = /^\d{4}-\d{2}-\d{2}$/;
+  const TIME = /^([01]\d|2[0-3]):[0-5]\d$/, DATE = /^\d{4}-\d{2}-\d{2}$/;
   const sameShape = (v, def) => typeof v === typeof def && (typeof v !== "number" || Number.isFinite(v))
     && (typeof def !== "string" || ((!TIME.test(def) || TIME.test(v)) && (!DATE.test(def) || DATE.test(v))));
   const settings = {};
@@ -260,15 +286,31 @@ export function parseBackup(text) {
     if (def === undefined || v === null) continue;
     if (v === "" ? OPTIONAL.has(k) : k === "goals" ? isObj(v) : sameShape(v, def)) settings[k] = v;
   }
+  if (settings.weekdayPlace !== undefined && !PLACE_KEYS.includes(settings.weekdayPlace)) delete settings.weekdayPlace;
+  // objectifs : listes d'objets seulement (un `null` dans une liste bloquait le planning et les réglages)
+  if (settings.goals) {
+    const list = (l) => (Array.isArray(l) ? l.filter(isObj) : []);
+    const weeks = isObj(settings.goals.weeks) ? settings.goals.weeks : {};
+    settings.goals = {
+      base: list(settings.goals.base),
+      weeks: Object.fromEntries(Object.entries(weeks).filter(([wk, l]) => DATE.test(wk) && Array.isArray(l)).map(([wk, l]) => [wk, list(l)]))
+    };
+  }
   // journées : heures au format HH:MM, le reste tel quel s'il a la bonne forme
   const days = {};
   for (const [k, v] of Object.entries(o.days || {})) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !isObj(v)) continue;
     const d = { ...v };
     for (const f of ["wake", "start", "end"]) if (d[f] !== undefined && !(typeof d[f] === "string" && TIME.test(d[f]))) delete d[f];
-    for (const f of ["done", "ov", "replan", "custom"]) if (d[f] !== undefined && !isObj(d[f])) delete d[f];
+    for (const f of ["done", "ov", "replan", "custom", "ts"]) if (d[f] !== undefined && !isObj(d[f])) delete d[f];
+    if (d.place !== undefined && !PLACE_KEYS.includes(d.place)) delete d.place;
+    if (d.replan && !(Number.isFinite(d.replan.at) && (d.replan.studied === undefined || Number.isFinite(d.replan.studied)))) delete d.replan;
     if (d.custom) {
-      const items = Array.isArray(d.custom.items) ? d.custom.items.filter((it) => isObj(it) && typeof it.kind === "string" && Number.isFinite(it.s) && Number.isFinite(it.e) && it.e > it.s) : null;
+      // créneaux : heures dans la journée (0 → 48h), tâches = liste de { min } numériques
+      const okTask = (t) => isObj(t) && Number.isFinite(t.min) && t.min >= 0;
+      const okItem = (it) => isObj(it) && typeof it.kind === "string" && Number.isFinite(it.s) && Number.isFinite(it.e) && it.s >= 0 && it.e > it.s && it.e <= 2880
+        && (it.tasks === undefined || (Array.isArray(it.tasks) && it.tasks.every(okTask)));
+      const items = Array.isArray(d.custom.items) ? d.custom.items.filter(okItem) : null;
       if (items) d.custom = { ...d.custom, items };
       else delete d.custom;
     }
@@ -279,10 +321,16 @@ export function parseBackup(text) {
 
 /** Remplace réglages et journées par ceux d'une sauvegarde lue avec parseBackup. */
 export function importData({ settings, days }) {
+  // restaurer = remplacer : chaque champ est daté de maintenant, et les journées absentes de la sauvegarde
+  // sont vidées dans la base aussi (sinon la synchronisation les ramène)
+  const now = new Date().toISOString(), ts = Object.fromEntries(DAY_FIELDS.map((f) => [f, now]));
+  const fresh = Object.fromEntries(Object.entries(days).map(([k, v]) => [k, { ...v, updated: now, ts }]));
+  const gone = Object.keys(state.days).filter((k) => !fresh[k]);
   state.settings = settings;
-  state.days = days;
+  state.days = fresh;
   cache();
   notify();
   writeDoc("app/settings", settings);
-  for (const [k, v] of Object.entries(days)) writeDoc("days/" + k, v);
+  for (const [k, v] of Object.entries(fresh)) writeDoc("days/" + k, v);
+  for (const k of gone) writeDoc("days/" + k, { updated: now, ts });
 }

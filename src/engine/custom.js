@@ -8,10 +8,13 @@ export const CUSTOM_SUBJECTS = ["CHIM", "PHYS", "MATH", "BIO", "CHQ2", "MEDIG", 
 export const CUSTOM_NAMES = { CONC: "Concours médecine", AUTRE: "Autre" };
 
 // champs calculés par le moteur, recalculés à l'affichage
-const DERIVED = ["counts", "bloc", "seg", "legacyKey", "past", "conflict", "s0"];
+// (past : ce qui précède une replanification reste « passé », il ne compte pas ; legacyKey : anciennes coches)
+const DERIVED = ["counts", "bloc", "seg", "conflict", "s0"];
 // créneaux « de remplissage » : on les retire sans rien dire quand un autre créneau prend leur place
 const FILLER = new Set(["pause", "bigpause", "free", "settle"]);
 const MIN_LEN = 5;
+// plus petit morceau d'étude gardé quand un autre créneau en prend une partie
+const CRUMB = 15;
 
 const num = (cid) => +String(cid).replace(/\D/g, "") || 0;
 const nextCid = (items) => "c" + (items.reduce((a, it) => Math.max(a, num(it.cid)), 0) + 1);
@@ -29,8 +32,8 @@ export function studyTitle(subj, label = "") {
 }
 
 /**
- * Fige un plan calculé (res.items) en créneaux modifiables. Les coches restent attachées
- * (même clé) ; ce qui a été replanifié devient un créneau ordinaire.
+ * Fige un plan calculé (res.items) en créneaux modifiables. Chaque créneau garde sa clé (et sa clé
+ * ancienne) : les coches restent attachées ; ce qui précède une replanification reste « passé ».
  */
 export function freezeDay(res) {
   const out = [];
@@ -48,14 +51,19 @@ export function freezeDay(res) {
   return out;
 }
 
-/** Tâches d'une session ramenées à `len` minutes (en proportion, par pas de 5 min). */
+/**
+ * Tâches d'une session ramenées à `len` minutes (en proportion, par pas de 5 min ; méthode du plus fort
+ * reste : la somme fait toujours `len` et aucune tâche n'est négative).
+ */
 function scaleTasks(tasks, len) {
   const total = tasks.reduce((a, t) => a + t.min, 0);
   if (!tasks.length || total <= 0) return tasks;
-  const out = tasks.map((t) => ({ ...t, min: Math.round((t.min * len) / total / 5) * 5 }));
-  const diff = len - out.reduce((a, t) => a + t.min, 0);
-  out[out.length - 1].min += diff;
-  return out.filter((t) => t.min > 0);
+  const step = len % 5 ? 1 : 5, n = len / step;
+  const raw = tasks.map((t) => (t.min * n) / total), units = raw.map(Math.floor);
+  let left = n - units.reduce((a, u) => a + u, 0);
+  const order = raw.map((_, i) => i).sort((i, j) => raw[j] - units[j] - (raw[i] - units[i]) || i - j);
+  for (const i of order) { if (left <= 0) break; units[i]++; left--; }
+  return tasks.map((t, i) => ({ ...t, min: units[i] * step })).filter((t) => t.min > 0);
 }
 
 /** Créneau aux nouvelles heures (les tâches d'une session suivent la durée). */
@@ -79,8 +87,10 @@ function fit(items, it) {
       if (o.e > it.e && o.e - it.e >= MIN_LEN) out.push(resized(o, it.e, o.e));
       continue;
     }
-    if (o.s < it.s && o.s + MIN_LEN <= it.s) out.push(resized(o, o.s, it.s));
-    if (o.e > it.e && o.e - it.e >= MIN_LEN) {
+    // (morceau restant trop court : pas de session d'étude de quelques minutes, il devient du temps libre)
+    const min = o.kind === "study" ? CRUMB : MIN_LEN;
+    if (o.s < it.s && o.s + min <= it.s) out.push(resized(o, o.s, it.s));
+    if (o.e > it.e && o.e - it.e >= min) {
       const right = resized(o, it.e, o.e);
       if (o.s < it.s) { right.cid = nextCid([...items, ...out, it]); right.key = "custom#" + right.cid; }
       out.push(right);
@@ -105,8 +115,10 @@ function studyItem(base, subj, label, s, e) {
  */
 export function editDay(items, op) {
   const list = items.map((it) => ({ ...it }));
+  for (const it of list) if (!it.cid) it.cid = nextCid(list);
   if (op.type === "remove") return list.filter((it) => it.cid !== op.cid);
-  const s = Math.round(+op.s / 5) * 5, e = Math.round(+op.e / 5) * 5;
+  const r5 = (x) => (x == null || x === "" ? NaN : Math.round(+x / 5) * 5);
+  const s = r5(op.s), e = r5(op.e);
   if (op.type === "update") {
     const cur = list.find((it) => it.cid === op.cid);
     if (!cur) return list;
@@ -124,7 +136,8 @@ export function editDay(items, op) {
     // remettre une séance de l'unif dans la journée (« J'y vais »)
     const it = { ...op.item, cid: op.item.cid || nextCid(list) };
     if (!(it.e - it.s >= MIN_LEN)) return list;
-    return fit(list, it);
+    // (une séance déjà là, même coupée en deux, est remplacée : pas de doublon)
+    return fit(it.id ? list.filter((x) => !(x.kind === "fixed" && x.id === it.id)) : list, it);
   }
   if (op.type === "add") {
     if (!(e - s >= MIN_LEN)) return list;
