@@ -4,6 +4,7 @@ import "./styles/shell.css";
 import "./styles/day.css";
 import "./styles/week.css";
 import "./styles/pages.css";
+import "./styles/edit.css";
 import { mountApp } from "./ui/app.js";
 import { connectSync } from "./store.js";
 import { platform } from "./platform.js";

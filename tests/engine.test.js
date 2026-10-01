@@ -520,3 +520,141 @@ describe("corrections de l'analyse au peigne fin", () => {
     expect(E.goalTitle({ kind: "theorie", subj: "MEDIG" })).toBe("Théorie de MEDIG");
   });
 });
+
+describe("journée modifiée à la main", () => {
+  const mk = (base = {}) => {
+    const store = { ...base };
+    return { store, get: (d) => store[d] || null };
+  };
+  const freeze = (ds, st, get) => E.freezeDay(E.planDay(ds, st, get));
+  const titles = (r) => r.items.flatMap((it) => (it.tasks || []).map((t) => t.title));
+  const noOverlap = (items) => {
+    const xs = [...items].sort((a, b) => a.s - b.s);
+    for (let i = 1; i < xs.length; i++) expect(xs[i].s, E.hm(xs[i].s)).toBeGreaterThanOrEqual(xs[i - 1].e);
+  };
+
+  it("figer sans rien changer : même journée, mêmes coches", () => {
+    const { store, get } = mk();
+    const before = E.planDay("2026-10-06", {});
+    store["2026-10-06"] = { custom: { items: freeze("2026-10-06", {}, get) } };
+    const after = E.planDay("2026-10-06", {}, get);
+    expect(after.custom).toBe(true);
+    expect(after.net).toBe(before.net);
+    expect(after.bySubject).toEqual(before.bySubject);
+    // (le temps libre n'est plus un créneau : ce sont les trous de la journée)
+    expect(after.items.map((it) => it.key)).toEqual(before.items.filter((it) => it.kind !== "free").map((it) => it.key));
+  });
+
+  it("mercredi 30/09 : tutorat, puis 1h de bio ajoutée et 2h de physique ; le reste supprimé ne compte pas", () => {
+    const ds = "2026-09-30", { store, get } = mk();
+    let items = freeze(ds, {}, get);
+    const cid = (label) => items.find((it) => it.kind === "fixed" && E.evLabel(it) === label).cid;
+    for (const l of ["Permanence physique", "Séminaire de chimie", "Séminaire de physique (exercices)"]) items = E.editDay(items, { type: "remove", cid: cid(l) });
+    items = items.filter((it) => !(it.kind === "study" && it.s >= 840));
+    items = E.editDay(items, { type: "add", kind: "study", subj: "BIO", s: 840, e: 900 });
+    items = E.editDay(items, { type: "add", kind: "study", subj: "PHYS", s: 910, e: 1030 });
+    store[ds] = { custom: { items } };
+    const r = E.planDay(ds, {}, get);
+    noOverlap(r.items);
+    // séance du matin (70 min) + tutorat (110) + bio (60) + physique (120)
+    expect(r.net).toBe(70 + 110 + 60 + 120);
+    expect(r.bySubject.BIO).toBe(70 + 110 + 60);
+    expect(r.bySubject.PHYS).toBe(120);
+    expect(r.bySubject.CHIM).toBeUndefined();
+    // les séances supprimées : « je n'y vais pas », de nouveau proposées
+    expect(r.events.find((e) => e.type === "SEM").attend).toBe(false);
+    expect(r.events.find((e) => e.type === "TUT").attend).toBe(true);
+    expect(titles(r)).toEqual(expect.arrayContaining(["Bio", "Physique"]));
+  });
+
+  it("supprimer 4h de maths : la répartition de la semaine perd 4h de maths", () => {
+    const { store, get } = mk();
+    const sum = (week, k) => week.reduce((a, r) => a + (r.bySubject[k] || 0), 0);
+    const before = sum(E.planWeek("2026-10-12", {}), "MATH");
+    let removed = 0;
+    for (const ds of ["2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16"]) {
+      if (removed >= 240) break;
+      let items = freeze(ds, {}, get);
+      for (const it of items.filter((x) => x.kind === "study" && x.tasks.every((t) => t.subj === "MATH"))) {
+        if (removed >= 240) break;
+        items = E.editDay(items, { type: "remove", cid: it.cid });
+        removed += it.e - it.s;
+      }
+      store[ds] = { custom: { items } };
+    }
+    expect(removed).toBeGreaterThan(0);
+    // (les jours suivants peuvent reprendre la rotation, mais jamais remettre ce qui a été supprimé ce jour-là)
+    const after = E.planWeek("2026-10-12", {}, get);
+    expect(sum(after, "MATH")).toBeLessThanOrEqual(before - removed + 180);
+    expect(sum(after, "MATH")).toBeLessThan(before);
+  });
+
+  it("changer de matière, une demi-heure seulement, matière libre (« Médecine »)", () => {
+    const ds = "2026-10-06", { store, get } = mk();
+    let items = freeze(ds, {}, get);
+    const st = items.filter((it) => it.kind === "study");
+    const before = E.planDay(ds, {}).net;
+    // la première session devient de la chimie, d'une demi-heure
+    items = E.editDay(items, { type: "update", cid: st[1].cid, subj: "CHIM", s: st[1].s, e: st[1].s + 30 });
+    // la suivante devient « Médecine »
+    items = E.editDay(items, { type: "update", cid: st[2].cid, subj: "AUTRE", label: "Médecine" });
+    store[ds] = { custom: { items } };
+    const r = E.planDay(ds, {}, get);
+    noOverlap(r.items);
+    expect(r.net).toBe(before - (st[1].e - st[1].s - 30));
+    const s1 = r.items.find((it) => it.cid === st[1].cid);
+    expect([s1.e - s1.s, s1.tasks]).toEqual([30, [{ subj: "CHIM", kind: "custom", title: "Chimie", min: 30 }]]);
+    expect(r.bySubject["~Médecine"]).toBe(st[2].e - st[2].s);
+  });
+
+  it("un créneau ajouté par-dessus d'autres : ils sont raccourcis, coupés ou retirés", () => {
+    const ds = "2026-10-06", { get } = mk();
+    let items = freeze(ds, {}, get);
+    const big = items.find((it) => it.kind === "study" && it.e - it.s >= 90);
+    const mid = big.s + 30;
+    items = E.editDay(items, { type: "add", kind: "study", subj: "BIO", s: mid, e: mid + 30 });
+    noOverlap(items);
+    const parts = items.filter((it) => it.kind === "study" && (it.cid === big.cid || (it.s === mid + 30 && it.e === big.e)));
+    expect(parts.map((it) => [it.s, it.e])).toEqual([[big.s, mid], [mid + 30, big.e]]);
+    for (const p of parts) expect(p.tasks.reduce((a, t) => a + t.min, 0)).toBe(p.e - p.s);
+    expect(new Set(items.map((it) => it.cid)).size).toBe(items.length);
+    expect(new Set(items.map((it) => it.key)).size).toBe(items.length);
+  });
+
+  it("l'annale supprimée d'un jour revient plus tard dans la semaine", () => {
+    const ds = "2026-10-06", { store, get } = mk();
+    let items = freeze(ds, {}, get);
+    const ann = items.find((it) => it.kind === "study" && it.tasks.some((t) => t.kind === "goal"));
+    expect(ann).toBeDefined();
+    const title = ann.tasks[0].title;
+    items = E.editDay(items, { type: "remove", cid: ann.cid });
+    store[ds] = { custom: { items } };
+    const week = E.planWeek(ds, {}, get);
+    expect(titles(week[1])).not.toContain(title);
+    expect(week.slice(2).flatMap(titles)).toContain(title);
+  });
+
+  it("une séance perso (ex. « Cours de médecine ») compte comme une séance", () => {
+    const ds = "2026-10-10", { store, get } = mk();
+    let items = freeze(ds, {}, get);
+    items = E.editDay(items, { type: "add", kind: "fixed", subj: "AUTRE", label: "Cours de médecine", s: 600, e: 720 });
+    store[ds] = { custom: { items } };
+    const r = E.planDay(ds, {}, get);
+    noOverlap(r.items);
+    const fx = r.items.find((it) => it.kind === "fixed");
+    expect([E.evLabel(fx), fx.counts, E.hm(fx.s), E.hm(fx.e)]).toEqual(["Cours de médecine", true, "10:00", "12:00"]);
+    // la séance prend 20 min de pause (09:50–10:20) et 1h40 de l'annale (10:20–12:00) : +20 min
+    expect(r.net).toBe(540 + 20);
+  });
+
+  it("les heures restent sur la grille de 5 min et rien d'absurde n'est accepté", () => {
+    const ds = "2026-10-06", { get } = mk();
+    let items = freeze(ds, {}, get);
+    const st = items.find((it) => it.kind === "study");
+    expect(E.editDay(items, { type: "update", cid: st.cid, s: st.s, e: st.s + 2 })).toEqual(items); // < 5 min
+    expect(E.editDay(items, { type: "add", kind: "study", subj: "MATH", s: 900, e: 880 })).toEqual(items); // fin avant début
+    items = E.editDay(items, { type: "add", kind: "study", subj: "MATH", s: 901, e: 962 });
+    const add = items.find((it) => it.key.startsWith("custom#") && it.tasks?.[0].subj === "MATH");
+    expect([add.s, add.e]).toEqual([900, 960]);
+  });
+});

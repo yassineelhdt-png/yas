@@ -44,6 +44,7 @@
   --control: #8A94A0;
   --accent: #2554C7; --accent-ink: #FFFFFF; --accent-soft: #E8EEFA;
   --ok: #1E7A4C; --warn: #8F5600; --warn-soft: #FBF1E2;
+  --danger: #B42318; --danger-soft: #FDECEA;
   /* matières : teintes sourdes, lisibles en petit */
   --c-chim: #0E7C74; --c-phys: #4F4FB8; --c-math: #A65A0B; --c-bio: #2F7D3B; --c-medig: #6F665C;
   --c-chq2: #1B6A93; --c-conc: #B03A55; --c-rais: #9A3F79; --c-eth: #75569A; --c-rev: #4A6583;
@@ -81,6 +82,7 @@
     --bg: #0C0F13; --surface: #12161C; --surface-2: #171C23; --ink: #E6EAEF; --ink-2: #B4BDC7; --muted: #8791A0; --line: #262D36; --line-2: #1D232B; --control: #5E6875;
     --accent: #86A6F0; --accent-ink: #0C0F13; --accent-soft: #1A2440;
     --ok: #57B883; --warn: #E0A552; --warn-soft: #2E2517;
+    --danger: #F28B7D; --danger-soft: #33191A;
     --c-chim: #3DB8AE; --c-phys: #8F90EC; --c-math: #E3A150; --c-bio: #6BBF78; --c-medig: #B5AA9C;
     --c-chq2: #57AED8; --c-conc: #EB7C93; --c-rais: #D986B8; --c-eth: #B89BDD; --c-rev: #8FA9C8;
     --c-sport: #F0976A; --c-break: #5B6573;
@@ -93,6 +95,7 @@
   --bg: #0C0F13; --surface: #12161C; --surface-2: #171C23; --ink: #E6EAEF; --ink-2: #B4BDC7; --muted: #8791A0; --line: #262D36; --line-2: #1D232B; --control: #5E6875;
   --accent: #86A6F0; --accent-ink: #0C0F13; --accent-soft: #1A2440;
   --ok: #57B883; --warn: #E0A552; --warn-soft: #2E2517;
+  --danger: #F28B7D; --danger-soft: #33191A;
   --c-chim: #3DB8AE; --c-phys: #8F90EC; --c-math: #E3A150; --c-bio: #6BBF78; --c-medig: #B5AA9C;
   --c-chq2: #57AED8; --c-conc: #EB7C93; --c-rais: #D986B8; --c-eth: #B89BDD; --c-rev: #8FA9C8;
   --c-sport: #F0976A; --c-break: #5B6573;

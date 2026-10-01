@@ -38,6 +38,13 @@ export function methodView() {
         <li>À Erasme, tu restes sur place entre les cours ; depuis un autre lieu, les séances ont leurs trajets.</li>
       </ul>
 
+      <h2>Modifier ta journée</h2>
+      <ul>
+        <li>Bouton « Modifier la journée » au-dessus du planning : touche un créneau pour changer sa matière (chimie, physique… ou « Autre » avec un nom libre, ex. Médecine), son intitulé ou ses heures (30 min, 1h, 1h30, 2h), ou le supprimer. « Ajouter » crée une étude, une séance, une pause ou un repas, aussi dans un temps libre.</li>
+        <li>Ce que tu supprimes ne compte plus : ni dans les heures du jour, ni dans la répartition de la semaine (4h de maths supprimées sur 16h → 12h de maths). Une annale supprimée revient plus tard dans la semaine.</li>
+        <li>Une journée modifiée ne se recalcule plus toute seule (lever, lieu, replanification) ; « Revenir au plan automatique » efface tes changements de ce jour. « Annuler » défait la dernière modification.</li>
+      </ul>
+
       <h2>Objectifs de la semaine</h2>
       <ul>
         <li>Annales, théorie à rattraper, exercices… (Réglages → Objectifs de la semaine), pour chaque semaine ou pour une semaine précise.</li>

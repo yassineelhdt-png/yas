@@ -15,6 +15,8 @@ export const state = {
   date: null,
   sync: "local", // local | connecting | cloud | error
   replanOpen: false,
+  editing: false, // vue Jour en mode « Modifier »
+  sheet: null, // fiche de modification d'un créneau ouverte
   theme: "auto", // auto | light | dark
   toast: null
 };
@@ -264,7 +266,12 @@ export function parseBackup(text) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !isObj(v)) continue;
     const d = { ...v };
     for (const f of ["wake", "start", "end"]) if (d[f] !== undefined && !(typeof d[f] === "string" && TIME.test(d[f]))) delete d[f];
-    for (const f of ["done", "ov", "replan"]) if (d[f] !== undefined && !isObj(d[f])) delete d[f];
+    for (const f of ["done", "ov", "replan", "custom"]) if (d[f] !== undefined && !isObj(d[f])) delete d[f];
+    if (d.custom) {
+      const items = Array.isArray(d.custom.items) ? d.custom.items.filter((it) => isObj(it) && typeof it.kind === "string" && Number.isFinite(it.s) && Number.isFinite(it.e) && it.e > it.s) : null;
+      if (items) d.custom = { ...d.custom, items };
+      else delete d.custom;
+    }
     days[k] = d;
   }
   return { settings, days };

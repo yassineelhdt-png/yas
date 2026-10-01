@@ -8,4 +8,5 @@ export { SUBJ, TYPE, evLabel } from "./labels.js";
 export { weekNo, isBlocus, dayEvents } from "./events.js";
 export { planDay, planWeek, isEthique } from "./plan.js";
 export { PLACES, PLACE_KEYS, placeInfo } from "./places.js";
+export { CUSTOM_SUBJECTS, customName, studyTitle, freezeDay, editDay, gaps } from "./custom.js";
 export { GOAL_KINDS, GOAL_SUBJECTS, goalTitle, goalsOfWeek, goalUnits } from "./goals.js";

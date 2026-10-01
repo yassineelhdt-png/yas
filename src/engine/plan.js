@@ -255,6 +255,7 @@ function dayBlocks(goals, S, queue, hard, start) {
 
 function planOne(ds, S, getDay, backlog, weekMin, goals) {
   const day = getDay(ds) || {};
+  if (day.custom && Array.isArray(day.custom.items)) return planCustom(ds, S, getDay, backlog, weekMin, goals, day);
   const w = dow(ds);
   const wake = m(day.wake || S.wake);
   const place = placeOfDay(ds, w, S, day);
@@ -363,6 +364,82 @@ function placeGoal(ch, goals, weekMin, S) {
   return true;
 }
 
+// matière d'une tâche pour les totaux : « Autre » garde son nom (ex. « Médecine »)
+const totalKey = (subj, title) => (subj === "AUTRE" ? "~" + (title || "Autre") : rotKey(subj || "REV"));
+
+/** Ce qui compte dans l'objectif net : total, par matière, par bloc ; début et fin de l'étude. */
+function tally(res) {
+  let net = 0;
+  const byS = {};
+  for (const it of res.items) {
+    it.counts = !it.past && (it.kind === "study" || it.kind === "exam" || (it.kind === "fixed" && !it.missed));
+    if (!it.counts) continue;
+    net += it.e - it.s;
+    if (it.tasks) for (const tk of it.tasks) { const k = totalKey(tk.subj, tk.title); byS[k] = (byS[k] || 0) + tk.min; }
+    else { const k = totalKey(it.subj, it.title); byS[k] = (byS[k] || 0) + (it.e - it.s); }
+  }
+
+  // blocs, séparés par les repas, le sport et la grande pause
+  let bloc = 1, inBloc = 0;
+  for (const it of res.items) {
+    if (it.kind === "lunch" || it.kind === "dinner" || it.kind === "sport" || it.kind === "bigpause") {
+      if (inBloc) { bloc++; inBloc = 0; }
+      it.bloc = 0;
+    } else if (it.counts) { it.bloc = bloc; inBloc += it.e - it.s; }
+    else it.bloc = inBloc ? bloc : 0;
+  }
+  const blocs = {};
+  for (const it of res.items) if (it.counts && it.bloc) blocs[it.bloc] = (blocs[it.bloc] || 0) + (it.e - it.s);
+  res.blocs = blocs;
+
+  if (res.replanStudied) net += res.replanStudied;
+  res.net = net;
+  res.bySubject = byS;
+  const counted = res.items.filter((it) => it.counts);
+  res.studyEnd = counted.reduce((a, it) => Math.max(a, it.e), 0);
+  res.studyStart = counted.reduce((a, it) => Math.min(a, it.s), 1e9);
+}
+
+/**
+ * Journée modifiée à la main (day.custom.items) : ses créneaux remplacent le plan calculé. Le plan
+ * calculé sert seulement de base (séances du jour, lieu, ce qui est reporté au lendemain), sans
+ * toucher à la semaine ; ce qui reste dans la journée compte pour les objectifs et l'équilibre.
+ */
+function planCustom(ds, S, getDay, backlog, weekMin, goals, day) {
+  const plain = (d) => (d === ds ? { ...day, custom: undefined, replan: undefined } : getDay(d));
+  const res = planOne(ds, S, plain, backlog, { ...weekMin }, (goals || []).map((u) => ({ ...u })));
+  res.custom = true;
+  res.items = day.custom.items.filter((it) => it && it.e > it.s).map((it) => ({ ...it, tasks: it.tasks?.map((t) => ({ ...t })) })).sort(byStart);
+  res.missed = [];
+  res.fit = null;
+  res.closedAt = undefined;
+  res.replanAt = undefined;
+  res.replanStudied = 0;
+  res.warnings = [];
+  res.notes = [];
+  // séances : j'y vais = la séance est dans la journée
+  const inDay = new Set(res.items.filter((it) => it.kind === "fixed").map((it) => it.id));
+  res.events = res.events.map((ev) => ({ ...ev, attend: inDay.has(ev.id) }));
+  for (const it of res.items) {
+    for (const t of it.tasks || []) {
+      if (t.kind === "goal") {
+        const u = (goals || []).find((x) => x.gid === t.gid && x.left > 0);
+        if (u) u.left = Math.max(0, u.left - t.min);
+      }
+      const k = rotKey(t.subj);
+      if (weekMin[k] !== undefined) weekMin[k] += t.min;
+    }
+    if (!it.key) it.key = "custom#" + it.cid;
+  }
+  tally(res);
+  const last = res.items.at(-1);
+  res.workEnd = res.studyEnd || res.start;
+  res.end = last ? Math.max(last.e, res.workEnd) : res.workEnd;
+  if (res.studyStart < 1e9) res.start = Math.min(res.start, res.studyStart);
+  if (res.end > 23 * 60) res.warnings.push("La journée finit après 23h. Lève-toi plus tôt demain pour garder tes " + S.sleepH + "h de sommeil.");
+  return res;
+}
+
 /** Remplit les sessions, numérote les blocs, calcule les totaux et les alertes. */
 function finish(res, S, queue, weekMin, goals) {
   // segments = suites de sessions d'étude non coupées par une séance / une épreuve
@@ -404,36 +481,7 @@ function finish(res, S, queue, weekMin, goals) {
     }
   }
 
-  // ce qui compte dans l'objectif net
-  let net = 0;
-  const byS = {};
-  for (const it of res.items) {
-    it.counts = !it.past && (it.kind === "study" || it.kind === "exam" || (it.kind === "fixed" && !it.missed));
-    if (!it.counts) continue;
-    net += it.e - it.s;
-    if (it.tasks) for (const tk of it.tasks) { const k = rotKey(tk.subj); byS[k] = (byS[k] || 0) + tk.min; }
-    else { const k = rotKey(it.subj || "REV"); byS[k] = (byS[k] || 0) + (it.e - it.s); }
-  }
-
-  // blocs, séparés par les repas, le sport et la grande pause
-  let bloc = 1, inBloc = 0;
-  for (const it of res.items) {
-    if (it.kind === "lunch" || it.kind === "dinner" || it.kind === "sport" || it.kind === "bigpause") {
-      if (inBloc) { bloc++; inBloc = 0; }
-      it.bloc = 0;
-    } else if (it.counts) { it.bloc = bloc; inBloc += it.e - it.s; }
-    else it.bloc = inBloc ? bloc : 0;
-  }
-  const blocs = {};
-  for (const it of res.items) if (it.counts && it.bloc) blocs[it.bloc] = (blocs[it.bloc] || 0) + (it.e - it.s);
-  res.blocs = blocs;
-
-  if (res.replanStudied) net += res.replanStudied;
-  res.net = net;
-  res.bySubject = byS;
-  const counted = res.items.filter((it) => it.counts);
-  res.studyEnd = counted.reduce((a, it) => Math.max(a, it.e), 0);
-  res.studyStart = counted.reduce((a, it) => Math.min(a, it.s), 1e9);
+  tally(res);
 
   const fit = res.fit;
   // informations (pas des problèmes)
@@ -462,7 +510,7 @@ function finish(res, S, queue, weekMin, goals) {
     if (!parts.length) parts.push("pauses raccourcies");
     res.warnings.push("Pour faire tes " + S.targetH + "h avant " + hm(fit.endAt) + " : " + parts.join(", ") + ".");
   }
-  if (fit?.mode === "cut") res.warnings.push("Pour finir à " + hm(fit.endAt) + ", tu fais " + hdur(net) + " nettes au lieu de " + S.targetH + "h. Commence plus tôt ou recule l'heure de fin.");
+  if (fit?.mode === "cut") res.warnings.push("Pour finir à " + hm(fit.endAt) + ", tu fais " + hdur(res.net) + " nettes au lieu de " + S.targetH + "h. Commence plus tôt ou recule l'heure de fin.");
   if (fit?.mode === "late") res.warnings.push("Impossible de finir à " + hm(fit.endAt) + " : tes séances à l'unif (avec les trajets et le déjeuner) vont au-delà.");
   if (fit?.mode === "invalid") res.warnings.push("L'heure de fin (" + hm(fit.endAt) + ") tombe avant " + (res.mode === "concours" ? "la fin du concours blanc" : "le début") + " : elle est ignorée.");
   if (res.end > 23 * 60) res.warnings.push("La journée finit après 23h. Lève-toi plus tôt demain pour garder tes " + S.sleepH + "h de sommeil.");

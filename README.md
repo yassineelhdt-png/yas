@@ -71,6 +71,9 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
 - **Finitions visuelles** (audit de l'agent analyste-exhaustif) : échelle de texte à 7 tailles, espacements et rayons
   sur une échelle, carte « En ce moment » teintée, frise plus légère, créneaux faits / passés lisibles, Réglages
   plus nets, grille de la semaine contrastée, interrupteurs lisibles en sombre.
+- **Journée modifiable** (« Modifier la journée ») : supprimer un créneau, changer sa matière (ou un nom libre,
+  ex. Médecine), ses heures ou sa durée, ajouter une étude / une séance / une pause. Ce qui est supprimé ne compte
+  plus, ni dans le jour ni dans la répartition de la semaine ; « Revenir au plan automatique » pour tout effacer.
 - **Présences au choix, séance par séance**, directement dans le planning (« Je n'y vais pas » / « J'y vais ») ;
   cours théoriques par défaut par matière (Réglages). **Tutorat de bio** le mercredi 12:00–13:50 (G1-2-302) ; **permanence de maths** le lundi 12:00–14:00 (local à confirmer) ;
   **guidances de bio** avec leur thème (PDF du 22/09), guidance 1 du jeudi 1/10, séance des VETE en rechange.
@@ -117,6 +120,7 @@ src/
     goals.js       objectifs de la semaine
     tasks.js       quoi travailler dans chaque session
     plan.js        plan du jour / de la semaine (modes semaine, samedi, concours, congé)
+    custom.js      journée modifiée à la main (figer, supprimer, changer, ajouter)
   ui/            vues Jour, Semaine, Réglages, Méthode (lit-html)
   store.js       état, sauvegarde locale, synchro Claude, export / import
   styles/        CSS (couleurs, thèmes clair / sombre)

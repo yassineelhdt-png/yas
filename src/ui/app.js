@@ -1,8 +1,9 @@
 // Coquille de l'app : barre du haut, navigation (onglets / barre du bas), rendu, raccourcis, gestes.
-import { html, render } from "lit-html";
+import { html, render, nothing } from "lit-html";
 import * as E from "../engine/index.js";
 import { state, subscribe, notify, getDay, dataRev, firstDay, viewFromHash } from "../store.js";
 import { dayView } from "./day.js";
+import { editSheet, edit } from "./edit.js";
 import { weekView } from "./week.js";
 import { settingsView } from "./settings.js";
 import { methodView } from "./method.js";
@@ -52,7 +53,7 @@ function withTransition(kind, mutate) {
 // ---------- navigation ----------
 function applyView(view) {
   if (view === state.view) return;
-  withTransition("fade", () => { state.view = view; state.replanOpen = false; });
+  withTransition("fade", () => { state.view = view; state.replanOpen = false; state.sheet = null; state.editing = false; });
   window.scrollTo(0, 0);
 }
 
@@ -80,7 +81,7 @@ function goView(view) {
 
 function setDate(ds, dir) {
   if (ds === state.date) return;
-  withTransition(dir > 0 ? "next" : "prev", () => { state.date = ds; state.replanOpen = false; });
+  withTransition(dir > 0 ? "next" : "prev", () => { state.date = ds; state.replanOpen = false; state.sheet = null; });
 }
 
 const nav = {
@@ -134,6 +135,7 @@ function shell() {
     </header>
     <main id="main" class="wrap view-${state.view}">${currentView()}</main>
     <nav class="bottomnav" role="tablist" aria-label="Vues">${tabButtons("btab")}</nav>
+    ${state.sheet && state.view === "jour" ? editSheet(plan("day", state.date)) : nothing}
     <div class="toast ${state.toast ? "show" : ""}" role="status" aria-live="polite">${state.toast || ""}</div>`;
 }
 
@@ -153,10 +155,19 @@ function applyTheme() {
   native?.then((n) => n.setBarsDark(dark));
 }
 
+let sheetWas = false;
 function renderNow() {
   scheduled = false;
   applyTheme();
+  const open = !!(state.sheet && state.view === "jour");
+  document.documentElement.classList.toggle("sheet-open", open);
   render(shell(), root);
+  // bas de l'en-tête collant : la barre « Modifier » se cale juste dessous
+  const topEnd = document.querySelector(".top")?.getBoundingClientRect().bottom;
+  if (topEnd > 0) document.documentElement.style.setProperty("--top-end", Math.round(topEnd) + "px");
+  // fiche qui s'ouvre : le focus y va (clavier, lecteur d'écran), sans ouvrir de clavier sur mobile
+  if (open && !sheetWas) document.querySelector(".sheet")?.focus({ preventScroll: true });
+  sheetWas = open;
 }
 
 let scheduled = false;
@@ -188,6 +199,10 @@ function tick() {
 // ---------- clavier (PC) ----------
 function onKey(e) {
   if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (state.sheet) {
+    if (e.key === "Escape") { e.preventDefault(); edit.close(); }
+    return;
+  }
   if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
   const step = state.view === "semaine" ? 7 : state.view === "jour" ? 1 : 0;
   if (e.key === "ArrowLeft" && step) nav.go(-step);
@@ -203,7 +218,7 @@ function bindSwipe(el) {
   let start = null;
   el.addEventListener("touchstart", (e) => {
     start = null;
-    if (state.view !== "jour" || e.touches.length !== 1) return;
+    if (state.view !== "jour" || state.sheet || e.touches.length !== 1) return;
     const t = e.touches[0];
     // bords de l'écran réservés aux gestes du système ; champs et interrupteurs ignorés
     if (t.clientX < 24 || t.clientX > window.innerWidth - 24) return;

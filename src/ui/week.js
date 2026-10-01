@@ -55,7 +55,11 @@ export function weekView(week, nav) {
     for (const [k, v] of Object.entries(r.bySubject)) tot[k] = (tot[k] || 0) + v;
     for (const it of r.items) if (it.kind === "fixed" && it.counts) fixed += it.e - it.s;
   }
-  const mx = Math.max(1, ...TOTAL_ORDER.map((k) => tot[k] || 0));
+  // matières de la semaine : les habituelles, puis celles ajoutées à la main (« ~Médecine »)
+  const keys = [...TOTAL_ORDER.filter((k) => tot[k]), ...Object.keys(tot).filter((k) => !TOTAL_ORDER.includes(k) && tot[k]).sort()];
+  const name = (k) => (k.startsWith("~") ? k.slice(1) : NAMES[k] || E.SUBJ[k] || k);
+  const mx = Math.max(1, ...keys.map((k) => tot[k]));
+  const edited = week.filter((r) => r.custom).length;
   // bilan : prévu et coché, jour par jour
   const days = week.map((r) => {
     const done = (getDay(r.date) || {}).done || {};
@@ -106,7 +110,7 @@ export function weekView(week, nav) {
         <div class="totals">
           ${days.map(({ r, did }) => html`
             <button class="tot day ${r.date === today ? "today" : ""}" @click=${() => nav.openDay(r.date)}>
-              <span>${shortDay(r.date)}</span>
+              <span>${shortDay(r.date)}${r.custom ? html` <small class="modtag" title="Journée modifiée à la main">modifiée</small>` : nothing}</span>
               <div class="b" role="progressbar" aria-valuemin="0" aria-valuemax=${r.net} aria-valuenow=${did} aria-label=${"Coché le " + shortDay(r.date)}><span style="width:${Math.min(100, (did / Math.max(1, r.net)) * 100).toFixed(1)}%"></span></div>
               <em>${E.hdur(did)} / ${E.hdur(r.net)}</em>
             </button>`)}
@@ -115,10 +119,10 @@ export function weekView(week, nav) {
       ${goalsCard(week, { onEdit: nav.editGoals })}
       <div class="card">
         <h2>Répartition de la semaine</h2>
-        <p class="sub">${E.hdur(net)} nettes au total, dont ${E.hdur(fixed)} en séances à l'unif.</p>
+        <p class="sub">${E.hdur(net)} nettes au total, dont ${E.hdur(fixed)} en séances à l'unif.${edited ? " Journées modifiées à la main : ce que tu as supprimé n'est pas compté." : ""}</p>
         <div class="totals">
-          ${TOTAL_ORDER.filter((k) => tot[k]).map((k) => html`
-            <div class="tot" style="--c:${cv(k)}"><span>${NAMES[k]}</span><div class="b"><span style="width:${((tot[k] / mx) * 100).toFixed(1)}%"></span></div><em>${E.hdur(tot[k])}</em></div>`)}
+          ${keys.map((k) => html`
+            <div class="tot" style="--c:${cv(k)}"><span>${name(k)}</span><div class="b"><span style="width:${((tot[k] / mx) * 100).toFixed(1)}%"></span></div><em>${E.hdur(tot[k])}</em></div>`)}
         </div>
       </div>
       <div class="card">

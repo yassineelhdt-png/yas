@@ -1,12 +1,12 @@
 export const SUBJ = {
   CHIM: "Chimie", PHYS: "Physique", MATH: "Maths", BIO: "Bio", BIO2: "Bio", MEDIG: "MEDIG",
-  CHQ2: "Chimie Q2", CONC: "Concours", REV: "Révision", RAIS: "Raisonnement", ETH: "Éthique & empathie"
+  CHQ2: "Chimie Q2", CONC: "Concours", REV: "Révision", RAIS: "Raisonnement", ETH: "Éthique & empathie", AUTRE: "Autre"
 };
 
 export const TYPE = {
   TH: "Cours théorique", SEM: "Séminaire", EX: "Exercices", TP: "TP", APPUI: "Appui pédagogique",
   TEST: "Interrogation", INFO: "Infos examen", VISITE: "Visite de copies", GUID: "Guidance", PERM: "Permanence",
-  TUT: "Tutorat"
+  TUT: "Tutorat", PERSO: "Séance"
 };
 
 /** Libellé lisible d'une séance à l'unif. */
@@ -23,6 +23,7 @@ export function evLabel(ev) {
     case "TEST": return "Interro de " + n;
     case "INFO": return "Infos examen " + n;
     case "VISITE": return "Visite de copies " + n;
+    case "PERSO": return ev.title || "Séance";
     default: return "Cours de " + n + (ev.note ? " · " + ev.note : "");
   }
 }
