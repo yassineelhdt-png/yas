@@ -416,10 +416,16 @@ function tally(res) {
  * Journée modifiée à la main (day.custom.items) : ses créneaux remplacent le plan calculé. Le plan
  * calculé sert seulement de base (séances du jour, lieu, ce qui est reporté au lendemain), sans
  * toucher à la semaine ; ce qui reste dans la journée compte pour les objectifs et l'équilibre.
+ * Un bloc d'objectif (annale…) supprimé ou raccourci ici est abandonné pour la semaine : il n'est
+ * pas replacé un autre jour ni le samedi (res.goalDropped : minutes abandonnées par objectif).
  */
 function planCustom(ds, S, getDay, backlog, weekMin, goals, day) {
   const plain = (d) => (d === ds ? { ...day, custom: undefined, replan: undefined } : getDay(d));
-  const res = planOne(ds, S, plain, backlog, { ...weekMin }, (goals || []).map((u) => ({ ...u })));
+  const base = (goals || []).map((u) => ({ ...u })), baseMin = { ...weekMin };
+  const res = planOne(ds, S, plain, backlog, baseMin, base);
+  // objectifs prévus ce jour-là par le plan calculé
+  const planned = {};
+  for (const it of res.items) for (const t of it.tasks || []) if (t.kind === "goal") planned[t.gid] = (planned[t.gid] || 0) + t.min;
   res.custom = true;
   res.items = day.custom.items.filter((it) => it && it.e > it.s).map((it) => ({ ...it, tasks: it.tasks?.map((t) => ({ ...t })) })).sort(byStart);
   res.missed = [];
@@ -437,6 +443,7 @@ function planCustom(ds, S, getDay, backlog, weekMin, goals, day) {
   res.events = res.events.map((ev) => ({ ...ev, attend: inDay.has(ev.id) }));
   // dimanche : la partie éthique est celle de la journée (supprimée = pas d'éthique)
   if (res.mode === "concours") res.ethique = res.items.some((it) => it.kind === "exam" && it.subj === "ETH");
+  const mine = {};
   for (const it of res.items) {
     for (const t of it.tasks || []) {
       if (t.kind === "goal") {
@@ -444,10 +451,20 @@ function planCustom(ds, S, getDay, backlog, weekMin, goals, day) {
         if (u) u.left = Math.max(0, u.left - t.min);
       }
       const k = rotKey(t.subj);
-      if (weekMin[k] !== undefined) weekMin[k] += t.min;
+      if (weekMin[k] !== undefined) mine[k] = (mine[k] || 0) + t.min;
     }
     if (!it.key) it.key = "custom#" + it.cid;
   }
+  // équilibre des matières : ce que le plan prévoyait ce jour-là compte comme fait, pour que les jours
+  // suivants ne rajoutent pas ce que tu as supprimé (4h de maths supprimées = 4h de maths en moins)
+  for (const k of Object.keys(weekMin)) weekMin[k] += Math.max(mine[k] || 0, baseMin[k] - weekMin[k]);
+  // ce que le plan prévoyait ce jour-là est consommé, même si la journée modifiée en a moins :
+  // l'objectif supprimé (ou la partie raccourcie) ne revient pas plus tard dans la semaine
+  (goals || []).forEach((u, i) => { u.left = Math.min(u.left, base[i].left); });
+  const kept = {};
+  for (const it of res.items) for (const t of it.tasks || []) if (t.kind === "goal") kept[t.gid] = (kept[t.gid] || 0) + t.min;
+  res.goalDropped = {};
+  for (const [gid, min] of Object.entries(planned)) if (min > (kept[gid] || 0)) res.goalDropped[gid] = min - (kept[gid] || 0);
   tally(res);
   const last = res.items.at(-1);
   res.workEnd = res.studyEnd || res.start;

@@ -73,7 +73,8 @@ Ouverte comme artefact Claude, l'app se synchronise automatiquement avec le comp
   plus nets, grille de la semaine contrastée, interrupteurs lisibles en sombre.
 - **Journée modifiable** (« Modifier la journée ») : supprimer un créneau, changer sa matière (ou un nom libre,
   ex. Médecine), ses heures ou sa durée, ajouter une étude / une séance / une pause / un repas. Ce qui est supprimé ne compte
-  plus, ni dans le jour ni dans la répartition de la semaine ; « Revenir au plan automatique » pour tout effacer.
+  plus, ni dans le jour ni dans la répartition de la semaine (pas de rattrapage les jours suivants) ; une annale
+  supprimée est abandonnée pour la semaine ; « Revenir au plan automatique » pour tout effacer.
 - **Présences au choix, séance par séance**, directement dans le planning (« Je n'y vais pas » / « J'y vais ») ;
   cours théoriques par défaut par matière (Réglages). **Tutorat de bio** le mercredi 12:00–13:50 (G1-2-302) ; **permanence de maths** le lundi 12:00–14:00 (local à confirmer) ;
   **guidances de bio** avec leur thème (PDF du 22/09), guidance 1 du jeudi 1/10, séance des VETE en rechange.

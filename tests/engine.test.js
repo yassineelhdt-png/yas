@@ -621,17 +621,21 @@ describe("journée modifiée à la main", () => {
     expect(new Set(items.map((it) => it.key)).size).toBe(items.length);
   });
 
-  it("l'annale supprimée d'un jour revient plus tard dans la semaine", () => {
+  it("l'annale supprimée d'un jour est abandonnée pour la semaine (pas replacée, ni le samedi)", () => {
     const ds = "2026-10-06", { store, get } = mk();
+    const goalSum = (week) => week.reduce((a, r) => a + r.items.reduce((b, it) => b + (it.tasks || []).filter((t) => t.kind === "goal").reduce((c, t) => c + t.min, 0), 0), 0);
+    const before = goalSum(E.planWeek(ds, {}, get));
     let items = freeze(ds, {}, get);
     const ann = items.find((it) => it.kind === "study" && it.tasks.some((t) => t.kind === "goal"));
     expect(ann).toBeDefined();
-    const title = ann.tasks[0].title;
+    const title = ann.tasks[0].title, len = ann.e - ann.s;
     items = E.editDay(items, { type: "remove", cid: ann.cid });
     store[ds] = { custom: { items } };
     const week = E.planWeek(ds, {}, get);
-    expect(titles(week[1])).not.toContain(title);
-    expect(week.slice(2).flatMap(titles)).toContain(title);
+    expect(week.flatMap(titles)).not.toContain(title);
+    // les autres annales de la semaine ne bougent pas : on perd exactement le bloc supprimé
+    expect(goalSum(week)).toBe(before - len);
+    expect(week[1].goalDropped).toEqual({ [ann.tasks[0].gid]: len });
   });
 
   it("une séance perso (ex. « Cours de médecine ») compte comme une séance", () => {
@@ -738,6 +742,28 @@ describe("samedi, lever tardif", () => {
       expect(seq[i + 1].kind, wake).toBe("lunch");
       expect(seq[i + 2].goal, wake).not.toBeUndefined();
       expect(sat.net, wake).toBe(540);
+    }
+  });
+});
+
+describe("supprimé = abandonné pour la semaine", () => {
+  it("4h d'annale de maths supprimées : exactement 4h de maths en moins dans la semaine (cours ou vacances)", () => {
+    for (const mon of ["2026-11-09", "2026-12-21"]) {
+      const store = {}, get = (d) => store[d] || null;
+      const maths = (w) => w.reduce((a, r) => a + (r.bySubject.MATH || 0), 0);
+      const w0 = E.planWeek(mon, {}, get), before = maths(w0);
+      const day = w0.find((r) => r.items.some((it) => (it.tasks || []).some((t) => t.gid === "annale-math")));
+      let items = E.freezeDay(day), len = 0;
+      for (const it of items.filter((x) => (x.tasks || []).some((t) => t.gid === "annale-math"))) {
+        items = E.editDay(items, { type: "remove", cid: it.cid });
+        len += it.e - it.s;
+      }
+      store[day.date] = { custom: { items } };
+      const w1 = E.planWeek(mon, {}, get);
+      expect(len, mon).toBe(240);
+      expect(maths(w1), mon).toBe(before - 240);
+      // l'annale n'est replacée nulle part
+      expect(w1.some((r) => r.items.some((it) => (it.tasks || []).some((t) => t.gid === "annale-math"))), mon).toBe(false);
     }
   });
 });

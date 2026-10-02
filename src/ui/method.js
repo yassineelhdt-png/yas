@@ -47,7 +47,7 @@ export function methodView() {
       <h2>Modifier ta journée</h2>
       <ul>
         <li>Bouton « Modifier la journée » au-dessus du planning : touche un créneau pour changer sa matière (chimie, physique… ou « Autre » avec un nom libre, ex. Médecine), son intitulé ou ses heures (30 min, 1h, 1h30, 2h), ou le supprimer. « Ajouter » crée une étude, une séance, une pause ou un repas, aussi dans un temps libre.</li>
-        <li>Ce que tu supprimes ne compte plus : ni dans les heures du jour, ni dans la répartition de la semaine (4h de maths supprimées sur 16h → 12h de maths). Une annale supprimée est replacée plus tard dans la semaine (ou le samedi matin) s'il reste du temps libre ; sinon, la carte « Objectifs de la semaine » indique ce qui manque.</li>
+        <li>Ce que tu supprimes ne compte plus : ni dans les heures du jour, ni dans la répartition de la semaine (4h de maths supprimées sur 16h → 12h de maths). Une annale supprimée (ou raccourcie) est abandonnée pour la semaine : elle n'est replacée ni un autre jour ni le samedi, et la carte « Objectifs de la semaine » l'indique.</li>
         <li>Une journée modifiée ne se recalcule plus toute seule (lever, lieu, replanification) ; « Revenir au plan automatique » efface tes changements de ce jour. « Annuler » défait la dernière modification.</li>
       </ul>
 
